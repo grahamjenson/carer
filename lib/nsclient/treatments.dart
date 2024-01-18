@@ -59,10 +59,15 @@ class Treatments {
   Treatments({required this.treatments});
 
   factory Treatments.fromJson(String jsonString) {
-    final List<dynamic> jsonList = json.decode(jsonString);
-    List<Treatment> treatmentsList =
-        jsonList.map((json) => Treatment.fromJson(json)).toList();
+    try {
+      final List<dynamic> jsonList = json.decode(jsonString);
+      List<Treatment> treatmentsList =
+          jsonList.map((json) => Treatment.fromJson(json)).toList();
 
-    return Treatments(treatments: treatmentsList);
+      return Treatments(treatments: treatmentsList);
+    } catch (e) {
+      print("Error parsing treatments: $e");
+      return Treatments(treatments: []);
+    }
   }
 }

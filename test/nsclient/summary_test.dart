@@ -17,4 +17,11 @@ void main() {
 
     // ... add more assertions as needed
   });
+
+  test('parsing bad summary will error correctly', () async {
+    final file = File(files["summary_bad"]!);
+    final jsonString = await file.readAsString();
+
+    expect(() => Summary.fromJson(jsonString), throwsException);
+  });
 }

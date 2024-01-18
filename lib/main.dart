@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:carer/homepage.dart';
+import 'package:carer/utils/env.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  // print all environmnet variables
   runApp(const MyApp());
 }
 

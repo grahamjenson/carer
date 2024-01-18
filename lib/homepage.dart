@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carer/nsclient/entries.dart';
 
 import 'package:carer/nsclient/nsclient.dart';
@@ -69,14 +71,13 @@ class _HomePageState extends State<HomePage> {
                 return const CircularProgressIndicator();
               }
 
-              var first  = entries.firstOrNull();
+              var first = entries.firstOrNull();
               if (first == null) {
                 return const CircularProgressIndicator();
               }
 
               print('PRINTING DATA: ${first.sgv! / 18}');
               return Text('DATA: ${first.sgv! / 18}');
-              
             }),
           ),
         ));

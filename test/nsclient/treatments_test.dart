@@ -8,7 +8,7 @@ import 'fixtures/files.dart';
 
 void main() {
   test('basic_treatments parse check', () async {
-    final file = File(files["basic_treatments"]!);
+    final file = File(files["treatments_basic"]!);
     final jsonString = await file.readAsString();
 
     Treatments treatments = Treatments.fromJson(jsonString);
@@ -31,5 +31,15 @@ void main() {
 
     expect(treatments.treatments, isA<List<Treatment>>());
     expect(treatments.treatments.length, equals(552));
+  });
+
+  test('treatmens paring bad data and erroring correctly', () async {
+    final file = File(files["treatments_bad"]!);
+    final jsonString = await file.readAsString();
+
+    Treatments treatments = Treatments.fromJson(jsonString);
+
+    expect(treatments.treatments, isA<List<Treatment>>());
+    expect(treatments.treatments.length, equals(0));
   });
 }

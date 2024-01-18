@@ -8,7 +8,7 @@ import 'fixtures/files.dart';
 void main() {
   test('Entries.fromJson should parse JSON and create Entries object',
       () async {
-    final file = File(files["basic_entries"]!);
+    final file = File(files["entries_basic"]!);
     final jsonString = await file.readAsString();
 
     Entries entries = Entries.fromJson(jsonString);
@@ -19,7 +19,7 @@ void main() {
     Entry entry = entries.entries[0];
     expect(entry.id, equals("65a842f04b47405049900d0"));
     expect(entry.app, equals("AAPS"));
-    // ... add more expectations for other properties
+    expect(entry.date, equals(DateTime.parse("2021-09-01T00:00:00.000Z")));
   });
 
   test('Entries.fromJson should parse JSON and create Entries object',
@@ -31,5 +31,12 @@ void main() {
 
     expect(entries.entries, isNotEmpty);
     expect(entries.entries.length, equals(1000));
+  });
+
+  test('parsing bad entries will error correctly', () async {
+    final file = File(files["entries_bad"]!);
+    final jsonString = await file.readAsString();
+
+    expect(() => Entries.fromJson(jsonString), throwsException);
   });
 }
