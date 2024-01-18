@@ -1,0 +1,10 @@
+{
+  "cob": {
+    "cob": 22.76624074074075,
+    "source": "OpenAPS",
+    "device": "openaps://CUBOT KINGKONG MINI 3",
+    "mills": 1705527514133,
+    "display": 22.8,
+    "displayLine": "COB: 22.8g"
+  }
+}
