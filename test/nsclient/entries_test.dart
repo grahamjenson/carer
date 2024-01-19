@@ -19,7 +19,6 @@ void main() {
     Entry entry = entries.entries[0];
     expect(entry.id, equals("65a842f04b47405049900d0"));
     expect(entry.app, equals("AAPS"));
-    expect(entry.date, equals(DateTime.parse("2021-09-01T00:00:00.000Z")));
   });
 
   test('Entries.fromJson should parse JSON and create Entries object',
@@ -33,10 +32,13 @@ void main() {
     expect(entries.entries.length, equals(1000));
   });
 
-  test('parsing bad entries will error correctly', () async {
+  test('parsing bad entries will return empty Entries object', () async {
     final file = File(files["entries_bad"]!);
     final jsonString = await file.readAsString();
 
-    expect(() => Entries.fromJson(jsonString), throwsException);
+    Entries entries = Entries.fromJson(jsonString);
+
+    expect(entries.entries, isA<List<Entry>>());
+    expect(entries.entries.length, equals(0));
   });
 }

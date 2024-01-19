@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:carer/utils/errors.dart';
+
 class Entry {
   String id;
   String app;
@@ -63,20 +65,26 @@ class Entry {
 }
 
 class Entries {
-    List<Entry> _entries;
+  List<Entry> entries;
 
-    bool isEmpty() => _entries.isEmpty;
-    Entry? firstOrNull () => entries.firstOrNull;
+  bool isEmpty() => entries.isEmpty;
+  Entry? firstOrNull() => entries.firstOrNull;
 
-    Entries(List<Entry> entries) : _entries = entries;
-    
-    factory Entries.fromJson(String jsonStr) {
+  Entries({
+    required this.entries,
+  });
+
+  factory Entries.fromJson(String jsonStr) {
+    try {
       final List<dynamic> jsonList = json.decode(jsonStr);
-      List<Entry> entries = jsonList.map((json) => Entry.fromJson(json)).toList();
-      return Entries(entries);
+      List<Entry> entries =
+          jsonList.map((json) => Entry.fromJson(json)).toList();
+      return Entries(entries: entries);
+    } catch (e, stackTrace) {
+      Errors.captureException(e, stackTrace: stackTrace);
+      return Entries(entries: []);
     }
-  
-    List<Entry> get entries => _entries;
-  
-    // Add any additional methods or properties as needed
   }
+
+  // Add any additional methods or properties as needed
+}

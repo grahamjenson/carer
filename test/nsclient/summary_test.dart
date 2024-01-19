@@ -10,6 +10,8 @@ void main() {
     final file = File(files["summary"]!);
     final jsonString = await file.readAsString();
 
+    print(jsonString);
+
     Summary summary = Summary.fromJson(jsonString);
 
     // Add your assertions here based on your data and the structure of your objects
@@ -18,10 +20,12 @@ void main() {
     // ... add more assertions as needed
   });
 
-  test('parsing bad summary will error correctly', () async {
+  test('parsing bad summary return enmpty Summary object', () async {
     final file = File(files["summary_bad"]!);
     final jsonString = await file.readAsString();
 
-    expect(() => Summary.fromJson(jsonString), throwsException);
+    Summary summary = Summary.fromJson(jsonString);
+
+    expect(summary.sgvs.sgvs.length, equals(0));
   });
 }

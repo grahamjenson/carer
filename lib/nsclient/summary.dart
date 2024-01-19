@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:carer/nsclient/shared.dart';
+import 'package:carer/utils/errors.dart';
+
 class SGV {
   int sgv;
   DateTime mills;
@@ -37,19 +40,19 @@ class TempBasal {
   }
 }
 
-class Treatment {
+class SummaryTreatment {
   DateTime mills;
   double? insulin;
   int? carbs;
 
-  Treatment({
+  SummaryTreatment({
     required this.mills,
     this.insulin,
     this.carbs,
   });
 
-  factory Treatment.fromJson(Map<String, dynamic> json) {
-    return Treatment(
+  factory SummaryTreatment.fromJson(Map<String, dynamic> json) {
+    return SummaryTreatment(
       mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
       insulin: json['insulin']?.toDouble(),
       carbs: json['carbs'],
@@ -103,9 +106,9 @@ class State {
 
   factory State.fromJson(Map<String, dynamic> json) {
     return State(
-      iob: json['iob'],
+      iob: json['iob'].toDouble(),
       cob: json['cob'],
-      bwp: json['bwp'],
+      bwp: json['bwp'].toDouble(),
       cage: json['cage'],
       iage: json['iage'],
       bage: json['bage'],
@@ -114,79 +117,109 @@ class State {
   }
 }
 
-class SGVCollection {
+class SGVs {
   List<SGV> sgvs;
 
-  SGVCollection({
+  SGVs({
     required this.sgvs,
   });
 
-  factory SGVCollection.fromJson(List<dynamic> json) {
+  factory SGVs.fromJson(List<dynamic> json) {
     List<SGV> sgvs = json.map((sgvJson) => SGV.fromJson(sgvJson)).toList();
-    return SGVCollection(sgvs: sgvs);
+    return SGVs(sgvs: sgvs);
   }
 }
 
-class TempBasalCollection {
+class TempBasals {
   List<TempBasal> tempBasals;
 
-  TempBasalCollection({
+  TempBasals({
     required this.tempBasals,
   });
 
-  factory TempBasalCollection.fromJson(List<dynamic> json) {
+  factory TempBasals.fromJson(List<dynamic> json) {
     List<TempBasal> tempBasals =
         json.map((tempBasalJson) => TempBasal.fromJson(tempBasalJson)).toList();
-    return TempBasalCollection(tempBasals: tempBasals);
+    return TempBasals(tempBasals: tempBasals);
   }
 }
 
-class TreatmentCollection {
-  List<Treatment> treatments;
+class SummaryTreatments {
+  List<SummaryTreatment> treatments;
 
-  TreatmentCollection({
+  SummaryTreatments({
     required this.treatments,
   });
 
-  factory TreatmentCollection.fromJson(List<dynamic> json) {
-    List<Treatment> treatments =
-        json.map((treatmentJson) => Treatment.fromJson(treatmentJson)).toList();
-    return TreatmentCollection(treatments: treatments);
+  factory SummaryTreatments.fromJson(List<dynamic> json) {
+    List<SummaryTreatment> treatments = json
+        .map((treatmentJson) => SummaryTreatment.fromJson(treatmentJson))
+        .toList();
+    return SummaryTreatments(treatments: treatments);
   }
 }
 
-class TargetCollection {
+class Targets {
   List<Target> targets;
 
-  TargetCollection({
+  Targets({
     required this.targets,
   });
 
-  factory TargetCollection.fromJson(List<dynamic> json) {
+  factory Targets.fromJson(List<dynamic> json) {
     List<Target> targets =
         json.map((targetJson) => Target.fromJson(targetJson)).toList();
-    return TargetCollection(targets: targets);
+    return Targets(targets: targets);
   }
 }
 
-class StateCollection {
-  State state;
+class Profile {
+  int dia;
+  List<TimeValue> carbratio;
+  List<TimeValue> sens;
+  List<TimeValue> basal;
+  List<TimeValue> targetLow;
+  List<TimeValue> targetHigh;
+  String units;
+  String timezone;
 
-  StateCollection({
-    required this.state,
+  Profile({
+    required this.dia,
+    required this.carbratio,
+    required this.sens,
+    required this.basal,
+    required this.targetLow,
+    required this.targetHigh,
+    required this.units,
+    required this.timezone,
   });
 
-  factory StateCollection.fromJson(Map<String, dynamic> json) {
-    return StateCollection(state: State.fromJson(json));
+  factory Profile.fromJson(Map<String, dynamic> json) {
+    return Profile(
+      dia: json['dia'],
+      carbratio: List<TimeValue>.from(
+          json['carbratio'].map((item) => TimeValue.fromJson(item))),
+      sens: List<TimeValue>.from(
+          json['sens'].map((item) => TimeValue.fromJson(item))),
+      basal: List<TimeValue>.from(
+          json['basal'].map((item) => TimeValue.fromJson(item))),
+      targetLow: List<TimeValue>.from(
+          json['target_low'].map((item) => TimeValue.fromJson(item))),
+      targetHigh: List<TimeValue>.from(
+          json['target_high'].map((item) => TimeValue.fromJson(item))),
+      units: json['units'],
+      timezone: json['timezone'],
+    );
   }
 }
 
 class Summary {
-  SGVCollection sgvs;
-  TempBasalCollection tempBasals;
-  TreatmentCollection treatments;
-  TargetCollection targets;
-  StateCollection state;
+  SGVs sgvs;
+  TempBasals tempBasals;
+  SummaryTreatments treatments;
+  Targets targets;
+  State state;
+  Profile profile;
 
   Summary({
     required this.sgvs,
@@ -194,18 +227,47 @@ class Summary {
     required this.treatments,
     required this.targets,
     required this.state,
+    required this.profile,
   });
 
   factory Summary.fromJson(String jsonString) {
-    var json = jsonDecode(jsonString);
-    return Summary(
-      sgvs: SGVCollection.fromJson(json['sgvs']),
-      tempBasals:
-          TempBasalCollection.fromJson(json['treatments']['tempBasals']),
-      treatments:
-          TreatmentCollection.fromJson(json['treatments']['treatments']),
-      targets: TargetCollection.fromJson(json['treatments']['targets']),
-      state: StateCollection.fromJson(json['state']),
-    );
+    try {
+      var json = jsonDecode(jsonString);
+      return Summary(
+        sgvs: SGVs.fromJson(json['sgvs']),
+        tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
+        treatments:
+            SummaryTreatments.fromJson(json['treatments']['treatments']),
+        targets: Targets.fromJson(json['treatments']['targets']),
+        state: State.fromJson(json['state']),
+        profile: Profile.fromJson(json['profile']),
+      );
+    } catch (e, stackTrace) {
+      Errors.captureException(e, stackTrace: stackTrace);
+      return Summary(
+        sgvs: SGVs(sgvs: []),
+        tempBasals: TempBasals(tempBasals: []),
+        treatments: SummaryTreatments(treatments: []),
+        targets: Targets(targets: []),
+        state: State(
+          iob: 0,
+          cob: 0,
+          bwp: 0,
+          cage: 0,
+          iage: 0,
+          bage: 0,
+          battery: 0,
+        ),
+        profile: Profile(
+            dia: 1,
+            carbratio: [],
+            sens: [],
+            basal: [],
+            targetLow: [],
+            targetHigh: [],
+            units: "",
+            timezone: ""),
+      );
+    }
   }
 }

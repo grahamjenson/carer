@@ -33,7 +33,8 @@ void main() {
     expect(treatments.treatments.length, equals(552));
   });
 
-  test('treatmens paring bad data and erroring correctly', () async {
+  test('treatments paring bad data will return empty Treatments object',
+      () async {
     final file = File(files["treatments_bad"]!);
     final jsonString = await file.readAsString();
 

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:carer/utils/errors.dart';
+
 class Treatment {
   String id;
   String app;
@@ -65,8 +67,8 @@ class Treatments {
           jsonList.map((json) => Treatment.fromJson(json)).toList();
 
       return Treatments(treatments: treatmentsList);
-    } catch (e) {
-      print("Error parsing treatments: $e");
+    } catch (e, stackTrace) {
+      Errors.captureException(e, stackTrace: stackTrace);
       return Treatments(treatments: []);
     }
   }
