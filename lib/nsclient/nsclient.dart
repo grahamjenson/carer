@@ -4,7 +4,6 @@ import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/settings.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 Uri entryEndpoint(nsURL, token) =>
     Uri.parse('$nsURL/api/v1/entries.json?token=$token');

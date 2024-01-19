@@ -8,7 +8,7 @@ class Errors {
     ScopeCallback? withScope,
   }) async {
     // TODO actuall handle error here, or reraise
-    print("THROWING ${throwable}");
+    print("THROWING $throwable");
     print(stackTrace);
   }
 }
