@@ -48,16 +48,17 @@ class _HomePageState extends State<HomePage> {
 
     if (summaryToBeUpdated) {
       summaryToBeUpdated = false;
-      var future = NSClient().getSummary();
-      future.then((value) {
+      NSClient().getSummary().catchError((e) {
+        log("GETTING SUMMARY ERROR: $e");
+        summaryToBeUpdated = true;
+        return Summary.empty();
+      }).then((value) {
+        if (value.dateRetrieved == Dates.earliest) {
+          return;
+        }
         setState(() {
           summary = value;
         });
-      });
-
-      future.catchError((e) {
-        log("GETTING SUMMARY ERROR: $e");
-        summaryToBeUpdated = true;
       });
     }
   }

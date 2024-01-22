@@ -41,7 +41,7 @@ class NSClient {
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
-      rethrow;
+      return Future.error(e);
     }
   }
 
@@ -62,7 +62,7 @@ class NSClient {
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
-      rethrow;
+      return Future.error(e);
     }
   }
 
@@ -84,7 +84,7 @@ class NSClient {
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
-      rethrow;
+      return Future.error(e);
     }
   }
 }
