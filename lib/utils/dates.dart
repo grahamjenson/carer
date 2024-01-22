@@ -19,4 +19,6 @@ class Dates {
     if (mills == null) return "";
     return dateAgoFromMills(mills);
   }
+
+  static final DateTime earliest = DateTime.fromMillisecondsSinceEpoch(0);
 }

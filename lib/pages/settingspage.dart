@@ -1,4 +1,4 @@
-import 'package:carer/settings.dart';
+import 'package:carer/models/settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -127,7 +127,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<String?> openTextDialog(String title,
       {String hint = "", String value = ""}) {
     controller = TextEditingController(text: value);
-    // TODO add regex validator
+    // TODO add http regex validator
     return showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(

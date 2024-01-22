@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:carer/settings.dart';
+import 'package:carer/models/settings.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,7 +24,7 @@ Uri basalEndpoint(nsURL, token) =>
 
 // Singleton
 class NSClient {
-  Future<Entries?> getEntries() async {
+  Future<Entries> getEntries() async {
     try {
       var (nsURL, token) = await Settings.getNightScoutURLToken();
       if (nsURL == "" || token == "") {
@@ -40,11 +40,12 @@ class NSClient {
       return Entries.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Future.value(Entries(entries: []));
+      // TODO rewrite to friendly error class
+      rethrow;
     }
   }
 
-  Future<Treatments?> getTreatments() async {
+  Future<Treatments> getTreatments() async {
     try {
       var (nsURL, token) = await Settings.getNightScoutURLToken();
       if (nsURL == "" || token == "") {
@@ -60,7 +61,8 @@ class NSClient {
       return Treatments.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Future.value(Treatments(treatments: []));
+      // TODO rewrite to friendly error class
+      rethrow;
     }
   }
 
@@ -78,34 +80,11 @@ class NSClient {
         print("NON 200 responce code ${response.statusCode}");
         throw Exception("Bad HTTP");
       }
-
       return Summary.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Future.value(Summary(
-        sgvs: SGVs(sgvs: []),
-        tempBasals: TempBasals(tempBasals: []),
-        treatments: SummaryTreatments(treatments: []),
-        targets: Targets(targets: []),
-        state: SummaryState(
-          iob: 0,
-          cob: 0,
-          bwp: 0,
-          cage: 0,
-          iage: 0,
-          bage: 0,
-          battery: 0,
-        ),
-        profile: Profile(
-            dia: 1,
-            carbratio: [],
-            sens: [],
-            basal: [],
-            targetLow: [],
-            targetHigh: [],
-            units: "",
-            timezone: ""),
-      ));
+      // TODO rewrite to friendly error class
+      rethrow;
     }
   }
 }

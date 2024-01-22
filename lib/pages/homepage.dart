@@ -2,9 +2,10 @@ import 'dart:developer';
 
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/settings.dart';
-import 'package:carer/settingspage.dart';
-import 'package:carer/snoozepage.dart';
+import 'package:carer/models/settings.dart';
+import 'package:carer/pages/settingspage.dart';
+import 'package:carer/pages/snoozepage.dart';
+import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool summaryToBeUpdated = true;
-  late Future<Summary?> futureSummary;
+  Summary summary = Summary.empty();
   late Timer timer;
 
   @override
@@ -39,26 +40,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   update() {
-    if (summaryToBeUpdated) {
-      setState(() {
-        if (summaryToBeUpdated) {
-          futureSummary = NSClient().getSummary();
-          summaryToBeUpdated = false;
-          print("HERE I SUPPOSE");
-        }
-      });
+    print(summary.ageInSeconds());
+    if (summary.ageInSeconds() > 15) {
+      print("dirty");
+      summaryToBeUpdated = true;
     }
 
-    futureSummary.then((value) {
-      if (value == null) return;
-      print("are you here");
-      print(value.ageInSeconds());
-      if (value.ageInSeconds() > 15) {
-        print("AsdsaD");
-        print(value.ageInSeconds());
+    if (summaryToBeUpdated) {
+      summaryToBeUpdated = false;
+      var future = NSClient().getSummary();
+      future.then((value) {
+        setState(() {
+          summary = value;
+        });
+      });
+
+      future.catchError((e) {
+        log("GETTING SUMMARY ERROR: $e");
         summaryToBeUpdated = true;
-      }
-    });
+      });
+    }
   }
 
   @override
@@ -106,14 +107,13 @@ class _HomePageState extends State<HomePage> {
         height: 100,
         color: Colors.blue,
         alignment: Alignment.center,
-        child: FutureBuilder<Summary?>(
-          future: futureSummary,
-          builder: ((context, futureSummary) {
-            if (futureSummary.hasError) {
-              return Text('Error: ${futureSummary.error}');
+        child: Builder(
+          builder: ((context) {
+            if (summary.dateRetrieved == Dates.earliest) {
+              return const CircularProgressIndicator();
             }
 
-            var lastSGV = futureSummary.data?.lastSGV;
+            var lastSGV = summary.lastSGV;
             if (lastSGV == null) {
               return const CircularProgressIndicator();
             }
@@ -128,14 +128,13 @@ class _HomePageState extends State<HomePage> {
         height: 100,
         color: Colors.red,
         alignment: Alignment.center,
-        child: FutureBuilder<Summary?>(
-          future: futureSummary,
-          builder: ((context, futureSummary) {
-            if (futureSummary.hasError) {
-              return Text('Error: ${futureSummary.error}');
+        child: Builder(
+          builder: ((context) {
+            if (summary.dateRetrieved == Dates.earliest) {
+              return const CircularProgressIndicator();
             }
 
-            var lastSGV = futureSummary.data?.lastSGV;
+            var lastSGV = summary.lastSGV;
             if (lastSGV == null) {
               return const CircularProgressIndicator();
             }

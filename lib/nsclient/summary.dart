@@ -225,12 +225,12 @@ class Profile {
 
 class Summary {
   DateTime dateRetrieved = DateTime.now();
-  SGVs sgvs;
-  TempBasals tempBasals;
-  SummaryTreatments treatments;
-  Targets targets;
-  SummaryState state;
-  Profile profile;
+  final SGVs sgvs;
+  final TempBasals tempBasals;
+  final SummaryTreatments treatments;
+  final Targets targets;
+  final SummaryState state;
+  final Profile profile;
 
   Summary({
     required this.sgvs,
@@ -239,23 +239,15 @@ class Summary {
     required this.targets,
     required this.state,
     required this.profile,
-  });
+    DateTime? dateRetrieved,
+  }) {
+    if (dateRetrieved != null) {
+      this.dateRetrieved = dateRetrieved;
+    }
+  }
 
-  factory Summary.fromJson(String jsonString) {
-    try {
-      var json = jsonDecode(jsonString);
-      return Summary(
-        sgvs: SGVs.fromJson(json['sgvs']),
-        tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
-        treatments:
-            SummaryTreatments.fromJson(json['treatments']['treatments']),
-        targets: Targets.fromJson(json['treatments']['targets']),
-        state: SummaryState.fromJson(json['state']),
-        profile: Profile.fromJson(json['profile']),
-      );
-    } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
-      return Summary(
+  factory Summary.empty() {
+    return Summary(
         sgvs: SGVs(sgvs: []),
         tempBasals: TempBasals(tempBasals: []),
         treatments: SummaryTreatments(treatments: []),
@@ -278,7 +270,24 @@ class Summary {
             targetHigh: [],
             units: "",
             timezone: ""),
+        dateRetrieved: Dates.earliest);
+  }
+
+  factory Summary.fromJson(String jsonString) {
+    try {
+      var json = jsonDecode(jsonString);
+      return Summary(
+        sgvs: SGVs.fromJson(json['sgvs']),
+        tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
+        treatments:
+            SummaryTreatments.fromJson(json['treatments']['treatments']),
+        targets: Targets.fromJson(json['treatments']['targets']),
+        state: SummaryState.fromJson(json['state']),
+        profile: Profile.fromJson(json['profile']),
       );
+    } catch (e, stackTrace) {
+      Errors.captureException(e, stackTrace: stackTrace);
+      return Summary.empty();
     }
   }
 
