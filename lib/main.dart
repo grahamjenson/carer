@@ -1,4 +1,3 @@
-
 import 'package:carer/homepage.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Carer',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,

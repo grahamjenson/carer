@@ -1,10 +1,14 @@
-
-import 'package:carer/nsclient/entries.dart';
+import 'dart:developer';
 
 import 'package:carer/nsclient/nsclient.dart';
+import 'package:carer/nsclient/summary.dart';
+import 'package:carer/settings.dart';
 import 'package:carer/settingspage.dart';
+import 'package:carer/snoozepage.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:slide_to_act/slide_to_act.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,62 +18,148 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<Entries?> futureEntries;
+  bool summaryToBeUpdated = true;
+  late Future<Summary?> futureSummary;
+  late Timer timer;
 
   @override
   void initState() {
     super.initState();
 
-    futureEntries = NSClient().getEntries();
+    Settings.addSettingsChangeListener((setting, _) {
+      log("Listener Setting changed: $setting");
+      if (setting == SettingNames.nightscoutUrl) {
+        summaryToBeUpdated = true;
+      }
+    });
 
-    const oneSecond = Duration(seconds: 25);
-    Timer.periodic(oneSecond, (Timer t) {
-      print("DATA REFRESH1");
+    update();
+    log("init");
+    timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => update());
+  }
+
+  update() {
+    if (summaryToBeUpdated) {
       setState(() {
-        print("DATA REFRESH2");
-        futureEntries = NSClient().getEntries();
+        if (summaryToBeUpdated) {
+          futureSummary = NSClient().getSummary();
+          summaryToBeUpdated = false;
+          print("HERE I SUPPOSE");
+        }
       });
+    }
+
+    futureSummary.then((value) {
+      if (value == null) return;
+      print("are you here");
+      print(value.ageInSeconds());
+      if (value.ageInSeconds() > 15) {
+        print("AsdsaD");
+        print(value.ageInSeconds());
+        summaryToBeUpdated = true;
+      }
     });
   }
 
   @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    log("build");
     return Scaffold(
-        appBar: AppBar(title: const Text('TITITITITILE'), actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.add_alert),
-            tooltip: 'Show Snackbar',
-            onPressed: () {
-              print("PUSHED");
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          )
-        ]),
-        body: Center(
-          child: FutureBuilder<Entries?>(
-            future: futureEntries,
-            builder: ((context, snapshot) {
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
+      backgroundColor: Colors.black,
+      body: Column(children: [
+        const Spacer(),
+        bglDisplay(),
+        const Spacer(),
+        statsDisplay(),
+        const Spacer(),
+        sleepDisplay()
+      ]),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: [
+            IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
+            const Spacer(),
+            IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+            IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsPage()),
+                  );
+                })
+          ],
+        ),
+      ),
+    );
+  }
 
-              var entries = snapshot.data;
-              if (entries == null || entries.isEmpty()) {
-                return const CircularProgressIndicator();
-              }
+  Widget bglDisplay() {
+    return Container(
+        height: 100,
+        color: Colors.blue,
+        alignment: Alignment.center,
+        child: FutureBuilder<Summary?>(
+          future: futureSummary,
+          builder: ((context, futureSummary) {
+            if (futureSummary.hasError) {
+              return Text('Error: ${futureSummary.error}');
+            }
 
-              var first = entries.firstOrNull();
-              if (first == null) {
-                return const CircularProgressIndicator();
-              }
+            var lastSGV = futureSummary.data?.lastSGV;
+            if (lastSGV == null) {
+              return const CircularProgressIndicator();
+            }
 
-              print('PRINTING DATA: ${first.sgv! / 18}');
-              return Text('DATA: ${first.sgv! / 18}');
-            }),
-          ),
+            return Text('DATA: ${lastSGV.sgvMmolL} ${lastSGV.dateAgo}');
+          }),
+        ));
+  }
+
+  Widget statsDisplay() {
+    return Container(
+        height: 100,
+        color: Colors.red,
+        alignment: Alignment.center,
+        child: FutureBuilder<Summary?>(
+          future: futureSummary,
+          builder: ((context, futureSummary) {
+            if (futureSummary.hasError) {
+              return Text('Error: ${futureSummary.error}');
+            }
+
+            var lastSGV = futureSummary.data?.lastSGV;
+            if (lastSGV == null) {
+              return const CircularProgressIndicator();
+            }
+
+            return Text('DATA: ${lastSGV.sgvMmolL} ${lastSGV.dateAgo}');
+          }),
+        ));
+  }
+
+  Widget sleepDisplay() {
+    return Container(
+        height: 100,
+        color: Colors.purple,
+        alignment: Alignment.center,
+        child: SlideAction(
+          text: "Snnoze 1346",
+          sliderRotate: false,
+          onSubmit: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SnoozePage()),
+            );
+            return null;
+          },
         ));
   }
 }

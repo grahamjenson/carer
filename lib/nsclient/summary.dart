@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carer/nsclient/shared.dart';
+import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 
 class SGV {
@@ -17,6 +18,15 @@ class SGV {
       sgv: json['sgv'],
       mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
     );
+  }
+
+  // returns the date in minutes ago format
+  String get dateAgo {
+    return Dates.dateAgoFromMills(mills);
+  }
+
+  double get sgvMmolL {
+    return sgv / 18;
   }
 }
 
@@ -85,7 +95,7 @@ class Target {
   }
 }
 
-class State {
+class SummaryState {
   double iob;
   int cob;
   double bwp;
@@ -94,7 +104,7 @@ class State {
   int bage;
   int battery;
 
-  State({
+  SummaryState({
     required this.iob,
     required this.cob,
     required this.bwp,
@@ -104,8 +114,8 @@ class State {
     required this.battery,
   });
 
-  factory State.fromJson(Map<String, dynamic> json) {
-    return State(
+  factory SummaryState.fromJson(Map<String, dynamic> json) {
+    return SummaryState(
       iob: json['iob'].toDouble(),
       cob: json['cob'],
       bwp: json['bwp'].toDouble(),
@@ -214,11 +224,12 @@ class Profile {
 }
 
 class Summary {
+  DateTime dateRetrieved = DateTime.now();
   SGVs sgvs;
   TempBasals tempBasals;
   SummaryTreatments treatments;
   Targets targets;
-  State state;
+  SummaryState state;
   Profile profile;
 
   Summary({
@@ -239,7 +250,7 @@ class Summary {
         treatments:
             SummaryTreatments.fromJson(json['treatments']['treatments']),
         targets: Targets.fromJson(json['treatments']['targets']),
-        state: State.fromJson(json['state']),
+        state: SummaryState.fromJson(json['state']),
         profile: Profile.fromJson(json['profile']),
       );
     } catch (e, stackTrace) {
@@ -249,7 +260,7 @@ class Summary {
         tempBasals: TempBasals(tempBasals: []),
         treatments: SummaryTreatments(treatments: []),
         targets: Targets(targets: []),
-        state: State(
+        state: SummaryState(
           iob: 0,
           cob: 0,
           bwp: 0,
@@ -269,5 +280,17 @@ class Summary {
             timezone: ""),
       );
     }
+  }
+
+  // function returns the last SGV
+  SGV? get lastSGV {
+    if (sgvs.sgvs.isEmpty) {
+      return null;
+    }
+    return sgvs.sgvs.last;
+  }
+
+  int ageInSeconds() {
+    return DateTime.now().difference(dateRetrieved).inSeconds;
   }
 }

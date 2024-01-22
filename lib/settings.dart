@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum SettingNames { nightscoutUrl, unit, screenActive }
+
 enum Unit { mmol, mg }
 
 extension UnitExtension on Unit {
@@ -35,13 +37,20 @@ extension UnitExtension on Unit {
 }
 
 class Settings {
-  static const String _nightscoutUrl = "nightscoutUrl";
-  static const String _unit = "unit";
-  static const String _screenActive = "screenActive";
+  static final List<Function> _listeners = [];
 
+  static addSettingsChangeListener(
+      Function(SettingNames, dynamic) listener) async {
+    _listeners.add(listener);
+  }
+
+  ////
+  // NIGHT SCOUT URL
+  ////
   static Future<(String, String)> getNightScoutURLToken() async {
+    var setting = SettingNames.nightscoutUrl;
     final prefs = await SharedPreferences.getInstance();
-    var pref = prefs.getString(_nightscoutUrl);
+    var pref = prefs.getString(setting.name);
     if (pref != null && pref.isNotEmpty) {
       var uri = Uri.parse(pref);
       var token = uri.queryParameters["token"];
@@ -54,8 +63,9 @@ class Settings {
   }
 
   static Future<String> getNightScoutURL() async {
+    var setting = SettingNames.nightscoutUrl;
     final prefs = await SharedPreferences.getInstance();
-    var pref = prefs.getString(_nightscoutUrl);
+    var pref = prefs.getString(setting.name);
     if (pref != null && pref.isNotEmpty) {
       return pref;
     }
@@ -63,23 +73,41 @@ class Settings {
   }
 
   static Future<void> setNightScoutURL(String value) async {
+    var setting = SettingNames.nightscoutUrl;
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(_nightscoutUrl, value);
+    prefs.setString(setting.name, value);
+    for (var element in _listeners) {
+      element(setting, value);
+    }
   }
 
+  ////
+  // UNIT
+  ////
+
   static Future<Unit> getUnit() async {
+    var setting = SettingNames.unit;
     final prefs = await SharedPreferences.getInstance();
-    return UnitExtension.fromBool(prefs.getBool(_unit));
+    return UnitExtension.fromBool(prefs.getBool(setting.name));
   }
 
   static Future<void> setUnit(Unit value) async {
+    var setting = SettingNames.unit;
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(_unit, value.toBool());
+    prefs.setBool(setting.name, value.toBool());
+    for (var element in _listeners) {
+      element(setting, value);
+    }
   }
 
+  ////
+  // SCREEN ACTIVE
+  ////
+
   static Future<bool> getScreenActive() async {
+    var setting = SettingNames.unit;
     final prefs = await SharedPreferences.getInstance();
-    var pref = prefs.getBool(_screenActive);
+    var pref = prefs.getBool(setting.name);
     if (pref != null) {
       return pref;
     }
@@ -87,7 +115,11 @@ class Settings {
   }
 
   static Future<void> setScreenActive(bool value) async {
+    var setting = SettingNames.unit;
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(_screenActive, value);
+    prefs.setBool(setting.name, value);
+    for (var element in _listeners) {
+      element(setting, value);
+    }
   }
 }

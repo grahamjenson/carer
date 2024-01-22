@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
@@ -9,6 +11,9 @@ Uri entryEndpoint(nsURL, token) =>
     Uri.parse('$nsURL/api/v1/entries.json?token=$token');
 Uri treatmentsEndpoint(nsURL, token) =>
     Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
+
+Uri summaryEndpoint(nsURL, token) =>
+    Uri.parse('$nsURL/api/v2/summary.json?token=$token');
 
 Uri iobEndpoint(nsURL, token) =>
     Uri.parse('$nsURL/api/v2/properties/iob.json?token=$token');
@@ -65,8 +70,10 @@ class NSClient {
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
       }
-      final response = await http.get(treatmentsEndpoint(nsURL, token));
-
+      var ep = summaryEndpoint(nsURL, token);
+      log("FETCHING ${ep.toString()}");
+      final response = await http.get(ep);
+      log("FETCHED ${ep.toString()}");
       if (response.statusCode != 200) {
         print("NON 200 responce code ${response.statusCode}");
         throw Exception("Bad HTTP");
@@ -80,7 +87,7 @@ class NSClient {
         tempBasals: TempBasals(tempBasals: []),
         treatments: SummaryTreatments(treatments: []),
         targets: Targets(targets: []),
-        state: State(
+        state: SummaryState(
           iob: 0,
           cob: 0,
           bwp: 0,
