@@ -5,6 +5,15 @@ class SnoozePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text("asdasd");
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Snooze'),
+        ),
+        body: const Center(
+          child: Text(
+            'Snooze',
+            style: TextStyle(fontSize: 24),
+          ),
+        ));
   }
 }

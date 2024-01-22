@@ -26,7 +26,7 @@ class SGV {
   }
 
   double get sgvMmolL {
-    return sgv / 18;
+    return double.parse((sgv / 18).toStringAsFixed(1));
   }
 }
 

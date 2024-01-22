@@ -6,6 +6,7 @@ import 'package:carer/models/settings.dart';
 import 'package:carer/pages/settingspage.dart';
 import 'package:carer/pages/snoozepage.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/widgets/bgl.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -40,9 +41,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   update() {
-    print(summary.ageInSeconds());
     if (summary.ageInSeconds() > 15) {
-      print("dirty");
       summaryToBeUpdated = true;
     }
 
@@ -76,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.black,
       body: Column(children: [
         const Spacer(),
-        bglDisplay(),
+        BGL(summary: summary),
         const Spacer(),
         statsDisplay(),
         const Spacer(),
@@ -101,27 +100,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  Widget bglDisplay() {
-    return Container(
-        height: 100,
-        color: Colors.blue,
-        alignment: Alignment.center,
-        child: Builder(
-          builder: ((context) {
-            if (summary.dateRetrieved == Dates.earliest) {
-              return const CircularProgressIndicator();
-            }
-
-            var lastSGV = summary.lastSGV;
-            if (lastSGV == null) {
-              return const CircularProgressIndicator();
-            }
-
-            return Text('DATA: ${lastSGV.sgvMmolL} ${lastSGV.dateAgo}');
-          }),
-        ));
   }
 
   Widget statsDisplay() {

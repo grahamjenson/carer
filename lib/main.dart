@@ -16,7 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'Carer',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 0, 0)),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 0, 0, 0),
+            brightness: Brightness.dark),
         useMaterial3: true,
       ),
       home: const HomePage(),
