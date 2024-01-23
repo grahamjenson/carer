@@ -36,9 +36,6 @@ class SummaryCN extends ChangeNotifier {
         _summaryToBeUpdated = true;
         return Summary.empty();
       }).then((value) {
-        if (value.dateRetrieved == Dates.earliest) {
-          return;
-        }
         summary = value;
         notifyListeners();
       });

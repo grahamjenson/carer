@@ -51,7 +51,7 @@ class BGL extends StatelessWidget {
         child: FittedBox(
             fit: BoxFit.cover,
             child: Text(
-              '$sgv',
+              sgv.toStringAsFixed(1),
             )));
   }
 
@@ -67,7 +67,7 @@ class BGL extends StatelessWidget {
         child: FittedBox(
             fit: BoxFit.cover,
             child: Text(
-              '$delta',
+              delta.toStringAsFixed(1),
             )));
   }
 
