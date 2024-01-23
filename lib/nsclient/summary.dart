@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class SGV {
   int sgv;
@@ -32,7 +35,7 @@ class SGV {
 
 class TempBasal {
   DateTime start;
-  int duration;
+  double duration;
   double absolute;
 
   TempBasal({
@@ -44,7 +47,7 @@ class TempBasal {
   factory TempBasal.fromJson(Map<String, dynamic> json) {
     return TempBasal(
       start: DateTime.fromMillisecondsSinceEpoch(json['start']),
-      duration: json['duration'],
+      duration: json['duration'].toDouble(),
       absolute: json['absolute'].toDouble(),
     );
   }
@@ -297,6 +300,29 @@ class Summary {
       return null;
     }
     return sgvs.sgvs.last;
+  }
+
+  double delta() {
+    if (sgvs.sgvs.length < 2) {
+      return 0;
+    }
+    return (sgvs.sgvs.last.sgvMmolL - sgvs.sgvs[sgvs.sgvs.length - 2].sgvMmolL)
+        .toDouble();
+  }
+
+  IconData trendIcon() {
+    if (sgvs.sgvs.length < 2) {
+      return Icons.trending_flat;
+    }
+    var delta =
+        sgvs.sgvs.last.sgvMmolL - sgvs.sgvs[sgvs.sgvs.length - 2].sgvMmolL;
+    if (delta > 0) {
+      return Icons.trending_up;
+    } else if (delta < 0) {
+      return Icons.trending_down;
+    } else {
+      return Icons.trending_flat;
+    }
   }
 
   int ageInSeconds() {

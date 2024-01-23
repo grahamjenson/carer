@@ -74,9 +74,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(children: [
-        const Spacer(),
         BGL(summary: summary),
-        const Spacer(),
         statsDisplay(),
         const Spacer(),
         sleepDisplay()
