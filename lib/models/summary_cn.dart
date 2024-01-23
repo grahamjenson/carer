@@ -30,7 +30,7 @@ class SummaryCN extends ChangeNotifier {
 
     if (_summaryToBeUpdated) {
       _summaryToBeUpdated = false;
-      var (nsURL, nsToken) = settings.nightScoutURLAndToken;
+      var (nsURL, nsToken) = settings.nightscoutURLAndToken;
       NSClient().getSummary(nsURL, nsToken).catchError((e) {
         log("GETTING SUMMARY ERROR: $e");
         _summaryToBeUpdated = true;
@@ -40,6 +40,7 @@ class SummaryCN extends ChangeNotifier {
           return;
         }
         summary = value;
+        notifyListeners();
       });
     }
   }

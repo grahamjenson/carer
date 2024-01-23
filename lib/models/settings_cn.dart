@@ -38,7 +38,7 @@ extension UnitExtension on Unit {
 }
 
 class Settings extends ChangeNotifier {
-  String nightScoutURL = '';
+  String nightscoutURL = '';
   Unit unit = Unit.mmol;
   bool screenActive = true;
 
@@ -49,7 +49,7 @@ class Settings extends ChangeNotifier {
     var screenActivePref = prefs.getBool(SettingNames.unit.name);
 
     if (urlPref != null && urlPref.isNotEmpty) {
-      nightScoutURL = urlPref;
+      nightscoutURL = urlPref;
     }
     if (unitPref != null) {
       unit = UnitExtension.fromBool(unitPref);
@@ -61,15 +61,15 @@ class Settings extends ChangeNotifier {
 
   @override
   String toString() {
-    return 'Settings{nightScoutURL: $nightScoutURL, unit: $unit, screenActive: $screenActive}';
+    return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive}';
   }
 
   ////
   // NIGHT SCOUT URL
   ////
-  (String, String) get nightScoutURLAndToken {
-    if (nightScoutURL.isNotEmpty) {
-      var uri = Uri.parse(nightScoutURL);
+  (String, String) get nightscoutURLAndToken {
+    if (nightscoutURL.isNotEmpty) {
+      var uri = Uri.parse(nightscoutURL);
       var token = uri.queryParameters["token"];
       token ??= '';
       var base = '${uri.scheme}://${uri.host}';
@@ -79,10 +79,11 @@ class Settings extends ChangeNotifier {
     return ('', '');
   }
 
-  Future<void> setNightScoutURL(String value) async {
+  Future<void> setNightscoutURL(String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(SettingNames.nightscoutUrl.name, value);
-    nightScoutURL = value;
+    nightscoutURL = value;
+    notifyListeners();
   }
 
   ////
@@ -93,6 +94,7 @@ class Settings extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool(SettingNames.unit.name, value.toBool());
     unit = value;
+    notifyListeners();
   }
 
   ////
@@ -103,5 +105,6 @@ class Settings extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool(SettingNames.unit.name, value);
     screenActive = value;
+    notifyListeners();
   }
 }

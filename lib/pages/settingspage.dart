@@ -4,33 +4,10 @@ import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+class SettingsPage extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "
-
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  late TextEditingController controller;
-  String nightscoutUrl = '';
-  String nightscoutToken = '';
-  Unit unit = Unit.mmol;
-  bool screenActive = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           body: SettingsList(
             sections: [
-              nightscoutSection(settings),
+              nightscoutSection(context, settings),
               unitsSection(settings),
               screenSection(settings),
             ],
@@ -49,22 +26,21 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  SettingsSection nightscoutSection(Settings settings) {
+  SettingsSection nightscoutSection(BuildContext context, Settings settings) {
     return SettingsSection(
       title: const Text('Nightscout'),
       tiles: [
         SettingsTile.navigation(
           title: const Text('URL'),
-          value: Text(nightscoutUrl),
+          value: Text(settings.nightscoutURL),
           leading: const Icon(Icons.language),
           onPressed: (context) async {
-            final url = await openTextDialog("Nightscout URL",
-                hint: "URL", value: nightscoutUrl);
+            final url = await openTextDialog(context, "Nightscout URL",
+                hint: "URL", value: settings.nightscoutURL);
             if (url == null || url.isEmpty) return;
-            await settings.setNightScoutURL(url);
-            setState(() {
-              nightscoutUrl = url;
-            });
+            print(settings.toString());
+            await settings.setNightscoutURL(url);
+            print(settings.toString());
           },
         ),
       ],
@@ -76,14 +52,11 @@ class _SettingsPageState extends State<SettingsPage> {
       tiles: [
         SettingsTile.switchTile(
           title: const Text('Units'),
-          trailing: Text(unit.name),
-          initialValue: unit == Unit.mmol,
+          trailing: Text(settings.unit.name),
+          initialValue: settings.unit.toBool(),
           onToggle: (value) async {
             var unitP = UnitExtension.fromBool(value);
             await settings.setUnit(unitP);
-            setState(() {
-              unit = unitP;
-            });
           },
         ),
       ],
@@ -95,21 +68,18 @@ class _SettingsPageState extends State<SettingsPage> {
       tiles: [
         SettingsTile.switchTile(
           title: const Text('Keep Screen Active'),
-          initialValue: screenActive,
+          initialValue: settings.screenActive,
           onToggle: (value) async {
             await settings.setScreenActive(value);
-            setState(() {
-              screenActive = value;
-            });
           },
         ),
       ],
     );
   }
 
-  Future<String?> openTextDialog(String title,
+  Future<String?> openTextDialog(BuildContext context, String title,
       {String hint = "", String value = ""}) {
-    controller = TextEditingController(text: value);
+    controller.value = TextEditingValue(text: value);
     // TODO add http regex validator
     return showDialog<String>(
         context: context,

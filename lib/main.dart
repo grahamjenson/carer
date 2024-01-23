@@ -5,25 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Load the settings from Shared Preferences before starting
   var s = Settings();
+  await s.populate();
 
-  print(s.toString());
   runApp(MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => s),
-        ChangeNotifierProvider(create: (context) => SummaryCN(settings: s)),
-      ],
-      child: FutureProvider(
-        initialData: null,
-        create: (context) => s.populate(),
-        child: MyApp(settings: s),
-      )));
+    providers: [
+      ChangeNotifierProvider(create: (context) => s),
+      ChangeNotifierProvider(create: (context) => SummaryCN(settings: s)),
+    ],
+    child: MyApp(settings: s),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  Settings settings;
-  MyApp({super.key, required this.settings});
+  final Settings settings;
+  const MyApp({super.key, required this.settings});
 
   // This widget is the root of your application.
   @override
