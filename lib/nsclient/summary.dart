@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:carer/models/settings_cn.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
@@ -28,8 +29,13 @@ class SGV {
     return Dates.dateAgoFromMills(mills);
   }
 
-  double get sgvMmolL {
-    return double.parse((sgv / 18).toStringAsFixed(1));
+  double sgvU(Unit unit) {
+    switch (unit) {
+      case Unit.mg:
+        return sgv.toDouble();
+      case Unit.mmol:
+        return (sgv / 18).toDouble();
+    }
   }
 }
 
@@ -302,20 +308,20 @@ class Summary {
     return sgvs.sgvs.last;
   }
 
-  double delta() {
+  double delta(Unit unit) {
     if (sgvs.sgvs.length < 2) {
       return 0;
     }
-    return (sgvs.sgvs.last.sgvMmolL - sgvs.sgvs[sgvs.sgvs.length - 2].sgvMmolL)
+    return (sgvs.sgvs.last.sgvU(unit) -
+            sgvs.sgvs[sgvs.sgvs.length - 2].sgvU(unit))
         .toDouble();
   }
 
-  IconData trendIcon() {
+  IconData get trendIcon {
     if (sgvs.sgvs.length < 2) {
       return Icons.trending_flat;
     }
-    var delta =
-        sgvs.sgvs.last.sgvMmolL - sgvs.sgvs[sgvs.sgvs.length - 2].sgvMmolL;
+    var delta = sgvs.sgvs.last.sgv - sgvs.sgvs[sgvs.sgvs.length - 2].sgv;
     if (delta > 0) {
       return Icons.trending_up;
     } else if (delta < 0) {

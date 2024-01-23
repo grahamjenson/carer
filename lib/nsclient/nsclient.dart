@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:carer/models/settings.dart';
+import 'package:carer/models/settings_cn.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,9 +24,8 @@ Uri basalEndpoint(nsURL, token) =>
 
 // Singleton
 class NSClient {
-  Future<Entries> getEntries() async {
+  Future<Entries> getEntries(String nsURL, String token) async {
     try {
-      var (nsURL, token) = await Settings.getNightScoutURLToken();
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
       }
@@ -45,9 +44,8 @@ class NSClient {
     }
   }
 
-  Future<Treatments> getTreatments() async {
+  Future<Treatments> getTreatments(String nsURL, String token) async {
     try {
-      var (nsURL, token) = await Settings.getNightScoutURLToken();
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
       }
@@ -66,9 +64,8 @@ class NSClient {
     }
   }
 
-  Future<Summary> getSummary() async {
+  Future<Summary> getSummary(String nsURL, String token) async {
     try {
-      var (nsURL, token) = await Settings.getNightScoutURLToken();
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
       }

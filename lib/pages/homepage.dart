@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/models/settings.dart';
+import 'package:carer/models/settings_cn.dart';
 import 'package:carer/pages/settingspage.dart';
 import 'package:carer/pages/snoozepage.dart';
 import 'package:carer/utils/dates.dart';
@@ -12,61 +12,8 @@ import 'dart:async';
 
 import 'package:slide_to_act/slide_to_act.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  bool summaryToBeUpdated = true;
-  Summary summary = Summary.empty();
-  late Timer timer;
-
-  @override
-  void initState() {
-    super.initState();
-
-    Settings.addSettingsChangeListener((setting, _) {
-      log("Listener Setting changed: $setting");
-      if (setting == SettingNames.nightscoutUrl) {
-        summaryToBeUpdated = true;
-      }
-    });
-
-    update();
-    log("init");
-    timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => update());
-  }
-
-  update() {
-    if (summary.ageInSeconds() > 15) {
-      summaryToBeUpdated = true;
-    }
-
-    if (summaryToBeUpdated) {
-      summaryToBeUpdated = false;
-      NSClient().getSummary().catchError((e) {
-        log("GETTING SUMMARY ERROR: $e");
-        summaryToBeUpdated = true;
-        return Summary.empty();
-      }).then((value) {
-        if (value.dateRetrieved == Dates.earliest) {
-          return;
-        }
-        setState(() {
-          summary = value;
-        });
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,10 +21,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(children: [
-        BGL(summary: summary),
+        const BGL(),
         statsDisplay(),
         const Spacer(),
-        sleepDisplay()
+        sleepDisplay(context)
       ]),
       bottomNavigationBar: BottomAppBar(
         child: Row(
@@ -107,21 +54,12 @@ class _HomePageState extends State<HomePage> {
         alignment: Alignment.center,
         child: Builder(
           builder: ((context) {
-            if (summary.dateRetrieved == Dates.earliest) {
-              return const CircularProgressIndicator();
-            }
-
-            var lastSGV = summary.lastSGV;
-            if (lastSGV == null) {
-              return const CircularProgressIndicator();
-            }
-
-            return Text('DATA: ${lastSGV.sgvMmolL} ${lastSGV.dateAgo}');
+            return const Text('DATA:');
           }),
         ));
   }
 
-  Widget sleepDisplay() {
+  Widget sleepDisplay(BuildContext context) {
     return Container(
         height: 100,
         color: Colors.purple,

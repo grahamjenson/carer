@@ -1,7 +1,8 @@
-import 'package:carer/models/settings.dart';
+import 'package:carer/models/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -26,47 +27,29 @@ class _SettingsPageState extends State<SettingsPage> {
   Unit unit = Unit.mmol;
   bool screenActive = true;
 
-  Future<void> getSharedPrefs() async {
-    var prefNightscoutUrl = await Settings.getNightScoutURL();
-    var prefUnit = await Settings.getUnit();
-    var prefScreenActive = await Settings.getScreenActive();
-
-    setState(() {
-      nightscoutUrl = prefNightscoutUrl;
-      unit = prefUnit;
-      screenActive = prefScreenActive;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    getSharedPrefs();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Settings'),
-        ),
-        body: getSettings());
+    return Consumer<Settings>(builder: (context, settings, child) {
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text('Settings'),
+          ),
+          body: SettingsList(
+            sections: [
+              nightscoutSection(settings),
+              unitsSection(settings),
+              screenSection(settings),
+            ],
+          ));
+    });
   }
 
-  SettingsList getSettings() {
-    return SettingsList(platform: DevicePlatform.iOS, sections: [
-      nightscoutSection(),
-      unitsSection(),
-      screenSection(),
-    ]);
-  }
-
-  SettingsSection nightscoutSection() {
+  SettingsSection nightscoutSection(Settings settings) {
     return SettingsSection(
       title: const Text('Nightscout'),
       tiles: [
@@ -78,7 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
             final url = await openTextDialog("Nightscout URL",
                 hint: "URL", value: nightscoutUrl);
             if (url == null || url.isEmpty) return;
-            await Settings.setNightScoutURL(url);
+            await settings.setNightScoutURL(url);
             setState(() {
               nightscoutUrl = url;
             });
@@ -88,7 +71,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  SettingsSection unitsSection() {
+  SettingsSection unitsSection(Settings settings) {
     return SettingsSection(
       tiles: [
         SettingsTile.switchTile(
@@ -97,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
           initialValue: unit == Unit.mmol,
           onToggle: (value) async {
             var unitP = UnitExtension.fromBool(value);
-            await Settings.setUnit(unitP);
+            await settings.setUnit(unitP);
             setState(() {
               unit = unitP;
             });
@@ -107,14 +90,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  SettingsSection screenSection() {
+  SettingsSection screenSection(Settings settings) {
     return SettingsSection(
       tiles: [
         SettingsTile.switchTile(
           title: const Text('Keep Screen Active'),
           initialValue: screenActive,
           onToggle: (value) async {
-            await Settings.setScreenActive(value);
+            await settings.setScreenActive(value);
             setState(() {
               screenActive = value;
             });
