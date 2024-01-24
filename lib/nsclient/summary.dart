@@ -321,10 +321,12 @@ class Summary {
     if (sgvs.sgvs.length < 2) {
       return Icons.trending_flat;
     }
+
     var delta = sgvs.sgvs.last.sgv - sgvs.sgvs[sgvs.sgvs.length - 2].sgv;
-    if (delta > 0) {
+
+    if (delta > 20) {
       return Icons.trending_up;
-    } else if (delta < 0) {
+    } else if (delta < -20) {
       return Icons.trending_down;
     } else {
       return Icons.trending_flat;

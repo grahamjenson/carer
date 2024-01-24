@@ -5,19 +5,14 @@ class Dates {
     var diff = now.difference(mills);
     var minutes = diff.inMinutes;
     if (minutes < 60) {
-      return "$minutes minutes ago";
+      return "${minutes}mins";
     }
     var hours = diff.inHours;
     if (hours < 24) {
-      return "$hours hours ago";
+      return "${hours}hours";
     }
     var days = diff.inDays;
-    return "$days days ago";
-  }
-
-  static String dateAgoFromNow(DateTime? mills) {
-    if (mills == null) return "";
-    return dateAgoFromMills(mills);
+    return "${days}days";
   }
 
   static final DateTime earliest = DateTime.fromMillisecondsSinceEpoch(0);

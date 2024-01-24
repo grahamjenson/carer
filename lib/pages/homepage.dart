@@ -1,16 +1,11 @@
 import 'dart:developer';
 
-import 'package:carer/nsclient/nsclient.dart';
-import 'package:carer/nsclient/summary.dart';
-import 'package:carer/models/settings_cn.dart';
 import 'package:carer/pages/settingspage.dart';
-import 'package:carer/pages/snoozepage.dart';
-import 'package:carer/utils/dates.dart';
-import 'package:carer/widgets/bgl.dart';
-import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:slide_to_act/slide_to_act.dart';
+import 'package:carer/widgets/bgl.dart';
+import 'package:carer/widgets/history.dart';
+import 'package:carer/widgets/sleep.dart';
+import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -20,12 +15,16 @@ class HomePage extends StatelessWidget {
     log("build");
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(children: [
-        const BGL(),
-        statsDisplay(),
-        const Spacer(),
-        sleepDisplay(context)
-      ]),
+      body: Container(
+        color: Colors.black,
+        height: MediaQuery.of(context).size.height,
+        child: const Column(children: [
+          Flexible(flex: 2, child: BGL()),
+          Flexible(flex: 1, child: History()),
+          Spacer(),
+          Flexible(flex: 1, child: Sleep()),
+        ]),
+      ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
           children: [
@@ -46,7 +45,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget statsDisplay() {
+  Widget historyDisplay() {
     return Container(
         height: 100,
         color: Colors.red,
@@ -55,24 +54,6 @@ class HomePage extends StatelessWidget {
           builder: ((context) {
             return const Text('DATA:');
           }),
-        ));
-  }
-
-  Widget sleepDisplay(BuildContext context) {
-    return Container(
-        height: 100,
-        color: Colors.purple,
-        alignment: Alignment.center,
-        child: SlideAction(
-          text: "Snnoze 1346",
-          sliderRotate: false,
-          onSubmit: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SnoozePage()),
-            );
-            return null;
-          },
         ));
   }
 }

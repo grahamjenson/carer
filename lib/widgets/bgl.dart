@@ -13,7 +13,6 @@ class BGL extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) => Container(
-            height: 100,
             color: const Color.fromARGB(255, 0, 0, 0),
             alignment: Alignment.center,
             child: Builder(
@@ -27,32 +26,34 @@ class BGL extends StatelessWidget {
                   return const CircularProgressIndicator();
                 }
 
-                return Center(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       bgl(lastSGV.sgvU(settings.unit)),
                       Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             delta(summaryCn.summary.delta(settings.unit)),
                             trend(summaryCn.summary.trendIcon),
                             timeSince(lastSGV.dateAgo),
                           ]),
-                    ]));
+                    ]);
               }),
             )));
   }
 
   Widget bgl(double sgv) {
-    return Container(
-        width: 100,
-        color: const Color.fromARGB(255, 0, 0, 0),
-        child: FittedBox(
-            fit: BoxFit.cover,
-            child: Text(
-              sgv.toStringAsFixed(1),
-            )));
+    return Expanded(
+        flex: 1,
+        child: Container(
+            color: const Color.fromARGB(255, 209, 208, 208),
+            child: FittedBox(
+                fit: BoxFit.fitHeight,
+                child: Text(
+                  sgv.toStringAsFixed(1),
+                  textAlign: TextAlign.right,
+                ))));
   }
 
   Widget trend(IconData icon) {
@@ -68,6 +69,7 @@ class BGL extends StatelessWidget {
             fit: BoxFit.cover,
             child: Text(
               delta.toStringAsFixed(1),
+              textAlign: TextAlign.left,
             )));
   }
 

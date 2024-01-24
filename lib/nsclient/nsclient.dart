@@ -32,7 +32,7 @@ class NSClient {
       final response = await http.get(entryEndpoint(nsURL, token));
 
       if (response.statusCode != 200) {
-        print("NON 200 responce code ${response.statusCode}");
+        log("NON 200 responce code ${response.statusCode}");
         throw Exception("Bad HTTP");
       }
 
@@ -52,7 +52,7 @@ class NSClient {
       final response = await http.get(treatmentsEndpoint(nsURL, token));
 
       if (response.statusCode != 200) {
-        print("NON 200 responce code ${response.statusCode}");
+        log("NON 200 responce code ${response.statusCode}");
         throw Exception("Bad HTTP");
       }
 
@@ -70,7 +70,6 @@ class NSClient {
         throw Exception("No URL");
       }
       var ep = summaryEndpoint(nsURL, token);
-      log("FETCHING ${ep.toString()}");
       final response = await http.get(ep);
       log("FETCHED ${ep.toString()}");
       if (response.statusCode != 200) {
