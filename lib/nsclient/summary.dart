@@ -39,7 +39,17 @@ class SGV {
   }
 }
 
-class TempBasal {
+abstract class ATreatment {
+  DateTime get date;
+  IconData get icon;
+  String get minsAgo {
+    return Dates.dateAgoShort(date);
+  }
+
+  String get description;
+}
+
+class TempBasal extends ATreatment {
   DateTime start;
   double duration;
   double absolute;
@@ -50,6 +60,17 @@ class TempBasal {
     required this.absolute,
   });
 
+  @override
+  DateTime get date => start;
+
+  @override
+  IconData get icon => Icons.access_time;
+
+  @override
+  String get description {
+    return "Temp Basal $absolute";
+  }
+
   factory TempBasal.fromJson(Map<String, dynamic> json) {
     return TempBasal(
       start: DateTime.fromMillisecondsSinceEpoch(json['start']),
@@ -59,7 +80,7 @@ class TempBasal {
   }
 }
 
-class SummaryTreatment {
+class SummaryTreatment extends ATreatment {
   DateTime mills;
   double? insulin;
   int? carbs;
@@ -70,6 +91,29 @@ class SummaryTreatment {
     this.carbs,
   });
 
+  @override
+  DateTime get date => mills;
+
+  @override
+  IconData get icon {
+    if (insulin != null) {
+      return Icons.face;
+    } else {
+      return Icons.fastfood;
+    }
+  }
+
+  @override
+  String get description {
+    if (insulin != null) {
+      return insulin.toString();
+    } else if (carbs != null) {
+      return carbs.toString();
+    } else {
+      return "";
+    }
+  }
+
   factory SummaryTreatment.fromJson(Map<String, dynamic> json) {
     return SummaryTreatment(
       mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
@@ -79,18 +123,29 @@ class SummaryTreatment {
   }
 }
 
-class Target {
+class Target extends ATreatment {
   int targetTop;
   int targetBottom;
   int duration;
-  DateTime? mills;
+  DateTime mills;
 
   Target({
     required this.targetTop,
     required this.targetBottom,
     required this.duration,
-    this.mills,
+    required this.mills,
   });
+
+  @override
+  DateTime get date => mills;
+
+  @override
+  IconData get icon => Icons.trending_flat;
+
+  @override
+  String get description {
+    return targetTop.toString();
+  }
 
   factory Target.fromJson(Map<String, dynamic> json) {
     return Target(
@@ -99,7 +154,7 @@ class Target {
       duration: json['duration'],
       mills: json['mills'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['mills'])
-          : null,
+          : Dates.earliest,
     );
   }
 }
@@ -335,5 +390,25 @@ class Summary {
 
   int ageInSeconds() {
     return DateTime.now().difference(dateRetrieved).inSeconds;
+  }
+
+  // return a list of tempBasals treatments and targets in order
+  List<ATreatment> get history {
+    List<ATreatment> history = [];
+
+    // add the tempBasals
+    history.addAll(tempBasals.tempBasals);
+
+    // add the treatments
+    history.addAll(treatments.treatments);
+
+    // add the targets
+    history.addAll(targets.targets);
+
+    // sort the history by date
+    history.sort((a, b) => b.date.compareTo(a.date));
+
+    history = history.take(6).toList();
+    return history;
   }
 }
