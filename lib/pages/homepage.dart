@@ -16,14 +16,16 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Container(
-        color: Colors.black,
         height: MediaQuery.of(context).size.height,
-        child: const Column(children: [
-          Flexible(flex: 2, child: BGL()),
-          Flexible(flex: 1, child: History()),
-          Spacer(),
-          Flexible(flex: 1, child: Sleep()),
-        ]),
+        width: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.all(8),
+        child: const Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(flex: 2, child: BGL()),
+              Flexible(flex: 1, child: History()),
+              Flexible(flex: 1, child: Sleep()),
+            ]),
       ),
       bottomNavigationBar: BottomAppBar(
         child: Row(

@@ -28,32 +28,33 @@ class BGL extends StatelessWidget {
 
                 return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      bgl(lastSGV.sgvU(settings.unit)),
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            delta(summaryCn.summary.delta(settings.unit)),
-                            trend(summaryCn.summary.trendIcon),
-                            timeSince(lastSGV.dateAgo),
-                          ]),
+                      Expanded(
+                          flex: 4, child: bgl(lastSGV.sgvU(settings.unit))),
+                      Expanded(
+                          flex: 3,
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                delta(summaryCn.summary.delta(settings.unit)),
+                                trend(summaryCn.summary.trendIcon),
+                                timeSince(lastSGV.dateAgo),
+                              ])),
                     ]);
               }),
             )));
   }
 
   Widget bgl(double sgv) {
-    return Expanded(
-        flex: 1,
-        child: Container(
-            color: const Color.fromARGB(255, 209, 208, 208),
-            child: FittedBox(
-                fit: BoxFit.fitHeight,
-                child: Text(
-                  sgv.toStringAsFixed(1),
-                  textAlign: TextAlign.right,
-                ))));
+    return FittedBox(
+        alignment: AlignmentDirectional.centerEnd,
+        fit: BoxFit.fitHeight,
+        child: Text(
+          sgv.toStringAsFixed(1),
+          textAlign: TextAlign.right,
+        ));
   }
 
   Widget trend(IconData icon) {
