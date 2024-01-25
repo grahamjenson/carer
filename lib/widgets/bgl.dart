@@ -38,9 +38,19 @@ class BGL extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                delta(summaryCn.summary.delta(settings.unit)),
-                                trend(summaryCn.summary.trendIcon),
-                                timeSince(lastSGV.dateAgo),
+                                const Spacer(
+                                  flex: 6,
+                                ),
+                                Expanded(
+                                    flex: 2,
+                                    child: delta(summaryCn.summary
+                                        .delta(settings.unit))),
+                                Expanded(
+                                    flex: 2,
+                                    child: trend(summaryCn.summary.trendIcon)),
+                                Expanded(
+                                    flex: 2, child: timeSince(lastSGV.dateAgo)),
+                                const Spacer(flex: 6),
                               ])),
                     ]);
               }),
@@ -58,29 +68,21 @@ class BGL extends StatelessWidget {
   }
 
   Widget trend(IconData icon) {
-    return Container(
-        color: const Color.fromARGB(255, 0, 0, 0),
-        child: FittedBox(fit: BoxFit.cover, child: Icon(icon)));
+    return FittedBox(child: Icon(icon));
   }
 
   Widget delta(double delta) {
-    return Container(
-        color: const Color.fromARGB(255, 0, 0, 0),
-        child: FittedBox(
-            fit: BoxFit.cover,
-            child: Text(
-              delta.toStringAsFixed(1),
-              textAlign: TextAlign.left,
-            )));
+    return FittedBox(
+        child: Text(
+      delta.toStringAsFixed(1),
+      textAlign: TextAlign.left,
+    ));
   }
 
   Widget timeSince(String dateStr) {
-    return Container(
-        color: const Color.fromARGB(255, 0, 0, 0),
-        child: FittedBox(
-            fit: BoxFit.cover,
-            child: Text(
-              dateStr,
-            )));
+    return FittedBox(
+        child: Text(
+      dateStr,
+    ));
   }
 }
