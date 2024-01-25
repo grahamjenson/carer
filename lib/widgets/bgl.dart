@@ -31,28 +31,31 @@ class BGL extends StatelessWidget {
 
   Widget bglLayout(lastSGV, summaryCn, settings) {
     return Row(children: [
-      Expanded(flex: 4, child: bgl(lastSGV.sgvU(settings.unit))),
+      const Spacer(flex: 1),
+      Expanded(flex: 32, child: bgl(lastSGV.sgvU(settings.unit))),
       Expanded(
-          flex: 2,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Spacer(flex: 5),
-                Expanded(
-                    flex: 2,
-                    child: delta(summaryCn.summary.delta(settings.unit))),
-                Expanded(flex: 2, child: trend(summaryCn.summary.trendIcon)),
-                Expanded(flex: 2, child: timeSince(lastSGV.dateAgo)),
-                const Spacer(flex: 5),
-              ]))
+        flex: 8,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Spacer(flex: 5),
+            Expanded(
+                flex: 2, child: delta(summaryCn.summary.delta(settings.unit))),
+            Expanded(flex: 2, child: trend(summaryCn.summary.trendIcon)),
+            Expanded(flex: 2, child: timeSince(lastSGV.dateAgo)),
+            const Spacer(flex: 5),
+          ],
+        ),
+      ),
+      const Spacer(flex: 1),
     ]);
   }
 
   Widget bgl(double sgv) {
     return FittedBox(
         alignment: AlignmentDirectional.centerEnd,
-        fit: BoxFit.fitHeight,
+        fit: BoxFit.fitWidth,
         child: Text(
           sgv.toStringAsFixed(1),
           textAlign: TextAlign.right,
