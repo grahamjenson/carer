@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(8),
         child: const Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Flexible(flex: 2, child: BGL()),
               Flexible(flex: 1, child: History()),

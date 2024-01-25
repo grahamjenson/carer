@@ -12,49 +12,41 @@ class BGL extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
-        builder: (context, settings, summaryCn, child) => Container(
-            color: const Color.fromARGB(255, 0, 0, 0),
-            alignment: Alignment.center,
-            child: Builder(
+        builder: (context, settings, summaryCn, child) => Builder(
               builder: ((context) {
+                const loader = Center(child: CircularProgressIndicator());
                 if (summaryCn.summary.dateRetrieved == Dates.earliest) {
-                  return const CircularProgressIndicator();
+                  return loader;
                 }
 
                 var lastSGV = summaryCn.summary.lastSGV;
                 if (lastSGV == null) {
-                  return const CircularProgressIndicator();
+                  return loader;
                 }
 
-                return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          flex: 4, child: bgl(lastSGV.sgvU(settings.unit))),
-                      Expanded(
-                          flex: 3,
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Spacer(
-                                  flex: 6,
-                                ),
-                                Expanded(
-                                    flex: 2,
-                                    child: delta(summaryCn.summary
-                                        .delta(settings.unit))),
-                                Expanded(
-                                    flex: 2,
-                                    child: trend(summaryCn.summary.trendIcon)),
-                                Expanded(
-                                    flex: 2, child: timeSince(lastSGV.dateAgo)),
-                                const Spacer(flex: 6),
-                              ])),
-                    ]);
+                return bglLayout(lastSGV, summaryCn, settings);
               }),
-            )));
+            ));
+  }
+
+  Widget bglLayout(lastSGV, summaryCn, settings) {
+    return Row(children: [
+      Expanded(flex: 4, child: bgl(lastSGV.sgvU(settings.unit))),
+      Expanded(
+          flex: 2,
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Spacer(flex: 5),
+                Expanded(
+                    flex: 2,
+                    child: delta(summaryCn.summary.delta(settings.unit))),
+                Expanded(flex: 2, child: trend(summaryCn.summary.trendIcon)),
+                Expanded(flex: 2, child: timeSince(lastSGV.dateAgo)),
+                const Spacer(flex: 5),
+              ]))
+    ]);
   }
 
   Widget bgl(double sgv) {

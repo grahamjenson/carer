@@ -7,6 +7,7 @@ import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SGV {
   int sgv;
@@ -97,7 +98,7 @@ class SummaryTreatment extends ATreatment {
   @override
   IconData get icon {
     if (insulin != null) {
-      return Icons.face;
+      return FontAwesomeIcons.syringe;
     } else {
       return Icons.fastfood;
     }
