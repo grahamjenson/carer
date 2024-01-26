@@ -6,6 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+const ts = TextStyle(
+  fontSize: 100, // Set the font size to the value you want
+  height: 0.8,
+);
+
 class BGL extends StatelessWidget {
   const BGL({super.key});
 
@@ -31,7 +36,6 @@ class BGL extends StatelessWidget {
 
   Widget bglLayout(lastSGV, summaryCn, settings) {
     return Row(children: [
-      const Spacer(flex: 1),
       Expanded(flex: 32, child: bgl(lastSGV.sgvU(settings.unit))),
       Expanded(
         flex: 8,
@@ -48,18 +52,31 @@ class BGL extends StatelessWidget {
           ],
         ),
       ),
-      const Spacer(flex: 1),
     ]);
   }
 
   Widget bgl(double sgv) {
-    return FittedBox(
+    var lowerTarget = 4;
+    var upperTarget = 10;
+
+    return Container(
+      padding: const EdgeInsets.all(8),
+      child: FittedBox(
         alignment: AlignmentDirectional.centerEnd,
-        fit: BoxFit.fitWidth,
+        fit: BoxFit.contain,
         child: Text(
           sgv.toStringAsFixed(1),
           textAlign: TextAlign.right,
-        ));
+          style: TextStyle(
+            fontSize: 100,
+            height: 0.8,
+            color: (sgv < lowerTarget || sgv > upperTarget)
+                ? Colors.red
+                : Colors.green,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget trend(IconData icon) {
@@ -71,12 +88,14 @@ class BGL extends StatelessWidget {
         child: Text(
       delta.toStringAsFixed(1),
       textAlign: TextAlign.left,
+      style: ts,
     ));
   }
 
   Widget timeSince(String dateStr) {
     return FittedBox(
         child: Text(
+      style: ts,
       dateStr,
     ));
   }
