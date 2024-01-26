@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/models/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -27,20 +29,28 @@ class SettingsPage extends StatelessWidget {
   }
 
   SettingsSection nightscoutSection(BuildContext context, Settings settings) {
+    // ensuring the text values
+    var maxWidth =
+        min(650, max(0, MediaQuery.of(context).size.width - 200)).toDouble();
     return SettingsSection(
       title: const Text('Nightscout'),
       tiles: [
         SettingsTile.navigation(
           title: const Text('URL'),
-          value: Text(settings.nightscoutURL),
+          value: Container(
+            alignment: Alignment.centerRight,
+            width: maxWidth,
+            child: Text(
+              settings.nightscoutURL,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           leading: const Icon(Icons.language),
           onPressed: (context) async {
             final url = await openTextDialog(context, "Nightscout URL",
                 hint: "URL", value: settings.nightscoutURL);
             if (url == null || url.isEmpty) return;
-            print(settings.toString());
             await settings.setNightscoutURL(url);
-            print(settings.toString());
           },
         ),
       ],
