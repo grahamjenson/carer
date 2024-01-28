@@ -7,7 +7,8 @@ import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'package:unicons/unicons.dart';
 
 class SGV {
   int sgv;
@@ -25,9 +26,8 @@ class SGV {
     );
   }
 
-  // returns the date in minutes ago format
-  String get dateAgo {
-    return Dates.dateAgoFromMills(mills);
+  Duration get age {
+    return DateTime.now().difference(mills);
   }
 
   double sgvU(Unit unit) {
@@ -43,8 +43,8 @@ class SGV {
 abstract class ATreatment {
   DateTime get date;
   IconData get icon;
-  String get minsAgo {
-    return Dates.dateAgoShort(date);
+  Duration get age {
+    return DateTime.now().difference(date);
   }
 
   String get description;
@@ -98,7 +98,7 @@ class SummaryTreatment extends ATreatment {
   @override
   IconData get icon {
     if (insulin != null) {
-      return FontAwesomeIcons.syringe;
+      return UniconsLine.syringe;
     } else {
       return Icons.fastfood;
     }
@@ -202,6 +202,23 @@ class SGVs {
   factory SGVs.fromJson(List<dynamic> json) {
     List<SGV> sgvs = json.map((sgvJson) => SGV.fromJson(sgvJson)).toList();
     return SGVs(sgvs: sgvs);
+  }
+
+  SGV? delta() {
+    if (sgvs.length < 2) {
+      return null;
+    }
+
+    // also sanity check the last two sgvs
+    // second most recent sgv should be within 5 minutes of most recent
+    var last = sgvs.last;
+    var secondLast = sgvs[sgvs.length - 2];
+
+    if ((secondLast.age.inMinutes - last.age.inMinutes).abs() > 5) {
+      return null;
+    }
+
+    return SGV(mills: last.mills, sgv: last.sgv - secondLast.sgv);
   }
 }
 
@@ -364,29 +381,8 @@ class Summary {
     return sgvs.sgvs.last;
   }
 
-  double delta(Unit unit) {
-    if (sgvs.sgvs.length < 2) {
-      return 0;
-    }
-    return (sgvs.sgvs.last.sgvU(unit) -
-            sgvs.sgvs[sgvs.sgvs.length - 2].sgvU(unit))
-        .toDouble();
-  }
-
-  IconData get trendIcon {
-    if (sgvs.sgvs.length < 2) {
-      return Icons.trending_flat;
-    }
-
-    var delta = sgvs.sgvs.last.sgv - sgvs.sgvs[sgvs.sgvs.length - 2].sgv;
-
-    if (delta > 20) {
-      return Icons.trending_up;
-    } else if (delta < -20) {
-      return Icons.trending_down;
-    } else {
-      return Icons.trending_flat;
-    }
+  SGV? get delta {
+    return sgvs.delta();
   }
 
   int ageInSeconds() {

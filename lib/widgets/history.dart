@@ -30,7 +30,7 @@ class History extends StatelessWidget {
   Row historyRow(ATreatment treatment) {
     return Row(children: [
       Icon(treatment.icon),
-      Text(treatment.minsAgo),
+      Text(Dates.dateAgoFromMills(treatment.age)),
       Text(treatment.description),
     ]);
   }

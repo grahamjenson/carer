@@ -1,8 +1,8 @@
 class Dates {
-  static String dateAgoFromMills(DateTime? mills) {
-    if (mills == null) return "";
-    var now = DateTime.now();
-    var diff = now.difference(mills);
+  static String dateAgoFromMills(Duration? diff) {
+    if (diff == null) {
+      return "";
+    }
     var minutes = diff.inMinutes;
     if (minutes < 60) {
       return "${minutes}mins";
@@ -15,12 +15,10 @@ class Dates {
     return "${days}days";
   }
 
-  static String dateAgoShort(DateTime? mills) {
-    if (mills == null) return "";
-    var now = DateTime.now();
-    // returns time ago in format 1d 2h 3m
-    var diff = now.difference(mills);
-
+  static String dateAgoShort(Duration? diff) {
+    if (diff == null) {
+      return "";
+    }
     if (diff.inHours > 0) {
       return "${diff.inHours}h ${diff.inMinutes % 60}m ago";
     }
