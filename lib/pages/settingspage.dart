@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:carer/models/settings_cn.dart';
@@ -69,6 +70,22 @@ class SettingsPage extends StatelessWidget {
             await settings.setUnit(unitP);
           },
         ),
+        SettingsTile.navigation(
+          title: Text('Range High ${settings.rangeHigh}'),
+          value: Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              settings.rangeHigh.toString(),
+            ),
+          ),
+          leading: const Icon(Icons.language),
+          onPressed: (context) async {
+            final range = await openSliderDialog(context, "Nightscout URL",
+                hint: "URL", value: settings.rangeHigh);
+            if (range == null) return;
+            await settings.setRangeHigh(range);
+          },
+        ),
       ],
     );
   }
@@ -104,6 +121,33 @@ class SettingsPage extends StatelessWidget {
                 TextButton(
                     onPressed: () =>
                         {Navigator.of(context).pop(controller.text)},
+                    child: const Text("Save"))
+              ],
+            ));
+  }
+
+  Future<int?> openSliderDialog(BuildContext context, String title,
+      {String hint = "", int value = 0}) {
+    double currentSliderValue = value.toDouble();
+    // TODO add http regex validator
+    return showDialog<int>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(title),
+              content: Slider(
+                  value: value.toDouble(),
+                  autofocus: true,
+                  max: 300,
+                  min: 100,
+                  divisions: 20,
+                  label: currentSliderValue.round().toString(),
+                  onChanged: (double value) {
+                    currentSliderValue = value;
+                  }),
+              actions: [
+                TextButton(
+                    onPressed: () =>
+                        {Navigator.of(context).pop(currentSliderValue.toInt())},
                     child: const Text("Save"))
               ],
             ));

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SettingNames { nightscoutUrl, unit, screenActive }
+enum SettingNames { nightscoutUrl, unit, screenActive, rangeHigh, rangeLow }
 
 enum Unit { mmol, mg }
 
@@ -38,30 +38,46 @@ extension UnitExtension on Unit {
 }
 
 class Settings extends ChangeNotifier {
+  late SharedPreferences prefs;
+
   String nightscoutURL = '';
   Unit unit = Unit.mmol;
   bool screenActive = true;
+  int rangeHigh = 180;
+  int rangeLow = 72;
 
   Future<void> populate() async {
-    final prefs = await SharedPreferences.getInstance();
-    var urlPref = prefs.getString(SettingNames.nightscoutUrl.name);
-    var unitPref = prefs.getBool(SettingNames.unit.name);
-    var screenActivePref = prefs.getBool(SettingNames.unit.name);
+    prefs = await SharedPreferences.getInstance();
 
+    var urlPref = prefs.getString(SettingNames.nightscoutUrl.name);
     if (urlPref != null && urlPref.isNotEmpty) {
       nightscoutURL = urlPref;
     }
+
+    var unitPref = prefs.getBool(SettingNames.unit.name);
     if (unitPref != null) {
       unit = UnitExtension.fromBool(unitPref);
     }
+
+    var screenActivePref = prefs.getBool(SettingNames.unit.name);
     if (screenActivePref != null) {
       screenActive = screenActivePref;
+    }
+
+    var rangeHighPref = prefs.getInt(SettingNames.rangeHigh.name);
+    if (rangeHighPref != null) {
+      rangeHigh = rangeHighPref;
+    }
+
+    var rangeLowPref = prefs.getInt(SettingNames.rangeLow.name);
+    if (rangeLowPref != null) {
+      rangeLow = rangeLowPref;
     }
   }
 
   @override
   String toString() {
-    return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive}';
+    return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive, rangeHigh: $rangeHigh, rangeLow: $rangeLow}';
   }
 
   ////
@@ -80,7 +96,6 @@ class Settings extends ChangeNotifier {
   }
 
   Future<void> setNightscoutURL(String value) async {
-    final prefs = await SharedPreferences.getInstance();
     prefs.setString(SettingNames.nightscoutUrl.name, value);
     nightscoutURL = value;
     notifyListeners();
@@ -91,7 +106,6 @@ class Settings extends ChangeNotifier {
   ////
 
   Future<void> setUnit(Unit value) async {
-    final prefs = await SharedPreferences.getInstance();
     prefs.setBool(SettingNames.unit.name, value.toBool());
     unit = value;
     notifyListeners();
@@ -102,9 +116,32 @@ class Settings extends ChangeNotifier {
   ////
 
   Future<void> setScreenActive(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
     prefs.setBool(SettingNames.unit.name, value);
     screenActive = value;
+    notifyListeners();
+  }
+
+  ////
+  // RANGE HIGH
+  ////
+
+  Future<void> setRangeHigh(int value) async {
+    rangeHigh = value;
+    await setInt(SettingNames.rangeHigh, value);
+  }
+
+  ////
+  // RANGE LOW
+  ////
+
+  Future<void> setRangeLow(int value) async {
+    rangeLow = value;
+    await setInt(SettingNames.rangeLow, value);
+  }
+
+  // PRIVATE FUNCTIONS
+  Future<void> setInt(SettingNames name, int value) async {
+    await prefs.setInt(name.name, value);
     notifyListeners();
   }
 }
