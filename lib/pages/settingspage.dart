@@ -66,6 +66,11 @@ class SettingsPage extends StatelessWidget {
     var highStr = unit.str(high);
     var lowStr = unit.str(low);
 
+    var uhigh = settings.urgentHigh.toDouble();
+    var ulow = settings.urgentLow.toDouble();
+    var uhighStr = unit.str(uhigh);
+    var ulowStr = unit.str(ulow);
+
     return SettingsSection(
       tiles: [
         SettingsTile.switchTile(
@@ -81,6 +86,7 @@ class SettingsPage extends StatelessWidget {
           //title: Text('Range High ${settings.rangeHigh}'),
           title: Row(children: [
             const Expanded(flex: 3, child: Text("Target")),
+            Expanded(flex: 1, child: Text(lowStr, textAlign: TextAlign.end)),
             Expanded(
                 flex: 6,
                 child: Container(
@@ -88,15 +94,48 @@ class SettingsPage extends StatelessWidget {
                     height: 20,
                     child: RangeSlider(
                       values: RangeValues(low, high),
-                      labels: RangeLabels(lowStr, highStr),
                       divisions: 230,
                       min: 50,
                       max: 280,
                       onChanged: (RangeValues vals) {
-                        settings.setTargetLow(vals.start.toInt());
-                        settings.setTargetHigh(vals.end.toInt());
+                        var newLow = vals.start.toInt();
+                        var newHigh = vals.end.toInt();
+                        settings.setTargetLow(newLow);
+                        settings.setTargetHigh(newHigh);
                       },
                     ))),
+            Expanded(
+                flex: 1,
+                child: Text(
+                  highStr,
+                  textAlign: TextAlign.start,
+                )),
+            const Spacer(flex: 1)
+          ]),
+          leading: const Icon(UniconsLine.arrow_circle_up),
+        ),
+        SettingsTile(
+          //title: Text('Range High ${settings.rangeHigh}'),
+          title: Row(children: [
+            const Expanded(flex: 3, child: Text("Urgent Target")),
+            Expanded(flex: 1, child: Text(ulowStr, textAlign: TextAlign.end)),
+            Expanded(
+                flex: 6,
+                child: Container(
+                    alignment: Alignment.center,
+                    height: 20,
+                    child: RangeSlider(
+                      values: RangeValues(ulow, uhigh),
+                      divisions: 230,
+                      min: 50,
+                      max: 280,
+                      onChanged: (RangeValues vals) {
+                        settings.setUrgentLow(vals.start.toInt());
+                        settings.setUrgentHigh(vals.end.toInt());
+                      },
+                    ))),
+            Expanded(
+                flex: 1, child: Text(uhighStr, textAlign: TextAlign.start)),
             const Spacer(flex: 1)
           ]),
           leading: const Icon(UniconsLine.arrow_circle_up),
@@ -144,7 +183,6 @@ class SettingsPage extends StatelessWidget {
   Future<int?> openSliderDialog(BuildContext context, String title,
       {String hint = "", int value = 0}) {
     double currentSliderValue = value.toDouble();
-    // TODO add http regex validator
     return showDialog<int>(
         context: context,
         builder: (context) => AlertDialog(

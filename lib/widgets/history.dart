@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
@@ -11,27 +13,44 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
-        builder: (context, settings, summaryCn, child) => Container(
-            color: const Color.fromARGB(255, 255, 0, 0),
-            alignment: Alignment.center,
-            child: Builder(
-              builder: ((context) {
-                if (summaryCn.summary.dateRetrieved == Dates.earliest) {
-                  return const Text("");
-                }
+        builder: (context, settings, summaryCn, child) {
+      var width = MediaQuery.of(context).size.width;
 
-                var history = summaryCn.summary.history;
-                var rows = [for (var t in history) historyRow(t)];
-                return Column(children: rows);
-              }),
-            )));
+      // minSize of container
+      const int minWidth = 300;
+      const int minHeight = 60;
+      var count = max(1, width / minWidth).toInt();
+      var ratio = (width / count) / minHeight;
+      return GridView.count(
+        crossAxisCount: count,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: ratio,
+        children: historyContainers(settings, summaryCn),
+      );
+    });
   }
 
-  Row historyRow(ATreatment treatment) {
-    return Row(children: [
-      Icon(treatment.icon),
-      Text(Dates.dateAgoFromMills(treatment.age)),
-      Text(treatment.description),
-    ]);
+  List<Widget> historyContainers(Settings settings, SummaryCN summaryCn) {
+    if (summaryCn.summary.dateRetrieved == Dates.earliest) {
+      return [];
+    }
+    var history = summaryCn.summary.history;
+    return [for (var t in history) historyRow(t)];
+  }
+
+  Widget historyRow(ATreatment treatment) {
+    return SizedBox(
+      child: Card(
+        child: ListTile(
+          leading: Icon(treatment.icon),
+          title: Text(
+            treatment.description,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Text(Dates.dateAgoShort(treatment.age)),
+        ),
+      ),
+    );
   }
 }

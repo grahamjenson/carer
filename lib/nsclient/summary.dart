@@ -414,7 +414,6 @@ class Summary {
     // sort the history by date
     history.sort((a, b) => b.date.compareTo(a.date));
 
-    history = history.take(6).toList();
     return history;
   }
 }

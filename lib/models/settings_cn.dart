@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SettingNames { nightscoutUrl, unit, screenActive, targetHigh, targetLow }
+enum SettingNames {
+  nightscoutUrl,
+  unit,
+  screenActive,
+  targetHigh,
+  targetLow,
+  urgentHigh,
+  urgentLow
+}
 
 enum Unit { mmol, mg }
 
@@ -56,6 +64,8 @@ class Settings extends ChangeNotifier {
   bool screenActive = true;
   int targetHigh = 180;
   int targetLow = 72;
+  int urgentHigh = 270;
+  int urgentLow = 55;
 
   Future<void> populate() async {
     prefs = await SharedPreferences.getInstance();
@@ -84,6 +94,16 @@ class Settings extends ChangeNotifier {
     if (targetLowPref != null) {
       targetLow = targetLowPref;
     }
+
+    var urgentHighPref = prefs.getInt(SettingNames.urgentHigh.name);
+    if (urgentHighPref != null) {
+      urgentHigh = urgentHighPref;
+    }
+
+    var urgentLowPref = prefs.getInt(SettingNames.urgentLow.name);
+    if (urgentLowPref != null) {
+      urgentLow = urgentLowPref;
+    }
   }
 
   @override
@@ -91,9 +111,8 @@ class Settings extends ChangeNotifier {
     return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive, targetHigh: $targetHigh, targetLow: $targetLow}';
   }
 
-  ////
   // NIGHT SCOUT URL
-  ////
+
   (String, String) get nightscoutURLAndToken {
     if (nightscoutURL.isNotEmpty) {
       var uri = Uri.parse(nightscoutURL);
@@ -112,9 +131,7 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  ////
   // UNIT
-  ////
 
   Future<void> setUnit(Unit value) async {
     prefs.setBool(SettingNames.unit.name, value.toBool());
@@ -122,9 +139,7 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  ////
   // SCREEN ACTIVE
-  ////
 
   Future<void> setScreenActive(bool value) async {
     prefs.setBool(SettingNames.unit.name, value);
@@ -132,25 +147,67 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  ////
   // target HIGH
-  ////
 
   Future<void> setTargetHigh(int value) async {
+    if (value < targetLow) {
+      return;
+    }
+
     targetHigh = value;
     await setInt(SettingNames.targetHigh, value);
+
+    if (targetHigh > urgentHigh) {
+      await setUrgentHigh(value);
+    }
   }
 
-  ////
   // target LOW
-  ////
 
   Future<void> setTargetLow(int value) async {
+    if (targetHigh < value) {
+      return;
+    }
     targetLow = value;
     await setInt(SettingNames.targetLow, value);
+
+    if (targetLow < urgentLow) {
+      await setUrgentLow(value);
+    }
   }
 
+  // Urgent HIGH
+
+  Future<void> setUrgentHigh(int value) async {
+    if (value < urgentLow) {
+      return;
+    }
+
+    urgentHigh = value;
+    await setInt(SettingNames.urgentHigh, value);
+
+    if (targetHigh > urgentHigh) {
+      await setTargetHigh(value);
+    }
+  }
+
+  // Urgent LOW
+
+  Future<void> setUrgentLow(int value) async {
+    if (urgentHigh < value) {
+      return;
+    }
+
+    urgentLow = value;
+    await setInt(SettingNames.urgentLow, value);
+    if (targetLow < urgentLow) {
+      await setTargetLow(value);
+    }
+  }
+
+  ////
   // PRIVATE FUNCTIONS
+  ////
   Future<void> setInt(SettingNames name, int value) async {
     await prefs.setInt(name.name, value);
     notifyListeners();
