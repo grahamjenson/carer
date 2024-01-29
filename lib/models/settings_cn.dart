@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SettingNames { nightscoutUrl, unit, screenActive, rangeHigh, rangeLow }
+enum SettingNames { nightscoutUrl, unit, screenActive, targetHigh, targetLow }
 
 enum Unit { mmol, mg }
 
@@ -35,6 +35,17 @@ extension UnitExtension on Unit {
         return "mmol/L";
     }
   }
+
+  String str(double value) {
+    switch (this) {
+      case Unit.mmol:
+        return (value / 18).toStringAsFixed(1);
+      case Unit.mg:
+        return value.toString();
+      default:
+        return value.toString();
+    }
+  }
 }
 
 class Settings extends ChangeNotifier {
@@ -43,8 +54,8 @@ class Settings extends ChangeNotifier {
   String nightscoutURL = '';
   Unit unit = Unit.mmol;
   bool screenActive = true;
-  int rangeHigh = 180;
-  int rangeLow = 72;
+  int targetHigh = 180;
+  int targetLow = 72;
 
   Future<void> populate() async {
     prefs = await SharedPreferences.getInstance();
@@ -64,20 +75,20 @@ class Settings extends ChangeNotifier {
       screenActive = screenActivePref;
     }
 
-    var rangeHighPref = prefs.getInt(SettingNames.rangeHigh.name);
-    if (rangeHighPref != null) {
-      rangeHigh = rangeHighPref;
+    var targetHighPref = prefs.getInt(SettingNames.targetHigh.name);
+    if (targetHighPref != null) {
+      targetHigh = targetHighPref;
     }
 
-    var rangeLowPref = prefs.getInt(SettingNames.rangeLow.name);
-    if (rangeLowPref != null) {
-      rangeLow = rangeLowPref;
+    var targetLowPref = prefs.getInt(SettingNames.targetLow.name);
+    if (targetLowPref != null) {
+      targetLow = targetLowPref;
     }
   }
 
   @override
   String toString() {
-    return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive, rangeHigh: $rangeHigh, rangeLow: $rangeLow}';
+    return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive, targetHigh: $targetHigh, targetLow: $targetLow}';
   }
 
   ////
@@ -122,21 +133,21 @@ class Settings extends ChangeNotifier {
   }
 
   ////
-  // RANGE HIGH
+  // target HIGH
   ////
 
-  Future<void> setRangeHigh(int value) async {
-    rangeHigh = value;
-    await setInt(SettingNames.rangeHigh, value);
+  Future<void> setTargetHigh(int value) async {
+    targetHigh = value;
+    await setInt(SettingNames.targetHigh, value);
   }
 
   ////
-  // RANGE LOW
+  // target LOW
   ////
 
-  Future<void> setRangeLow(int value) async {
-    rangeLow = value;
-    await setInt(SettingNames.rangeLow, value);
+  Future<void> setTargetLow(int value) async {
+    targetLow = value;
+    await setInt(SettingNames.targetLow, value);
   }
 
   // PRIVATE FUNCTIONS

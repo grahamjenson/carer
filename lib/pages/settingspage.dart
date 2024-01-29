@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:unicons/unicons.dart';
 
 class SettingsPage extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
@@ -59,6 +60,12 @@ class SettingsPage extends StatelessWidget {
   }
 
   SettingsSection unitsSection(Settings settings) {
+    var unit = settings.unit;
+    var high = settings.targetHigh.toDouble();
+    var low = settings.targetLow.toDouble();
+    var highStr = unit.str(high);
+    var lowStr = unit.str(low);
+
     return SettingsSection(
       tiles: [
         SettingsTile.switchTile(
@@ -70,21 +77,29 @@ class SettingsPage extends StatelessWidget {
             await settings.setUnit(unitP);
           },
         ),
-        SettingsTile.navigation(
-          title: Text('Range High ${settings.rangeHigh}'),
-          value: Container(
-            alignment: Alignment.centerRight,
-            child: Text(
-              settings.rangeHigh.toString(),
-            ),
-          ),
-          leading: const Icon(Icons.language),
-          onPressed: (context) async {
-            final range = await openSliderDialog(context, "Nightscout URL",
-                hint: "URL", value: settings.rangeHigh);
-            if (range == null) return;
-            await settings.setRangeHigh(range);
-          },
+        SettingsTile(
+          //title: Text('Range High ${settings.rangeHigh}'),
+          title: Row(children: [
+            const Expanded(flex: 3, child: Text("Target")),
+            Expanded(
+                flex: 6,
+                child: Container(
+                    alignment: Alignment.center,
+                    height: 20,
+                    child: RangeSlider(
+                      values: RangeValues(low, high),
+                      labels: RangeLabels(lowStr, highStr),
+                      divisions: 230,
+                      min: 50,
+                      max: 280,
+                      onChanged: (RangeValues vals) {
+                        settings.setTargetLow(vals.start.toInt());
+                        settings.setTargetHigh(vals.end.toInt());
+                      },
+                    ))),
+            const Spacer(flex: 1)
+          ]),
+          leading: const Icon(UniconsLine.arrow_circle_up),
         ),
       ],
     );

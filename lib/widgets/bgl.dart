@@ -67,14 +67,15 @@ class BGL extends StatelessWidget {
 
   Widget bglLayout(SGV lastSGV, SummaryCN summaryCn, Settings settings) {
     return Row(children: [
-      Expanded(flex: 2, child: bgl(lastSGV.sgvU(settings.unit))),
+      Expanded(flex: 2, child: bgl(lastSGV, settings)),
       Expanded(flex: 1, child: diffPanel(settings, summaryCn))
     ]);
   }
 
-  Widget bgl(double sgv) {
-    var lowerTarget = 4;
-    var upperTarget = 10;
+  Widget bgl(SGV sgv, Settings settings) {
+    var unit = settings.unit;
+    var lowTarget = settings.targetLow;
+    var highTarget = settings.targetHigh;
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -82,12 +83,12 @@ class BGL extends StatelessWidget {
         alignment: AlignmentDirectional.centerEnd,
         fit: BoxFit.contain,
         child: Text(
-          sgv.toStringAsFixed(1),
+          sgv.sgvStr(unit),
           textAlign: TextAlign.right,
           style: TextStyle(
             fontSize: 100,
             height: 0.8,
-            color: (sgv < lowerTarget || sgv > upperTarget)
+            color: (sgv.sgv < lowTarget || sgv.sgv > highTarget)
                 ? Colors.red
                 : Colors.green,
           ),

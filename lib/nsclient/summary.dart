@@ -38,6 +38,15 @@ class SGV {
         return (sgv / 18).toDouble();
     }
   }
+
+  String sgvStr(Unit unit) {
+    switch (unit) {
+      case Unit.mg:
+        return sgv.toString();
+      case Unit.mmol:
+        return (sgv / 18).toStringAsFixed(1);
+    }
+  }
 }
 
 abstract class ATreatment {
