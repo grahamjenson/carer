@@ -85,7 +85,7 @@ class SettingsPage extends StatelessWidget {
         SettingsTile(
           //title: Text('Range High ${settings.rangeHigh}'),
           title: Row(children: [
-            const Expanded(flex: 3, child: Text("Target")),
+            const Expanded(flex: 2, child: Text("Target")),
             Expanded(flex: 1, child: Text(lowStr, textAlign: TextAlign.end)),
             Expanded(
                 flex: 6,
@@ -110,14 +110,12 @@ class SettingsPage extends StatelessWidget {
                   highStr,
                   textAlign: TextAlign.start,
                 )),
-            const Spacer(flex: 1)
           ]),
-          leading: const Icon(UniconsLine.arrow_circle_up),
         ),
         SettingsTile(
           //title: Text('Range High ${settings.rangeHigh}'),
           title: Row(children: [
-            const Expanded(flex: 3, child: Text("Urgent Target")),
+            const Expanded(flex: 2, child: Text("Urgent")),
             Expanded(flex: 1, child: Text(ulowStr, textAlign: TextAlign.end)),
             Expanded(
                 flex: 6,
@@ -136,9 +134,7 @@ class SettingsPage extends StatelessWidget {
                     ))),
             Expanded(
                 flex: 1, child: Text(uhighStr, textAlign: TextAlign.start)),
-            const Spacer(flex: 1)
           ]),
-          leading: const Icon(UniconsLine.arrow_circle_up),
         ),
       ],
     );

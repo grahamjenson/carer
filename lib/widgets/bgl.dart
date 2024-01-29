@@ -2,6 +2,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/widgets/math.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -19,26 +20,25 @@ IconData trendIcon(SGV? delta) {
   }
 
   var sgv = delta.sgv;
+  var (target, proportion) = targetRange(-9, -5, 5, 9, sgv.toDouble());
 
-  if (sgv.abs() < 5) {
-    return UniconsLine.arrow_right;
-  } else if (sgv.abs() < 9) {
-    // diagonal arrows
-    if (sgv < 0) {
-      return UniconsLine.arrow_down_right;
-    }
-    return UniconsLine.arrow_up_right;
-  } else if (sgv.abs() < 19) {
-    // diagonal arrows
-    if (sgv < 0) {
+  switch (target) {
+    case TargetRange.veryLow:
+      if (proportion > 10) {
+        return UniconsLine.angle_double_down;
+      }
       return UniconsLine.arrow_down;
-    }
-    return UniconsLine.arrow_up;
-  } else {
-    if (sgv < 0) {
-      return UniconsLine.angle_double_down;
-    }
-    return UniconsLine.angle_double_up;
+    case TargetRange.low:
+      return UniconsLine.arrow_down_right;
+    case TargetRange.inRange:
+      return UniconsLine.arrow_right;
+    case TargetRange.high:
+      return UniconsLine.arrow_up_right;
+    case TargetRange.veryHigh:
+      if (proportion > 10) {
+        return UniconsLine.angle_double_up;
+      }
+      return UniconsLine.arrow_up;
   }
 }
 
@@ -76,6 +76,38 @@ class BGL extends StatelessWidget {
     var unit = settings.unit;
     var lowTarget = settings.targetLow;
     var highTarget = settings.targetHigh;
+    var urgentHigh = settings.urgentHigh;
+    var urgentLow = settings.urgentLow;
+
+    var (target, proportion) = targetRange(
+        urgentLow.toDouble(),
+        lowTarget.toDouble(),
+        highTarget.toDouble(),
+        urgentHigh.toDouble(),
+        sgv.sgv.toDouble());
+
+    var color1 = Colors.red;
+    var color2 = Colors.green;
+
+    switch (target) {
+      case TargetRange.veryLow:
+        color1 = Colors.red;
+        color2 = Colors.red;
+      case TargetRange.low:
+        color1 = Colors.yellow;
+        color2 = Colors.red;
+      case TargetRange.inRange:
+        color1 = Colors.green;
+        color2 = Colors.green;
+      case TargetRange.high:
+        color1 = Colors.red;
+        color2 = Colors.yellow;
+      case TargetRange.veryHigh:
+        color1 = Colors.red;
+        color2 = Colors.red;
+    }
+
+    var color = Color.lerp(color1, color2, proportion.toDouble());
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -88,9 +120,7 @@ class BGL extends StatelessWidget {
           style: TextStyle(
             fontSize: 100,
             height: 0.8,
-            color: (sgv.sgv < lowTarget || sgv.sgv > highTarget)
-                ? Colors.red
-                : Colors.green,
+            color: color,
           ),
         ),
       ),

@@ -49,9 +49,9 @@ extension UnitExtension on Unit {
       case Unit.mmol:
         return (value / 18).toStringAsFixed(1);
       case Unit.mg:
-        return value.toString();
+        return value.toStringAsFixed(0);
       default:
-        return value.toString();
+        return value.toStringAsFixed(0);
     }
   }
 }
@@ -149,60 +149,55 @@ class Settings extends ChangeNotifier {
 
   // target HIGH
 
-  Future<void> setTargetHigh(int value) async {
-    if (value < targetLow) {
+  Future<void> setTargetHigh(int nTargetHigh) async {
+    if (!validTargets(urgentLow, targetLow, nTargetHigh, urgentHigh)) {
       return;
     }
 
-    targetHigh = value;
-    await setInt(SettingNames.targetHigh, value);
-
-    if (targetHigh > urgentHigh) {
-      await setUrgentHigh(value);
-    }
+    targetHigh = nTargetHigh;
+    await setInt(SettingNames.targetHigh, nTargetHigh);
   }
 
   // target LOW
 
-  Future<void> setTargetLow(int value) async {
-    if (targetHigh < value) {
+  Future<void> setTargetLow(int nTargetLow) async {
+    if (!validTargets(urgentLow, nTargetLow, targetHigh, urgentHigh)) {
       return;
     }
-    targetLow = value;
-    await setInt(SettingNames.targetLow, value);
 
-    if (targetLow < urgentLow) {
-      await setUrgentLow(value);
-    }
+    targetLow = nTargetLow;
+    await setInt(SettingNames.targetLow, nTargetLow);
   }
 
   // Urgent HIGH
 
-  Future<void> setUrgentHigh(int value) async {
-    if (value < urgentLow) {
+  Future<void> setUrgentHigh(int nUrgentHigh) async {
+    if (!validTargets(urgentLow, targetLow, targetHigh, nUrgentHigh)) {
       return;
     }
 
-    urgentHigh = value;
-    await setInt(SettingNames.urgentHigh, value);
-
-    if (targetHigh > urgentHigh) {
-      await setTargetHigh(value);
-    }
+    urgentHigh = nUrgentHigh;
+    await setInt(SettingNames.urgentHigh, nUrgentHigh);
   }
 
   // Urgent LOW
 
-  Future<void> setUrgentLow(int value) async {
-    if (urgentHigh < value) {
+  Future<void> setUrgentLow(int nUrgentLow) async {
+    if (!validTargets(nUrgentLow, targetLow, targetHigh, urgentHigh)) {
       return;
     }
 
-    urgentLow = value;
-    await setInt(SettingNames.urgentLow, value);
-    if (targetLow < urgentLow) {
-      await setTargetLow(value);
-    }
+    urgentLow = nUrgentLow;
+    await setInt(SettingNames.urgentLow, nUrgentLow);
+  }
+
+  bool validTargets(
+      int urgentLow, int targetLow, int targetHigh, int urgentHigh) {
+    return 9 <= urgentLow &&
+        urgentLow <= targetLow &&
+        targetLow <= targetHigh &&
+        targetHigh <= urgentHigh &&
+        urgentHigh <= 360;
   }
 
   ////
