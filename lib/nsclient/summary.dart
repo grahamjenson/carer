@@ -414,6 +414,13 @@ class Summary {
     // sort the history by date
     history.sort((a, b) => b.date.compareTo(a.date));
 
+    // filter history to items that only happend in late 6 hours
+    history = history
+        .where((element) => element.date.isAfter(DateTime.now().subtract(
+              const Duration(hours: 6),
+            )))
+        .toList();
+
     return history;
   }
 }
