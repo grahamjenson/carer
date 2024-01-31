@@ -15,10 +15,11 @@ class Dates {
     return "${days}days";
   }
 
-  static String dateAgoShort(Duration? diff) {
-    if (diff == null) {
-      return "";
+  static String dateAgoShort(Duration diff) {
+    if (diff.inMinutes == 0) {
+      return "now";
     }
+
     if (diff.inHours > 0) {
       return "${diff.inHours}h ${diff.inMinutes % 60}m ago";
     }
