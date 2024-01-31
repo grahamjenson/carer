@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:carer/pages/settingspage.dart';
 
-import 'package:carer/widgets/bgl.dart';
+import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/history.dart';
 import 'package:carer/widgets/sleep.dart';
 import 'package:flutter/material.dart';
