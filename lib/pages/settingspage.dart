@@ -100,8 +100,8 @@ class SettingsPage extends StatelessWidget {
                       onChanged: (RangeValues vals) {
                         var newLow = vals.start.toInt();
                         var newHigh = vals.end.toInt();
-                        settings.setTargetLow(newLow);
-                        settings.setTargetHigh(newHigh);
+                        settings.targetLow = newLow;
+                        settings.targetHigh = newHigh;
                       },
                     ))),
             Expanded(
@@ -128,8 +128,8 @@ class SettingsPage extends StatelessWidget {
                       min: 50,
                       max: 280,
                       onChanged: (RangeValues vals) {
-                        settings.setUrgentLow(vals.start.toInt());
-                        settings.setUrgentHigh(vals.end.toInt());
+                        settings.urgentLow = vals.start.toInt();
+                        settings.urgentHigh = vals.end.toInt();
                       },
                     ))),
             Expanded(

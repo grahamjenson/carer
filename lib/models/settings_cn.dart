@@ -62,10 +62,13 @@ class Settings extends ChangeNotifier {
   String nightscoutURL = '';
   Unit unit = Unit.mmol;
   bool screenActive = true;
-  int targetHigh = 180;
-  int targetLow = 72;
-  int urgentHigh = 270;
-  int urgentLow = 55;
+
+  Map<String, int> targets = {
+    SettingNames.targetHigh.name: 180,
+    SettingNames.targetLow.name: 72,
+    SettingNames.urgentHigh.name: 270,
+    SettingNames.urgentLow.name: 55
+  };
 
   Future<void> populate() async {
     prefs = await SharedPreferences.getInstance();
@@ -85,24 +88,11 @@ class Settings extends ChangeNotifier {
       screenActive = screenActivePref;
     }
 
-    var targetHighPref = prefs.getInt(SettingNames.targetHigh.name);
-    if (targetHighPref != null) {
-      targetHigh = targetHighPref;
-    }
-
-    var targetLowPref = prefs.getInt(SettingNames.targetLow.name);
-    if (targetLowPref != null) {
-      targetLow = targetLowPref;
-    }
-
-    var urgentHighPref = prefs.getInt(SettingNames.urgentHigh.name);
-    if (urgentHighPref != null) {
-      urgentHigh = urgentHighPref;
-    }
-
-    var urgentLowPref = prefs.getInt(SettingNames.urgentLow.name);
-    if (urgentLowPref != null) {
-      urgentLow = urgentLowPref;
+    for (var setting in targets.entries) {
+      var value = prefs.getInt(setting.key);
+      if (value != null) {
+        targets[setting.key] = value;
+      }
     }
   }
 
@@ -147,49 +137,43 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  // target HIGH
-
-  Future<void> setTargetHigh(int nTargetHigh) async {
-    if (!validTargets(urgentLow, targetLow, nTargetHigh, urgentHigh)) {
-      return;
-    }
-
-    targetHigh = nTargetHigh;
-    await setInt(SettingNames.targetHigh, nTargetHigh);
+  // getters
+  int get targetHigh {
+    return targets[SettingNames.targetHigh.name]!;
   }
 
-  // target LOW
-
-  Future<void> setTargetLow(int nTargetLow) async {
-    if (!validTargets(urgentLow, nTargetLow, targetHigh, urgentHigh)) {
-      return;
-    }
-
-    targetLow = nTargetLow;
-    await setInt(SettingNames.targetLow, nTargetLow);
+  int get targetLow {
+    return targets[SettingNames.targetLow.name]!;
   }
 
-  // Urgent HIGH
-
-  Future<void> setUrgentHigh(int nUrgentHigh) async {
-    if (!validTargets(urgentLow, targetLow, targetHigh, nUrgentHigh)) {
-      return;
-    }
-
-    urgentHigh = nUrgentHigh;
-    await setInt(SettingNames.urgentHigh, nUrgentHigh);
+  int get urgentHigh {
+    return targets[SettingNames.urgentHigh.name]!;
   }
 
-  // Urgent LOW
-
-  Future<void> setUrgentLow(int nUrgentLow) async {
-    if (!validTargets(nUrgentLow, targetLow, targetHigh, urgentHigh)) {
-      return;
-    }
-
-    urgentLow = nUrgentLow;
-    await setInt(SettingNames.urgentLow, nUrgentLow);
+  int get urgentLow {
+    return targets[SettingNames.urgentLow.name]!;
   }
+
+  // setters
+
+  set targetHigh(int value) {
+    setTarget(SettingNames.targetHigh, value);
+  }
+
+  set targetLow(int value) {
+    setTarget(SettingNames.targetLow, value);
+  }
+
+  set urgentHigh(int value) {
+    setTarget(SettingNames.urgentHigh, value);
+  }
+
+  set urgentLow(int value) {
+    setTarget(SettingNames.urgentLow, value);
+  }
+
+  ////
+  // private functions
 
   bool validTargets(
       int urgentLow, int targetLow, int targetHigh, int urgentHigh) {
@@ -203,8 +187,19 @@ class Settings extends ChangeNotifier {
   ////
   // PRIVATE FUNCTIONS
   ////
-  Future<void> setInt(SettingNames name, int value) async {
-    await prefs.setInt(name.name, value);
+  Future<void> setTarget(SettingNames setting, int value) async {
+    var clone = Map<String, int>.from(targets);
+    clone[setting.name] = value;
+    if (validTargets(
+        clone[SettingNames.urgentLow.name]!,
+        clone[SettingNames.targetLow.name]!,
+        clone[SettingNames.targetHigh.name]!,
+        clone[SettingNames.urgentHigh.name]!)) {
+      targets = clone;
+    } else {
+      return;
+    }
+    await prefs.setInt(setting.name, value);
     notifyListeners();
   }
 }
