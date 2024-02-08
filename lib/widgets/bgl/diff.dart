@@ -52,6 +52,12 @@ class _DiffWidgetState extends State<DiffWidget>
   }
 
   @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {

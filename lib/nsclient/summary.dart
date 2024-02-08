@@ -11,7 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
 
 class SGV {
-  int sgv;
+  final int sgv;
   DateTime mills;
 
   SGV({
@@ -170,15 +170,15 @@ class Target extends ATreatment {
 }
 
 class SummaryState {
-  double iob;
-  int cob;
-  double bwp;
-  int cage;
-  int iage;
-  int bage;
-  int battery;
+  final double iob;
+  final int cob;
+  final double bwp;
+  final int cage;
+  final int iage;
+  final int bage;
+  final int battery;
 
-  SummaryState({
+  const SummaryState({
     required this.iob,
     required this.cob,
     required this.bwp,
@@ -202,9 +202,9 @@ class SummaryState {
 }
 
 class SGVs {
-  List<SGV> sgvs;
+  final List<SGV> sgvs;
 
-  SGVs({
+  const SGVs({
     required this.sgvs,
   });
 
@@ -232,9 +232,9 @@ class SGVs {
 }
 
 class TempBasals {
-  List<TempBasal> tempBasals;
+  final List<TempBasal> tempBasals;
 
-  TempBasals({
+  const TempBasals({
     required this.tempBasals,
   });
 
@@ -246,9 +246,9 @@ class TempBasals {
 }
 
 class SummaryTreatments {
-  List<SummaryTreatment> treatments;
+  final List<SummaryTreatment> treatments;
 
-  SummaryTreatments({
+  const SummaryTreatments({
     required this.treatments,
   });
 
@@ -261,9 +261,9 @@ class SummaryTreatments {
 }
 
 class Targets {
-  List<Target> targets;
+  final List<Target> targets;
 
-  Targets({
+  const Targets({
     required this.targets,
   });
 
@@ -275,16 +275,16 @@ class Targets {
 }
 
 class Profile {
-  int dia;
-  List<TimeValue> carbratio;
-  List<TimeValue> sens;
-  List<TimeValue> basal;
-  List<TimeValue> targetLow;
-  List<TimeValue> targetHigh;
-  String units;
-  String timezone;
+  final int dia;
+  final List<TimeValue> carbratio;
+  final List<TimeValue> sens;
+  final List<TimeValue> basal;
+  final List<TimeValue> targetLow;
+  final List<TimeValue> targetHigh;
+  final String units;
+  final String timezone;
 
-  Profile({
+  const Profile({
     required this.dia,
     required this.carbratio,
     required this.sens,
@@ -315,7 +315,7 @@ class Profile {
 }
 
 class Summary {
-  DateTime dateRetrieved = DateTime.now();
+  final int dateRetrievedmills;
   final SGVs sgvs;
   final TempBasals tempBasals;
   final SummaryTreatments treatments;
@@ -323,46 +323,40 @@ class Summary {
   final SummaryState state;
   final Profile profile;
 
-  Summary({
+  const Summary({
     required this.sgvs,
     required this.tempBasals,
     required this.treatments,
     required this.targets,
     required this.state,
     required this.profile,
-    DateTime? dateRetrieved,
-  }) {
-    if (dateRetrieved != null) {
-      this.dateRetrieved = dateRetrieved;
-    }
-  }
+    required this.dateRetrievedmills,
+  });
 
-  factory Summary.empty() {
-    return Summary(
-        sgvs: SGVs(sgvs: []),
-        tempBasals: TempBasals(tempBasals: []),
-        treatments: SummaryTreatments(treatments: []),
-        targets: Targets(targets: []),
-        state: SummaryState(
-          iob: 0,
-          cob: 0,
-          bwp: 0,
-          cage: 0,
-          iage: 0,
-          bage: 0,
-          battery: 0,
-        ),
-        profile: Profile(
-            dia: 1,
-            carbratio: [],
-            sens: [],
-            basal: [],
-            targetLow: [],
-            targetHigh: [],
-            units: "",
-            timezone: ""),
-        dateRetrieved: Dates.earliest);
-  }
+  static const Summary empty = Summary(
+      sgvs: SGVs(sgvs: []),
+      tempBasals: TempBasals(tempBasals: []),
+      treatments: SummaryTreatments(treatments: []),
+      targets: Targets(targets: []),
+      state: SummaryState(
+        iob: 0,
+        cob: 0,
+        bwp: 0,
+        cage: 0,
+        iage: 0,
+        bage: 0,
+        battery: 0,
+      ),
+      profile: Profile(
+          dia: 1,
+          carbratio: [],
+          sens: [],
+          basal: [],
+          targetLow: [],
+          targetHigh: [],
+          units: "",
+          timezone: ""),
+      dateRetrievedmills: 0);
 
   factory Summary.fromJson(String jsonString) {
     try {
@@ -375,11 +369,16 @@ class Summary {
         targets: Targets.fromJson(json['treatments']['targets']),
         state: SummaryState.fromJson(json['state']),
         profile: Profile.fromJson(json['profile']),
+        dateRetrievedmills: DateTime.now().millisecondsSinceEpoch,
       );
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Summary.empty();
+      return Summary.empty;
     }
+  }
+
+  DateTime get dateRetrieved {
+    return DateTime.fromMillisecondsSinceEpoch(dateRetrievedmills);
   }
 
   // function returns the last SGV

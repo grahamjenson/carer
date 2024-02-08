@@ -1,4 +1,5 @@
 import 'package:carer/models/settings_cn.dart';
+import 'package:carer/nsclient/summary.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum DebugSettingNames {
@@ -7,10 +8,24 @@ enum DebugSettingNames {
 }
 
 enum FakeSummary {
-  off,
-  normal,
-  low,
-  high,
+  off(),
+  normal(),
+  low(),
+  high();
+
+  const FakeSummary();
+  Summary summary() {
+    switch (this) {
+      case FakeSummary.off:
+        return Summary.empty;
+      case FakeSummary.normal:
+        return highSummary();
+      case FakeSummary.low:
+        return highSummary();
+      case FakeSummary.high:
+        return highSummary();
+    }
+  }
 }
 
 class DebugSettings {
@@ -49,4 +64,22 @@ class DebugSettings {
     _fakeSummary = value;
     notifyListeners();
   }
+}
+
+Summary highSummary() {
+  return Summary(
+      sgvs: SGVs(sgvs: [
+        SGV(
+            sgv: 180,
+            mills: DateTime.now()..subtract(const Duration(minutes: 8))),
+        SGV(
+            sgv: 200,
+            mills: DateTime.now()..subtract(const Duration(minutes: 4))),
+      ]),
+      tempBasals: Summary.empty.tempBasals,
+      treatments: Summary.empty.treatments,
+      targets: Summary.empty.targets,
+      state: Summary.empty.state,
+      profile: Summary.empty.profile,
+      dateRetrievedmills: 10);
 }

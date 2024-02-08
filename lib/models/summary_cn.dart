@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:carer/models/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
@@ -10,7 +11,7 @@ class SummaryCN extends ChangeNotifier {
   Settings settings;
 
   // When this updates lots of things will change
-  Summary summary = Summary.empty();
+  Summary summary = Summary.empty;
   bool _summaryToBeUpdated = true;
   String _updateReason = "";
 
@@ -40,20 +41,37 @@ class SummaryCN extends ChangeNotifier {
 
     if (_summaryToBeUpdated) {
       // clenaup
-      log("UPDATING SUMMARY: $_updateReason");
-      _updateReason = "";
-      _summaryToBeUpdated = false;
 
       // Calling update
-      var (nsURL, nsToken) = settings.nightscoutURLAndToken;
-      NSClient().getSummary(nsURL, nsToken).catchError((e) {
-        log("GETTING SUMMARY ERROR: $e");
-        _summaryToBeUpdated = true;
-        return Summary.empty();
-      }).then((value) {
-        summary = value;
-        notifyListeners();
-      });
+      if (settings.debugSettings.debug &&
+          settings.debugSettings.fakeSummary != FakeSummary.off) {
+        log("USING DEBUG SUMMARY: $_updateReason");
+        _updateReason = "";
+        _summaryToBeUpdated = false;
+        useDebugSummary();
+      } else {
+        log("UPDATING SUMMARY: $_updateReason");
+        _updateReason = "";
+        _summaryToBeUpdated = false;
+        updateSummary();
+      }
     }
+  }
+
+  updateSummary() {
+    var (nsURL, nsToken) = settings.nightscoutURLAndToken;
+    NSClient().getSummary(nsURL, nsToken).catchError((e) {
+      log("GETTING SUMMARY ERROR: $e");
+      _summaryToBeUpdated = true;
+      return Summary.empty;
+    }).then((value) {
+      summary = value;
+      notifyListeners();
+    });
+  }
+
+  useDebugSummary() {
+    summary = settings.debugSettings.fakeSummary.summary();
+    notifyListeners();
   }
 }
