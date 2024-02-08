@@ -44,7 +44,7 @@ class SummaryCN extends ChangeNotifier {
 
       // Calling update
       if (settings.debugSettings.debug &&
-          settings.debugSettings.fakeSummary != FakeSummary.off) {
+          settings.debugSettings.debugSummary != DebugSummary.off) {
         log("USING DEBUG SUMMARY: $_updateReason");
         _updateReason = "";
         _summaryToBeUpdated = false;
@@ -71,7 +71,7 @@ class SummaryCN extends ChangeNotifier {
   }
 
   useDebugSummary() {
-    summary = settings.debugSettings.fakeSummary.summary();
+    summary = settings.debugSettings.debugSummary.summary();
     notifyListeners();
   }
 }

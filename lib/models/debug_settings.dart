@@ -4,25 +4,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum DebugSettingNames {
   debug,
-  fakeSummary,
+  debugSummary,
 }
 
-enum FakeSummary {
+enum DebugSummary {
   off(),
   normal(),
   low(),
   high();
 
-  const FakeSummary();
+  const DebugSummary();
   Summary summary() {
     switch (this) {
-      case FakeSummary.off:
+      case DebugSummary.off:
         return Summary.empty;
-      case FakeSummary.normal:
+      case DebugSummary.normal:
         return highSummary();
-      case FakeSummary.low:
+      case DebugSummary.low:
         return highSummary();
-      case FakeSummary.high:
+      case DebugSummary.high:
         return highSummary();
     }
   }
@@ -35,7 +35,7 @@ class DebugSettings {
   DebugSettings({required this.prefs, required this.notifyListeners});
 
   bool _debug = false;
-  FakeSummary _fakeSummary = FakeSummary.off;
+  DebugSummary _debugSummary = DebugSummary.off;
 
   void populateDebugSettings() {
     var debugPref = prefs.getBool(DebugSettingNames.debug.name);
@@ -43,11 +43,11 @@ class DebugSettings {
       _debug = debugPref;
     }
 
-    var fakeSummaryPref = prefs.getString(DebugSettingNames.fakeSummary.name);
-    if (fakeSummaryPref != null) {
-      _fakeSummary = FakeSummary.values.firstWhere(
-          (e) => e.name == fakeSummaryPref,
-          orElse: () => FakeSummary.off);
+    var debugSummaryPref = prefs.getString(DebugSettingNames.debugSummary.name);
+    if (debugSummaryPref != null) {
+      _debugSummary = DebugSummary.values.firstWhere(
+          (e) => e.name == debugSummaryPref,
+          orElse: () => DebugSummary.off);
     }
   }
 
@@ -58,10 +58,10 @@ class DebugSettings {
     notifyListeners();
   }
 
-  FakeSummary get fakeSummary => _fakeSummary;
-  set fakeSummary(FakeSummary value) {
-    prefs.setString(DebugSettingNames.fakeSummary.name, value.name);
-    _fakeSummary = value;
+  DebugSummary get debugSummary => _debugSummary;
+  set debugSummary(DebugSummary value) {
+    prefs.setString(DebugSettingNames.debugSummary.name, value.name);
+    _debugSummary = value;
     notifyListeners();
   }
 }
@@ -73,7 +73,7 @@ Summary highSummary() {
             sgv: 180,
             mills: DateTime.now()..subtract(const Duration(minutes: 8))),
         SGV(
-            sgv: 200,
+            sgv: 250,
             mills: DateTime.now()..subtract(const Duration(minutes: 4))),
       ]),
       tempBasals: Summary.empty.tempBasals,

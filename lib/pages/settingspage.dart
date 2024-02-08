@@ -159,22 +159,22 @@ class SettingsPage extends StatelessWidget {
   SettingsSection debugSection(Settings settings) {
     var debugSettings = [];
     if (settings.debug) {
-      // Add FakeSummary Selector
+      // Add debugSummary Selector
       debugSettings.add(SettingsTile(
         title: Row(children: [
-          const Text('Fake Summary'),
+          const Text('Debug Summary'),
           Container(
               alignment: Alignment.centerRight,
               child: DropdownMenu(
-                initialSelection: settings.fakeSummary,
+                initialSelection: settings.debugSummary,
                 requestFocusOnTap: false,
-                onSelected: (FakeSummary? value) {
+                onSelected: (DebugSummary? value) {
                   if (value == null) return;
-                  settings.fakeSummary = value;
+                  settings.debugSummary = value;
                 },
-                dropdownMenuEntries:
-                    FakeSummary.values.map<DropdownMenuEntry<FakeSummary>>((e) {
-                  return DropdownMenuEntry<FakeSummary>(
+                dropdownMenuEntries: DebugSummary.values
+                    .map<DropdownMenuEntry<DebugSummary>>((e) {
+                  return DropdownMenuEntry<DebugSummary>(
                     value: e,
                     label: e.name,
                   );

@@ -221,6 +221,6 @@ class Settings extends ChangeNotifier {
   bool get debug => debugSettings.debug;
   set debug(bool value) => debugSettings.debug = value;
 
-  FakeSummary get fakeSummary => debugSettings.fakeSummary;
-  set fakeSummary(FakeSummary value) => debugSettings.fakeSummary = value;
+  DebugSummary get debugSummary => debugSettings.debugSummary;
+  set debugSummary(DebugSummary value) => debugSettings.debugSummary = value;
 }
