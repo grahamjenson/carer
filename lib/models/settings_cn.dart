@@ -1,4 +1,6 @@
 import 'package:carer/models/debug_settings.dart';
+import 'package:carer/models/target_settings.dart';
+import 'package:carer/widgets/math.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,12 +13,6 @@ enum SettingNames {
 
   // App settings
   screenActive,
-
-  // targets
-  targetHigh,
-  targetLow,
-  urgentHigh,
-  urgentLow,
 }
 
 enum Unit { mmol, mg }
@@ -67,17 +63,11 @@ extension UnitExtension on Unit {
 class Settings extends ChangeNotifier {
   late SharedPreferences prefs;
   late DebugSettings debugSettings;
+  late TargetSettings targetSettings;
 
   String _nightscoutURL = '';
   Unit _unit = Unit.mmol;
   bool _screenActive = true;
-
-  Map<String, int> targets = {
-    SettingNames.targetHigh.name: 180,
-    SettingNames.targetLow.name: 72,
-    SettingNames.urgentHigh.name: 270,
-    SettingNames.urgentLow.name: 55
-  };
 
   Future<void> populate() async {
     prefs = await SharedPreferences.getInstance();
@@ -97,16 +87,11 @@ class Settings extends ChangeNotifier {
       _screenActive = screenActivePref;
     }
 
-    for (var setting in targets.entries) {
-      var value = prefs.getInt(setting.key);
-      if (value != null) {
-        targets[setting.key] = value;
-      }
-    }
+    targetSettings = TargetSettings(prefs: prefs, settings: this);
+    targetSettings.populate();
 
-    debugSettings =
-        DebugSettings(prefs: prefs, notifyListeners: notifyListeners);
-    debugSettings.populateDebugSettings();
+    debugSettings = DebugSettings(prefs: prefs, settings: this);
+    debugSettings.populate();
   }
 
   @override
@@ -151,73 +136,20 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  // getters
-  int get targetHigh {
-    return targets[SettingNames.targetHigh.name]!;
-  }
+  // targets
+  int get targetHigh => targetSettings.targetHigh;
+  int get targetLow => targetSettings.targetLow;
+  int get urgentHigh => targetSettings.urgentHigh;
+  int get urgentLow => targetSettings.urgentLow;
 
-  int get targetLow {
-    return targets[SettingNames.targetLow.name]!;
-  }
+  set targetHigh(int value) => targetSettings.targetHigh = value;
+  set targetLow(int value) => targetSettings.targetLow = value;
+  set urgentHigh(int value) => targetSettings.urgentHigh = value;
+  set urgentLow(int value) => targetSettings.urgentLow = value;
 
-  int get urgentHigh {
-    return targets[SettingNames.urgentHigh.name]!;
-  }
+  (Range, double) targetRange(int sgv) => targetSettings.targetRange(sgv);
 
-  int get urgentLow {
-    return targets[SettingNames.urgentLow.name]!;
-  }
-
-  // setters
-
-  set targetHigh(int value) {
-    setTarget(SettingNames.targetHigh, value);
-  }
-
-  set targetLow(int value) {
-    setTarget(SettingNames.targetLow, value);
-  }
-
-  set urgentHigh(int value) {
-    setTarget(SettingNames.urgentHigh, value);
-  }
-
-  set urgentLow(int value) {
-    setTarget(SettingNames.urgentLow, value);
-  }
-
-  ////
-  // private functions
-
-  bool validTargets(
-      int urgentLow, int targetLow, int targetHigh, int urgentHigh) {
-    return 9 <= urgentLow &&
-        urgentLow <= targetLow &&
-        targetLow <= targetHigh &&
-        targetHigh <= urgentHigh &&
-        urgentHigh <= 360;
-  }
-
-  ////
-  // PRIVATE FUNCTIONS
-  ////
-  Future<void> setTarget(SettingNames setting, int value) async {
-    var clone = Map<String, int>.from(targets);
-    clone[setting.name] = value;
-    if (validTargets(
-        clone[SettingNames.urgentLow.name]!,
-        clone[SettingNames.targetLow.name]!,
-        clone[SettingNames.targetHigh.name]!,
-        clone[SettingNames.urgentHigh.name]!)) {
-      targets = clone;
-    } else {
-      return;
-    }
-    await prefs.setInt(setting.name, value);
-    notifyListeners();
-  }
-
-  // Passing Through
+  // debug
   bool get debug => debugSettings.debug;
   set debug(bool value) => debugSettings.debug = value;
 

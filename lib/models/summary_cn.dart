@@ -71,7 +71,7 @@ class SummaryCN extends ChangeNotifier {
   }
 
   useDebugSummary() {
-    summary = settings.debugSettings.debugSummary.summary();
+    summary = settings.debugSettings.debugSummary.summary(settings);
     notifyListeners();
   }
 }

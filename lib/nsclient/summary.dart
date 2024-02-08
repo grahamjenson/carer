@@ -106,7 +106,9 @@ class SummaryTreatment extends ATreatment {
 
   @override
   IconData get icon {
-    if (insulin != null) {
+    if (insulin != null && carbs != null) {
+      return UniconsLine.anchor;
+    } else if (insulin != null) {
       return UniconsLine.syringe;
     } else {
       return Icons.fastfood;
@@ -115,7 +117,9 @@ class SummaryTreatment extends ATreatment {
 
   @override
   String get description {
-    if (insulin != null) {
+    if (insulin != null && carbs != null) {
+      return "$insulin, $carbs";
+    } else if (insulin != null) {
       return insulin.toString();
     } else if (carbs != null) {
       return carbs.toString();
@@ -397,18 +401,32 @@ class Summary {
     return DateTime.now().difference(dateRetrieved).inSeconds;
   }
 
+  TempBasal? get lastTempBasal {
+    if (tempBasals.tempBasals.isEmpty) {
+      return null;
+    }
+    return tempBasals.tempBasals.last;
+  }
+
+  Target? get lastTarget {
+    if (targets.targets.isEmpty) {
+      return null;
+    }
+    return targets.targets.last;
+  }
+
   // return a list of tempBasals treatments and targets in order
   List<ATreatment> get history {
     List<ATreatment> history = [];
 
     // add the tempBasals
-    history.addAll(tempBasals.tempBasals);
+    //history.addAll(tempBasals.tempBasals);
 
     // add the treatments
     history.addAll(treatments.treatments);
 
     // add the targets
-    history.addAll(targets.targets);
+    //history.addAll(targets.targets);
 
     // sort the history by date
     history.sort((a, b) => b.date.compareTo(a.date));

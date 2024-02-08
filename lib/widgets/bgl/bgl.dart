@@ -4,6 +4,7 @@ import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/animations.dart';
 import 'package:carer/widgets/bgl/diff.dart';
+import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/math.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -40,31 +41,6 @@ class _BGLState extends State<BGL> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  Color targetColor(TargetRange target, num proportion) {
-    var color1 = Colors.red;
-    var color2 = Colors.green;
-
-    switch (target) {
-      case TargetRange.veryLow:
-        color1 = Colors.red;
-        color2 = Colors.red;
-      case TargetRange.low:
-        color1 = Colors.yellow;
-        color2 = Colors.red;
-      case TargetRange.inRange:
-        color1 = Colors.green;
-        color2 = Colors.green;
-      case TargetRange.high:
-        color1 = Colors.red;
-        color2 = Colors.yellow;
-      case TargetRange.veryHigh:
-        color1 = Colors.red;
-        color2 = Colors.red;
-    }
-
-    return Color.lerp(color1, color2, proportion.toDouble()) ?? Colors.red;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
@@ -92,19 +68,9 @@ class _BGLState extends State<BGL> with SingleTickerProviderStateMixin {
 
   Widget bgl(SGV sgv, Settings settings) {
     var unit = settings.unit;
-    var lowTarget = settings.targetLow;
-    var highTarget = settings.targetHigh;
-    var urgentHigh = settings.urgentHigh;
-    var urgentLow = settings.urgentLow;
+    var (target, proportion) = settings.targetRange(sgv.sgv);
 
-    var (target, proportion) = targetRange(
-        urgentLow.toDouble(),
-        lowTarget.toDouble(),
-        highTarget.toDouble(),
-        urgentHigh.toDouble(),
-        sgv.sgv.toDouble());
-
-    var color = targetColor(target, proportion);
+    var color = Colours.targetColor(target, proportion);
 
     return Container(
       padding: const EdgeInsets.all(8),

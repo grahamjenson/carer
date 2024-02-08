@@ -1,19 +1,19 @@
-enum TargetRange { veryLow, low, inRange, high, veryHigh }
+enum Range { veryLow, low, inRange, high, veryHigh }
 
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
 
-(TargetRange, num) targetRange(
+(Range, double) range(
     double veryLow, double low, double high, double veryHigh, double value) {
   if (value < veryLow) {
-    return (TargetRange.veryLow, (veryLow - value).abs());
+    return (Range.veryLow, (veryLow - value).abs().toDouble());
   } else if (value < low) {
-    return (TargetRange.low, (low - value) / (low - veryLow));
+    return (Range.low, (low - value) / (low - veryLow));
   } else if (value < high) {
-    return (TargetRange.inRange, (high - value) / (high - low));
+    return (Range.inRange, (high - value) / (high - low));
   } else if (value < veryHigh) {
-    return (TargetRange.high, (veryHigh - value) / (veryHigh - high));
+    return (Range.high, (veryHigh - value) / (veryHigh - high));
   } else {
-    return (TargetRange.veryHigh, (value - veryHigh).abs());
+    return (Range.veryHigh, (value - veryHigh).abs().toDouble());
   }
 }

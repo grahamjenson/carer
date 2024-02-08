@@ -2,25 +2,26 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/animations.dart';
+import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/math.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
 
-IconData trendIcon(TargetRange target, num proportion) {
+IconData trendIcon(Range target, num proportion) {
   switch (target) {
-    case TargetRange.veryLow:
+    case Range.veryLow:
       if (proportion > 10) {
         return UniconsLine.angle_double_down;
       }
       return UniconsLine.arrow_down;
-    case TargetRange.low:
+    case Range.low:
       return UniconsLine.arrow_down_right;
-    case TargetRange.inRange:
+    case Range.inRange:
       return UniconsLine.arrow_right;
-    case TargetRange.high:
+    case Range.high:
       return UniconsLine.arrow_up_right;
-    case TargetRange.veryHigh:
+    case Range.veryHigh:
       if (proportion > 10) {
         return UniconsLine.angle_double_up;
       }
@@ -68,9 +69,9 @@ class _DiffWidgetState extends State<DiffWidget>
 
       var sgv = delta.sgv;
       var sgvU = delta.sgvU(settings.unit);
-      var (target, proportion) = targetRange(-9, -5, 5, 9, sgv.toDouble());
+      var (target, proportion) = range(-9, -5, 5, 9, sgv.toDouble());
 
-      var color = targetColor(target, proportion);
+      var color = Colours.diffColour(target, proportion);
 
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -86,37 +87,12 @@ class _DiffWidgetState extends State<DiffWidget>
     });
   }
 
-  Color targetColor(TargetRange target, num proportion) {
-    var color1 = Colors.red;
-    var color2 = Colors.green;
-
-    switch (target) {
-      case TargetRange.veryLow:
-        color1 = Colors.red;
-        color2 = Colors.red;
-      case TargetRange.low:
-        color1 = Colors.yellow;
-        color2 = Colors.red;
-      case TargetRange.inRange:
-        color1 = Colors.green;
-        color2 = Colors.green;
-      case TargetRange.high:
-        color1 = Colors.red;
-        color2 = Colors.yellow;
-      case TargetRange.veryHigh:
-        color1 = Colors.red;
-        color2 = Colors.red;
-    }
-
-    return Color.lerp(color1, color2, proportion.toDouble()) ?? Colors.red;
-  }
-
   Widget trend(IconData icon, Color color) {
-    //  Icon(icon, color: color, size: 10)
-    Widget icond = ScaleTransition(
-      scale: heartBeat,
-      child: Icon(icon, color: color, size: 10),
-    );
+    //      Widget icond = ScaleTransition(
+    //   scale: heartBeat,
+    //   child: Icon(icon, color: color, size: 10),
+    // );
+    Widget icond = Icon(icon, color: color, size: 10);
 
     return FittedBox(child: icond);
   }
@@ -144,11 +120,7 @@ class _DiffWidgetState extends State<DiffWidget>
   }
 
   Widget timeSince(Duration age) {
-    var color = Colors.white;
-    if (age.inMinutes > 6) {
-      color = Colors.red;
-    }
-
+    var color = Colours.timeSinceLastReading(age);
     var ts = TextStyle(
       fontSize: 10,
       height: 0.8,

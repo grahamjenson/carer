@@ -14,18 +14,7 @@ class History extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
-      var width = MediaQuery.of(context).size.width;
-
-      // minSize of container
-      const int minWidth = 300;
-      const int minHeight = 60;
-      var count = max(1, width / minWidth).toInt();
-      var ratio = (width / count) / minHeight;
-      return GridView.count(
-        crossAxisCount: count,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: ratio,
+      return ListView(
         children: historyContainers(settings, summaryCn),
       );
     });
@@ -40,17 +29,16 @@ class History extends StatelessWidget {
   }
 
   Widget historyRow(ATreatment treatment) {
-    return SizedBox(
-      child: Card(
-        child: ListTile(
-          leading: Icon(treatment.icon),
-          title: Text(
-            treatment.description,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: Text(Dates.dateAgoShort(treatment.age)),
+    return Row(
+      children: [
+        Icon(
+          treatment.icon,
         ),
-      ),
+        Text(
+          Dates.dateAgoShort(treatment.age),
+        ),
+        Text(treatment.description),
+      ],
     );
   }
 }

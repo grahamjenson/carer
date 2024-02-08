@@ -8,36 +8,35 @@ enum DebugSettingNames {
 }
 
 enum DebugSummary {
-  off(),
-  normal(),
-  low(),
-  high();
+  off,
+  low,
+  normal,
+  high;
 
-  const DebugSummary();
-  Summary summary() {
+  Summary summary(Settings settings) {
     switch (this) {
       case DebugSummary.off:
         return Summary.empty;
       case DebugSummary.normal:
-        return highSummary();
+        return normalSummary(settings);
       case DebugSummary.low:
-        return highSummary();
+        return lowSummary(settings);
       case DebugSummary.high:
-        return highSummary();
+        return highSummary(settings);
     }
   }
 }
 
 class DebugSettings {
   SharedPreferences prefs;
-  Function() notifyListeners;
+  Settings settings;
 
-  DebugSettings({required this.prefs, required this.notifyListeners});
+  DebugSettings({required this.prefs, required this.settings});
 
   bool _debug = false;
   DebugSummary _debugSummary = DebugSummary.off;
 
-  void populateDebugSettings() {
+  void populate() {
     var debugPref = prefs.getBool(DebugSettingNames.debug.name);
     if (debugPref != null) {
       _debug = debugPref;
@@ -55,25 +54,84 @@ class DebugSettings {
   set debug(bool value) {
     prefs.setBool(DebugSettingNames.debug.name, value);
     _debug = value;
-    notifyListeners();
+    settings.notifyListeners();
   }
 
   DebugSummary get debugSummary => _debugSummary;
   set debugSummary(DebugSummary value) {
     prefs.setString(DebugSettingNames.debugSummary.name, value.name);
     _debugSummary = value;
-    notifyListeners();
+    settings.notifyListeners();
   }
 }
 
-Summary highSummary() {
+var counter = 0;
+
+Summary highSummary(Settings settings) {
+  var start = settings.targetHigh - 18;
+  var end = settings.urgentHigh + 18;
+  counter++;
+  if (counter > end || counter < start) {
+    counter = start;
+  }
+
   return Summary(
       sgvs: SGVs(sgvs: [
         SGV(
-            sgv: 180,
+            sgv: counter ~/ 1.2,
             mills: DateTime.now()..subtract(const Duration(minutes: 8))),
         SGV(
-            sgv: 250,
+            sgv: counter,
+            mills: DateTime.now()..subtract(const Duration(minutes: 4))),
+      ]),
+      tempBasals: Summary.empty.tempBasals,
+      treatments: Summary.empty.treatments,
+      targets: Summary.empty.targets,
+      state: Summary.empty.state,
+      profile: Summary.empty.profile,
+      dateRetrievedmills: 10);
+}
+
+Summary lowSummary(Settings settings) {
+  var start = settings.urgentLow - 18;
+  var end = settings.targetLow + 18;
+  counter++;
+  if (counter > end || counter < start) {
+    counter = start;
+  }
+
+  return Summary(
+      sgvs: SGVs(sgvs: [
+        SGV(
+            sgv: counter ~/ 1.2,
+            mills: DateTime.now()..subtract(const Duration(minutes: 8))),
+        SGV(
+            sgv: counter,
+            mills: DateTime.now()..subtract(const Duration(minutes: 4))),
+      ]),
+      tempBasals: Summary.empty.tempBasals,
+      treatments: Summary.empty.treatments,
+      targets: Summary.empty.targets,
+      state: Summary.empty.state,
+      profile: Summary.empty.profile,
+      dateRetrievedmills: 10);
+}
+
+Summary normalSummary(Settings settings) {
+  var start = settings.targetLow - 18;
+  var end = settings.targetHigh + 18;
+  counter++;
+  if (counter > end || counter < start) {
+    counter = start;
+  }
+
+  return Summary(
+      sgvs: SGVs(sgvs: [
+        SGV(
+            sgv: counter ~/ 1.2,
+            mills: DateTime.now()..subtract(const Duration(minutes: 8))),
+        SGV(
+            sgv: counter,
             mills: DateTime.now()..subtract(const Duration(minutes: 4))),
       ]),
       tempBasals: Summary.empty.tempBasals,
