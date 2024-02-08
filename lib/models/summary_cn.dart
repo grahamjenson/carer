@@ -12,22 +12,39 @@ class SummaryCN extends ChangeNotifier {
   // When this updates lots of things will change
   Summary summary = Summary.empty();
   bool _summaryToBeUpdated = true;
+  String _updateReason = "";
 
   SummaryCN({required this.settings}) {
-    Timer.periodic(const Duration(seconds: 5), (Timer t) => update());
+    Timer.periodic(const Duration(seconds: 1), (Timer t) => update());
     update();
     settings.addListener(() {
       _summaryToBeUpdated = true;
+      _updateReason = "Added Listener";
     });
   }
 
   update() {
     if (summary.ageInSeconds() > 15) {
       _summaryToBeUpdated = true;
+      _updateReason = "Age older than 15";
+    }
+
+    if (summary.lastSGV != null) {
+      var sgvage = summary.lastSGV!.age.inSeconds;
+      // Check more frequently when the SGV is about to expire
+      if (sgvage > 295 && sgvage < 315) {
+        _summaryToBeUpdated = true;
+        _updateReason = "Last SGV older than 290";
+      }
     }
 
     if (_summaryToBeUpdated) {
+      // clenaup
+      log("UPDATING SUMMARY: $_updateReason");
+      _updateReason = "";
       _summaryToBeUpdated = false;
+
+      // Calling update
       var (nsURL, nsToken) = settings.nightscoutURLAndToken;
       NSClient().getSummary(nsURL, nsToken).catchError((e) {
         log("GETTING SUMMARY ERROR: $e");

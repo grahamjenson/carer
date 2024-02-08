@@ -1,14 +1,22 @@
+import 'package:carer/models/debug_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum SettingNames {
+  // NS Settings
   nightscoutUrl,
+
+  // Unit for BGL
   unit,
+
+  // App settings
   screenActive,
+
+  // targets
   targetHigh,
   targetLow,
   urgentHigh,
-  urgentLow
+  urgentLow,
 }
 
 enum Unit { mmol, mg }
@@ -58,10 +66,11 @@ extension UnitExtension on Unit {
 
 class Settings extends ChangeNotifier {
   late SharedPreferences prefs;
+  late DebugSettings debugSettings;
 
-  String nightscoutURL = '';
-  Unit unit = Unit.mmol;
-  bool screenActive = true;
+  String _nightscoutURL = '';
+  Unit _unit = Unit.mmol;
+  bool _screenActive = true;
 
   Map<String, int> targets = {
     SettingNames.targetHigh.name: 180,
@@ -75,17 +84,17 @@ class Settings extends ChangeNotifier {
 
     var urlPref = prefs.getString(SettingNames.nightscoutUrl.name);
     if (urlPref != null && urlPref.isNotEmpty) {
-      nightscoutURL = urlPref;
+      _nightscoutURL = urlPref;
     }
 
     var unitPref = prefs.getBool(SettingNames.unit.name);
     if (unitPref != null) {
-      unit = UnitExtension.fromBool(unitPref);
+      _unit = UnitExtension.fromBool(unitPref);
     }
 
     var screenActivePref = prefs.getBool(SettingNames.unit.name);
     if (screenActivePref != null) {
-      screenActive = screenActivePref;
+      _screenActive = screenActivePref;
     }
 
     for (var setting in targets.entries) {
@@ -94,6 +103,10 @@ class Settings extends ChangeNotifier {
         targets[setting.key] = value;
       }
     }
+
+    debugSettings =
+        DebugSettings(prefs: prefs, notifyListeners: notifyListeners);
+    debugSettings.populateDebugSettings();
   }
 
   @override
@@ -115,25 +128,26 @@ class Settings extends ChangeNotifier {
     return ('', '');
   }
 
-  Future<void> setNightscoutURL(String value) async {
+  String get nightscoutURL => _nightscoutURL;
+  set nightscoutURL(String value) {
     prefs.setString(SettingNames.nightscoutUrl.name, value);
-    nightscoutURL = value;
+    _nightscoutURL = value;
     notifyListeners();
   }
 
   // UNIT
-
-  Future<void> setUnit(Unit value) async {
+  Unit get unit => _unit;
+  set unit(Unit value) {
     prefs.setBool(SettingNames.unit.name, value.toBool());
-    unit = value;
+    _unit = value;
     notifyListeners();
   }
 
   // SCREEN ACTIVE
-
-  Future<void> setScreenActive(bool value) async {
+  bool get screenActive => _screenActive;
+  set screenActive(bool value) {
     prefs.setBool(SettingNames.unit.name, value);
-    screenActive = value;
+    _screenActive = value;
     notifyListeners();
   }
 
@@ -202,4 +216,11 @@ class Settings extends ChangeNotifier {
     await prefs.setInt(setting.name, value);
     notifyListeners();
   }
+
+  // Passing Through
+  bool get debug => debugSettings.debug;
+  set debug(bool value) => debugSettings.debug = value;
+
+  FakeSummary get fakeSummary => debugSettings.fakeSummary;
+  set fakeSummary(FakeSummary value) => debugSettings.fakeSummary = value;
 }

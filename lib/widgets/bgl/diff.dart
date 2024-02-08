@@ -119,7 +119,7 @@ class _DiffWidgetState extends State<DiffWidget>
     var sgvStr = sgvU.toStringAsFixed(1);
 
     if (sgvU == 0) {
-      sgvStr = "0";
+      sgvStr = "+0";
     } else if (sgvU > 0) {
       sgvStr = "+${sgvU.toStringAsFixed(1)}";
     }

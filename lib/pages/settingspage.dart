@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:math';
 
+import 'package:carer/models/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -25,6 +26,7 @@ class SettingsPage extends StatelessWidget {
               nightscoutSection(context, settings),
               unitsSection(settings),
               screenSection(settings),
+              debugSection(settings),
             ],
           ));
     });
@@ -52,7 +54,7 @@ class SettingsPage extends StatelessWidget {
             final url = await openTextDialog(context, "Nightscout URL",
                 hint: "URL", value: settings.nightscoutURL);
             if (url == null || url.isEmpty) return;
-            await settings.setNightscoutURL(url);
+            settings.nightscoutURL = url;
           },
         ),
       ],
@@ -79,7 +81,7 @@ class SettingsPage extends StatelessWidget {
           initialValue: settings.unit.toBool(),
           onToggle: (value) async {
             var unitP = UnitExtension.fromBool(value);
-            await settings.setUnit(unitP);
+            settings.unit = unitP;
           },
         ),
         SettingsTile(
@@ -147,13 +149,60 @@ class SettingsPage extends StatelessWidget {
           title: const Text('Keep Screen Active'),
           initialValue: settings.screenActive,
           onToggle: (value) async {
-            await settings.setScreenActive(value);
+            settings.screenActive = value;
           },
         ),
       ],
     );
   }
 
+  SettingsSection debugSection(Settings settings) {
+    var debugSettings = [];
+    if (settings.debug) {
+      // Add FakeSummary Selector
+      debugSettings.add(SettingsTile(
+        title: Row(children: [
+          const Text('Fake Summary'),
+          Container(
+              alignment: Alignment.centerRight,
+              child: DropdownMenu(
+                initialSelection: settings.fakeSummary,
+                requestFocusOnTap: false,
+                onSelected: (FakeSummary? value) {
+                  if (value == null) return;
+                  settings.fakeSummary = value;
+                },
+                dropdownMenuEntries:
+                    FakeSummary.values.map<DropdownMenuEntry<FakeSummary>>((e) {
+                  return DropdownMenuEntry<FakeSummary>(
+                    value: e,
+                    label: e.name,
+                  );
+                }).toList(),
+              ))
+        ]),
+      ));
+    }
+
+    return SettingsSection(
+      title: const Text('Debug'),
+      tiles: [
+        SettingsTile.switchTile(
+          title: const Text('Debug'),
+          initialValue: settings.debug,
+          leading: const Icon(UniconsLine.bug),
+          onToggle: (value) async {
+            settings.debug = value;
+          },
+        ),
+        ...debugSettings,
+      ],
+    );
+  }
+
+  ////
+  // Dialog
+  ////
   Future<String?> openTextDialog(BuildContext context, String title,
       {String hint = "", String value = ""}) {
     controller.value = TextEditingValue(text: value);
