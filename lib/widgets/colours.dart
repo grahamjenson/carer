@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:carer/widgets/math.dart';
+import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 
 class Colours {

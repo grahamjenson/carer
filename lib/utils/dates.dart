@@ -21,9 +21,9 @@ class Dates {
     }
 
     if (diff.inHours > 0) {
-      return "${diff.inHours}h${diff.inMinutes % 60}m ago";
+      return "${diff.inHours}h${diff.inMinutes % 60}m";
     }
-    return "${diff.inMinutes}m ago";
+    return "${diff.inMinutes}m";
   }
 
   static final DateTime earliest = DateTime.fromMillisecondsSinceEpoch(0);

@@ -13,8 +13,6 @@ class Sleep extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) => Container(
-            height: 100,
-            color: Colors.purple,
             alignment: Alignment.center,
             child: SlideAction(
               text: "Snnoze 1346",

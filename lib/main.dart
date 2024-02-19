@@ -3,6 +3,7 @@ import 'package:carer/models/summary_cn.dart';
 import 'package:carer/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wakelock/wakelock.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +11,12 @@ void main() async {
   // Load the settings from Shared Preferences before starting
   var s = Settings();
   await s.populate();
+
+  if (s.screenActive) {
+    await Wakelock.enable();
+  } else {
+    await Wakelock.disable();
+  }
 
   runApp(MultiProvider(
     providers: [

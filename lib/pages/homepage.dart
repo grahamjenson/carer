@@ -3,7 +3,8 @@ import 'dart:developer';
 import 'package:carer/pages/settingspage.dart';
 
 import 'package:carer/widgets/bgl/bgl.dart';
-import 'package:carer/widgets/history.dart';
+import 'package:carer/widgets/insights/history.dart';
+import 'package:carer/widgets/insights/insights.dart';
 import 'package:carer/widgets/sleep.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +23,8 @@ class HomePage extends StatelessWidget {
         child: const Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Flexible(flex: 2, child: BGL()),
-              Flexible(flex: 1, child: History()),
+              Flexible(flex: 4, child: BGL()),
+              Flexible(flex: 2, child: Insights()),
               Flexible(flex: 1, child: Sleep()),
             ]),
       ),

@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
+import 'package:wakelock/wakelock.dart';
 
 class SettingsPage extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
@@ -150,6 +151,7 @@ class SettingsPage extends StatelessWidget {
           initialValue: settings.screenActive,
           onToggle: (value) async {
             settings.screenActive = value;
+            await Wakelock.toggle(enable: value);
           },
         ),
       ],

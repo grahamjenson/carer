@@ -78,7 +78,7 @@ class TempBasal extends ATreatment {
 
   @override
   String get description {
-    return "Temp Basal $absolute";
+    return "Temp Basal ${absolute.toStringAsFixed(2)}";
   }
 
   factory TempBasal.fromJson(Map<String, dynamic> json) {
@@ -118,11 +118,11 @@ class SummaryTreatment extends ATreatment {
   @override
   String get description {
     if (insulin != null && carbs != null) {
-      return "$insulin, $carbs";
+      return "${insulin!.toStringAsFixed(2)}u, ${carbs!.toStringAsFixed(2)}g";
     } else if (insulin != null) {
-      return insulin.toString();
+      return '${insulin!.toStringAsFixed(2)}u';
     } else if (carbs != null) {
-      return carbs.toString();
+      return '${carbs!.toStringAsFixed(2)}g';
     } else {
       return "";
     }
@@ -227,7 +227,7 @@ class SGVs {
     var last = sgvs.last;
     var secondLast = sgvs[sgvs.length - 2];
 
-    if ((secondLast.age.inMinutes - last.age.inMinutes).abs() > 5) {
+    if ((secondLast.age.inMinutes - last.age.inMinutes).abs() > 6) {
       return null;
     }
 

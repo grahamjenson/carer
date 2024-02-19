@@ -1,6 +1,6 @@
 import 'package:carer/models/debug_settings.dart';
 import 'package:carer/models/target_settings.dart';
-import 'package:carer/widgets/math.dart';
+import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -82,7 +82,7 @@ class Settings extends ChangeNotifier {
       _unit = UnitExtension.fromBool(unitPref);
     }
 
-    var screenActivePref = prefs.getBool(SettingNames.unit.name);
+    var screenActivePref = prefs.getBool(SettingNames.screenActive.name);
     if (screenActivePref != null) {
       _screenActive = screenActivePref;
     }
@@ -131,7 +131,7 @@ class Settings extends ChangeNotifier {
   // SCREEN ACTIVE
   bool get screenActive => _screenActive;
   set screenActive(bool value) {
-    prefs.setBool(SettingNames.unit.name, value);
+    prefs.setBool(SettingNames.screenActive.name, value);
     _screenActive = value;
     notifyListeners();
   }
