@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:carer/pages/settingspage.dart';
 
 import 'package:carer/widgets/bgl/bgl.dart';
+import 'package:carer/widgets/current_time.dart';
 import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/insights.dart';
 import 'package:carer/widgets/sleep.dart';
@@ -24,16 +25,14 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Flexible(flex: 4, child: BGL()),
-              Flexible(flex: 2, child: Insights()),
-              Flexible(flex: 1, child: Sleep()),
+              //Flexible(flex: 4, child: Insights()),
             ]),
       ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
           children: [
-            IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
+            const FittedBox(child: CurrentTimeWidget()),
             const Spacer(),
-            IconButton(icon: const Icon(Icons.search), onPressed: () {}),
             IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
@@ -46,17 +45,5 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget historyDisplay() {
-    return Container(
-        height: 100,
-        color: Colors.red,
-        alignment: Alignment.center,
-        child: Builder(
-          builder: ((context) {
-            return const Text('DATA:');
-          }),
-        ));
   }
 }

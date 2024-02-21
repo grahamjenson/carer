@@ -8,7 +8,7 @@ import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class SettingsPage extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
@@ -151,7 +151,7 @@ class SettingsPage extends StatelessWidget {
           initialValue: settings.screenActive,
           onToggle: (value) async {
             settings.screenActive = value;
-            await Wakelock.toggle(enable: value);
+            await WakelockPlus.toggle(enable: value);
           },
         ),
       ],
@@ -167,18 +167,17 @@ class SettingsPage extends StatelessWidget {
           const Text('Debug Summary'),
           Container(
               alignment: Alignment.centerRight,
-              child: DropdownMenu(
-                initialSelection: settings.debugSummary,
-                requestFocusOnTap: false,
-                onSelected: (DebugSummary? value) {
+              child: DropdownButton(
+                value: settings.debugSummary,
+                onChanged: (DebugSummary? value) {
                   if (value == null) return;
                   settings.debugSummary = value;
                 },
-                dropdownMenuEntries: DebugSummary.values
-                    .map<DropdownMenuEntry<DebugSummary>>((e) {
-                  return DropdownMenuEntry<DebugSummary>(
+                items: DebugSummary.values
+                    .map<DropdownMenuItem<DebugSummary>>((e) {
+                  return DropdownMenuItem<DebugSummary>(
                     value: e,
-                    label: e.name,
+                    child: Text(e.name),
                   );
                 }).toList(),
               ))

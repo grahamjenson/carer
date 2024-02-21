@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
+   sodipodi:docname="bgl.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.6600727"
+     inkscape:cx="405.40392"
+     inkscape:cy="189.14834"
+     inkscape:window-width="1600"
+     inkscape:window-height="1280"
+     inkscape:window-x="1600"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path5318"
+       style="fill-opacity:0.956879;stroke:#000000;stroke-width:0.779743;fill:#ff0000"
+       d="M 102.57194,50 C 85.714729,76.744467 74.815103,99.710308 47.360859,99.710308 19.906613,99.710308 -2.3494501,77.454246 -2.3494501,50 -2.3494503,22.545754 19.906613,0.28969202 47.360859,0.28969224 74.815103,0.28969224 86.069618,23.787866 102.57194,50 Z"
+       sodipodi:nodetypes="csssc" />
+    <path
+       id="path5347"
+       style="fill:#666666;fill-opacity:0.956879;stroke:#000000;stroke-width:0.779743"
+       d="M 46.197507,3.8421667 C 36.015438,4.0657463 25.918676,7.8073291 18.020846,14.354377 9.309348,21.450663 3.3138367,32.050521 1.6857605,43.15689 c -1.54903046,10.329253 0.532108,21.341556 5.9590828,30.411422 3.5620437,6.035866 8.5992597,11.219491 14.4012037,15.031401 9.111817,6.03927 20.444987,8.667955 31.277255,7.136269 1.966171,-0.284011 3.990553,-0.745225 5.899382,-1.387322 7.171911,-2.332074 13.154476,-7.29467 18.037793,-12.915194 6.986819,-8.110128 12.410639,-17.445682 18.083731,-26.512931 1.019557,-1.638121 2.04205,-3.274415 3.06273,-4.911837 C 91.207936,38.64025 84.733993,26.766231 75.60976,16.785035 70.184971,11.003327 63.31639,6.1846477 55.416339,4.6574686 52.389811,4.011515 49.288794,3.7741944 46.197507,3.8421667 Z" />
+  </g>
+</svg>

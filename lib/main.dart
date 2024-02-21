@@ -3,7 +3,7 @@ import 'package:carer/models/summary_cn.dart';
 import 'package:carer/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,9 +13,9 @@ void main() async {
   await s.populate();
 
   if (s.screenActive) {
-    await Wakelock.enable();
+    await WakelockPlus.enable();
   } else {
-    await Wakelock.disable();
+    await WakelockPlus.disable();
   }
 
   runApp(MultiProvider(

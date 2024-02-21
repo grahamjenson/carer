@@ -39,6 +39,17 @@ class SGV {
     }
   }
 
+  String sgvUWithSign(Unit unit) {
+    var sgv = sgvU(unit);
+    var sgvStr = sgv.toStringAsFixed(1);
+    if (sgv == 0) {
+      sgvStr = "+0";
+    } else if (sgv > 0) {
+      sgvStr = "+${sgv.toStringAsFixed(1)}";
+    }
+    return sgvStr;
+  }
+
   String sgvStr(Unit unit) {
     switch (unit) {
       case Unit.mg:

@@ -1,13 +1,15 @@
+import 'dart:math';
+
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
-import 'package:carer/widgets/animations.dart';
-import 'package:carer/widgets/bgl/diff.dart';
+
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
 
@@ -20,27 +22,7 @@ class BGL extends StatefulWidget {
   State<BGL> createState() => _BGLState();
 }
 
-class _BGLState extends State<BGL> with SingleTickerProviderStateMixin {
-  late AnimationController animationController;
-  late Animation<double> heartBeat;
-
-  @override
-  void initState() {
-    super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: false);
-
-    heartBeat = heartBeatTS().animate(animationController);
-  }
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    super.dispose();
-  }
-
+class _BGLState extends State<BGL> {
   @override
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
@@ -55,38 +37,89 @@ class _BGLState extends State<BGL> with SingleTickerProviderStateMixin {
         return loader;
       }
 
-      return bglLayout(lastSGV, summaryCn, settings);
+      var delta = summaryCn.summary.delta;
+      if (delta == null) {
+        return const FittedBox(child: Icon(UniconsLine.question, size: 10));
+      }
+      var sgv = delta.sgv;
+      var sgvU = delta.sgvU(settings.unit);
+      var (target, proportion) = range(-9, -5, 5, 9, sgv.toDouble());
+
+      var color = Colours.diffColour(target, proportion);
+
+      return bgl(lastSGV, delta, settings, context);
     });
   }
 
-  Widget bglLayout(SGV lastSGV, SummaryCN summaryCn, Settings settings) {
-    return Row(children: [
-      Expanded(flex: 2, child: bgl(lastSGV, settings)),
-      const Expanded(flex: 1, child: DiffWidget())
-    ]);
-  }
+  Widget bgl(SGV sgv, SGV delta, Settings settings, BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    // min of screen width and height
+    int minScreen = screenHeight.toInt();
 
-  Widget bgl(SGV sgv, Settings settings) {
     var unit = settings.unit;
     var (target, proportion) = settings.targetRange(sgv.sgv);
 
     var color = Colours.targetColor(target, proportion);
 
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: FittedBox(
-        alignment: AlignmentDirectional.centerEnd,
-        fit: BoxFit.contain,
-        child: Text(
-          sgv.sgvStr(unit),
-          textAlign: TextAlign.right,
-          style: TextStyle(
-            fontSize: 100,
-            height: 0.8,
-            color: color,
-          ),
+    // Need a number between -90 and 90
+    double scaledDelta = (((delta.sgv + 24) / 48) * 180) - 90;
+
+    // limit scaleDelta to -90 to 90 and flip
+    scaledDelta = -1 * min(90, max(-90, scaledDelta));
+
+    return Stack(
+      alignment: Alignment.center,
+      fit: StackFit.expand,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+                child: FractionallySizedBox(
+              heightFactor: 1,
+              child: FittedBox(
+                  child: Text(
+                Dates.dateAgoShort(delta.age),
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 199, 210, 172),
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
+            )),
+            Flexible(
+                child: FractionallySizedBox(
+                    heightFactor: 3.5,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: minScreen * 0.12, horizontal: 0),
+                      child: FittedBox(
+                        child: Text(
+                          sgv.sgvStr(unit),
+                          style: const TextStyle(
+                            color: Color.fromARGB(255, 199, 210, 172),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ))),
+            Flexible(
+                child: FractionallySizedBox(
+              heightFactor: 1,
+              child: FittedBox(
+                child: Text(
+                  delta.sgvUWithSign(unit),
+                  style: const TextStyle(
+                    color: Color.fromARGB(255, 199, 210, 172),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            )),
+          ],
         ),
-      ),
+      ],
     );
   }
 }

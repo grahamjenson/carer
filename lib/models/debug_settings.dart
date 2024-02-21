@@ -68,9 +68,9 @@ class DebugSettings {
 var counter = 0;
 
 Summary highSummary(Settings settings) {
-  var start = settings.targetHigh - 18;
+  var start = settings.targetHigh - 6;
   var end = settings.urgentHigh + 18;
-  counter++;
+  counter += 4;
   if (counter > end || counter < start) {
     counter = start;
   }
@@ -95,15 +95,15 @@ Summary highSummary(Settings settings) {
 Summary lowSummary(Settings settings) {
   var start = settings.urgentLow - 18;
   var end = settings.targetLow + 18;
-  counter++;
+  counter -= 2;
   if (counter > end || counter < start) {
-    counter = start;
+    counter = end;
   }
 
   return Summary(
       sgvs: SGVs(sgvs: [
         SGV(
-            sgv: counter ~/ 1.2,
+            sgv: counter ~/ 0.8,
             mills: DateTime.now()..subtract(const Duration(minutes: 8))),
         SGV(
             sgv: counter,
@@ -120,7 +120,7 @@ Summary lowSummary(Settings settings) {
 Summary normalSummary(Settings settings) {
   var start = settings.targetLow - 18;
   var end = settings.targetHigh + 18;
-  counter++;
+  counter += 2;
   if (counter > end || counter < start) {
     counter = start;
   }
