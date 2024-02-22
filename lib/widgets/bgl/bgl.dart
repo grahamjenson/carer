@@ -7,7 +7,9 @@ import 'package:carer/utils/dates.dart';
 
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/utils/math.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -68,58 +70,52 @@ class _BGLState extends State<BGL> {
     // limit scaleDelta to -90 to 90 and flip
     scaledDelta = -1 * min(90, max(-90, scaledDelta));
 
-    return Stack(
-      alignment: Alignment.center,
-      fit: StackFit.expand,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return AspectRatio(
+        aspectRatio: 1.5,
+        child: Stack(
           children: [
-            Flexible(
-                child: FractionallySizedBox(
-              heightFactor: 1,
+            FractionallySizedBox(
+              widthFactor: 1,
+              heightFactor: 0.2,
               child: FittedBox(
-                  child: Text(
-                Dates.dateAgoShort(delta.age),
-                style: const TextStyle(
-                  color: Color.fromARGB(255, 199, 210, 172),
-                  fontWeight: FontWeight.bold,
-                ),
-              )),
-            )),
-            Flexible(
-                child: FractionallySizedBox(
-                    heightFactor: 3.5,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: minScreen * 0.12, horizontal: 0),
-                      child: FittedBox(
-                        child: Text(
-                          sgv.sgvStr(unit),
-                          style: const TextStyle(
-                            color: Color.fromARGB(255, 199, 210, 172),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ))),
-            Flexible(
-                child: FractionallySizedBox(
-              heightFactor: 1,
-              child: FittedBox(
+                alignment: Alignment.topCenter,
                 child: Text(
-                  delta.sgvUWithSign(unit),
+                  Dates.dateAgoShort(delta.age),
                   style: const TextStyle(
                     color: Color.fromARGB(255, 199, 210, 172),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            )),
+            ),
+            FractionallySizedBox(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: FittedBox(
+                child: Text(sgv.sgvStr(unit),
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 199, 210, 172),
+                      fontWeight: FontWeight.bold,
+                    )),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: FractionallySizedBox(
+                widthFactor: 1,
+                heightFactor: 0.2,
+                child: FittedBox(
+                  child: Text(
+                    delta.sgvUWithSign(unit),
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 199, 210, 172),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
-        ),
-      ],
-    );
+        ));
   }
 }
