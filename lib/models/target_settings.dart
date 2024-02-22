@@ -93,13 +93,4 @@ class TargetSettings {
     await prefs.setInt(setting.name, value);
     settings.notifyListeners();
   }
-
-  (Range, double) targetRange(int sgv) {
-    var low = settings.targetLow.toDouble();
-    var high = settings.targetHigh.toDouble();
-    var veryHigh = settings.urgentHigh.toDouble();
-    var veryLow = settings.urgentLow.toDouble();
-
-    return range(veryLow, low, high, veryHigh, sgv.toDouble());
-  }
 }

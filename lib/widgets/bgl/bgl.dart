@@ -4,6 +4,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/widgets/bgl/magarrow.dart';
 
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/utils/math.dart';
@@ -43,11 +44,6 @@ class _BGLState extends State<BGL> {
       if (delta == null) {
         return const FittedBox(child: Icon(UniconsLine.question, size: 10));
       }
-      var sgv = delta.sgv;
-      var sgvU = delta.sgvU(settings.unit);
-      var (target, proportion) = range(-9, -5, 5, 9, sgv.toDouble());
-
-      var color = Colours.diffColour(target, proportion);
 
       return bgl(lastSGV, delta, settings, context);
     });
@@ -60,30 +56,60 @@ class _BGLState extends State<BGL> {
     int minScreen = screenHeight.toInt();
 
     var unit = settings.unit;
-    var (target, proportion) = settings.targetRange(sgv.sgv);
+    var (target, proportion) = targetRange(settings, sgv.sgv);
+    var (diffTarget, diffProportion) = diffRange(delta.sgv);
 
-    var color = Colours.targetColor(target, proportion);
-
-    // Need a number between -90 and 90
-    double scaledDelta = (((delta.sgv + 24) / 48) * 180) - 90;
-
-    // limit scaleDelta to -90 to 90 and flip
-    scaledDelta = -1 * min(90, max(-90, scaledDelta));
+    // direction up if deltat is positive down if negative
+    var direction = Direction.up;
+    var mag = Magnitute.small;
+    switch (diffTarget) {
+      case Range7.veryVeryLow:
+        direction = Direction.down;
+        mag = Magnitute.large;
+        break;
+      case Range7.veryLow:
+        direction = Direction.down;
+        mag = Magnitute.medium;
+        break;
+      case Range7.low:
+        direction = Direction.down;
+        mag = Magnitute.small;
+        break;
+      case Range7.mid:
+        direction = Direction.right;
+        mag = Magnitute.small;
+        break;
+      case Range7.high:
+        direction = Direction.up;
+        mag = Magnitute.small;
+        break;
+      case Range7.veryHigh:
+        direction = Direction.up;
+        mag = Magnitute.medium;
+        break;
+      case Range7.veryVeryHigh:
+        direction = Direction.up;
+        mag = Magnitute.large;
+        break;
+    }
 
     return AspectRatio(
         aspectRatio: 1.5,
         child: Stack(
           children: [
-            FractionallySizedBox(
-              widthFactor: 1,
-              heightFactor: 0.2,
-              child: FittedBox(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  Dates.dateAgoShort(delta.age),
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 199, 210, 172),
-                    fontWeight: FontWeight.bold,
+            Align(
+              alignment: const Alignment(0, -0.9),
+              child: FractionallySizedBox(
+                widthFactor: 1,
+                heightFactor: 0.2,
+                child: FittedBox(
+                  alignment: const Alignment(0, 0),
+                  child: Text(
+                    Dates.dateAgoShort(delta.age),
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 199, 210, 172),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -100,21 +126,31 @@ class _BGLState extends State<BGL> {
               ),
             ),
             Align(
-              alignment: Alignment.bottomCenter,
+              alignment: const Alignment(0.3, 0.9),
               child: FractionallySizedBox(
-                widthFactor: 1,
+                widthFactor: .5,
                 heightFactor: 0.2,
-                child: FittedBox(
-                  child: Text(
-                    delta.sgvUWithSign(unit),
-                    style: const TextStyle(
-                      color: Color.fromARGB(255, 199, 210, 172),
-                      fontWeight: FontWeight.bold,
+                child: Row(children: [
+                  Expanded(
+                      child: FittedBox(
+                    child: Text(
+                      delta.sgvUWithSign(unit),
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 199, 210, 172),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ),
+                  )),
+                  Flexible(
+                      child: FractionallySizedBox(
+                          heightFactor: 1.2,
+                          child: MagArrow(
+                            direction: direction,
+                            magnitute: mag,
+                          ))),
+                ]),
               ),
-            )
+            ),
           ],
         ));
   }

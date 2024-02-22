@@ -147,8 +147,6 @@ class Settings extends ChangeNotifier {
   set urgentHigh(int value) => targetSettings.urgentHigh = value;
   set urgentLow(int value) => targetSettings.urgentLow = value;
 
-  (Range, double) targetRange(int sgv) => targetSettings.targetRange(sgv);
-
   // debug
   bool get debug => debugSettings.debug;
   set debug(bool value) => debugSettings.debug = value;
