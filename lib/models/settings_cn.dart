@@ -1,5 +1,6 @@
 import 'package:carer/models/debug_settings.dart';
 import 'package:carer/models/target_settings.dart';
+import 'package:carer/models/ui_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,9 +11,6 @@ enum SettingNames {
 
   // Unit for BGL
   unit,
-
-  // App settings
-  screenActive,
 }
 
 enum Unit { mmol, mg }
@@ -48,14 +46,23 @@ extension UnitExtension on Unit {
     }
   }
 
-  String str(double value) {
+  double val(num value) {
+    switch (this) {
+      case Unit.mg:
+        return value.toDouble();
+      case Unit.mmol:
+        return (value / 18).toDouble();
+    }
+  }
+
+  String str(num value) {
     switch (this) {
       case Unit.mmol:
-        return (value / 18).toStringAsFixed(1);
+        return (value.toDouble() / 18).toStringAsFixed(1);
       case Unit.mg:
-        return value.toStringAsFixed(0);
+        return value.toDouble().toStringAsFixed(0);
       default:
-        return value.toStringAsFixed(0);
+        return value.toDouble().toStringAsFixed(0);
     }
   }
 }
@@ -64,10 +71,10 @@ class Settings extends ChangeNotifier {
   late SharedPreferences prefs;
   late DebugSettings debugSettings;
   late TargetSettings targetSettings;
+  late UISettings uiSettings;
 
   String _nightscoutURL = '';
   Unit _unit = Unit.mmol;
-  bool _screenActive = true;
 
   Future<void> populate() async {
     prefs = await SharedPreferences.getInstance();
@@ -82,10 +89,8 @@ class Settings extends ChangeNotifier {
       _unit = UnitExtension.fromBool(unitPref);
     }
 
-    var screenActivePref = prefs.getBool(SettingNames.screenActive.name);
-    if (screenActivePref != null) {
-      _screenActive = screenActivePref;
-    }
+    uiSettings = UISettings(prefs: prefs, settings: this);
+    uiSettings.populate();
 
     targetSettings = TargetSettings(prefs: prefs, settings: this);
     targetSettings.populate();
@@ -128,13 +133,12 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  // SCREEN ACTIVE
-  bool get screenActive => _screenActive;
-  set screenActive(bool value) {
-    prefs.setBool(SettingNames.screenActive.name, value);
-    _screenActive = value;
-    notifyListeners();
-  }
+  // UI
+  bool get screenActive => uiSettings.screenActive;
+  set screenActive(bool value) => uiSettings.screenActive = value;
+
+  bool get showHistory => uiSettings.showHistory;
+  set showHistory(bool value) => uiSettings.showHistory = value;
 
   // targets
   int get targetHigh => targetSettings.targetHigh;

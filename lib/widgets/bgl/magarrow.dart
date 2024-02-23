@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 enum Direction {
@@ -24,7 +25,7 @@ class MagArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 0.7,
+      aspectRatio: 0.3,
       child: CustomPaint(
         painter: MyPainter(direction, magnitute),
       ),
@@ -51,8 +52,8 @@ class MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    Color main = const Color.fromARGB(255, 199, 210, 172);
-    Color dim = const Color.fromARGB(75, 199, 210, 172);
+    Color main = mainColor;
+    Color dim = mainColor.withAlpha(75);
 
     Paint paint = Paint();
     double minV = min(size.height, size.width);
@@ -65,8 +66,8 @@ class MyPainter extends CustomPainter {
     size = size;
 
     // center
-    drawMultiPointLine(size, canvas, paint, [0.43, 0.50], [0.5, 0.46]);
-    drawMultiPointLine(size, canvas, paint, [0.57, 0.50], [0.5, 0.54]);
+    drawMultiPointLine(size, canvas, paint, [0.22, 0.50], [0.5, 0.46]);
+    drawMultiPointLine(size, canvas, paint, [0.26, 0.50], [0.5, 0.54]);
 
     // up
     if (direction == Direction.up) {
@@ -75,18 +76,18 @@ class MyPainter extends CustomPainter {
       paint.color = dim;
     }
 
-    drawMultiPointLine(size, canvas, paint, [0.32, 0.50], [0.45, 0.35]);
+    drawMultiPointLine(size, canvas, paint, [0, 0.50], [0.45, 0.35]);
 
     if (magnitutude == Magnitute.small) {
       paint.color = dim;
     }
 
-    drawMultiPointLine(size, canvas, paint, [0.21, 0.50], [0.4, 0.24]);
+    drawMultiPointLine(size, canvas, paint, [0, 0.50], [0.34, 0.24]);
     if (magnitutude == Magnitute.medium) {
       paint.color = dim;
     }
 
-    drawMultiPointLine(size, canvas, paint, [0.1, 0.50], [0.35, 0.13]);
+    drawMultiPointLine(size, canvas, paint, [0, 0.50], [0.23, 0.13]);
 
     // down
     if (direction == Direction.down) {
@@ -95,19 +96,19 @@ class MyPainter extends CustomPainter {
       paint.color = dim;
     }
 
-    drawMultiPointLine(size, canvas, paint, [0.32, 0.50], [0.55, 0.65]);
+    drawMultiPointLine(size, canvas, paint, [0, 0.50], [0.55, 0.65]);
 
     if (magnitutude == Magnitute.small) {
       paint.color = dim;
     }
 
-    drawMultiPointLine(size, canvas, paint, [0.21, 0.50], [0.6, 0.76]);
+    drawMultiPointLine(size, canvas, paint, [0, 0.50], [0.66, 0.76]);
 
     if (magnitutude == Magnitute.medium) {
       paint.color = dim;
     }
 
-    drawMultiPointLine(size, canvas, paint, [0.1, 0.50], [0.65, 0.87]);
+    drawMultiPointLine(size, canvas, paint, [0, 0.50], [0.77, 0.87]);
   }
 
   void drawMultiPointLine(

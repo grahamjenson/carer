@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 
+const mainColor = Color.fromARGB(255, 199, 210, 172);
+
 class Colours {
   static Color targetColor(Range5 target, num proportion) {
     var color1 = const Color.fromARGB(255, 169, 131, 129);

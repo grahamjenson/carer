@@ -8,7 +8,6 @@ import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 class SettingsPage extends StatelessWidget {
   final TextEditingController controller = TextEditingController();
@@ -26,7 +25,7 @@ class SettingsPage extends StatelessWidget {
             sections: [
               nightscoutSection(context, settings),
               unitsSection(settings),
-              screenSection(settings),
+              uiSection(settings),
               debugSection(settings),
             ],
           ));
@@ -143,15 +142,22 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  SettingsSection screenSection(Settings settings) {
+  SettingsSection uiSection(Settings settings) {
     return SettingsSection(
+      title: const Text('UI'),
       tiles: [
         SettingsTile.switchTile(
           title: const Text('Keep Screen Active'),
           initialValue: settings.screenActive,
           onToggle: (value) async {
             settings.screenActive = value;
-            await WakelockPlus.toggle(enable: value);
+          },
+        ),
+        SettingsTile.switchTile(
+          title: const Text('Show History'),
+          initialValue: settings.showHistory,
+          onToggle: (value) async {
+            settings.showHistory = value;
           },
         ),
       ],

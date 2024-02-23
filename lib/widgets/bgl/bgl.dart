@@ -107,7 +107,7 @@ class _BGLState extends State<BGL> {
                   child: Text(
                     Dates.dateAgoShort(delta.age),
                     style: const TextStyle(
-                      color: Color.fromARGB(255, 199, 210, 172),
+                      color: mainColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -120,13 +120,13 @@ class _BGLState extends State<BGL> {
               child: FittedBox(
                 child: Text(sgv.sgvStr(unit),
                     style: const TextStyle(
-                      color: Color.fromARGB(255, 199, 210, 172),
+                      color: mainColor,
                       fontWeight: FontWeight.bold,
                     )),
               ),
             ),
             Align(
-              alignment: const Alignment(0.3, 0.9),
+              alignment: const Alignment(0.4, 0.85),
               child: FractionallySizedBox(
                 widthFactor: .5,
                 heightFactor: 0.2,
@@ -136,14 +136,14 @@ class _BGLState extends State<BGL> {
                     child: Text(
                       delta.sgvUWithSign(unit),
                       style: const TextStyle(
-                        color: Color.fromARGB(255, 199, 210, 172),
+                        color: mainColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   )),
                   Flexible(
                       child: FractionallySizedBox(
-                          heightFactor: 1.2,
+                          heightFactor: 1,
                           child: MagArrow(
                             direction: direction,
                             magnitute: mag,

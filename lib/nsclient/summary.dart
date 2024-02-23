@@ -31,12 +31,7 @@ class SGV {
   }
 
   double sgvU(Unit unit) {
-    switch (unit) {
-      case Unit.mg:
-        return sgv.toDouble();
-      case Unit.mmol:
-        return (sgv / 18).toDouble();
-    }
+    return unit.val(sgv);
   }
 
   String sgvUWithSign(Unit unit) {
@@ -61,6 +56,8 @@ class SGV {
 }
 
 abstract class ATreatment {
+  Unit unit = Unit.mg;
+
   DateTime get date;
   IconData get icon;
   Duration get age {
@@ -89,7 +86,7 @@ class TempBasal extends ATreatment {
 
   @override
   String get description {
-    return "Temp Basal ${absolute.toStringAsFixed(2)}";
+    return "${absolute.toStringAsFixed(2)}u";
   }
 
   factory TempBasal.fromJson(Map<String, dynamic> json) {
@@ -126,14 +123,30 @@ class SummaryTreatment extends ATreatment {
     }
   }
 
+  String get insulinStr {
+    if (insulin != null) {
+      return '${insulin!.toStringAsFixed(2)}u';
+    } else {
+      return "";
+    }
+  }
+
+  String get carbStr {
+    if (carbs != null) {
+      return '${carbs!.toStringAsFixed(0)}g';
+    } else {
+      return "";
+    }
+  }
+
   @override
   String get description {
     if (insulin != null && carbs != null) {
-      return "${insulin!.toStringAsFixed(2)}u, ${carbs!.toStringAsFixed(2)}g";
+      return "$insulinStr, $carbStr";
     } else if (insulin != null) {
-      return '${insulin!.toStringAsFixed(2)}u';
+      return insulinStr;
     } else if (carbs != null) {
-      return '${carbs!.toStringAsFixed(2)}g';
+      return carbStr;
     } else {
       return "";
     }
@@ -169,7 +182,10 @@ class Target extends ATreatment {
 
   @override
   String get description {
-    return targetTop.toString();
+    if (targetBottom == targetTop) {
+      return "${unit.str(targetBottom)}${unit.name}";
+    }
+    return "${unit.str(targetBottom)}-${unit.str(targetTop)}${unit.name}";
   }
 
   factory Target.fromJson(Map<String, dynamic> json) {
@@ -427,25 +443,31 @@ class Summary {
   }
 
   // return a list of tempBasals treatments and targets in order
-  List<ATreatment> get history {
+  List<ATreatment> history(Unit unit) {
     List<ATreatment> history = [];
 
     // add the tempBasals
-    //history.addAll(tempBasals.tempBasals);
+    history.addAll(tempBasals.tempBasals);
 
     // add the treatments
     history.addAll(treatments.treatments);
 
     // add the targets
-    //history.addAll(targets.targets);
+    history.addAll(targets.targets);
 
     // sort the history by date
     history.sort((a, b) => b.date.compareTo(a.date));
 
+    // loop over all the treatments and convert them to the correct unit
+    history = history.map((treatment) {
+      treatment.unit = unit;
+      return treatment;
+    }).toList();
+
     // filter history to items that only happend in late 6 hours
     history = history
         .where((element) => element.date.isAfter(DateTime.now().subtract(
-              const Duration(hours: 6),
+              const Duration(hours: 24),
             )))
         .toList();
 
