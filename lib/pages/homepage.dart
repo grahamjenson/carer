@@ -9,7 +9,6 @@ import 'package:carer/widgets/current_time.dart';
 import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/stats.dart';
 
-import 'package:carer/widgets/sleep.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +19,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
-      log("build");
       List<Widget> sections = [
-        const Flexible(flex: 5, child: BGL()),
+        const Flexible(flex: 4, child: BGL()),
       ];
 
       if (settings.showHistory) {

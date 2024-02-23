@@ -84,6 +84,11 @@ class TempBasal extends ATreatment {
   @override
   IconData get icon => Icons.access_time;
 
+  //return the date + duration in seconds as a DateTime
+  DateTime get dateEnd {
+    return date.add(Duration(seconds: duration.toInt()));
+  }
+
   @override
   String get description {
     return "${absolute.toStringAsFixed(2)}u";
@@ -180,6 +185,11 @@ class Target extends ATreatment {
   @override
   IconData get icon => Icons.trending_flat;
 
+  //return the date + duration in seconds as a DateTime
+  DateTime get dateEnd {
+    return date.add(Duration(seconds: duration));
+  }
+
   @override
   String get description {
     if (targetBottom == targetTop) {
@@ -272,6 +282,7 @@ class TempBasals {
   factory TempBasals.fromJson(List<dynamic> json) {
     List<TempBasal> tempBasals =
         json.map((tempBasalJson) => TempBasal.fromJson(tempBasalJson)).toList();
+    tempBasals.sort((a, b) => a.date.compareTo(b.date));
     return TempBasals(tempBasals: tempBasals);
   }
 }
@@ -301,6 +312,7 @@ class Targets {
   factory Targets.fromJson(List<dynamic> json) {
     List<Target> targets =
         json.map((targetJson) => Target.fromJson(targetJson)).toList();
+    targets.sort((a, b) => a.date.compareTo(b.date));
     return Targets(targets: targets);
   }
 }
@@ -432,14 +444,34 @@ class Summary {
     if (tempBasals.tempBasals.isEmpty) {
       return null;
     }
-    return tempBasals.tempBasals.last;
+    var lastTempBasal = tempBasals.tempBasals.last;
+
+    print(lastTempBasal.dateEnd);
+    print(DateTime.now());
+    print(lastTempBasal.absolute);
+    // if the last target dateEnd is in the past, return null
+    if (DateTime.now().isBefore(lastTempBasal.dateEnd)) {
+      return lastTempBasal;
+    }
+    return null;
   }
 
   Target? get lastTarget {
     if (targets.targets.isEmpty) {
       return null;
     }
-    return targets.targets.last;
+    var lastTarget = targets.targets.last;
+
+    print(lastTarget.dateEnd);
+    print(DateTime.now());
+    print(lastTarget.targetBottom);
+
+    // if the last target dateEnd is in the past, return null
+    if (DateTime.now().isBefore(lastTarget.dateEnd)) {
+      return lastTarget;
+    }
+
+    return null;
   }
 
   // return a list of tempBasals treatments and targets in order

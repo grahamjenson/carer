@@ -1,5 +1,6 @@
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
+import 'package:carer/nsclient/summary.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,7 @@ class Stats extends StatelessWidget {
 
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
+      var summary = summaryCn.summary;
       return Container(
         margin: const EdgeInsets.only(left: 8),
         width: 140,
@@ -57,7 +59,14 @@ class Stats extends StatelessWidget {
                         label: SizedBox(
                             width: 50, child: Text('stat', style: heading))),
                   ],
-                  rows: [iob(summaryCn), cob(summaryCn), power(summaryCn)],
+                  rows: [
+                    iob(summary),
+                    cob(summary),
+                    power(summary),
+                    cage(summary),
+                    tempBasal(summary),
+                    target(summary, settings.unit),
+                  ],
                 ),
               )),
             ),
@@ -67,44 +76,75 @@ class Stats extends StatelessWidget {
     });
   }
 
-  DataRow iob(summaryCn) {
+  DataRow iob(Summary summary) {
     return DataRow(
       cells: [
         const DataCell(
           Text("IOB", style: row),
         ),
         DataCell(
-          Text("${summaryCn.summary.state.iob}u", style: row),
+          Text("${summary.state.iob}u", style: row),
         ),
       ],
     );
   }
 
-  DataRow cob(summaryCn) {
+  DataRow cob(Summary summary) {
     return DataRow(
       cells: [
         const DataCell(
           Text("COB", style: row),
         ),
         DataCell(
-          Text("${summaryCn.summary.state.cob}g", style: row),
+          Text("${summary.state.cob}g", style: row),
         ),
       ],
     );
   }
 
-  DataRow power(summaryCn) {
+  DataRow power(Summary summary) {
     return DataRow(
       cells: [
         const DataCell(Text("Power", style: row)),
         DataCell(
-          Text("${summaryCn.summary.state.battery}%", style: row),
+          Text("${summary.state.battery}%", style: row),
         ),
       ],
     );
   }
 
-  //   Text('IOB ${summaryCn.summary.state.iob}'),
-  // Text('COB ${summaryCn.summary.state.cob}'),
-  // Text('Power ${summaryCn.summary.state.battery}'),
+  DataRow cage(Summary summary) {
+    return DataRow(
+      cells: [
+        const DataCell(Text("cage", style: row)),
+        DataCell(
+          Text("${summary.state.cage}h", style: row),
+        ),
+      ],
+    );
+  }
+
+  DataRow tempBasal(Summary summary) {
+    return DataRow(
+      cells: [
+        const DataCell(Text("TempBasal", style: row)),
+        DataCell(
+          Text(summary.lastTempBasal?.description ?? "none", style: row),
+        ),
+      ],
+    );
+  }
+
+  DataRow target(Summary summary, Unit unit) {
+    var lastTarget = summary.lastTarget;
+    lastTarget?.unit = unit;
+    return DataRow(
+      cells: [
+        const DataCell(Text("Target", style: row)),
+        DataCell(
+          Text(lastTarget?.description ?? "none", style: row),
+        ),
+      ],
+    );
+  }
 }
