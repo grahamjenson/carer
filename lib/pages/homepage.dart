@@ -6,6 +6,7 @@ import 'package:carer/pages/settingspage.dart';
 
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/current_time.dart';
+import 'package:carer/widgets/insights/chart.dart';
 import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/stats.dart';
 
@@ -23,6 +24,9 @@ class HomePage extends StatelessWidget {
         const Flexible(flex: 4, child: BGL()),
       ];
 
+      if (settings.showChart) {
+        sections.add(const Flexible(flex: 2, child: BGLChart()));
+      }
       if (settings.showHistory) {
         sections.add(
           Flexible(
@@ -37,6 +41,7 @@ class HomePage extends StatelessWidget {
           ),
         );
       }
+
       return Scaffold(
         backgroundColor: Colors.black,
         body: Container(

@@ -60,36 +60,28 @@ class _BGLState extends State<BGL> {
     var (diffTarget, diffProportion) = diffRange(delta.sgv);
 
     // direction up if deltat is positive down if negative
-    var direction = Direction.up;
-    var mag = Magnitute.small;
+    var mag = 0;
     switch (diffTarget) {
       case Range7.veryVeryLow:
-        direction = Direction.down;
-        mag = Magnitute.large;
+        mag = -3;
         break;
       case Range7.veryLow:
-        direction = Direction.down;
-        mag = Magnitute.medium;
+        mag = -2;
         break;
       case Range7.low:
-        direction = Direction.down;
-        mag = Magnitute.small;
+        mag = -1;
         break;
       case Range7.mid:
-        direction = Direction.right;
-        mag = Magnitute.small;
+        mag = 0;
         break;
       case Range7.high:
-        direction = Direction.up;
-        mag = Magnitute.small;
+        mag = 1;
         break;
       case Range7.veryHigh:
-        direction = Direction.up;
-        mag = Magnitute.medium;
+        mag = 2;
         break;
       case Range7.veryVeryHigh:
-        direction = Direction.up;
-        mag = Magnitute.large;
+        mag = 3;
         break;
     }
 
@@ -145,7 +137,6 @@ class _BGLState extends State<BGL> {
                       child: FractionallySizedBox(
                           heightFactor: 1,
                           child: MagArrow(
-                            direction: direction,
                             magnitute: mag,
                           ))),
                 ]),

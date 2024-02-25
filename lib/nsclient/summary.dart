@@ -446,9 +446,6 @@ class Summary {
     }
     var lastTempBasal = tempBasals.tempBasals.last;
 
-    print(lastTempBasal.dateEnd);
-    print(DateTime.now());
-    print(lastTempBasal.absolute);
     // if the last target dateEnd is in the past, return null
     if (DateTime.now().isBefore(lastTempBasal.dateEnd)) {
       return lastTempBasal;
@@ -461,10 +458,6 @@ class Summary {
       return null;
     }
     var lastTarget = targets.targets.last;
-
-    print(lastTarget.dateEnd);
-    print(DateTime.now());
-    print(lastTarget.targetBottom);
 
     // if the last target dateEnd is in the past, return null
     if (DateTime.now().isBefore(lastTarget.dateEnd)) {

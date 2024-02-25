@@ -160,6 +160,13 @@ class SettingsPage extends StatelessWidget {
             settings.showHistory = value;
           },
         ),
+        SettingsTile.switchTile(
+          title: const Text('Show Chart'),
+          initialValue: settings.showChart,
+          onToggle: (value) async {
+            settings.showChart = value;
+          },
+        ),
       ],
     );
   }
