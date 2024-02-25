@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
@@ -7,7 +6,6 @@ import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unicons/unicons.dart';
 
 class History extends StatelessWidget {
   const History({super.key});

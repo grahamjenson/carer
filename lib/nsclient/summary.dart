@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:unicons/unicons.dart';
 

@@ -1,7 +1,6 @@
 import 'package:carer/models/debug_settings.dart';
 import 'package:carer/models/target_settings.dart';
 import 'package:carer/models/ui_settings.dart';
-import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

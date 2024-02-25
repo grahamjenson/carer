@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';

@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:carer/models/settings_cn.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:http/http.dart' as http;
 

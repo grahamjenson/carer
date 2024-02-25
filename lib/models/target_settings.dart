@@ -1,5 +1,4 @@
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/utils/math.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // find where in the target range and by what proportion a number is
