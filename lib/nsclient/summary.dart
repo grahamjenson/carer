@@ -17,6 +17,8 @@ class SGV {
     required this.mills,
   });
 
+  get date => mills;
+
   factory SGV.fromJson(Map<String, dynamic> json) {
     return SGV(
       sgv: json['sgv'],
@@ -48,7 +50,7 @@ class SGV {
       case Unit.mg:
         return sgv.toString();
       case Unit.mmol:
-        return (sgv / 18).toStringAsFixed(1);
+        return (sgv / 18.018).toStringAsFixed(1);
     }
   }
 }
@@ -249,7 +251,14 @@ class SGVs {
 
   factory SGVs.fromJson(List<dynamic> json) {
     List<SGV> sgvs = json.map((sgvJson) => SGV.fromJson(sgvJson)).toList();
+    // sort sgvs by age
+    sgvs.sort((a, b) => a.mills.compareTo(b.mills));
     return SGVs(sgvs: sgvs);
+  }
+
+  // return the last sgvs for minutes
+  List<SGV> lastMins(int minutes) {
+    return sgvs.where((sgv) => sgv.age.inMinutes < minutes).toList();
   }
 
   SGV? delta() {

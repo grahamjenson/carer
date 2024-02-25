@@ -66,6 +66,9 @@ class Stats extends StatelessWidget {
                     cage(summary),
                     tempBasal(summary),
                     target(summary, settings.unit),
+                    fifteenMinDiff(summary, settings.unit),
+                    todaysInRange(
+                        summary, settings.targetLow, settings.targetHigh),
                   ],
                 ),
               )),
@@ -143,6 +146,43 @@ class Stats extends StatelessWidget {
         const DataCell(Text("Target", style: row)),
         DataCell(
           Text(lastTarget?.description ?? "none", style: row),
+        ),
+      ],
+    );
+  }
+
+  DataRow fifteenMinDiff(Summary summary, Unit unit) {
+    var sgvs = summary.sgvs.lastMins(15);
+    var diff = summary.lastSGV!.sgv - sgvs.first.sgv;
+    return DataRow(
+      cells: [
+        const DataCell(Text("15min diff", style: row)),
+        DataCell(
+          Text("${unit.str(diff)}${unit.name}", style: row),
+        ),
+      ],
+    );
+  }
+
+  DataRow todaysInRange(Summary summary, int low, int high) {
+    // TODO summary does not include this.
+
+    var sgvsTodayInRange = summary.sgvs.sgvs
+        .where((s) => s.sgv >= low && s.sgv <= high)
+        // Checks if mills is today
+        .toList()
+        .length;
+
+    // Total readings today is mins in Today / 5
+
+    var total = summary.sgvs.sgvs.length;
+    var percent = ((sgvsTodayInRange / total) * 100).toStringAsFixed(0);
+
+    return DataRow(
+      cells: [
+        const DataCell(Text("% in range", style: row)),
+        DataCell(
+          Text("$percent%", style: row),
         ),
       ],
     );

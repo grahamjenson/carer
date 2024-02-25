@@ -50,14 +50,14 @@ extension UnitExtension on Unit {
       case Unit.mg:
         return value.toDouble();
       case Unit.mmol:
-        return (value / 18).toDouble();
+        return (value / 18.018).toDouble();
     }
   }
 
   String str(num value) {
     switch (this) {
       case Unit.mmol:
-        return (value.toDouble() / 18).toStringAsFixed(1);
+        return (value.toDouble() / 18.018).toStringAsFixed(1);
       case Unit.mg:
         return value.toDouble().toStringAsFixed(0);
       default:

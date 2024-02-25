@@ -40,7 +40,8 @@ class _MagArrowState extends State<MagArrow>
 
   @override
   Widget build(BuildContext context) {
-    _animation = IntTween(begin: 0, end: widget.magnitute).animate(_controller)
+    _animation = IntTween(begin: 0, end: widget.magnitute).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic))
       ..addListener(() {
         setState(() {});
       });
