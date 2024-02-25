@@ -16,8 +16,9 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
   return range5(veryLow, low, high, veryHigh, sgv.toDouble());
 }
 
-(Range7, double) diffRange(int sgv) {
-  return range7(-27, -18, -9, 9, 18, 27, sgv.toDouble());
+(Range7, double) diffRange(int currentsgv, int diff) {
+  // This is bases on percentage of the current sgv because the closer to low the more important it is
+  return range7(-0.15, -0.07, -0.05, 0.05, 0.07, 0.15, diff / currentsgv);
 }
 
 (Range5, double) range5(

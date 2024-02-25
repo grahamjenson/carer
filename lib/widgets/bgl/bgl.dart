@@ -50,14 +50,8 @@ class _BGLState extends State<BGL> {
   }
 
   Widget bgl(SGV sgv, SGV delta, Settings settings, BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    // min of screen width and height
-    int minScreen = screenHeight.toInt();
-
     var unit = settings.unit;
-    var (target, proportion) = targetRange(settings, sgv.sgv);
-    var (diffTarget, diffProportion) = diffRange(delta.sgv);
+    var (diffTarget, _) = diffRange(sgv.sgv, delta.sgv);
 
     // direction up if deltat is positive down if negative
     var mag = 0;

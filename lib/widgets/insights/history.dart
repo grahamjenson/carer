@@ -86,7 +86,6 @@ class History extends StatelessWidget {
 
   DataRow? historyRow(ATreatment treatment) {
     const row = TextStyle(color: mainColor, fontSize: 12);
-    const emptyCell = DataCell(Spacer());
     if (treatment is SummaryTreatment) {
       return DataRow(cells: [
         DataCell(

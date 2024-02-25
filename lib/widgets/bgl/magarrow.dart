@@ -67,7 +67,7 @@ class MyPainter extends CustomPainter {
     double minV = min(size.height, size.width);
     paint.color = main;
 
-    paint.strokeWidth = minV * 0.1;
+    paint.strokeWidth = minV * 0.2;
     paint.style = PaintingStyle.stroke;
     // Path number 1
 
