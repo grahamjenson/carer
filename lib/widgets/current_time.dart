@@ -41,6 +41,7 @@ class CurrentTimeWidgetState extends State<CurrentTimeWidget> {
   @override
   Widget build(BuildContext context) {
     return Text(_timeString,
-        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold));
+        style: const TextStyle(
+            height: 0.5, fontSize: 32, fontWeight: FontWeight.bold));
   }
 }

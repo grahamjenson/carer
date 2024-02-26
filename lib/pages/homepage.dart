@@ -19,47 +19,39 @@ class HomePage extends StatelessWidget {
     final aspectRatio = MediaQuery.of(context).size.aspectRatio;
     final isWideScreen = aspectRatio > 1.0;
 
-    if (isWideScreen) {}
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
-      List<Widget> sections = [
-        const Flexible(flex: 4, child: BGL()),
-      ];
-
-      if (settings.showChart) {
-        sections.add(const Flexible(flex: 2, child: BGLChart()));
+      Widget insights = const SizedBox.shrink();
+      if (settings.showChart && settings.showHistory) {
+        insights = const Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Flexible(child: BGLChart()),
+              Flexible(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                    Flexible(child: History()),
+                    Flexible(child: Stats())
+                  ]))
+            ]);
+      } else if (settings.showChart) {
+        insights = const Flexible(child: Flexible(child: BGLChart()));
+      } else if (settings.showHistory) {
+        insights = const Row(
+            children: [Flexible(child: History()), Flexible(child: Stats())]);
       }
 
-      if (settings.showHistory) {
-        List<Widget> history = const [
-          Flexible(child: History()),
-          Flexible(child: Stats())
-        ];
-
-        Widget insights = Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: history);
-        if (isWideScreen) {
-          insights = Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: history,
-          );
-        }
-        sections.add(
-          Flexible(
-            flex: 2,
-            child: Container(alignment: Alignment.center, child: insights),
-          ),
-        );
-      }
+      var bgl = const Flexible(flex: 4, child: BGL());
 
       Widget mainLine = Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround, children: sections);
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [bgl, Flexible(flex: 5, child: insights)]);
 
       if (isWideScreen) {
         mainLine = Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: sections);
+            children: [bgl, Flexible(flex: 3, child: insights)]);
       }
 
       return Scaffold(
@@ -71,7 +63,8 @@ class HomePage extends StatelessWidget {
           child: mainLine,
         ),
         bottomNavigationBar: BottomAppBar(
-          height: 50,
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          height: 40,
           child: Row(
             children: [
               const FittedBox(child: CurrentTimeWidget()),
