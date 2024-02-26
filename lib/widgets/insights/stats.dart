@@ -153,6 +153,16 @@ class Stats extends StatelessWidget {
 
   DataRow fifteenMinDiff(Summary summary, Unit unit) {
     var sgvs = summary.sgvs.lastMins(15);
+    if (sgvs.isEmpty) {
+      return const DataRow(
+        cells: [
+          DataCell(Text("15min diff", style: row)),
+          DataCell(
+            Text("none", style: row),
+          ),
+        ],
+      );
+    }
     var diff = summary.lastSGV!.sgv - sgvs.first.sgv;
     return DataRow(
       cells: [

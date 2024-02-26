@@ -69,7 +69,7 @@ var counter = 0;
 
 Summary highSummary(Settings settings) {
   var start = settings.targetHigh - 6;
-  var end = settings.urgentHigh + 18;
+  var end = 15 * 18;
   counter += 6;
   if (counter > end || counter < start) {
     counter = start;

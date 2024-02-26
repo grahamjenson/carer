@@ -16,6 +16,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final aspectRatio = MediaQuery.of(context).size.aspectRatio;
+    final isWideScreen = aspectRatio > 1.0;
+
+    if (isWideScreen) {}
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
       List<Widget> sections = [
@@ -25,19 +29,37 @@ class HomePage extends StatelessWidget {
       if (settings.showChart) {
         sections.add(const Flexible(flex: 2, child: BGLChart()));
       }
+
       if (settings.showHistory) {
+        List<Widget> history = const [
+          Flexible(child: History()),
+          Flexible(child: Stats())
+        ];
+
+        Widget insights = Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: history);
+        if (isWideScreen) {
+          insights = Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: history,
+          );
+        }
         sections.add(
           Flexible(
             flex: 2,
-            child: Container(
-              alignment: Alignment.center,
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [History(), Stats()],
-              ),
-            ),
+            child: Container(alignment: Alignment.center, child: insights),
           ),
         );
+      }
+
+      Widget mainLine = Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround, children: sections);
+
+      if (isWideScreen) {
+        mainLine = Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: sections);
       }
 
       return Scaffold(
@@ -46,16 +68,16 @@ class HomePage extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           padding: const EdgeInsets.all(8),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: sections),
+          child: mainLine,
         ),
         bottomNavigationBar: BottomAppBar(
+          height: 50,
           child: Row(
             children: [
               const FittedBox(child: CurrentTimeWidget()),
               const Spacer(),
               IconButton(
+                  padding: EdgeInsets.zero,
                   icon: const Icon(Icons.settings),
                   onPressed: () {
                     Navigator.push(
