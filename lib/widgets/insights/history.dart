@@ -3,6 +3,7 @@ import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
+import 'package:carer/widgets/insights/window.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,53 +19,33 @@ class History extends StatelessWidget {
         builder: (context, settings, summaryCn, child) {
       var history = historyContainers(settings, summaryCn);
 
-      return Container(
-        width: 140,
-        decoration: BoxDecoration(
-          border: Border.all(color: mainColor, width: 1),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: mainColor,
-              ),
-              child: const Text("History",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 10,
-                  )),
-            ),
-            Expanded(
-                child: SingleChildScrollView(
-                    child: DataTable(
-                        columnSpacing: 5,
-                        dividerThickness: 0.01,
-                        headingRowHeight: 12,
-                        dataRowMinHeight: 14,
-                        dataRowMaxHeight: 15,
-                        horizontalMargin: 0,
-                        columns: const [
-                          DataColumn(
-                              label: SizedBox(
-                                  width: 50,
-                                  child: Text('ago', style: heading))),
-                          DataColumn(
-                              label: SizedBox(
-                                  width: 50,
-                                  child: Text('insulin', style: heading))),
-                          DataColumn(
-                              label: SizedBox(
-                                  width: 50,
-                                  child: Text('carbs', style: heading))),
-                        ],
-                        rows: history))),
-          ],
+      return Window(
+        title: "History",
+        child: Expanded(
+          child: SingleChildScrollView(
+              child: Container(
+                  alignment: Alignment.center,
+                  child: DataTable(
+                      columnSpacing: 5,
+                      dividerThickness: 0.01,
+                      headingRowHeight: 12,
+                      dataRowMinHeight: 14,
+                      dataRowMaxHeight: 15,
+                      horizontalMargin: 0,
+                      columns: const [
+                        DataColumn(
+                            label: SizedBox(
+                                width: 50, child: Text('ago', style: heading))),
+                        DataColumn(
+                            label: SizedBox(
+                                width: 50,
+                                child: Text('insulin', style: heading))),
+                        DataColumn(
+                            label: SizedBox(
+                                width: 50,
+                                child: Text('carbs', style: heading))),
+                      ],
+                      rows: history))),
         ),
       );
     });

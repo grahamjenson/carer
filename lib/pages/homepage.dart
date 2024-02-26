@@ -3,6 +3,7 @@ import 'package:carer/models/summary_cn.dart';
 import 'package:carer/pages/settingspage.dart';
 
 import 'package:carer/widgets/bgl/bgl.dart';
+import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/current_time.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
 import 'package:carer/widgets/insights/history.dart';
@@ -56,22 +57,34 @@ class HomePage extends StatelessWidget {
 
       return Scaffold(
         backgroundColor: Colors.black,
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          padding: const EdgeInsets.all(8),
-          child: mainLine,
+        body: Stack(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(8),
+              child: mainLine,
+            ),
+            const Positioned(
+              top: 10, // Adjust these values as needed
+              left: 10,
+              child: FittedBox(child: CurrentTimeWidget()),
+            ),
+          ],
         ),
         bottomNavigationBar: BottomAppBar(
+          color: Colors.transparent,
           padding: const EdgeInsets.only(left: 8, right: 8),
           height: 40,
           child: Row(
             children: [
-              const FittedBox(child: CurrentTimeWidget()),
               const Spacer(),
               IconButton(
                   padding: EdgeInsets.zero,
-                  icon: const Icon(Icons.settings),
+                  icon: const Icon(
+                    Icons.settings,
+                    color: mainColor,
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,

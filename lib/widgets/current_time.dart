@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 class CurrentTimeWidget extends StatefulWidget {
@@ -42,6 +43,9 @@ class CurrentTimeWidgetState extends State<CurrentTimeWidget> {
   Widget build(BuildContext context) {
     return Text(_timeString,
         style: const TextStyle(
-            height: 0.5, fontSize: 32, fontWeight: FontWeight.bold));
+            height: 0.5,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: mainColor));
   }
 }
