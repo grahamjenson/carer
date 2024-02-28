@@ -57,13 +57,17 @@ class _BGLState extends State<BGL> {
                 heightFactor: 0.2,
                 child: FittedBox(
                   alignment: const Alignment(0, 0),
-                  child: Text(
-                    Dates.dateAgoShort(delta.age),
+                  child: RichText(
+                      text: TextSpan(
+                    text: "${delta.age.inMinutes}",
                     style: const TextStyle(
                       color: mainColor,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
+                    children: const [
+                      TextSpan(text: "min", style: TextStyle(fontSize: 6)),
+                    ],
+                  )),
                 ),
               ),
             ),

@@ -11,6 +11,29 @@ import 'package:provider/provider.dart';
 class BGLChart extends StatelessWidget {
   const BGLChart({super.key});
 
+  final TextStyle touchedTextStyle = const TextStyle(
+      fontSize: 10,
+      fontWeight: FontWeight.w700,
+      color: Colors.white,
+      shadows: [
+        Shadow(
+            // bottomLeft
+            offset: Offset(-1.5, -1.5),
+            color: Colors.black),
+        Shadow(
+            // bottomRight
+            offset: Offset(1.5, -1.5),
+            color: Colors.black),
+        Shadow(
+            // topRight
+            offset: Offset(1.5, 1.5),
+            color: Colors.black),
+        Shadow(
+            // topLeft
+            offset: Offset(-1.5, 1.5),
+            color: Colors.black),
+      ]);
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
@@ -18,7 +41,6 @@ class BGLChart extends StatelessWidget {
       int minsAgo = 125;
       // Breaking down the objects
       Summary summary = summaryCn.summary;
-      List<SGV> sgvs = summary.sgvs.lastMins(minsAgo);
 
       double maxY = settings.urgentHigh + 36;
       double minY = 0;
@@ -26,11 +48,33 @@ class BGLChart extends StatelessWidget {
       double maxX = 0; // now
 
       // convert the last hours of summary sgvs into flspots
-      List<FlSpot> spots = [];
-      for (var i = 0; i < sgvs.length; i++) {
-        var sgv = sgvs[i];
-        spots.add(FlSpot(-sgv.age.inMinutes.toDouble(), sgv.sgv.toDouble()));
-      }
+      var bglSpotData = bglSpots(summary, minsAgo);
+
+      var lineChartData = LineChartData(
+        rangeAnnotations: rangeAnnotations(settings),
+        gridData: gridData(),
+        titlesData: titleData(settings),
+        borderData: borderData(),
+        maxX: maxX,
+        minX: minX,
+        minY: minY,
+        maxY: maxY,
+        lineBarsData: [
+          LineChartBarData(
+            color: mainColor,
+            spots: bglSpotData,
+            barWidth: 2,
+            dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+          ),
+          LineChartBarData(
+            color: mainColor,
+            spots: basalSpots(summary, minsAgo),
+            barWidth: 2,
+            dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+          ),
+        ],
+        lineTouchData: lineTouchData(settings),
+      );
 
       return Window(
         title: "Chart",
@@ -41,132 +85,138 @@ class BGLChart extends StatelessWidget {
                   top: 5,
                 ),
                 child: LineChart(
-                  LineChartData(
-                    rangeAnnotations: RangeAnnotations(
-                      horizontalRangeAnnotations: [
-                        HorizontalRangeAnnotation(
-                          y1: settings.urgentHigh.toDouble(),
-                          y2: settings.urgentLow.toDouble(),
-                          color: mainColor.withAlpha(35),
-                        ),
-                        HorizontalRangeAnnotation(
-                          y1: settings.targetHigh.toDouble(),
-                          y2: settings.targetLow.toDouble(),
-                          color: mainColor.withAlpha(35),
-                        ),
-                      ],
-                    ),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: true,
-                      horizontalInterval: 36,
-                      verticalInterval: 10,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: mainColor.withAlpha(90),
-                          strokeWidth: 1,
-                        );
-                      },
-                      getDrawingVerticalLine: (value) {
-                        return FlLine(
-                          color: mainColor.withAlpha(90),
-                          strokeWidth: 1,
-                        );
-                      },
-                    ),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: bottomTitleWidgets(),
-                      ),
-                      leftTitles:
-                          AxisTitles(sideTitles: leftTitleWidgets(settings)),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border:
-                          Border.all(color: mainColor.withAlpha(50), width: 1),
-                    ),
-                    maxX: maxX,
-                    minY: minY,
-                    maxY: maxY,
-                    lineBarsData: [
-                      LineChartBarData(
-                        color: mainColor,
-                        spots: spots,
-                        barWidth: 2,
-                        dotData:
-                            FlDotData(show: true, getDotPainter: bglDotPainter),
-                      ),
-                    ],
-                    lineTouchData: LineTouchData(
-                        enabled: true,
-                        touchTooltipData: LineTouchTooltipData(
-                          tooltipBgColor: Colors.transparent,
-                          tooltipRoundedRadius: 10.0,
-                          fitInsideHorizontally: true,
-                          tooltipMargin: -15,
-                          tooltipPadding: const EdgeInsets.all(0),
-                          getTooltipItems: (touchedSpots) {
-                            return touchedSpots.map(
-                              (LineBarSpot touchedSpot) {
-                                const textStyle = TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    shadows: [
-                                      Shadow(
-                                          // bottomLeft
-                                          offset: Offset(-1.5, -1.5),
-                                          color: Colors.black),
-                                      Shadow(
-                                          // bottomRight
-                                          offset: Offset(1.5, -1.5),
-                                          color: Colors.black),
-                                      Shadow(
-                                          // topRight
-                                          offset: Offset(1.5, 1.5),
-                                          color: Colors.black),
-                                      Shadow(
-                                          // topLeft
-                                          offset: Offset(-1.5, 1.5),
-                                          color: Colors.black),
-                                    ]);
-                                return LineTooltipItem(
-                                  settings.unit
-                                      .str(spots[touchedSpot.spotIndex].y),
-                                  textStyle,
-                                );
-                              },
-                            ).toList();
-                          },
-                        ),
-                        getTouchedSpotIndicator:
-                            (LineChartBarData barData, List<int> indicators) {
-                          return indicators.map(
-                            (int index) {
-                              const line = FlLine(
-                                  color: Colors.grey,
-                                  strokeWidth: 1,
-                                  dashArray: [2, 4]);
-                              return const TouchedSpotIndicatorData(
-                                line,
-                                FlDotData(show: false),
-                              );
-                            },
-                          ).toList();
-                        },
-                        getTouchLineEnd: (_, __) => double.infinity),
-                  ),
+                  lineChartData,
                 ))),
       );
     });
+  }
+
+  List<FlSpot> bglSpots(Summary summary, int minsAgo) {
+    List<SGV> sgvs = summary.sgvs.lastMins(minsAgo);
+    List<FlSpot> spots = [];
+    for (var i = 0; i < sgvs.length; i++) {
+      var sgv = sgvs[i];
+      spots.add(FlSpot(-sgv.age.inMinutes.toDouble(), sgv.sgv.toDouble()));
+    }
+    return spots;
+  }
+
+  List<FlSpot> basalSpots(Summary summary, int minsAgo) {
+    List<FlSpot> spots = [];
+    // Every 5 minuts write a spot
+    for (int i = 0; i < minsAgo; i += 5) {
+      var (basal, tempbasal) =
+          summary.basalAtTime(DateTime.now().subtract(Duration(minutes: i)));
+      if (tempbasal != null) {
+        spots.add(FlSpot(-i.toDouble(), tempbasal.absolute * 100));
+      } else if (basal != null) {
+        spots.add(FlSpot(-i.toDouble(), basal.value * 100));
+      }
+    }
+    return spots;
+  }
+
+  LineTouchData lineTouchData(Settings settings) {
+    return LineTouchData(
+      enabled: true,
+      touchTooltipData: LineTouchTooltipData(
+        tooltipBgColor: Colors.transparent,
+        tooltipRoundedRadius: 10.0,
+        fitInsideHorizontally: true,
+        tooltipMargin: -15,
+        tooltipPadding: const EdgeInsets.all(0),
+        getTooltipItems: (touchedSpots) {
+          return touchedSpots.map(
+            (LineBarSpot touchedSpot) {
+              if (touchedSpot.barIndex != 0) {
+                return null;
+              }
+              //OriginalSpot touchedSpot.bar.spots[touchedSpot.spotIndex];
+              return LineTooltipItem(
+                settings.unit.str(touchedSpot.y),
+                touchedTextStyle,
+              );
+            },
+          ).toList();
+        },
+      ),
+      getTouchedSpotIndicator:
+          (LineChartBarData barData, List<int> indicators) {
+        return indicators.map(
+          (int index) {
+            var line = FlLine(
+                color: mainColor.withAlpha(150),
+                strokeWidth: 1,
+                dashArray: [2, 4]);
+            return TouchedSpotIndicatorData(
+              line,
+              const FlDotData(show: false),
+            );
+          },
+        ).toList();
+      },
+    );
+  }
+
+  FlBorderData borderData() {
+    return FlBorderData(
+      show: true,
+      border: Border.all(color: mainColor.withAlpha(50), width: 1),
+    );
+  }
+
+  FlTitlesData titleData(Settings settings) {
+    return FlTitlesData(
+      show: true,
+      rightTitles: const AxisTitles(
+        sideTitles: SideTitles(showTitles: false),
+      ),
+      topTitles: const AxisTitles(
+        sideTitles: SideTitles(showTitles: false),
+      ),
+      bottomTitles: AxisTitles(
+        sideTitles: bottomTitleWidgets(),
+      ),
+      leftTitles: AxisTitles(sideTitles: leftTitleWidgets(settings)),
+    );
+  }
+
+  FlGridData gridData() {
+    return FlGridData(
+      show: true,
+      drawVerticalLine: true,
+      horizontalInterval: 36,
+      verticalInterval: 10,
+      getDrawingHorizontalLine: (value) {
+        return FlLine(
+          color: mainColor.withAlpha(90),
+          strokeWidth: 1,
+        );
+      },
+      getDrawingVerticalLine: (value) {
+        return FlLine(
+          color: mainColor.withAlpha(90),
+          strokeWidth: 1,
+        );
+      },
+    );
+  }
+
+  RangeAnnotations rangeAnnotations(Settings settings) {
+    return RangeAnnotations(
+      horizontalRangeAnnotations: [
+        HorizontalRangeAnnotation(
+          y1: settings.urgentHigh.toDouble(),
+          y2: settings.urgentLow.toDouble(),
+          color: mainColor.withAlpha(35),
+        ),
+        HorizontalRangeAnnotation(
+          y1: settings.targetHigh.toDouble(),
+          y2: settings.targetLow.toDouble(),
+          color: mainColor.withAlpha(35),
+        ),
+      ],
+    );
   }
 
   SideTitles bottomTitleWidgets() {

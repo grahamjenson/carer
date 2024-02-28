@@ -4,7 +4,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:flutter/material.dart';
-
+import 'package:collection/collection.dart';
 import 'package:unicons/unicons.dart';
 
 class TimeValue {
@@ -63,11 +63,9 @@ class TimeValues {
     return TimeValues(values: values);
   }
 
-  TimeValue? get(DateTime date) {
-    return values.firstWhere(
+  TimeValue? atDate(DateTime date) {
+    return values.lastWhereOrNull(
       (element) => element.isBefore(date),
-      orElse: () =>
-          TimeValue(time: const TimeOfDay(hour: 0, minute: 0), value: 0),
     );
   }
 }
@@ -361,6 +359,11 @@ class TempBasals {
     tempBasals.sort((a, b) => a.date.compareTo(b.date));
     return TempBasals(tempBasals: tempBasals);
   }
+
+  TempBasal? atDate(DateTime date) {
+    return tempBasals
+        .lastWhereOrNull((element) => element.start.isBefore(date));
+  }
 }
 
 class SummaryTreatments {
@@ -511,21 +514,14 @@ class Summary {
     return DateTime.now().difference(dateRetrieved).inSeconds;
   }
 
-  TimeValue? currentBasal() {
-    return profile.basal.get(DateTime.now());
-  }
-
-  TempBasal? get lastTempBasal {
-    if (tempBasals.tempBasals.isEmpty) {
-      return null;
+  (TimeValue?, TempBasal?) basalAtTime(DateTime date) {
+    var tempBasal = tempBasals.atDate(date);
+    var basal = profile.basal.atDate(date);
+    if (tempBasal != null) {
+      return (basal, tempBasal);
     }
-    var lastTempBasal = tempBasals.tempBasals.last;
 
-    // if the last target dateEnd is in the past, return null
-    if (DateTime.now().isBefore(lastTempBasal.dateEnd)) {
-      return lastTempBasal;
-    }
-    return null;
+    return (basal, null);
   }
 
   Target? get lastTarget {

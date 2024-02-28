@@ -46,8 +46,7 @@ class Stats extends StatelessWidget {
                 cob(summary),
                 power(summary),
                 cage(summary),
-                tempBasal(summary),
-                currentBasal(summary),
+                basal(summary),
                 target(summary, settings.unit),
                 fifteenMinDiff(summary, settings.unit),
                 todaysInRange(summary, settings.targetLow, settings.targetHigh),
@@ -107,12 +106,12 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow tempBasal(Summary summary) {
-    var basal = summary.lastTempBasal;
-    if (basal == null) {
+  DataRow basal(Summary summary) {
+    var (basal, tempBasal) = summary.basalAtTime(DateTime.now());
+    if (basal == null && tempBasal == null) {
       return const DataRow(
         cells: [
-          DataCell(Text("TempBasal", style: row)),
+          DataCell(Text("Basal", style: row)),
           DataCell(
             Text("none", style: row),
           ),
@@ -120,22 +119,21 @@ class Stats extends StatelessWidget {
       );
     }
 
+    if (tempBasal == null) {
+      return DataRow(
+        cells: [
+          const DataCell(Text("Basal", style: row)),
+          DataCell(
+            Text("${basal!.value.toStringAsFixed(2)}u", style: row),
+          ),
+        ],
+      );
+    }
     return DataRow(
       cells: [
-        const DataCell(Text("TempBasal", style: row)),
+        const DataCell(Text("Basal", style: row)),
         DataCell(
-          Text(basal.description, style: row),
-        ),
-      ],
-    );
-  }
-
-  DataRow currentBasal(Summary summary) {
-    return DataRow(
-      cells: [
-        const DataCell(Text("CurrentBasal", style: row)),
-        DataCell(
-          Text("${summary.currentBasal()?.value ?? "none"}", style: row),
+          Text(tempBasal.description, style: row),
         ),
       ],
     );
