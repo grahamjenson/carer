@@ -1,6 +1,7 @@
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
+import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class Stats extends StatelessWidget {
                 power(summary),
                 cage(summary),
                 tempBasal(summary),
+                currentBasal(summary),
                 target(summary, settings.unit),
                 fifteenMinDiff(summary, settings.unit),
                 todaysInRange(summary, settings.targetLow, settings.targetHigh),
@@ -106,11 +108,34 @@ class Stats extends StatelessWidget {
   }
 
   DataRow tempBasal(Summary summary) {
+    var basal = summary.lastTempBasal;
+    if (basal == null) {
+      return const DataRow(
+        cells: [
+          DataCell(Text("TempBasal", style: row)),
+          DataCell(
+            Text("none", style: row),
+          ),
+        ],
+      );
+    }
+
     return DataRow(
       cells: [
         const DataCell(Text("TempBasal", style: row)),
         DataCell(
-          Text(summary.lastTempBasal?.description ?? "none", style: row),
+          Text(basal.description, style: row),
+        ),
+      ],
+    );
+  }
+
+  DataRow currentBasal(Summary summary) {
+    return DataRow(
+      cells: [
+        const DataCell(Text("CurrentBasal", style: row)),
+        DataCell(
+          Text("${summary.currentBasal()?.value ?? "none"}", style: row),
         ),
       ],
     );

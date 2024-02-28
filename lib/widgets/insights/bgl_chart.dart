@@ -110,18 +110,34 @@ class BGLChart extends StatelessWidget {
                         touchTooltipData: LineTouchTooltipData(
                           tooltipBgColor: Colors.transparent,
                           tooltipRoundedRadius: 10.0,
-                          showOnTopOfTheChartBoxArea: true,
                           fitInsideHorizontally: true,
-                          tooltipMargin: -20,
+                          tooltipMargin: -15,
                           tooltipPadding: const EdgeInsets.all(0),
                           getTooltipItems: (touchedSpots) {
                             return touchedSpots.map(
                               (LineBarSpot touchedSpot) {
                                 const textStyle = TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                );
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                          // bottomLeft
+                                          offset: Offset(-1.5, -1.5),
+                                          color: Colors.black),
+                                      Shadow(
+                                          // bottomRight
+                                          offset: Offset(1.5, -1.5),
+                                          color: Colors.black),
+                                      Shadow(
+                                          // topRight
+                                          offset: Offset(1.5, 1.5),
+                                          color: Colors.black),
+                                      Shadow(
+                                          // topLeft
+                                          offset: Offset(-1.5, 1.5),
+                                          color: Colors.black),
+                                    ]);
                                 return LineTooltipItem(
                                   settings.unit
                                       .str(spots[touchedSpot.spotIndex].y),

@@ -1,12 +1,76 @@
 import 'dart:convert';
 
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/nsclient/shared.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:unicons/unicons.dart';
+
+class TimeValue {
+  TimeOfDay time;
+  double value;
+
+  TimeValue({
+    required this.time,
+    required this.value,
+  });
+
+  factory TimeValue.fromJson(Map<String, dynamic> json) {
+    final dateTime = DateTime.parse("1970-01-01T${json['time']}");
+    final timeOfDay = TimeOfDay.fromDateTime(dateTime);
+
+    return TimeValue(
+      time: timeOfDay,
+      value: json['value'].toDouble(),
+    );
+  }
+
+  bool isBefore(DateTime date) {
+    // make DateTime from time
+    var dateTime =
+        DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    return dateTime.isBefore(date);
+  }
+
+  // compareTo to compare two TimeValues
+  int compareTo(TimeValue other) {
+    // lexicographically ordered for hour then minute
+    return time.hour * 60 +
+        time.minute -
+        (other.time.hour * 60 + other.time.minute);
+  }
+
+  @override
+  String toString() {
+    return "TimeValue: $time, $value";
+  }
+}
+
+class TimeValues {
+  final List<TimeValue> values;
+
+  const TimeValues({
+    required this.values,
+  });
+
+  factory TimeValues.fromJson(List<dynamic> json) {
+    List<TimeValue> values =
+        json.map((valueJson) => TimeValue.fromJson(valueJson)).toList();
+
+    // Sort this to make the TimeValues chronologically ordered
+    values.sort((a, b) => a.compareTo(b));
+    return TimeValues(values: values);
+  }
+
+  TimeValue? get(DateTime date) {
+    return values.firstWhere(
+      (element) => element.isBefore(date),
+      orElse: () =>
+          TimeValue(time: const TimeOfDay(hour: 0, minute: 0), value: 0),
+    );
+  }
+}
 
 class SGV {
   final int sgv;
@@ -89,9 +153,13 @@ class TempBasal extends ATreatment {
     return date.add(Duration(seconds: duration.toInt()));
   }
 
+  Duration get remaining {
+    return dateEnd.difference(DateTime.now());
+  }
+
   @override
   String get description {
-    return "${absolute.toStringAsFixed(2)}u";
+    return "${absolute.toStringAsFixed(2)}u ${Dates.dateAgoShort(remaining, hours: false)}";
   }
 
   factory TempBasal.fromJson(Map<String, dynamic> json) {
@@ -253,6 +321,7 @@ class SGVs {
     List<SGV> sgvs = json.map((sgvJson) => SGV.fromJson(sgvJson)).toList();
     // sort sgvs by age
     sgvs.sort((a, b) => a.mills.compareTo(b.mills));
+
     return SGVs(sgvs: sgvs);
   }
 
@@ -326,11 +395,11 @@ class Targets {
 
 class Profile {
   final int dia;
-  final List<TimeValue> carbratio;
-  final List<TimeValue> sens;
-  final List<TimeValue> basal;
-  final List<TimeValue> targetLow;
-  final List<TimeValue> targetHigh;
+  final TimeValues carbratio;
+  final TimeValues sens;
+  final TimeValues basal;
+  final TimeValues targetLow;
+  final TimeValues targetHigh;
   final String units;
   final String timezone;
 
@@ -348,16 +417,11 @@ class Profile {
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
       dia: json['dia'],
-      carbratio: List<TimeValue>.from(
-          json['carbratio'].map((item) => TimeValue.fromJson(item))),
-      sens: List<TimeValue>.from(
-          json['sens'].map((item) => TimeValue.fromJson(item))),
-      basal: List<TimeValue>.from(
-          json['basal'].map((item) => TimeValue.fromJson(item))),
-      targetLow: List<TimeValue>.from(
-          json['target_low'].map((item) => TimeValue.fromJson(item))),
-      targetHigh: List<TimeValue>.from(
-          json['target_high'].map((item) => TimeValue.fromJson(item))),
+      carbratio: TimeValues.fromJson(json['carbratio']),
+      sens: TimeValues.fromJson(json['sens']),
+      basal: TimeValues.fromJson(json['basal']),
+      targetLow: TimeValues.fromJson(json['target_low']),
+      targetHigh: TimeValues.fromJson(json['target_high']),
       units: json['units'],
       timezone: json['timezone'],
     );
@@ -399,11 +463,11 @@ class Summary {
       ),
       profile: Profile(
           dia: 1,
-          carbratio: [],
-          sens: [],
-          basal: [],
-          targetLow: [],
-          targetHigh: [],
+          carbratio: TimeValues(values: []),
+          sens: TimeValues(values: []),
+          basal: TimeValues(values: []),
+          targetLow: TimeValues(values: []),
+          targetHigh: TimeValues(values: []),
           units: "",
           timezone: ""),
       dateRetrievedmills: 0);
@@ -445,6 +509,10 @@ class Summary {
 
   int ageInSeconds() {
     return DateTime.now().difference(dateRetrieved).inSeconds;
+  }
+
+  TimeValue? currentBasal() {
+    return profile.basal.get(DateTime.now());
   }
 
   TempBasal? get lastTempBasal {
