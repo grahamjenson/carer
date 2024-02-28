@@ -8,7 +8,8 @@ import 'package:provider/provider.dart';
 
 class Stats extends StatelessWidget {
   const Stats({super.key});
-  static const TextStyle row = TextStyle(color: mainColor, fontSize: 12);
+  static const TextStyle row =
+      TextStyle(color: mainColor, fontSize: 14, fontWeight: FontWeight.bold);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class Stats extends StatelessWidget {
               dividerThickness: 0.01,
               headingRowHeight: 0,
               dataRowMinHeight: 14,
-              dataRowMaxHeight: 15,
+              dataRowMaxHeight: 18,
               horizontalMargin: 0,
               columns: const [
                 DataColumn(

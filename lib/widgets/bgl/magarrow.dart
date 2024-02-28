@@ -1,62 +1,112 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:carer/models/summary_cn.dart';
+import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MagArrow extends StatefulWidget {
-  int magnitute;
-
-  // -3 -2 -1 0 1 2 3 repre
-  MagArrow({super.key, required this.magnitute});
+  const MagArrow({super.key});
 
   @override
   State<MagArrow> createState() => _MagArrowState();
 }
 
-class _MagArrowState extends State<MagArrow>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late Animation<int> _animation;
+class _MagArrowState extends State<MagArrow> {
+  int diff = 0;
+  int limit = 3;
+  late Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration:
-          const Duration(seconds: 1), // Change this to your desired duration
-      vsync: this,
-    )..repeat();
-    _animation = IntTween(begin: 0, end: widget.magnitute).animate(_controller)
-      ..addListener(() {
+
+    // Using a timer here instead of animation, because 60fps for this is overkill;
+    // I think using an animatino for this is bad because it used lots of power for nothing much
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (Timer t) {
+      var previousDiff = diff;
+      diff = (diff + 1) % limit;
+      if (diff != previousDiff) {
         setState(() {});
-      });
+      }
+    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _animation = IntTween(begin: 0, end: widget.magnitute).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic))
-      ..addListener(() {
-        setState(() {});
-      });
+    return Consumer<SummaryCN>(builder: (context, summaryCn, child) {
+      var mag = findMagnitude(summaryCn);
+      int? value = mag;
+      if (mag == null) {
+        value = mag;
+      } else if (mag == 0) {
+        value = 0;
+        diff = 0;
+        limit = 1;
+      } else if (mag > 0) {
+        value = diff;
+        limit = mag.abs() + 1;
+      } else if (mag < 0) {
+        value = -diff;
+        limit = mag.abs() + 1;
+      }
 
-    return AspectRatio(
-      aspectRatio: 0.3,
-      child: CustomPaint(
-        painter: MyPainter(_animation.value),
-      ),
-    );
+      return AspectRatio(
+        aspectRatio: 0.3,
+        child: CustomPaint(
+          painter: MyPainter(value),
+        ),
+      );
+    });
+  }
+
+  int? findMagnitude(SummaryCN summaryCn) {
+    var lastSGV = summaryCn.summary.lastSGV;
+    var delta = summaryCn.summary.delta;
+    if (lastSGV == null || delta == null) {
+      return null;
+    }
+
+    var (diffTarget, _) = diffRange(lastSGV.sgv, delta.sgv);
+
+    var mag = 0;
+    switch (diffTarget) {
+      case Range7.veryVeryLow:
+        mag = -3;
+        break;
+      case Range7.veryLow:
+        mag = -2;
+        break;
+      case Range7.low:
+        mag = -1;
+        break;
+      case Range7.mid:
+        mag = 0;
+        break;
+      case Range7.high:
+        mag = 1;
+        break;
+      case Range7.veryHigh:
+        mag = 2;
+        break;
+      case Range7.veryVeryHigh:
+        mag = 3;
+        break;
+    }
+    return mag;
   }
 }
 
 class MyPainter extends CustomPainter {
-  int magnitutude;
+  int? magnitutude;
   MyPainter(this.magnitutude);
 
   @override
@@ -76,7 +126,11 @@ class MyPainter extends CustomPainter {
 
     // center
     // We always draw center
-    drawCenter(size, paint, main, canvas);
+    if (magnitutude == null) {
+      drawCenter(size, paint, dim, canvas);
+    } else {
+      drawCenter(size, paint, main, canvas);
+    }
 
     // up
     switch (magnitutude) {
@@ -143,6 +197,14 @@ class MyPainter extends CustomPainter {
         drawDown2(size, paint, main, canvas);
         drawDown3(size, paint, main, canvas);
         break;
+      default: // 0
+        drawUp3(size, paint, dim, canvas);
+        drawUp2(size, paint, dim, canvas);
+        drawUp1(size, paint, dim, canvas);
+
+        drawDown1(size, paint, dim, canvas);
+        drawDown2(size, paint, dim, canvas);
+        drawDown3(size, paint, dim, canvas);
     }
   }
 

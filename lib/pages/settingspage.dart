@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/models/debug_settings.dart';
+import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -25,6 +25,7 @@ class SettingsPage extends StatelessWidget {
               nightscoutSection(context, settings),
               unitsSection(settings),
               uiSection(settings),
+              alarmSection(settings),
               debugSection(settings),
             ],
           ));
@@ -164,6 +165,28 @@ class SettingsPage extends StatelessWidget {
           initialValue: settings.showChart,
           onToggle: (value) async {
             settings.showChart = value;
+          },
+        ),
+      ],
+    );
+  }
+
+  SettingsSection alarmSection(Settings settings) {
+    return SettingsSection(
+      title: const Text('Alarms'),
+      tiles: [
+        SettingsTile.switchTile(
+          title: const Text('Low Alarm'),
+          initialValue: settings.lowAlarm,
+          onToggle: (value) async {
+            settings.lowAlarm = value;
+          },
+        ),
+        SettingsTile.switchTile(
+          title: const Text('High Alarm'),
+          initialValue: settings.highAlarm,
+          onToggle: (value) async {
+            settings.highAlarm = value;
           },
         ),
       ],

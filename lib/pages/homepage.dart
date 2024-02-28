@@ -57,7 +57,8 @@ class HomePage extends StatelessWidget {
 
       return Scaffold(
         backgroundColor: Colors.black,
-        body: Stack(
+        body: SafeArea(
+            child: Stack(
           children: [
             Container(
               height: MediaQuery.of(context).size.height,
@@ -71,7 +72,7 @@ class HomePage extends StatelessWidget {
               child: FittedBox(child: CurrentTimeWidget()),
             ),
           ],
-        ),
+        )),
         bottomNavigationBar: BottomAppBar(
           color: Colors.transparent,
           padding: const EdgeInsets.only(left: 8, right: 8),

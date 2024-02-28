@@ -1,6 +1,7 @@
-import 'package:carer/models/debug_settings.dart';
-import 'package:carer/models/target_settings.dart';
-import 'package:carer/models/ui_settings.dart';
+import 'package:carer/models/settings/alarm_settings.dart';
+import 'package:carer/models/settings/debug_settings.dart';
+import 'package:carer/models/settings/target_settings.dart';
+import 'package:carer/models/settings/ui_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -71,6 +72,7 @@ class Settings extends ChangeNotifier {
   late DebugSettings debugSettings;
   late TargetSettings targetSettings;
   late UISettings uiSettings;
+  late AlarmSettings alarmSettings;
 
   String _nightscoutURL = '';
   Unit _unit = Unit.mmol;
@@ -93,6 +95,9 @@ class Settings extends ChangeNotifier {
 
     targetSettings = TargetSettings(prefs: prefs, settings: this);
     targetSettings.populate();
+
+    alarmSettings = AlarmSettings(prefs: prefs, settings: this);
+    alarmSettings.populate();
 
     debugSettings = DebugSettings(prefs: prefs, settings: this);
     debugSettings.populate();
@@ -152,6 +157,13 @@ class Settings extends ChangeNotifier {
   set targetLow(int value) => targetSettings.targetLow = value;
   set urgentHigh(int value) => targetSettings.urgentHigh = value;
   set urgentLow(int value) => targetSettings.urgentLow = value;
+
+  //alarms
+  bool get lowAlarm => alarmSettings.lowAlarm;
+  set lowAlarm(bool value) => alarmSettings.lowAlarm = value;
+
+  bool get highAlarm => alarmSettings.highAlarm;
+  set highAlarm(bool value) => alarmSettings.highAlarm = value;
 
   // debug
   bool get debug => debugSettings.debug;

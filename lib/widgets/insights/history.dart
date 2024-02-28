@@ -30,7 +30,7 @@ class History extends StatelessWidget {
                       dividerThickness: 0.01,
                       headingRowHeight: 12,
                       dataRowMinHeight: 14,
-                      dataRowMaxHeight: 15,
+                      dataRowMaxHeight: 18,
                       horizontalMargin: 0,
                       columns: const [
                         DataColumn(
@@ -63,7 +63,8 @@ class History extends StatelessWidget {
   }
 
   DataRow? historyRow(ATreatment treatment) {
-    const row = TextStyle(color: mainColor, fontSize: 12);
+    const row =
+        TextStyle(color: mainColor, fontSize: 14, fontWeight: FontWeight.bold);
     if (treatment is SummaryTreatment) {
       return DataRow(cells: [
         DataCell(

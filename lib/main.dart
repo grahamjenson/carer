@@ -1,3 +1,4 @@
+import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/pages/homepage.dart';
@@ -9,21 +10,25 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load the settings from Shared Preferences before starting
-  var s = Settings();
-  await s.populate();
+  var settings = Settings();
+  await settings.populate();
 
-  if (s.screenActive) {
+  if (settings.screenActive) {
     await WakelockPlus.enable();
   } else {
     await WakelockPlus.disable();
   }
 
+  final summary = SummaryCN(settings: settings);
+  final alarms = AlarmsChangeNotifier(settings: settings, summaryCn: summary);
+
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => s),
-      ChangeNotifierProvider(create: (context) => SummaryCN(settings: s)),
+      ChangeNotifierProvider(create: (context) => settings),
+      ChangeNotifierProvider(create: (context) => summary),
+      ChangeNotifierProvider(create: (context) => alarms),
     ],
-    child: MyApp(settings: s),
+    child: MyApp(settings: settings),
   ));
 }
 

@@ -45,33 +45,6 @@ class _BGLState extends State<BGL> {
 
   Widget bgl(SGV sgv, SGV delta, Settings settings, BuildContext context) {
     var unit = settings.unit;
-    var (diffTarget, _) = diffRange(sgv.sgv, delta.sgv);
-
-    // direction up if deltat is positive down if negative
-    var mag = 0;
-    switch (diffTarget) {
-      case Range7.veryVeryLow:
-        mag = -3;
-        break;
-      case Range7.veryLow:
-        mag = -2;
-        break;
-      case Range7.low:
-        mag = -1;
-        break;
-      case Range7.mid:
-        mag = 0;
-        break;
-      case Range7.high:
-        mag = 1;
-        break;
-      case Range7.veryHigh:
-        mag = 2;
-        break;
-      case Range7.veryVeryHigh:
-        mag = 3;
-        break;
-    }
 
     return AspectRatio(
         aspectRatio: 1.5,
@@ -121,12 +94,9 @@ class _BGLState extends State<BGL> {
                       ),
                     ),
                   )),
-                  Flexible(
+                  const Flexible(
                       child: FractionallySizedBox(
-                          heightFactor: 1,
-                          child: MagArrow(
-                            magnitute: mag,
-                          ))),
+                          heightFactor: 1, child: MagArrow())),
                 ]),
               ),
             ),

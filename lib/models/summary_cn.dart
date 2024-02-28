@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:carer/models/debug_settings.dart';
+import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
