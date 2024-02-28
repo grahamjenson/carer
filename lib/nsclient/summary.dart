@@ -379,6 +379,13 @@ class SummaryTreatments {
         .toList();
     return SummaryTreatments(treatments: treatments);
   }
+
+  // return the last treatments for minutes
+  List<SummaryTreatment> lastMins(int minutes) {
+    return treatments
+        .where((treatment) => treatment.age.inMinutes < minutes)
+        .toList();
+  }
 }
 
 class Targets {

@@ -8,11 +8,24 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+class InsulinSpot extends FlSpot {
+  final double insulin;
+  InsulinSpot(super.x, super.y, this.insulin);
+}
+
+class CarbSpot extends FlSpot {
+  final double carb;
+  CarbSpot(super.x, super.y, this.carb);
+}
+
 class BGLChart extends StatelessWidget {
+  final basalMultiplier = 18 * 3;
+
   const BGLChart({super.key});
 
   final TextStyle touchedTextStyle = const TextStyle(
       fontSize: 10,
+      height: 0.6,
       fontWeight: FontWeight.w700,
       color: Colors.white,
       shadows: [
@@ -49,11 +62,13 @@ class BGLChart extends StatelessWidget {
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(summary, minsAgo);
+      var (basalSpotData, maxBasal) = basalSpots(summary, minsAgo);
+      var treatments = treatmentsSpots(summary, minsAgo);
 
       var lineChartData = LineChartData(
         rangeAnnotations: rangeAnnotations(settings),
         gridData: gridData(),
-        titlesData: titleData(settings),
+        titlesData: titleData(settings, maxBasal),
         borderData: borderData(),
         maxX: maxX,
         minX: minX,
@@ -68,9 +83,14 @@ class BGLChart extends StatelessWidget {
           ),
           LineChartBarData(
             color: mainColor,
-            spots: basalSpots(summary, minsAgo),
+            spots: basalSpotData,
             barWidth: 2,
-            dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+            dotData: const FlDotData(show: false),
+          ),
+          LineChartBarData(
+            spots: treatments,
+            barWidth: 0,
+            dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter),
           ),
         ],
         lineTouchData: lineTouchData(settings),
@@ -91,6 +111,20 @@ class BGLChart extends StatelessWidget {
     });
   }
 
+  List<FlSpot> treatmentsSpots(Summary summary, int minsAgo) {
+    List<FlSpot> spots = [];
+    for (var t in summary.treatments.lastMins(minsAgo)) {
+      if (t.insulin != null) {
+        spots.add(InsulinSpot(-t.age.inMinutes.toDouble(),
+            t.insulin!.toDouble() * 200, t.insulin!.toDouble()));
+      } else if (t.carbs != null) {
+        spots.add(CarbSpot(-t.age.inMinutes.toDouble(), t.carbs!.toDouble() * 2,
+            t.carbs!.toDouble()));
+      }
+    }
+    return spots;
+  }
+
   List<FlSpot> bglSpots(Summary summary, int minsAgo) {
     List<SGV> sgvs = summary.sgvs.lastMins(minsAgo);
     List<FlSpot> spots = [];
@@ -101,19 +135,36 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  List<FlSpot> basalSpots(Summary summary, int minsAgo) {
+  (List<FlSpot>, double) basalSpots(Summary summary, int minsAgo) {
     List<FlSpot> spots = [];
-    // Every 5 minuts write a spot
-    for (int i = 0; i < minsAgo; i += 5) {
+    // Check the basal at every minute
+    for (int i = 0; i < minsAgo; i++) {
       var (basal, tempbasal) =
           summary.basalAtTime(DateTime.now().subtract(Duration(minutes: i)));
       if (tempbasal != null) {
-        spots.add(FlSpot(-i.toDouble(), tempbasal.absolute * 100));
+        spots.add(FlSpot(-i.toDouble(), tempbasal.absolute));
       } else if (basal != null) {
-        spots.add(FlSpot(-i.toDouble(), basal.value * 100));
+        spots.add(FlSpot(-i.toDouble(), basal.value));
       }
     }
-    return spots;
+    if (spots.isEmpty) {
+      return (spots, 1);
+    }
+    // Max basal from the list
+    double maxBasal = spots
+        .reduce((value, element) => value.y > element.y ? value : element)
+        .y;
+
+    // we are going to normilize the list of basals to the max basal so all values are betwen 0 and 1, then multiplied by size
+    if (maxBasal == 0) {
+      spots = spots.map((e) => FlSpot(e.x, 0)).toList();
+    } else {
+      spots = spots
+          .map((e) => FlSpot(e.x, (e.y / maxBasal) * basalMultiplier))
+          .toList();
+    }
+
+    return (spots, maxBasal);
   }
 
   LineTouchData lineTouchData(Settings settings) {
@@ -123,18 +174,21 @@ class BGLChart extends StatelessWidget {
         tooltipBgColor: Colors.transparent,
         tooltipRoundedRadius: 10.0,
         fitInsideHorizontally: true,
-        tooltipMargin: -15,
+        tooltipMargin: 10,
         tooltipPadding: const EdgeInsets.all(0),
+        showOnTopOfTheChartBoxArea: false,
         getTooltipItems: (touchedSpots) {
           return touchedSpots.map(
             (LineBarSpot touchedSpot) {
               if (touchedSpot.barIndex != 0) {
                 return null;
               }
+
               //OriginalSpot touchedSpot.bar.spots[touchedSpot.spotIndex];
               return LineTooltipItem(
                 settings.unit.str(touchedSpot.y),
                 touchedTextStyle,
+                textAlign: TextAlign.center,
               );
             },
           ).toList();
@@ -165,12 +219,10 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlTitlesData titleData(Settings settings) {
+  FlTitlesData titleData(Settings settings, double maxBasal) {
     return FlTitlesData(
       show: true,
-      rightTitles: const AxisTitles(
-        sideTitles: SideTitles(showTitles: false),
-      ),
+      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal)),
       topTitles: const AxisTitles(
         sideTitles: SideTitles(showTitles: false),
       ),
@@ -245,6 +297,35 @@ class BGLChart extends StatelessWidget {
         });
   }
 
+  SideTitles rightTitleWidgets(double maxBasal) {
+    return SideTitles(
+      showTitles: true,
+      interval: 1,
+      reservedSize: 19,
+      getTitlesWidget: (double value, TitleMeta meta) {
+        const style = TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 6,
+            color: mainColor,
+            height: 0.5);
+
+        bool drawTitle = (value == basalMultiplier.toDouble() ||
+            value == basalMultiplier.toDouble() / 2);
+
+        if (maxBasal == 0) {
+          drawTitle = value == 0;
+        }
+
+        if (drawTitle) {
+          return Text("${value / basalMultiplier * maxBasal}u",
+              style: style, textAlign: TextAlign.right);
+        }
+
+        return const SizedBox();
+      },
+    );
+  }
+
   SideTitles leftTitleWidgets(Settings settings) {
     return SideTitles(
       showTitles: true,
@@ -280,6 +361,26 @@ class BGLChart extends StatelessWidget {
       radius: 2,
       color: mainColor,
       strokeColor: mainColor,
+    );
+  }
+
+  FlDotPainter treatmentsDotPainter(
+    FlSpot spot,
+    double xPercentage,
+    LineChartBarData bar,
+    int index, {
+    double? size,
+  }) {
+    if (spot is InsulinSpot) {
+      return FlDotCrossPainter(
+        size: 6,
+        color: mainColor,
+      );
+    }
+    return FlDotSquarePainter(
+      strokeColor: mainColor,
+      size: 4,
+      color: mainColor,
     );
   }
 }
