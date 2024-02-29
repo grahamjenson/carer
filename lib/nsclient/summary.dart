@@ -390,11 +390,15 @@ class SummaryTreatments {
   List<SummaryTreatment> summarizedTreatments(int minsAgo, int window) {
     List<SummaryTreatment> spots = [];
     var lastTreatments = lastMins(minsAgo);
+    // always start the window in the same place to make sure the same treatments are grouped together
+    // Calculate the start of the window
+    var windowStart = (DateTime.now().minute % window) - window;
 
     // We are going to group all treatments into 5 minute window blocks to make it more readable
-    for (var i = 0; i < minsAgo / window; i++) {
-      var treatments = lastTreatments.where((t) =>
-          t.age.inMinutes >= i * window && t.age.inMinutes < (i + 1) * window);
+    for (var i = windowStart; i < minsAgo; i += window) {
+      var treatments = lastTreatments
+          .where((t) => t.age.inMinutes >= i && t.age.inMinutes < (i + window));
+
       if (treatments.isEmpty) {
         continue;
       }
@@ -410,7 +414,7 @@ class SummaryTreatments {
       var newSummary = SummaryTreatment(
           insulin: insulin,
           carbs: carbs,
-          mills: DateTime.now().subtract(Duration(minutes: i * window)));
+          mills: DateTime.now().subtract(Duration(minutes: i)));
 
       spots.add(newSummary);
     }
