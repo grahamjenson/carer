@@ -106,6 +106,7 @@ class BGLChart extends StatelessWidget {
                 ),
                 child: LineChart(
                   lineChartData,
+                  duration: Duration.zero,
                 ))),
       );
     });
@@ -113,7 +114,9 @@ class BGLChart extends StatelessWidget {
 
   List<FlSpot> treatmentsSpots(Summary summary, int minsAgo) {
     List<FlSpot> spots = [];
-    for (var t in summary.treatments.lastMins(minsAgo)) {
+    var lastTreatments = summary.treatments.lastMins(minsAgo);
+
+    for (var t in lastTreatments) {
       if (t.insulin != null) {
         spots.add(InsulinSpot(-t.age.inMinutes.toDouble(),
             t.insulin!.toDouble() * 200, t.insulin!.toDouble()));
@@ -122,6 +125,7 @@ class BGLChart extends StatelessWidget {
             t.carbs!.toDouble()));
       }
     }
+
     return spots;
   }
 
@@ -376,11 +380,17 @@ class BGLChart extends StatelessWidget {
         size: 6,
         color: mainColor,
       );
+    } else if (spot is CarbSpot) {
+      return FlDotSquarePainter(
+        strokeColor: mainColor,
+        size: 4,
+        color: mainColor,
+      );
     }
-    return FlDotSquarePainter(
-      strokeColor: mainColor,
-      size: 4,
+    return FlDotCirclePainter(
+      radius: 0,
       color: mainColor,
+      strokeColor: mainColor,
     );
   }
 }
