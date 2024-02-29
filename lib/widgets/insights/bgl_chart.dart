@@ -8,44 +8,39 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class InsulinSpot extends FlSpot {
-  final double insulin;
-  InsulinSpot(super.x, super.y, this.insulin);
+class TreatmentSpot extends FlSpot {
+  final SummaryTreatment treatment;
+  TreatmentSpot(super.x, super.y, this.treatment);
 }
 
-class CarbSpot extends FlSpot {
-  final double carb;
-  CarbSpot(super.x, super.y, this.carb);
-}
+const TextStyle touchedTextStyle = TextStyle(
+    fontSize: 10,
+    height: 0.6,
+    fontWeight: FontWeight.w700,
+    color: mainColor,
+    shadows: [
+      Shadow(
+          // bottomLeft
+          offset: Offset(-1.5, -1.5),
+          color: Colors.black),
+      Shadow(
+          // bottomRight
+          offset: Offset(1.5, -1.5),
+          color: Colors.black),
+      Shadow(
+          // topRight
+          offset: Offset(1.5, 1.5),
+          color: Colors.black),
+      Shadow(
+          // topLeft
+          offset: Offset(-1.5, 1.5),
+          color: Colors.black),
+    ]);
 
 class BGLChart extends StatelessWidget {
   final basalMultiplier = 18 * 3;
 
   const BGLChart({super.key});
-
-  final TextStyle touchedTextStyle = const TextStyle(
-      fontSize: 10,
-      height: 0.6,
-      fontWeight: FontWeight.w700,
-      color: Colors.white,
-      shadows: [
-        Shadow(
-            // bottomLeft
-            offset: Offset(-1.5, -1.5),
-            color: Colors.black),
-        Shadow(
-            // bottomRight
-            offset: Offset(1.5, -1.5),
-            color: Colors.black),
-        Shadow(
-            // topRight
-            offset: Offset(1.5, 1.5),
-            color: Colors.black),
-        Shadow(
-            // topLeft
-            offset: Offset(-1.5, 1.5),
-            color: Colors.black),
-      ]);
 
   @override
   Widget build(BuildContext context) {
@@ -114,16 +109,13 @@ class BGLChart extends StatelessWidget {
 
   List<FlSpot> treatmentsSpots(Summary summary, int minsAgo) {
     List<FlSpot> spots = [];
-    var lastTreatments = summary.treatments.lastMins(minsAgo);
+    var lastTreatments = summary.treatments.summarizedTreatments(minsAgo, 5);
 
-    for (var t in lastTreatments) {
-      if (t.insulin != null) {
-        spots.add(InsulinSpot(-t.age.inMinutes.toDouble(),
-            t.insulin!.toDouble() * 200, t.insulin!.toDouble()));
-      } else if (t.carbs != null) {
-        spots.add(CarbSpot(-t.age.inMinutes.toDouble(), t.carbs!.toDouble() * 2,
-            t.carbs!.toDouble()));
-      }
+    for (var treatment in lastTreatments) {
+      spots.add(TreatmentSpot(
+          -treatment.age.inMinutes.toDouble(),
+          treatment.insulin! * 150 + treatment.carbs!.toDouble() * 2,
+          treatment));
     }
 
     return spots;
@@ -375,22 +367,137 @@ class BGLChart extends StatelessWidget {
     int index, {
     double? size,
   }) {
-    if (spot is InsulinSpot) {
-      return FlDotCrossPainter(
-        size: 6,
-        color: mainColor,
-      );
-    } else if (spot is CarbSpot) {
-      return FlDotSquarePainter(
-        strokeColor: mainColor,
-        size: 4,
-        color: mainColor,
-      );
+    if (spot is TreatmentSpot) {
+      if (spot.treatment.insulin != 0 && spot.treatment.carbs != 0) {
+        return FlTextPainterPainter(
+          "${spot.treatment.insulinStr} ${spot.treatment.carbStr}",
+          strokeColor: Colors.black,
+          size: 8,
+          color: mainColor,
+        );
+      } else if (spot.treatment.insulin != 0) {
+        return FlTextPainterPainter(
+          spot.treatment.insulinStr,
+          strokeColor: Colors.black,
+          size: 8,
+          color: mainColor,
+        );
+      } else if (spot.treatment.carbs != 0) {
+        return FlTextPainterPainter(
+          spot.treatment.carbStr,
+          strokeColor: Colors.black,
+          size: 8,
+          color: mainColor,
+        );
+      }
     }
     return FlDotCirclePainter(
       radius: 0,
       color: mainColor,
       strokeColor: mainColor,
     );
+  }
+}
+
+/// This class is an implementation of a [FlDotPainter] that draws Text on a canvas
+class FlTextPainterPainter extends FlDotPainter {
+  /// The color of the square is determined determined by [color],
+  /// [size] determines the size of the square.
+  /// You can have a stroke line around the square,
+  /// by setting the thickness with [strokeWidth],
+  /// and you can change the color of of the stroke with [strokeColor].
+  FlTextPainterPainter(
+    this.text, {
+    this.color = Colors.green,
+    this.size = 4.0,
+    this.strokeColor = const Color.fromRGBO(76, 175, 80, 1),
+    this.strokeWidth = 1.0,
+  });
+
+  /// The fill color to use for the square
+  final Color color;
+  final String text;
+
+  /// Customizes the size of the square
+  double size;
+
+  /// The stroke color to use for the square
+  Color strokeColor;
+
+  /// The stroke width to use for the square
+  double strokeWidth;
+
+  TextStyle get style {
+    return TextStyle(
+        fontSize: size,
+        height: 0.6,
+        fontWeight: FontWeight.w700,
+        color: color,
+        shadows: [
+          Shadow(
+              // bottomLeft
+              offset: Offset(-strokeWidth, -strokeWidth),
+              color: strokeColor),
+          Shadow(
+              // bottomRight
+              offset: Offset(strokeWidth, -strokeWidth),
+              color: strokeColor),
+          Shadow(
+              // topRight
+              offset: Offset(strokeWidth, strokeWidth),
+              color: strokeColor),
+          Shadow(
+              // topLeft
+              offset: Offset(-strokeWidth, strokeWidth),
+              color: strokeColor),
+        ]);
+  }
+
+  /// Implementation of the parent class to draw the square
+  @override
+  void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
+    // Create a TextSpan
+    var span = TextSpan(
+      text: text,
+      style: style,
+    );
+
+    // Create a TextPainter
+    final painter = TextPainter(
+      text: span,
+      textDirection: TextDirection.ltr,
+    );
+
+    // Layout the TextPainter
+    painter.layout();
+
+    // Draw the TextSpan on the canvas
+    painter.paint(canvas, offsetInCanvas);
+  }
+
+  /// Implementation of the parent class to get the size of the square
+  @override
+  Size getSize(FlSpot spot) {
+    return Size(size, size);
+  }
+
+  @override
+  Color get mainColor => color;
+
+  /// Used for equality check, see [EquatableMixin].
+  @override
+  List<Object?> get props => [
+        color,
+        size,
+        strokeColor,
+        strokeWidth,
+      ];
+
+  @override
+  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t) {
+    if (a is! FlDotSquarePainter || b is! FlDotSquarePainter) {
+      return b;
+    }
+    return b;
   }
 }

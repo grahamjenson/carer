@@ -55,8 +55,13 @@ class History extends StatelessWidget {
     if (summaryCn.summary.dateRetrieved == Dates.earliest) {
       return [];
     }
-    var history = summaryCn.summary.history;
-    return [for (var t in history(settings.unit)) historyRow(t)]
+    var history = summaryCn.summary.treatments.summarizedTreatments(1000, 5);
+    history = history.map((treatment) {
+      treatment.unit = settings.unit;
+      return treatment;
+    }).toList();
+
+    return [for (var t in history) historyRow(t)]
         .where((row) => row != null)
         .map((row) => row as DataRow)
         .toList();

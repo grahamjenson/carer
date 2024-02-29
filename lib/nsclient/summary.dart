@@ -195,7 +195,7 @@ class SummaryTreatment extends ATreatment {
   }
 
   String get insulinStr {
-    if (insulin != null) {
+    if (insulin != null && insulin != 0) {
       return '${insulin!.toStringAsFixed(2)}u';
     } else {
       return "";
@@ -203,7 +203,7 @@ class SummaryTreatment extends ATreatment {
   }
 
   String get carbStr {
-    if (carbs != null) {
+    if (carbs != null && carbs != 0) {
       return '${carbs!.toStringAsFixed(0)}g';
     } else {
       return "";
@@ -385,6 +385,36 @@ class SummaryTreatments {
     return treatments
         .where((treatment) => treatment.age.inMinutes < minutes)
         .toList();
+  }
+
+  List<SummaryTreatment> summarizedTreatments(int minsAgo, int window) {
+    List<SummaryTreatment> spots = [];
+    var lastTreatments = lastMins(minsAgo);
+
+    // We are going to group all treatments into 5 minute window blocks to make it more readable
+    for (var i = 0; i < minsAgo / window; i++) {
+      var treatments = lastTreatments.where((t) =>
+          t.age.inMinutes >= i * window && t.age.inMinutes < (i + 1) * window);
+      if (treatments.isEmpty) {
+        continue;
+      }
+
+      var insulin = treatments
+          .where((t) => t.insulin != null)
+          .map((t) => t.insulin!)
+          .fold(0.0, (a, b) => a + b);
+      var carbs = treatments
+          .where((t) => t.carbs != null)
+          .map((t) => t.carbs!)
+          .fold(0, (a, b) => a + b);
+      var newSummary = SummaryTreatment(
+          insulin: insulin,
+          carbs: carbs,
+          mills: DateTime.now().subtract(Duration(minutes: i * window)));
+
+      spots.add(newSummary);
+    }
+    return spots;
   }
 }
 

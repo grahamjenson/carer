@@ -25,7 +25,7 @@ class _MagArrowState extends State<MagArrow> {
 
     // Using a timer here instead of animation, because 60fps for this is overkill;
     // I think using an animatino for this is bad because it used lots of power for nothing much
-    _timer = Timer.periodic(const Duration(milliseconds: 500), (Timer t) {
+    _timer = Timer.periodic(const Duration(milliseconds: 250), (Timer t) {
       var previousDiff = diff;
       diff = (diff + 1) % limit;
       if (diff != previousDiff) {
