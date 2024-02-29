@@ -55,7 +55,7 @@ class History extends StatelessWidget {
     if (summaryCn.summary.dateRetrieved == Dates.earliest) {
       return [];
     }
-    var history = summaryCn.summary.treatments.summarizedTreatments(1000, 5);
+    var history = summaryCn.summary.treatments.summarizedTreatments(60 * 6, 5);
     history = history.map((treatment) {
       treatment.unit = settings.unit;
       return treatment;

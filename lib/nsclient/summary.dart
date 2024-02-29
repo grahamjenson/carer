@@ -390,14 +390,24 @@ class SummaryTreatments {
   List<SummaryTreatment> summarizedTreatments(int minsAgo, int window) {
     List<SummaryTreatment> spots = [];
     var lastTreatments = lastMins(minsAgo);
+    var now = DateTime.now();
     // always start the window in the same place to make sure the same treatments are grouped together
-    // Calculate the start of the window
-    var windowStart = (DateTime.now().minute % window) - window;
+    var startDate = now.subtract(Duration(minutes: minsAgo));
 
+    // This is not 100% efficient because it always scans at least an hour, but this is the easiest for now
+    var startWindow = DateTime(
+        startDate.year, startDate.month, startDate.day, startDate.hour, 0);
+    var endWindow = DateTime(
+        startDate.year, startDate.month, startDate.day, startDate.hour, window);
     // We are going to group all treatments into 5 minute window blocks to make it more readable
-    for (var i = windowStart; i < minsAgo; i += window) {
-      var treatments = lastTreatments
-          .where((t) => t.age.inMinutes >= i && t.age.inMinutes < (i + window));
+    while (startWindow.isBefore(now)) {
+      var treatments = lastTreatments.where((t) =>
+          (t.date.isAfter(startWindow) || t.date == startWindow) &&
+          t.date.isBefore(endWindow));
+
+      var oldStartwindow = startWindow;
+      startWindow = endWindow;
+      endWindow = endWindow.add(Duration(minutes: window));
 
       if (treatments.isEmpty) {
         continue;
@@ -412,12 +422,11 @@ class SummaryTreatments {
           .map((t) => t.carbs!)
           .fold(0, (a, b) => a + b);
       var newSummary = SummaryTreatment(
-          insulin: insulin,
-          carbs: carbs,
-          mills: DateTime.now().subtract(Duration(minutes: i)));
+          insulin: insulin, carbs: carbs, mills: oldStartwindow);
 
       spots.add(newSummary);
     }
+    spots.sort((a, b) => b.date.compareTo(a.date));
     return spots;
   }
 }
