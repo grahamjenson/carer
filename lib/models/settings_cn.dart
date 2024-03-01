@@ -2,6 +2,7 @@ import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings/target_settings.dart';
 import 'package:carer/models/settings/ui_settings.dart';
+import 'package:carer/nsclient/summary.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,14 +52,14 @@ extension UnitExtension on Unit {
       case Unit.mg:
         return value.toDouble();
       case Unit.mmol:
-        return (value / 18.018).toDouble();
+        return (value / MGtoMMOL).toDouble();
     }
   }
 
   String str(num value) {
     switch (this) {
       case Unit.mmol:
-        return (value.toDouble() / 18.018).toStringAsFixed(1);
+        return (value.toDouble() / MGtoMMOL).toStringAsFixed(1);
       case Unit.mg:
         return value.toDouble().toStringAsFixed(0);
       default:

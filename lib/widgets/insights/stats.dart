@@ -107,8 +107,9 @@ class Stats extends StatelessWidget {
   }
 
   DataRow basal(Summary summary) {
-    var (basal, tempBasal) = summary.basalAtTime(DateTime.now());
-    if (basal == null && tempBasal == null) {
+    var (profileBasal, tempBasal) = summary.basalAtTime(DateTime.now());
+    // Something is very wrong if there is no profile basal, so just checking that
+    if (profileBasal == null) {
       return const DataRow(
         cells: [
           DataCell(Text("Basal", style: row)),
@@ -119,37 +120,89 @@ class Stats extends StatelessWidget {
       );
     }
 
-    if (tempBasal == null) {
+    if (tempBasal != null) {
       return DataRow(
         cells: [
-          const DataCell(Text("Basal", style: row)),
+          const DataCell(Text("Basal*", style: row)),
           DataCell(
-            Text("${basal!.value.toStringAsFixed(2)}u", style: row),
+            Text(getBasalDescription(tempBasal.absolute, tempBasal.remaining),
+                style: row),
           ),
         ],
       );
     }
+
     return DataRow(
       cells: [
         const DataCell(Text("Basal", style: row)),
         DataCell(
-          Text(tempBasal.description, style: row),
+          Text(getBasalDescription(profileBasal.value, null), style: row),
         ),
       ],
     );
   }
 
+  String getBasalDescription(double value, Duration? remaining) {
+    var str = "${value.toStringAsFixed(2)}u";
+    if (remaining != null) {
+      str += " ${Dates.dateAgoShort(remaining, hours: false)}";
+    }
+    return str;
+  }
+
   DataRow target(Summary summary, Unit unit) {
-    var lastTarget = summary.lastTarget;
-    lastTarget?.unit = unit;
+    var (profileLowTarget, profileHighTarget, tempTarget) =
+        summary.targetAtTime(DateTime.now());
+    // Something is very wrong if there is no profile target, so just checking that
+    if (profileLowTarget == null || profileHighTarget == null) {
+      return const DataRow(
+        cells: [
+          DataCell(Text("Target", style: row)),
+          DataCell(
+            Text("none", style: row),
+          ),
+        ],
+      );
+    }
+
+    print("$profileLowTarget $profileHighTarget $tempTarget");
+
+    if (tempTarget != null) {
+      return DataRow(
+        cells: [
+          const DataCell(Text("Target*", style: row)),
+          DataCell(
+            Text(
+                targetDesciption(tempTarget.targetBottom, tempTarget.targetTop,
+                    unit, tempTarget.remaining),
+                style: row),
+          ),
+        ],
+      );
+    }
+
     return DataRow(
       cells: [
         const DataCell(Text("Target", style: row)),
         DataCell(
-          Text(lastTarget?.description ?? "none", style: row),
+          Text(
+              targetDesciption(
+                  profileLowTarget.value, profileHighTarget.value, unit, null),
+              style: row),
         ),
       ],
     );
+  }
+
+  String targetDesciption(num low, num high, Unit unit, Duration? remaining) {
+    var str = "${unit.str(low)}${unit.name}";
+    if (low != high) {
+      str = "${unit.str(low)}-${unit.str(high)}${unit.name}";
+    }
+    if (remaining != null) {
+      str += " ${Dates.dateAgoShort(remaining, hours: false)}";
+    }
+    return str;
   }
 
   DataRow fifteenMinDiff(Summary summary, Unit unit) {

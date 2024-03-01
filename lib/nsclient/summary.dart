@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:unicons/unicons.dart';
 
+const MGtoMMOL = 18.018;
+
 class TimeValue {
   TimeOfDay time;
   double value;
@@ -53,6 +55,11 @@ class TimeValues {
   const TimeValues({
     required this.values,
   });
+
+  TimeValues map(TimeValue Function(TimeValue) f) {
+    List<TimeValue> newValues = values.map(f).toList();
+    return TimeValues(values: newValues);
+  }
 
   factory TimeValues.fromJson(List<dynamic> json) {
     List<TimeValue> values =
@@ -112,21 +119,17 @@ class SGV {
       case Unit.mg:
         return sgv.toString();
       case Unit.mmol:
-        return (sgv / 18.018).toStringAsFixed(1);
+        return (sgv / MGtoMMOL).toStringAsFixed(1);
     }
   }
 }
 
 abstract class ATreatment {
-  Unit unit = Unit.mg;
-
   DateTime get date;
   IconData get icon;
   Duration get age {
     return DateTime.now().difference(date);
   }
-
-  String get description;
 }
 
 class TempBasal extends ATreatment {
@@ -153,11 +156,6 @@ class TempBasal extends ATreatment {
 
   Duration get remaining {
     return dateEnd.difference(DateTime.now());
-  }
-
-  @override
-  String get description {
-    return "${absolute.toStringAsFixed(2)}u ${Dates.dateAgoShort(remaining, hours: false)}";
   }
 
   factory TempBasal.fromJson(Map<String, dynamic> json) {
@@ -232,13 +230,13 @@ class SummaryTreatment extends ATreatment {
   }
 }
 
-class Target extends ATreatment {
+class TempTarget extends ATreatment {
   int targetTop;
   int targetBottom;
   int duration;
   DateTime mills;
 
-  Target({
+  TempTarget({
     required this.targetTop,
     required this.targetBottom,
     required this.duration,
@@ -256,16 +254,12 @@ class Target extends ATreatment {
     return date.add(Duration(seconds: duration));
   }
 
-  @override
-  String get description {
-    if (targetBottom == targetTop) {
-      return "${unit.str(targetBottom)}${unit.name}";
-    }
-    return "${unit.str(targetBottom)}-${unit.str(targetTop)}${unit.name}";
+  Duration get remaining {
+    return dateEnd.difference(DateTime.now());
   }
 
-  factory Target.fromJson(Map<String, dynamic> json) {
-    return Target(
+  factory TempTarget.fromJson(Map<String, dynamic> json) {
+    return TempTarget(
       targetTop: json['targetTop'],
       targetBottom: json['targetBottom'],
       duration: json['duration'],
@@ -361,8 +355,28 @@ class TempBasals {
   }
 
   TempBasal? atDate(DateTime date) {
-    return tempBasals
-        .lastWhereOrNull((element) => element.start.isBefore(date));
+    return tempBasals.lastWhereOrNull((element) =>
+        date.isAfter(element.date) && date.isBefore(element.dateEnd));
+  }
+}
+
+class Targets {
+  final List<TempTarget> targets;
+
+  const Targets({
+    required this.targets,
+  });
+
+  factory Targets.fromJson(List<dynamic> json) {
+    List<TempTarget> targets =
+        json.map((targetJson) => TempTarget.fromJson(targetJson)).toList();
+    targets.sort((a, b) => a.date.compareTo(b.date));
+    return Targets(targets: targets);
+  }
+
+  TempTarget? atDate(DateTime date) {
+    return targets.lastWhereOrNull((element) =>
+        date.isAfter(element.date) && date.isBefore(element.dateEnd));
   }
 }
 
@@ -431,21 +445,6 @@ class SummaryTreatments {
   }
 }
 
-class Targets {
-  final List<Target> targets;
-
-  const Targets({
-    required this.targets,
-  });
-
-  factory Targets.fromJson(List<dynamic> json) {
-    List<Target> targets =
-        json.map((targetJson) => Target.fromJson(targetJson)).toList();
-    targets.sort((a, b) => a.date.compareTo(b.date));
-    return Targets(targets: targets);
-  }
-}
-
 class Profile {
   final int dia;
   final TimeValues carbratio;
@@ -468,14 +467,31 @@ class Profile {
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
+    var units = json['units'];
+
+    var targetLow = TimeValues.fromJson(json['target_low']);
+    var targetHigh = TimeValues.fromJson(json['target_high']);
+
+    // The profile comes pre converted to the users units, but it would be easier if they were all just the same mg/dl
+    if (units == "mmol") {
+      targetLow = targetLow.map((e) {
+        e.value = e.value * MGtoMMOL;
+        return e;
+      });
+      targetHigh = targetHigh.map((e) {
+        e.value = e.value * MGtoMMOL;
+        return e;
+      });
+    }
+
     return Profile(
       dia: json['dia'],
       carbratio: TimeValues.fromJson(json['carbratio']),
       sens: TimeValues.fromJson(json['sens']),
       basal: TimeValues.fromJson(json['basal']),
-      targetLow: TimeValues.fromJson(json['target_low']),
-      targetHigh: TimeValues.fromJson(json['target_high']),
-      units: json['units'],
+      targetLow: targetLow,
+      targetHigh: targetHigh,
+      units: units,
       timezone: json['timezone'],
     );
   }
@@ -567,29 +583,20 @@ class Summary {
   (TimeValue?, TempBasal?) basalAtTime(DateTime date) {
     var tempBasal = tempBasals.atDate(date);
     var basal = profile.basal.atDate(date);
-    if (tempBasal != null) {
-      return (basal, tempBasal);
-    }
 
-    return (basal, null);
+    return (basal, tempBasal);
   }
 
-  Target? get lastTarget {
-    if (targets.targets.isEmpty) {
-      return null;
-    }
-    var lastTarget = targets.targets.last;
+  (TimeValue?, TimeValue?, TempTarget?) targetAtTime(DateTime date) {
+    var temptarget = targets.atDate(date);
+    var profileTargetLow = profile.targetLow.atDate(date);
+    var profileTargetHigh = profile.targetHigh.atDate(date);
 
-    // if the last target dateEnd is in the past, return null
-    if (DateTime.now().isBefore(lastTarget.dateEnd)) {
-      return lastTarget;
-    }
-
-    return null;
+    return (profileTargetLow, profileTargetHigh, temptarget);
   }
 
   // return a list of tempBasals treatments and targets in order
-  List<ATreatment> history(Unit unit) {
+  List<ATreatment> history() {
     List<ATreatment> history = [];
 
     // add the tempBasals
@@ -603,12 +610,6 @@ class Summary {
 
     // sort the history by date
     history.sort((a, b) => b.date.compareTo(a.date));
-
-    // loop over all the treatments and convert them to the correct unit
-    history = history.map((treatment) {
-      treatment.unit = unit;
-      return treatment;
-    }).toList();
 
     // filter history to items that only happend in late 6 hours
     history = history

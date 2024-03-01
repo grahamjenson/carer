@@ -56,10 +56,6 @@ class History extends StatelessWidget {
       return [];
     }
     var history = summaryCn.summary.treatments.summarizedTreatments(60 * 6, 5);
-    history = history.map((treatment) {
-      treatment.unit = settings.unit;
-      return treatment;
-    }).toList();
 
     return [for (var t in history) historyRow(t)]
         .where((row) => row != null)
