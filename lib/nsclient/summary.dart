@@ -413,13 +413,13 @@ class SummaryTreatments {
         startDate.year, startDate.month, startDate.day, startDate.hour, 0);
     var endWindow = DateTime(
         startDate.year, startDate.month, startDate.day, startDate.hour, window);
+
     // We are going to group all treatments into 5 minute window blocks to make it more readable
-    while (startWindow.isBefore(now)) {
+    while (endWindow.isBefore(now)) {
       var treatments = lastTreatments.where((t) =>
           (t.date.isAfter(startWindow) || t.date == startWindow) &&
           t.date.isBefore(endWindow));
 
-      var oldStartwindow = startWindow;
       startWindow = endWindow;
       endWindow = endWindow.add(Duration(minutes: window));
 
@@ -435,8 +435,13 @@ class SummaryTreatments {
           .where((t) => t.carbs != null)
           .map((t) => t.carbs!)
           .fold(0, (a, b) => a + b);
-      var newSummary = SummaryTreatment(
-          insulin: insulin, carbs: carbs, mills: oldStartwindow);
+
+      // the latest date from treatments
+      var date =
+          treatments.reduce((a, b) => a.date.isAfter(b.date) ? a : b).date;
+
+      var newSummary =
+          SummaryTreatment(insulin: insulin, carbs: carbs, mills: date);
 
       spots.add(newSummary);
     }

@@ -165,8 +165,6 @@ class Stats extends StatelessWidget {
       );
     }
 
-    print("$profileLowTarget $profileHighTarget $tempTarget");
-
     if (tempTarget != null) {
       return DataRow(
         cells: [
