@@ -58,6 +58,7 @@ class BGLChart extends StatelessWidget {
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(summary, minsAgo);
       var (basalSpotData, maxBasal) = basalSpots(summary, minsAgo);
+      var (lowTargets, highTargets) = targetSpots(summary, minsAgo);
       var treatments = treatmentsSpots(summary, minsAgo);
 
       var lineChartData = LineChartData(
@@ -87,8 +88,24 @@ class BGLChart extends StatelessWidget {
             barWidth: 0,
             dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter),
           ),
+          LineChartBarData(
+            color: mainColor.withAlpha(140),
+            spots: lowTargets,
+            barWidth: 2,
+            dotData: const FlDotData(show: false),
+          ),
+          LineChartBarData(
+            color: mainColor.withAlpha(140),
+            spots: highTargets,
+            barWidth: 2,
+            dotData: const FlDotData(show: false),
+          ),
         ],
         lineTouchData: lineTouchData(settings),
+        betweenBarsData: [
+          BetweenBarsData(
+              fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
+        ],
       );
 
       return Window(
@@ -111,11 +128,11 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> spots = [];
     var lastTreatments = summary.treatments.summarizedTreatments(minsAgo, 5);
 
+    // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
+    //SummaryTreatment lastTreatment
     for (var treatment in lastTreatments) {
-      spots.add(TreatmentSpot(
-          -treatment.age.inMinutes.toDouble(),
-          treatment.insulin! * 150 + treatment.carbs!.toDouble() * 2,
-          treatment));
+      spots.add(
+          TreatmentSpot(-treatment.age.inMinutes.toDouble(), 260, treatment));
     }
 
     return spots;
@@ -161,6 +178,24 @@ class BGLChart extends StatelessWidget {
     }
 
     return (spots, maxBasal);
+  }
+
+  (List<FlSpot>, List<FlSpot>) targetSpots(Summary summary, int minsAgo) {
+    List<FlSpot> lowTargets = [];
+    List<FlSpot> highTargets = [];
+    for (int i = 0; i < minsAgo; i++) {
+      var (lowTarget, highTarget, tempTarget) =
+          summary.targetAtTime(DateTime.now().subtract(Duration(minutes: i)));
+      if (tempTarget != null) {
+        lowTargets
+            .add(FlSpot(-i.toDouble(), tempTarget.targetBottom.toDouble()));
+        highTargets.add(FlSpot(-i.toDouble(), tempTarget.targetTop.toDouble()));
+      } else if (lowTarget != null && highTarget != null) {
+        lowTargets.add(FlSpot(-i.toDouble(), lowTarget.value));
+        highTargets.add(FlSpot(-i.toDouble(), highTarget.value));
+      }
+    }
+    return (lowTargets, highTargets);
   }
 
   LineTouchData lineTouchData(Settings settings) {
@@ -401,6 +436,8 @@ class BGLChart extends StatelessWidget {
 
 /// This class is an implementation of a [FlDotPainter] that draws Text on a canvas
 class FlTextPainterPainter extends FlDotPainter {
+  late FlDotCirclePainter circle;
+
   /// The color of the square is determined determined by [color],
   /// [size] determines the size of the square.
   /// You can have a stroke line around the square,
@@ -412,7 +449,14 @@ class FlTextPainterPainter extends FlDotPainter {
     this.size = 4.0,
     this.strokeColor = const Color.fromRGBO(76, 175, 80, 1),
     this.strokeWidth = 1.0,
-  });
+  }) {
+    circle = FlDotCirclePainter(
+      radius: 2,
+      color: color,
+      strokeColor: strokeColor,
+      strokeWidth: strokeWidth,
+    );
+  }
 
   /// The fill color to use for the square
   final Color color;
@@ -456,6 +500,8 @@ class FlTextPainterPainter extends FlDotPainter {
   /// Implementation of the parent class to draw the square
   @override
   void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
+    circle.draw(canvas, spot, offsetInCanvas);
+
     // Create a TextSpan
     var span = TextSpan(
       text: text,
@@ -466,13 +512,19 @@ class FlTextPainterPainter extends FlDotPainter {
     final painter = TextPainter(
       text: span,
       textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
     );
 
     // Layout the TextPainter
     painter.layout();
 
+    final centeredOffset = offsetInCanvas.translate(
+      -painter.width / 2,
+      -painter.height / 2 + painter.height + 3,
+    );
+
     // Draw the TextSpan on the canvas
-    painter.paint(canvas, offsetInCanvas);
+    painter.paint(canvas, centeredOffset);
   }
 
   /// Implementation of the parent class to get the size of the square
