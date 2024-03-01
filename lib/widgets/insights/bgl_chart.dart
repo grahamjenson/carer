@@ -13,6 +13,11 @@ class TreatmentSpot extends FlSpot {
   TreatmentSpot(super.x, super.y, this.treatment);
 }
 
+class BGLSpot extends FlSpot {
+  final SGV sgv;
+  BGLSpot(super.x, super.y, this.sgv);
+}
+
 const TextStyle touchedTextStyle = TextStyle(
     fontSize: 10,
     height: 0.6,
@@ -61,6 +66,13 @@ class BGLChart extends StatelessWidget {
       var (lowTargets, highTargets) = targetSpots(summary, minsAgo);
       var treatments = treatmentsSpots(summary, minsAgo);
 
+      var bglLineData = LineChartBarData(
+        color: mainColor,
+        spots: bglSpotData,
+        barWidth: 1,
+        dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+      );
+
       var lineChartData = LineChartData(
         rangeAnnotations: rangeAnnotations(settings),
         gridData: gridData(),
@@ -71,12 +83,7 @@ class BGLChart extends StatelessWidget {
         minY: minY,
         maxY: maxY,
         lineBarsData: [
-          LineChartBarData(
-            color: mainColor,
-            spots: bglSpotData,
-            barWidth: 2,
-            dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
-          ),
+          bglLineData,
           LineChartBarData(
             color: mainColor,
             spots: basalSpotData,
@@ -129,10 +136,21 @@ class BGLChart extends StatelessWidget {
     var lastTreatments = summary.treatments.summarizedTreatments(minsAgo, 5);
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
-    //SummaryTreatment lastTreatment
+    SummaryTreatment? lastTreatment;
+    var diff = 0.0;
+    const double change = 20;
     for (var treatment in lastTreatments) {
-      spots.add(
-          TreatmentSpot(-treatment.age.inMinutes.toDouble(), 260, treatment));
+      if (lastTreatment != null &&
+          treatment.age.inMinutes - lastTreatment.age.inMinutes < 12) {
+        diff = (diff + change) % (change * 2);
+      } else {
+        diff = 0;
+      }
+
+      spots.add(TreatmentSpot(
+          -treatment.age.inMinutes.toDouble(), 270 - diff, treatment));
+
+      lastTreatment = treatment;
     }
 
     return spots;
@@ -143,7 +161,8 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> spots = [];
     for (var i = 0; i < sgvs.length; i++) {
       var sgv = sgvs[i];
-      spots.add(FlSpot(-sgv.age.inMinutes.toDouble(), sgv.sgv.toDouble()));
+      spots
+          .add(BGLSpot(-sgv.age.inMinutes.toDouble(), sgv.sgv.toDouble(), sgv));
     }
     return spots;
   }
@@ -202,40 +221,28 @@ class BGLChart extends StatelessWidget {
     return LineTouchData(
       enabled: true,
       touchTooltipData: LineTouchTooltipData(
-        tooltipBgColor: Colors.transparent,
-        tooltipRoundedRadius: 10.0,
-        fitInsideHorizontally: true,
-        tooltipMargin: 10,
-        tooltipPadding: const EdgeInsets.all(0),
-        showOnTopOfTheChartBoxArea: false,
-        getTooltipItems: (touchedSpots) {
-          return touchedSpots.map(
-            (LineBarSpot touchedSpot) {
-              if (touchedSpot.barIndex != 0) {
-                return null;
-              }
-
-              //OriginalSpot touchedSpot.bar.spots[touchedSpot.spotIndex];
-              return LineTooltipItem(
-                settings.unit.str(touchedSpot.y),
-                touchedTextStyle,
-                textAlign: TextAlign.center,
-              );
-            },
-          ).toList();
-        },
+        // kill all tootips
+        getTooltipItems: (touchedSpots) =>
+            touchedSpots.map((e) => null).toList(),
       ),
       getTouchedSpotIndicator:
           (LineChartBarData barData, List<int> indicators) {
         return indicators.map(
           (int index) {
+            var spot = barData.spots[index];
+            if (spot is! BGLSpot) {
+              return null;
+            }
+
             var line = FlLine(
-                color: mainColor.withAlpha(150),
-                strokeWidth: 1,
-                dashArray: [2, 4]);
+              color: mainColor.withAlpha(150),
+              strokeWidth: 1,
+              dashArray: [2, 4],
+            );
             return TouchedSpotIndicatorData(
               line,
-              const FlDotData(show: false),
+              FlDotData(
+                  show: true, getDotPainter: bglHighlightPainter(settings)),
             );
           },
         ).toList();
@@ -395,6 +402,31 @@ class BGLChart extends StatelessWidget {
     );
   }
 
+  GetDotPainterCallback bglHighlightPainter(Settings settings) {
+    return (
+      FlSpot spot,
+      double xPercentage,
+      LineChartBarData bar,
+      int index, {
+      double? size,
+    }) {
+      if (spot is BGLSpot) {
+        return FlTextPainterPainter(
+          settings.unit.val(spot.sgv.sgv).toStringAsFixed(1),
+          strokeColor: Colors.black,
+          size: 12,
+          color: mainColor,
+          align: Alignment.topCenter,
+        );
+      }
+      return FlDotCirclePainter(
+        radius: 0,
+        color: mainColor,
+        strokeColor: mainColor,
+      );
+    };
+  }
+
   FlDotPainter treatmentsDotPainter(
     FlSpot spot,
     double xPercentage,
@@ -449,6 +481,7 @@ class FlTextPainterPainter extends FlDotPainter {
     this.size = 4.0,
     this.strokeColor = const Color.fromRGBO(76, 175, 80, 1),
     this.strokeWidth = 1.0,
+    this.align = Alignment.bottomCenter,
   }) {
     circle = FlDotCirclePainter(
       radius: 2,
@@ -457,6 +490,8 @@ class FlTextPainterPainter extends FlDotPainter {
       strokeWidth: strokeWidth,
     );
   }
+
+  final Alignment align;
 
   /// The fill color to use for the square
   final Color color;
@@ -517,11 +552,21 @@ class FlTextPainterPainter extends FlDotPainter {
 
     // Layout the TextPainter
     painter.layout();
-
-    final centeredOffset = offsetInCanvas.translate(
-      -painter.width / 2,
-      -painter.height / 2 + painter.height + 3,
-    );
+    var centeredOffset = offsetInCanvas;
+    switch (align) {
+      case Alignment.bottomCenter:
+        centeredOffset = offsetInCanvas.translate(
+          -painter.width / 2,
+          -painter.height / 2 + painter.height + 3,
+        );
+        break;
+      case Alignment.topCenter:
+        centeredOffset = offsetInCanvas.translate(
+          -painter.width / 2,
+          -painter.height / 2 - painter.height - 3,
+        );
+        break;
+    }
 
     // Draw the TextSpan on the canvas
     painter.paint(canvas, centeredOffset);
