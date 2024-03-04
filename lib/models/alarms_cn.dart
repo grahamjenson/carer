@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/models/t1d_cn.dart';
@@ -15,10 +16,19 @@ enum Alarms {
 
 class AlarmsChangeNotifier extends ChangeNotifier {
   T1DCN t1d;
+  Settings settings;
 
   Set<Alarms> alarms = <Alarms>{};
 
-  AlarmsChangeNotifier({required this.t1d}) {
+  double sleepTime = 0;
+
+  final player = AudioPlayer();
+
+  AlarmsChangeNotifier({required this.t1d, required this.settings}) {
+    settings.addListener(() {
+      checkAlarms();
+    });
+
     t1d.addListener(() {
       checkAlarms();
     });
@@ -61,6 +71,17 @@ class AlarmsChangeNotifier extends ChangeNotifier {
         break;
     }
 
+    // Filter Alarms that are not enabled
+    if (!settings.highAlarm) {
+      newAlarms.remove(Alarms.targetHigh);
+      newAlarms.remove(Alarms.targetVeryHigh);
+      newAlarms.remove(Alarms.diffVeryHigh);
+    } else if (!settings.lowAlarm) {
+      newAlarms.remove(Alarms.targetLow);
+      newAlarms.remove(Alarms.targetVeryLow);
+      newAlarms.remove(Alarms.diffVeryLow);
+    }
+
     if (newAlarms != alarms) {
       // Set alarms
       alarms = newAlarms;
@@ -75,9 +96,11 @@ class AlarmsChangeNotifier extends ChangeNotifier {
 
   void clearAlarm() {
     print("Clear Alarm");
+    player.stop();
   }
 
   void createAlarms(Set<Alarms> alarms) {
     print("Create Alarms $alarms");
+    player.play(AssetSource("alarm.mp3"));
   }
 }

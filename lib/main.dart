@@ -22,7 +22,7 @@ void main() async {
 
   final summary = SummaryCN(settings: settings);
   final t1d = T1DCN(settings: settings, summaryCn: summary);
-  final alarms = AlarmsChangeNotifier(t1d: t1d);
+  final alarms = AlarmsChangeNotifier(t1d: t1d, settings: settings);
 
   runApp(MultiProvider(
     providers: [
