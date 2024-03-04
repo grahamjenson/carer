@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:carer/models/summary_cn.dart';
+import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
@@ -42,8 +43,8 @@ class _MagArrowState extends State<MagArrow> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SummaryCN>(builder: (context, summaryCn, child) {
-      var mag = findMagnitude(summaryCn);
+    return Consumer<T1DCN>(builder: (context, t1dCn, child) {
+      var mag = findMagnitude(t1dCn);
       int? value = mag;
       if (mag == null) {
         value = mag;
@@ -68,17 +69,9 @@ class _MagArrowState extends State<MagArrow> {
     });
   }
 
-  int? findMagnitude(SummaryCN summaryCn) {
-    var lastSGV = summaryCn.summary.lastSGV;
-    var delta = summaryCn.summary.delta;
-    if (lastSGV == null || delta == null) {
-      return null;
-    }
-
-    var (diffTarget, _) = diffRange(lastSGV.sgv, delta.sgv);
-
+  int? findMagnitude(T1DCN t1d) {
     var mag = 0;
-    switch (diffTarget) {
+    switch (t1d.diffRange7) {
       case Range7.veryVeryLow:
         mag = -3;
         break;

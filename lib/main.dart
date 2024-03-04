@@ -1,6 +1,7 @@
 import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
+import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,13 +21,15 @@ void main() async {
   }
 
   final summary = SummaryCN(settings: settings);
-  final alarms = AlarmsChangeNotifier(settings: settings, summaryCn: summary);
+  final t1d = T1DCN(settings: settings, summaryCn: summary);
+  final alarms = AlarmsChangeNotifier(t1d: t1d);
 
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => settings),
       ChangeNotifierProvider(create: (context) => summary),
       ChangeNotifierProvider(create: (context) => alarms),
+      ChangeNotifierProvider(create: (context) => t1d),
     ],
     child: MyApp(settings: settings),
   ));

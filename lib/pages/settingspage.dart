@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:carer/models/models.dart';
 import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:flutter/material.dart';

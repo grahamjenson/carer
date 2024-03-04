@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/models/constants.dart';
+import 'package:carer/models/models.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:unicons/unicons.dart';
-
-const MGtoMMOL = 18.018;
 
 class TimeValue {
   TimeOfDay time;

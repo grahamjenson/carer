@@ -1,39 +1,83 @@
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/utils/math.dart';
+import 'package:carer/models/t1d_cn.dart';
 import 'package:flutter/material.dart';
 
-enum AlarmNames {
-  lowAlarm,
-  highAlarm,
-  noAlarm,
+enum Alarms {
+  targetVeryLow,
+  targetLow,
+  targetHigh,
+  targetVeryHigh,
+
+  diffVeryLow,
+  diffVeryHigh,
 }
 
 class AlarmsChangeNotifier extends ChangeNotifier {
-  Settings settings;
-  SummaryCN summaryCn;
+  T1DCN t1d;
 
-  bool alarm = false;
-  AlarmsChangeNotifier({required this.settings, required this.summaryCn}) {
-    summaryCn.addListener(() {
+  Set<Alarms> alarms = <Alarms>{};
+
+  AlarmsChangeNotifier({required this.t1d}) {
+    t1d.addListener(() {
       checkAlarms();
     });
   }
 
   void checkAlarms() {
-    if (summaryCn.summary.lastSGV == null) {
-      return;
-    }
-    var lastSGV = summaryCn.summary.lastSGV!;
-    var sgv = lastSGV.sgv;
+    var newAlarms = <Alarms>{};
 
-    if (sgv < settings.targetLow) {
-      alarm = true;
-      print("Low Alarm");
-    } else if (sgv > settings.targetHigh && settings.highAlarm) {
-      alarm = true;
-      print("High Alarm");
-    } else {
-      alarm = false;
+    switch (t1d.targetRange5) {
+      case Range5.veryLow:
+        newAlarms.add(Alarms.targetVeryLow);
+        break;
+      case Range5.low:
+        newAlarms.add(Alarms.targetLow);
+        break;
+      case Range5.high:
+        newAlarms.add(Alarms.targetHigh);
+        break;
+      case Range5.veryHigh:
+        newAlarms.add(Alarms.targetVeryHigh);
+        break;
+      default:
+        break;
     }
+
+    switch (t1d.diffRange7) {
+      case Range7.veryVeryLow:
+        newAlarms.add(Alarms.diffVeryLow);
+        break;
+      case Range7.veryLow:
+        newAlarms.add(Alarms.diffVeryLow);
+        break;
+      case Range7.veryHigh:
+        newAlarms.add(Alarms.diffVeryHigh);
+        break;
+      case Range7.veryVeryHigh:
+        newAlarms.add(Alarms.diffVeryHigh);
+        break;
+      default:
+        break;
+    }
+
+    if (newAlarms != alarms) {
+      // Set alarms
+      alarms = newAlarms;
+      if (alarms.isEmpty) {
+        clearAlarm();
+      } else {
+        createAlarms(alarms);
+      }
+      notifyListeners();
+    }
+  }
+
+  void clearAlarm() {
+    print("Clear Alarm");
+  }
+
+  void createAlarms(Set<Alarms> alarms) {
+    print("Create Alarms $alarms");
   }
 }
