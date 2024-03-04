@@ -72,15 +72,7 @@ class AlarmsChangeNotifier extends ChangeNotifier {
     }
 
     // Filter Alarms that are not enabled
-    if (!settings.highAlarm) {
-      newAlarms.remove(Alarms.targetHigh);
-      newAlarms.remove(Alarms.targetVeryHigh);
-      newAlarms.remove(Alarms.diffVeryHigh);
-    } else if (!settings.lowAlarm) {
-      newAlarms.remove(Alarms.targetLow);
-      newAlarms.remove(Alarms.targetVeryLow);
-      newAlarms.remove(Alarms.diffVeryLow);
-    }
+    filterAlarms(newAlarms);
 
     if (newAlarms != alarms) {
       // Set alarms
@@ -102,5 +94,19 @@ class AlarmsChangeNotifier extends ChangeNotifier {
   void createAlarms(Set<Alarms> alarms) {
     print("Create Alarms $alarms");
     player.play(AssetSource("alarm.mp3"));
+  }
+
+  filterAlarms(Set<Alarms> alarms) {
+    if (!settings.highAlarm) {
+      alarms.remove(Alarms.targetHigh);
+      alarms.remove(Alarms.targetVeryHigh);
+      alarms.remove(Alarms.diffVeryHigh);
+    }
+
+    if (!settings.lowAlarm) {
+      alarms.remove(Alarms.targetLow);
+      alarms.remove(Alarms.targetVeryLow);
+      alarms.remove(Alarms.diffVeryLow);
+    }
   }
 }
