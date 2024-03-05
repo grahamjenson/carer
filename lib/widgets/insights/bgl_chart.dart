@@ -19,6 +19,11 @@ class BGLSpot extends FlSpot {
   BGLSpot(super.x, super.y, this.sgv);
 }
 
+class BasalSpot extends FlSpot {
+  final double basal;
+  BasalSpot(super.x, super.y, this.basal);
+}
+
 const TextStyle touchedTextStyle = TextStyle(
     fontSize: 10,
     height: 0.6,
@@ -169,15 +174,16 @@ class BGLChart extends StatelessWidget {
   }
 
   (List<FlSpot>, double) basalSpots(Summary summary, int minsAgo) {
-    List<FlSpot> spots = [];
+    List<BasalSpot> spots = [];
     // Check the basal at every minute
     for (int i = 0; i < minsAgo; i++) {
       var (basal, tempbasal) =
           summary.basalAtTime(DateTime.now().subtract(Duration(minutes: i)));
       if (tempbasal != null) {
-        spots.add(FlSpot(-i.toDouble(), tempbasal.absolute));
+        spots.add(
+            BasalSpot(-i.toDouble(), tempbasal.absolute, tempbasal.absolute));
       } else if (basal != null) {
-        spots.add(FlSpot(-i.toDouble(), basal.value));
+        spots.add(BasalSpot(-i.toDouble(), basal.value, basal.value));
       }
     }
     if (spots.isEmpty) {
@@ -190,10 +196,11 @@ class BGLChart extends StatelessWidget {
 
     // we are going to normilize the list of basals to the max basal so all values are betwen 0 and 1, then multiplied by size
     if (maxBasal == 0) {
-      spots = spots.map((e) => FlSpot(e.x, 0)).toList();
+      spots = spots.map((e) => BasalSpot(e.x, 0, 0)).toList();
     } else {
       spots = spots
-          .map((e) => FlSpot(e.x, (e.y / maxBasal) * basalMultiplier))
+          .map((e) =>
+              BasalSpot(e.x, (e.y / maxBasal) * basalMultiplier, e.basal))
           .toList();
     }
 
@@ -231,20 +238,33 @@ class BGLChart extends StatelessWidget {
         return indicators.map(
           (int index) {
             var spot = barData.spots[index];
-            if (spot is! BGLSpot) {
-              return null;
+            if (spot is BGLSpot) {
+              var line = FlLine(
+                color: mainColor.withAlpha(150),
+                strokeWidth: 1,
+                dashArray: [2, 4],
+              );
+              return TouchedSpotIndicatorData(
+                line,
+                FlDotData(
+                    show: true, getDotPainter: bglHighlightPainter(settings)),
+              );
             }
 
-            var line = FlLine(
-              color: mainColor.withAlpha(150),
-              strokeWidth: 1,
-              dashArray: [2, 4],
-            );
-            return TouchedSpotIndicatorData(
-              line,
-              FlDotData(
-                  show: true, getDotPainter: bglHighlightPainter(settings)),
-            );
+            if (spot is BasalSpot) {
+              print("FJSAOJFIOASIOF");
+              var line = const FlLine(
+                color: Colors.transparent,
+                strokeWidth: 0,
+              );
+              return TouchedSpotIndicatorData(
+                line,
+                FlDotData(
+                    show: true, getDotPainter: bglHighlightPainter(settings)),
+              );
+            }
+
+            return null;
           },
         ).toList();
       },
@@ -420,6 +440,17 @@ class BGLChart extends StatelessWidget {
           align: Alignment.topCenter,
         );
       }
+
+      if (spot is BasalSpot) {
+        return FlTextPainterPainter(
+          spot.basal.toStringAsFixed(1),
+          strokeColor: Colors.black,
+          size: 8,
+          color: mainColor,
+          align: Alignment.topCenter,
+        );
+      }
+
       return FlDotCirclePainter(
         radius: 0,
         color: mainColor,
