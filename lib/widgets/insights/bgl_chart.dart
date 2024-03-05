@@ -153,8 +153,8 @@ class BGLChart extends StatelessWidget {
         diff = 0;
       }
 
-      spots.add(TreatmentSpot(
-          -treatment.age.inMinutes.toDouble(), 270 - diff, treatment));
+      spots.add(
+          TreatmentSpot(-treatment.age.inMinutes.toDouble(), 270, treatment));
 
       lastTreatment = treatment;
     }
@@ -459,6 +459,13 @@ class BGLChart extends StatelessWidget {
     };
   }
 
+  Alignment flipAlignment(int index) {
+    if (index % 2 == 0) {
+      return Alignment.topCenter;
+    }
+    return Alignment.bottomCenter;
+  }
+
   FlDotPainter treatmentsDotPainter(
     FlSpot spot,
     double xPercentage,
@@ -470,6 +477,7 @@ class BGLChart extends StatelessWidget {
       if (spot.treatment.insulin != 0 && spot.treatment.carbs != 0) {
         return FlTextPainterPainter(
           "${spot.treatment.insulinStr} ${spot.treatment.carbStr}",
+          align: flipAlignment(index),
           strokeColor: Colors.black,
           size: 8,
           color: mainColor,
@@ -477,6 +485,7 @@ class BGLChart extends StatelessWidget {
       } else if (spot.treatment.insulin != 0) {
         return FlTextPainterPainter(
           spot.treatment.insulinStr,
+          align: flipAlignment(index),
           strokeColor: Colors.black,
           size: 8,
           color: mainColor,
@@ -484,6 +493,7 @@ class BGLChart extends StatelessWidget {
       } else if (spot.treatment.carbs != 0) {
         return FlTextPainterPainter(
           spot.treatment.carbStr,
+          align: flipAlignment(index),
           strokeColor: Colors.black,
           size: 8,
           color: mainColor,

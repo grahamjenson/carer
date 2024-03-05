@@ -79,15 +79,16 @@ class _BGLState extends State<BGL> {
                 heightFactor: 0.2,
                 child: Row(children: [
                   Expanded(
-                      child: FittedBox(
-                    child: Text(
-                      delta.sgvUWithSign(unit),
-                      style: const TextStyle(
-                        color: mainColor,
-                        fontWeight: FontWeight.bold,
+                    child: FittedBox(
+                      child: Text(
+                        delta.sgvUWithSign(unit),
+                        style: const TextStyle(
+                          color: mainColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  )),
+                  ),
                   const Flexible(
                       child: FractionallySizedBox(
                           heightFactor: 1, child: MagArrow())),

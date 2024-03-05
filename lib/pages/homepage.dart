@@ -25,18 +25,17 @@ class HomePage extends StatelessWidget {
         builder: (context, settings, summaryCn, child) {
       Widget insights = const SizedBox.shrink();
       if (settings.showChart && settings.showHistory) {
-        insights = const Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Flexible(child: BGLChart()),
-              Flexible(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                    Flexible(child: History()),
-                    Flexible(child: Stats())
-                  ]))
-            ]);
+        insights =
+            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          Flexible(child: BGLChart()),
+          const Flexible(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                Flexible(child: History()),
+                Flexible(child: Stats())
+              ]))
+        ]);
       } else if (settings.showChart) {
         insights = const Flexible(child: Flexible(child: BGLChart()));
       } else if (settings.showHistory) {
