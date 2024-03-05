@@ -29,4 +29,52 @@ class Dates {
   }
 
   static final DateTime earliest = DateTime.fromMillisecondsSinceEpoch(0);
+
+  static String shortSecondsLeft(Duration duration) {
+    var totalSeconds = duration.inSeconds;
+    if (totalSeconds <= 0) {
+      return "";
+    }
+
+    var hours = (totalSeconds / 3600).floor();
+    var minutes = ((totalSeconds % 3600) / 60).floor();
+
+    var minutesStr = "<1m";
+
+    if (hours > 0) {
+      if (minutes == 0) {
+        return "${hours}h";
+      }
+      return "${hours}h${minutes}m";
+    }
+
+    if (minutes > 0) {
+      return "${minutes}m";
+    }
+
+    return minutesStr;
+  }
+
+  static int secondsTillNext24HourTime(int timeAsHour) {
+    DateTime now = DateTime.now();
+    DateTime nextTime = DateTime(now.year, now.month, now.day, timeAsHour);
+
+    if (now.isAfter(nextTime)) {
+      // If it's already past 8 PM today, find 8 PM tomorrow
+      nextTime = DateTime(now.year, now.month, now.day + 1, timeAsHour);
+    }
+
+    print("timeAsHour $timeAsHour, $now $nextTime ${now.timeZoneName}");
+
+    Duration difference = nextTime.difference(now);
+    return difference.inSeconds;
+  }
+
+  static String stringOf24HourTime(int timeAsHour) {
+    // convert 24hour time to am pm
+    if (timeAsHour > 12) {
+      return "${timeAsHour - 12}PM";
+    }
+    return "${timeAsHour}AM";
+  }
 }

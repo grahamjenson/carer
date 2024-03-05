@@ -1,9 +1,10 @@
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
-import 'package:carer/pages/settingspage.dart';
+
+import 'package:carer/widgets/bar.dart';
 
 import 'package:carer/widgets/bgl/bgl.dart';
-import 'package:carer/widgets/colours.dart';
+
 import 'package:carer/widgets/current_time.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
 import 'package:carer/widgets/insights/history.dart';
@@ -73,28 +74,7 @@ class HomePage extends StatelessWidget {
             ),
           ],
         )),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.transparent,
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          height: 40,
-          child: Row(
-            children: [
-              const Spacer(),
-              IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(
-                    Icons.settings,
-                    color: mainColor,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SettingsPage()),
-                    );
-                  })
-            ],
-          ),
-        ),
+        bottomNavigationBar: const Bar(),
       );
     });
   }

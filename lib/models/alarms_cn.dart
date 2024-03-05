@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/models/settings_cn.dart';
+import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/models/t1d_cn.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 enum Alarms {
@@ -14,17 +19,33 @@ enum Alarms {
   diffVeryHigh,
 }
 
-class AlarmsChangeNotifier extends ChangeNotifier {
+const se = SetEquality();
+
+class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
   Settings settings;
 
   Set<Alarms> alarms = <Alarms>{};
 
-  double sleepTime = 0;
+  // Minutes of sleep time
+  DateTime _sleepUntil = DateTime.now();
+  DateTime get sleepUntil => _sleepUntil;
+  set sleepUntil(DateTime value) {
+    _sleepUntil = value;
+    notifyListeners();
+  }
+
+  Duration get sleepDuration => _sleepUntil.difference(DateTime.now());
+  set sleepDurationSeconds(int value) {
+    _sleepUntil = DateTime.now().add(Duration(seconds: value));
+    notifyListeners();
+  }
 
   final player = AudioPlayer();
 
-  AlarmsChangeNotifier({required this.t1d, required this.settings}) {
+  AlarmsCN({required this.t1d, required this.settings}) {
+    Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
+
     settings.addListener(() {
       checkAlarms();
     });
@@ -74,7 +95,8 @@ class AlarmsChangeNotifier extends ChangeNotifier {
     // Filter Alarms that are not enabled
     filterAlarms(newAlarms);
 
-    if (newAlarms != alarms) {
+    if (!se.equals(newAlarms, alarms)) {
+      notifyListeners();
       // Set alarms
       alarms = newAlarms;
       if (alarms.isEmpty) {
@@ -82,7 +104,6 @@ class AlarmsChangeNotifier extends ChangeNotifier {
       } else {
         createAlarms(alarms);
       }
-      notifyListeners();
     }
   }
 
@@ -97,6 +118,12 @@ class AlarmsChangeNotifier extends ChangeNotifier {
   }
 
   filterAlarms(Set<Alarms> alarms) {
+    if (sleepDuration.inSeconds > 0) {
+      // We are sleeping, no alarms right now
+      alarms.clear();
+      return;
+    }
+
     if (!settings.highAlarm) {
       alarms.remove(Alarms.targetHigh);
       alarms.remove(Alarms.targetVeryHigh);

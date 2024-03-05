@@ -14,15 +14,12 @@ void main() async {
   var settings = Settings();
   await settings.populate();
 
-  if (settings.screenActive) {
-    await WakelockPlus.enable();
-  } else {
-    await WakelockPlus.disable();
-  }
+  // Make sure screen wont fall asleep if set
+  WakelockPlus.toggle(enable: settings.screenActive);
 
   final summary = SummaryCN(settings: settings);
   final t1d = T1DCN(settings: settings, summaryCn: summary);
-  final alarms = AlarmsChangeNotifier(t1d: t1d, settings: settings);
+  final alarms = AlarmsCN(t1d: t1d, settings: settings);
 
   runApp(MultiProvider(
     providers: [
