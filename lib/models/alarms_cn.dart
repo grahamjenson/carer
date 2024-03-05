@@ -124,15 +124,21 @@ class AlarmsCN extends ChangeNotifier {
       return;
     }
 
-    if (!settings.highAlarm) {
+    if (!settings.alarmSettings.highAlarm) {
       alarms.remove(Alarms.targetHigh);
       alarms.remove(Alarms.targetVeryHigh);
+    }
+
+    if (!settings.alarmSettings.lowAlarm) {
+      alarms.remove(Alarms.targetLow);
+      alarms.remove(Alarms.targetVeryLow);
+    }
+
+    if (!settings.alarmSettings.fastRiseAlarm) {
       alarms.remove(Alarms.diffVeryHigh);
     }
 
-    if (!settings.lowAlarm) {
-      alarms.remove(Alarms.targetLow);
-      alarms.remove(Alarms.targetVeryLow);
+    if (!settings.alarmSettings.fastDropAlarm) {
       alarms.remove(Alarms.diffVeryLow);
     }
   }

@@ -106,13 +106,6 @@ class Settings extends ChangeNotifier {
   set urgentHigh(int value) => targetSettings.urgentHigh = value;
   set urgentLow(int value) => targetSettings.urgentLow = value;
 
-  //alarms
-  bool get lowAlarm => alarmSettings.lowAlarm;
-  set lowAlarm(bool value) => alarmSettings.lowAlarm = value;
-
-  bool get highAlarm => alarmSettings.highAlarm;
-  set highAlarm(bool value) => alarmSettings.highAlarm = value;
-
   // debug
   bool get debug => debugSettings.debug;
   set debug(bool value) => debugSettings.debug = value;

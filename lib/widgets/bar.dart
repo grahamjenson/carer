@@ -129,7 +129,7 @@ Future<int?> openSleepDialog(BuildContext context) {
   return showDialog<int>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text("Sleep"),
+      title: const Text("Snooze"),
       content: Container(
         alignment: Alignment.center,
         height: 200,

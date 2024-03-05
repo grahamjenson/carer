@@ -33,7 +33,7 @@ class SummaryCN extends ChangeNotifier {
     if (summary.lastSGV != null) {
       var sgvage = summary.lastSGV!.age.inSeconds;
       // Check more frequently when the SGV is about to expire
-      if (sgvage > 300 && sgvage < 315) {
+      if (sgvage > 305 && sgvage < 315) {
         _summaryToBeUpdated = true;
         _updateReason = "Last SGV older than 300";
       }

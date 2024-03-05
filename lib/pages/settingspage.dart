@@ -178,16 +178,30 @@ class SettingsPage extends StatelessWidget {
       tiles: [
         SettingsTile.switchTile(
           title: const Text('Low Alarm'),
-          initialValue: settings.lowAlarm,
+          initialValue: settings.alarmSettings.lowAlarm,
           onToggle: (value) async {
-            settings.lowAlarm = value;
+            settings.alarmSettings.lowAlarm = value;
           },
         ),
         SettingsTile.switchTile(
           title: const Text('High Alarm'),
-          initialValue: settings.highAlarm,
+          initialValue: settings.alarmSettings.highAlarm,
           onToggle: (value) async {
-            settings.highAlarm = value;
+            settings.alarmSettings.highAlarm = value;
+          },
+        ),
+        SettingsTile.switchTile(
+          title: const Text('Fast Drop Alarm'),
+          initialValue: settings.alarmSettings.fastDropAlarm,
+          onToggle: (value) async {
+            settings.alarmSettings.fastDropAlarm = value;
+          },
+        ),
+        SettingsTile.switchTile(
+          title: const Text('Fast Rise Alarm'),
+          initialValue: settings.alarmSettings.fastRiseAlarm,
+          onToggle: (value) async {
+            settings.alarmSettings.fastRiseAlarm = value;
           },
         ),
       ],
