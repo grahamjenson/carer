@@ -3,6 +3,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -376,8 +377,9 @@ class BGLChart extends StatelessWidget {
         }
 
         if (drawTitle) {
-          return Text("${value / basalMultiplier * maxBasal}u",
-              style: style, textAlign: TextAlign.right);
+          var x = value / basalMultiplier * maxBasal;
+          x = (x * 100).round() / 100; // round to 2dp
+          return Text("${x}u", style: style, textAlign: TextAlign.right);
         }
 
         return const SizedBox();
@@ -433,7 +435,7 @@ class BGLChart extends StatelessWidget {
     }) {
       if (spot is BGLSpot) {
         return FlTextPainterPainter(
-          settings.unit.val(spot.sgv.sgv).toStringAsFixed(1),
+          spot.sgv.sgvStr(settings.unit),
           strokeColor: Colors.black,
           size: 12,
           color: mainColor,
@@ -443,7 +445,7 @@ class BGLChart extends StatelessWidget {
 
       if (spot is BasalSpot) {
         return FlTextPainterPainter(
-          spot.basal.toStringAsFixed(1),
+          "${toMax2dp(spot.basal)}",
           strokeColor: Colors.black,
           size: 8,
           color: mainColor,

@@ -57,3 +57,8 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
     return (Range7.veryVeryHigh, (value - veryVeryHigh).abs().toDouble());
   }
 }
+
+// functino that returns double at most 2dp
+double toMax2dp(num value) {
+  return (value * 100.0).round() / 100.0;
+}

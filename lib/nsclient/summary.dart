@@ -4,6 +4,7 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/models.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
+import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:unicons/unicons.dart';
@@ -193,7 +194,7 @@ class SummaryTreatment extends ATreatment {
 
   String get insulinStr {
     if (insulin != null && insulin != 0) {
-      return '${insulin!.toStringAsFixed(2)}u';
+      return '${toMax2dp(insulin!)}u';
     } else {
       return "";
     }
@@ -201,7 +202,7 @@ class SummaryTreatment extends ATreatment {
 
   String get carbStr {
     if (carbs != null && carbs != 0) {
-      return '${carbs!.toStringAsFixed(0)}g';
+      return '${toMax2dp(carbs!)}g';
     } else {
       return "";
     }
