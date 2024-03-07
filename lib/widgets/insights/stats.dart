@@ -18,7 +18,7 @@ class Stats extends StatelessWidget {
 
   static const row = TextStyle(
     color: mainColor,
-    fontSize: 16,
+    fontSize: 20,
   );
   static const small = TextStyle(
     color: mainColor,
@@ -50,7 +50,7 @@ class Stats extends StatelessWidget {
               dividerThickness: 0.01,
               headingRowHeight: 0,
               dataRowMinHeight: 14,
-              dataRowMaxHeight: 18,
+              dataRowMaxHeight: 20,
               horizontalMargin: 0,
               columns: const [
                 DataColumn(

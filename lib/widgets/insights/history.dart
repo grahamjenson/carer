@@ -6,6 +6,7 @@ import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class History extends StatelessWidget {
@@ -16,7 +17,7 @@ class History extends StatelessWidget {
 
   static const row = TextStyle(
     color: mainColor,
-    fontSize: 16,
+    fontSize: 20,
   );
   static const small = TextStyle(
     color: mainColor,
@@ -40,13 +41,16 @@ class History extends StatelessWidget {
                   alignment: Alignment.center,
                   child: DataTable(
                       border: const TableBorder(
-                        verticalInside: BorderSide(color: mainColor),
+                        verticalInside:
+                            BorderSide(color: mainColor, width: 0.2),
+                        horizontalInside:
+                            BorderSide(color: mainColor, width: 0.2),
                       ),
                       columnSpacing: 5,
                       dividerThickness: 0.01,
                       headingRowHeight: 12,
                       dataRowMinHeight: 14,
-                      dataRowMaxHeight: 18,
+                      dataRowMaxHeight: 20,
                       horizontalMargin: 0,
                       columns: const [
                         DataColumn(
