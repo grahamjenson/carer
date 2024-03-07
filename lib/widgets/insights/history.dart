@@ -18,6 +18,9 @@ class History extends StatelessWidget {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
       var history = historyContainers(settings, summaryCn);
+      if (!settings.uiSettings.showHistory) {
+        return const SizedBox.shrink();
+      }
 
       return Window(
         title: "History",

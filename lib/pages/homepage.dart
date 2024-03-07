@@ -23,26 +23,7 @@ class HomePage extends StatelessWidget {
 
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
-      Widget insights = const SizedBox.shrink();
-      if (settings.showChart && settings.showHistory) {
-        insights =
-            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          Flexible(child: BGLChart()),
-          const Flexible(
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                Flexible(child: History()),
-                Flexible(child: Stats())
-              ]))
-        ]);
-      } else if (settings.showChart) {
-        insights = const Flexible(child: Flexible(child: BGLChart()));
-      } else if (settings.showHistory) {
-        insights = const Row(
-            children: [Flexible(child: History()), Flexible(child: Stats())]);
-      }
-
+      var insights = getInsights(settings);
       var bgl = const Flexible(flex: 4, child: BGL());
 
       Widget mainLine = Column(
@@ -76,5 +57,34 @@ class HomePage extends StatelessWidget {
         bottomNavigationBar: const Bar(),
       );
     });
+  }
+
+  Widget getInsights(Settings settings) {
+    bool showHistory = settings.uiSettings.showHistory;
+    bool showStats = settings.uiSettings.showStats;
+    bool showChart = settings.uiSettings.showChart;
+
+    if (!showHistory && !showStats && !showChart) {
+      return const SizedBox.shrink();
+    }
+
+    if (showChart) {
+      var children = [const Flexible(child: BGLChart())];
+      if (showHistory || showStats) {
+        children.add(Flexible(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+              if (showHistory) const History(),
+              if (showStats) const Stats()
+            ])));
+      }
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
+    } else {
+      return const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [History(), Stats()]);
+    }
   }
 }

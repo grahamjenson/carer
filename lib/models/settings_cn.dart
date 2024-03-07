@@ -89,12 +89,6 @@ class Settings extends ChangeNotifier {
   bool get screenActive => uiSettings.screenActive;
   set screenActive(bool value) => uiSettings.screenActive = value;
 
-  bool get showHistory => uiSettings.showHistory;
-  set showHistory(bool value) => uiSettings.showHistory = value;
-
-  bool get showChart => uiSettings.showChart;
-  set showChart(bool value) => uiSettings.showChart = value;
-
   // targets
   int get targetHigh => targetSettings.targetHigh;
   int get targetLow => targetSettings.targetLow;

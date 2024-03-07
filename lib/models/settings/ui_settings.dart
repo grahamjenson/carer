@@ -2,7 +2,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-enum UISettingsNames { screenActive, showHistory, showChart }
+enum UISettingsNames { screenActive, showHistory, showStats, showChart }
 
 class UISettings {
   SharedPreferences prefs;
@@ -10,6 +10,7 @@ class UISettings {
 
   bool _screenActive = true;
   bool _showHistory = true;
+  bool _showStats = true;
   bool _showChart = true;
 
   UISettings({required this.prefs, required this.settings});
@@ -23,6 +24,11 @@ class UISettings {
     var showHistoryPref = prefs.getBool(UISettingsNames.showHistory.name);
     if (showHistoryPref != null) {
       _showHistory = showHistoryPref;
+    }
+
+    var showStatsPref = prefs.getBool(UISettingsNames.showStats.name);
+    if (showStatsPref != null) {
+      _showStats = showStatsPref;
     }
   }
 
@@ -48,6 +54,14 @@ class UISettings {
   set showChart(bool value) {
     prefs.setBool(UISettingsNames.showChart.name, value);
     _showChart = value;
+    settings.notifyListeners();
+  }
+
+  // ShowStats
+  bool get showStats => _showStats;
+  set showStats(bool value) {
+    prefs.setBool(UISettingsNames.showStats.name, value);
+    _showStats = value;
     settings.notifyListeners();
   }
 }

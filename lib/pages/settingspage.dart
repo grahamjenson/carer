@@ -74,6 +74,13 @@ class SettingsPage extends StatelessWidget {
     var uhighStr = unit.str(uhigh);
     var ulowStr = unit.str(ulow);
 
+    const minRange = 50.0;
+    const maxRange = 280.0;
+    double diff = 1;
+    if (unit == Unit.mmol) {
+      diff = 1.8;
+    }
+
     return SettingsSection(
       tiles: [
         SettingsTile.switchTile(
@@ -89,7 +96,15 @@ class SettingsPage extends StatelessWidget {
           //title: Text('Range High ${settings.rangeHigh}'),
           title: Row(children: [
             const Expanded(flex: 2, child: Text("Target")),
-            Expanded(flex: 1, child: Text(lowStr, textAlign: TextAlign.end)),
+            Expanded(
+                flex: 1,
+                child: InkWell(
+                    child: Text(lowStr, textAlign: TextAlign.end),
+                    onTap: () {
+                      settings.targetLow =
+                          max(minRange, settings.targetLow.toDouble() - diff)
+                              .toInt();
+                    })),
             Expanded(
                 flex: 6,
                 child: Container(
@@ -98,8 +113,8 @@ class SettingsPage extends StatelessWidget {
                     child: RangeSlider(
                       values: RangeValues(low, high),
                       divisions: 230,
-                      min: 50,
-                      max: 280,
+                      min: minRange,
+                      max: maxRange,
                       onChanged: (RangeValues vals) {
                         var newLow = vals.start.toInt();
                         var newHigh = vals.end.toInt();
@@ -108,18 +123,33 @@ class SettingsPage extends StatelessWidget {
                       },
                     ))),
             Expanded(
-                flex: 1,
-                child: Text(
-                  highStr,
-                  textAlign: TextAlign.start,
-                )),
+              flex: 1,
+              child: InkWell(
+                  child: Text(
+                    highStr,
+                    textAlign: TextAlign.start,
+                  ),
+                  onTap: () {
+                    settings.targetHigh =
+                        min(maxRange, settings.targetHigh.toDouble() + diff)
+                            .toInt();
+                  }),
+            ),
           ]),
         ),
         SettingsTile(
           //title: Text('Range High ${settings.rangeHigh}'),
           title: Row(children: [
             const Expanded(flex: 2, child: Text("Urgent")),
-            Expanded(flex: 1, child: Text(ulowStr, textAlign: TextAlign.end)),
+            Expanded(
+                flex: 1,
+                child: InkWell(
+                    child: Text(ulowStr, textAlign: TextAlign.end),
+                    onTap: () {
+                      settings.urgentLow =
+                          max(minRange, settings.urgentLow.toDouble() - diff)
+                              .toInt();
+                    })),
             Expanded(
                 flex: 6,
                 child: Container(
@@ -128,15 +158,24 @@ class SettingsPage extends StatelessWidget {
                     child: RangeSlider(
                       values: RangeValues(ulow, uhigh),
                       divisions: 230,
-                      min: 50,
-                      max: 280,
+                      min: minRange,
+                      max: maxRange,
                       onChanged: (RangeValues vals) {
                         settings.urgentLow = vals.start.toInt();
                         settings.urgentHigh = vals.end.toInt();
                       },
                     ))),
             Expanded(
-                flex: 1, child: Text(uhighStr, textAlign: TextAlign.start)),
+              flex: 1,
+              child: InkWell(
+                child: Text(uhighStr, textAlign: TextAlign.start),
+                onTap: () {
+                  settings.urgentHigh =
+                      min(maxRange, settings.urgentHigh.toDouble() + diff)
+                          .toInt();
+                },
+              ),
+            ),
           ]),
         ),
       ],
@@ -154,19 +193,36 @@ class SettingsPage extends StatelessWidget {
             settings.screenActive = value;
           },
         ),
-        SettingsTile.switchTile(
-          title: const Text('Show History'),
-          initialValue: settings.showHistory,
-          onToggle: (value) async {
-            settings.showHistory = value;
-          },
-        ),
-        SettingsTile.switchTile(
-          title: const Text('Show Chart'),
-          initialValue: settings.showChart,
-          onToggle: (value) async {
-            settings.showChart = value;
-          },
+        SettingsTile(
+          title: const Text("Boundary Alarms"),
+          trailing: ToggleButtons(
+            isSelected: [
+              settings.uiSettings.showChart,
+              settings.uiSettings.showHistory,
+              settings.uiSettings.showStats,
+            ],
+            onPressed: (int index) {
+              switch (index) {
+                case 0:
+                  settings.uiSettings.showChart =
+                      !settings.uiSettings.showChart;
+                  break;
+                case 1:
+                  settings.uiSettings.showHistory =
+                      !settings.uiSettings.showHistory;
+                  break;
+                case 2:
+                  settings.uiSettings.showStats =
+                      !settings.uiSettings.showStats;
+                  break;
+              }
+            },
+            children: [
+              littleTextBigIcon("Chart", UniconsLine.chart_line),
+              littleTextBigIcon("History", UniconsLine.history),
+              littleTextBigIcon("Stats", UniconsLine.chart_pie_alt),
+            ],
+          ),
         ),
       ],
     );
@@ -176,36 +232,80 @@ class SettingsPage extends StatelessWidget {
     return SettingsSection(
       title: const Text('Alarms'),
       tiles: [
-        SettingsTile.switchTile(
-          title: const Text('Low Alarm'),
-          initialValue: settings.alarmSettings.lowAlarm,
-          onToggle: (value) async {
-            settings.alarmSettings.lowAlarm = value;
-          },
+        SettingsTile(
+          title: const Text("Boundary Alarms"),
+          trailing: ToggleButtons(
+            isSelected: [
+              settings.alarmSettings.urgentLowAlarm,
+              settings.alarmSettings.lowAlarm,
+              settings.alarmSettings.highAlarm,
+              settings.alarmSettings.urgentHighAlarm,
+            ],
+            onPressed: (int index) {
+              switch (index) {
+                case 0:
+                  settings.alarmSettings.urgentLowAlarm =
+                      !settings.alarmSettings.urgentLowAlarm;
+                  break;
+                case 1:
+                  settings.alarmSettings.lowAlarm =
+                      !settings.alarmSettings.lowAlarm;
+                  break;
+                case 2:
+                  settings.alarmSettings.highAlarm =
+                      !settings.alarmSettings.highAlarm;
+                  break;
+                case 3:
+                  settings.alarmSettings.urgentHighAlarm =
+                      !settings.alarmSettings.urgentHighAlarm;
+                  break;
+              }
+            },
+            children: [
+              littleTextBigIcon("Urgent Low", UniconsLine.angle_double_down),
+              littleTextBigIcon("Low", UniconsLine.angle_down),
+              littleTextBigIcon("High", UniconsLine.angle_up),
+              littleTextBigIcon("Urgent High", UniconsLine.angle_double_up),
+            ],
+          ),
         ),
-        SettingsTile.switchTile(
-          title: const Text('High Alarm'),
-          initialValue: settings.alarmSettings.highAlarm,
-          onToggle: (value) async {
-            settings.alarmSettings.highAlarm = value;
-          },
-        ),
-        SettingsTile.switchTile(
-          title: const Text('Fast Drop Alarm'),
-          initialValue: settings.alarmSettings.fastDropAlarm,
-          onToggle: (value) async {
-            settings.alarmSettings.fastDropAlarm = value;
-          },
-        ),
-        SettingsTile.switchTile(
-          title: const Text('Fast Rise Alarm'),
-          initialValue: settings.alarmSettings.fastRiseAlarm,
-          onToggle: (value) async {
-            settings.alarmSettings.fastRiseAlarm = value;
-          },
-        ),
+        SettingsTile(
+          title: const Text("Difference Alarms"),
+          trailing: ToggleButtons(
+            isSelected: [
+              settings.alarmSettings.fastDropAlarm,
+              settings.alarmSettings.fastRiseAlarm,
+            ],
+            onPressed: (int index) {
+              switch (index) {
+                case 0:
+                  settings.alarmSettings.fastDropAlarm =
+                      !settings.alarmSettings.fastDropAlarm;
+                  break;
+                case 1:
+                  settings.alarmSettings.fastRiseAlarm =
+                      !settings.alarmSettings.fastRiseAlarm;
+                  break;
+              }
+            },
+            children: [
+              littleTextBigIcon("Fast Drop", UniconsLine.arrow_down_left),
+              littleTextBigIcon("Fast Rise", UniconsLine.arrow_up_left),
+            ],
+          ),
+        )
       ],
     );
+  }
+
+  Widget littleTextBigIcon(String text, IconData icon) {
+    return Container(
+        child: Column(
+      children: [
+        Icon(icon, size: 35),
+        Text(text, style: const TextStyle(fontSize: 8, height: 0.5)),
+      ],
+    ));
   }
 
   SettingsSection debugSection(Settings settings) {

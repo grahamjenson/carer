@@ -3,21 +3,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 enum AlarmSettingsNames {
+  urgentLowAlarm,
   lowAlarm,
   highAlarm,
+  urgentHighAlarm,
 
   fastDropAlarm,
   fastRiseAlarm,
 }
 
-enum PredictionAlgorithm { dumb }
+enum PredictionAlgorithm { dumb, smart }
 
 class AlarmSettings {
   SharedPreferences prefs;
   Settings settings;
 
+  bool _urgentLowlarm = false;
   bool _lowAlarm = false;
   bool _highAlarm = false;
+  bool _urgentHighAlarm = false;
 
   bool _fastDropAlarm = false;
   bool _fastRiseAlarm = false;
@@ -27,6 +31,13 @@ class AlarmSettings {
   AlarmSettings({required this.prefs, required this.settings});
 
   void populate() {
+    // Boundary Alarms
+    var urgentLowAlarmPref =
+        prefs.getBool(AlarmSettingsNames.urgentLowAlarm.name);
+    if (urgentLowAlarmPref != null) {
+      _urgentLowlarm = urgentLowAlarmPref;
+    }
+
     var lowAlarmPref = prefs.getBool(AlarmSettingsNames.lowAlarm.name);
     if (lowAlarmPref != null) {
       _lowAlarm = lowAlarmPref;
@@ -37,6 +48,13 @@ class AlarmSettings {
       _highAlarm = highAlarmPref;
     }
 
+    var urgentHighAlarmPref =
+        prefs.getBool(AlarmSettingsNames.urgentHighAlarm.name);
+    if (urgentHighAlarmPref != null) {
+      _urgentHighAlarm = urgentHighAlarmPref;
+    }
+
+    // Diff Alarms
     var fastDropAlarmPref =
         prefs.getBool(AlarmSettingsNames.fastDropAlarm.name);
     if (fastDropAlarmPref != null) {
@@ -50,7 +68,18 @@ class AlarmSettings {
     }
   }
 
-  // Screen Active
+  ////
+  // Boundary Alarms
+  ////
+
+  // urgentLowAlarm
+  bool get urgentLowAlarm => _urgentLowlarm;
+  set urgentLowAlarm(bool value) {
+    prefs.setBool(AlarmSettingsNames.urgentLowAlarm.name, value);
+    _urgentLowlarm = value;
+    settings.notifyListeners();
+  }
+
   bool get lowAlarm => _lowAlarm;
   set lowAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.lowAlarm.name, value);
@@ -66,6 +95,18 @@ class AlarmSettings {
     _highAlarm = value;
     settings.notifyListeners();
   }
+
+  // urgentHighAlarm
+  bool get urgentHighAlarm => _urgentHighAlarm;
+  set urgentHighAlarm(bool value) {
+    prefs.setBool(AlarmSettingsNames.urgentHighAlarm.name, value);
+    _urgentHighAlarm = value;
+    settings.notifyListeners();
+  }
+
+  ////
+  // Diff Alarms
+  ////
 
   // fasrDrop
   bool get fastDropAlarm => _fastDropAlarm;
