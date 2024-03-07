@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/models/summary_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';

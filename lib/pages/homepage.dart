@@ -67,24 +67,23 @@ class HomePage extends StatelessWidget {
     if (!showHistory && !showStats && !showChart) {
       return const SizedBox.shrink();
     }
-
+    var tables = [
+      if (showHistory) const Expanded(child: History()),
+      if (showStats) const Expanded(child: Stats()),
+    ];
     if (showChart) {
       var children = [const Flexible(child: BGLChart())];
       if (showHistory || showStats) {
         children.add(Flexible(
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-              if (showHistory) const History(),
-              if (showStats) const Stats()
-            ])));
+                children: tables)));
       }
       return Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
     } else {
-      return const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [History(), Stats()]);
+      return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround, children: tables);
     }
   }
 }

@@ -3,15 +3,27 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
+import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Stats extends StatelessWidget {
   const Stats({super.key});
-  static const TextStyle row =
-      TextStyle(color: mainColor, fontSize: 14, fontWeight: FontWeight.bold);
+
+  static const heading =
+      TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
+
+  static const row = TextStyle(
+    color: mainColor,
+    fontSize: 16,
+  );
+  static const small = TextStyle(
+    color: mainColor,
+    fontSize: 10,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +43,10 @@ class Stats extends StatelessWidget {
               child: Container(
             alignment: Alignment.center,
             child: DataTable(
-              columnSpacing: 5,
+              border: const TableBorder(
+                verticalInside: BorderSide(color: mainColor),
+              ),
+              columnSpacing: 10,
               dividerThickness: 0.01,
               headingRowHeight: 0,
               dataRowMinHeight: 14,
@@ -39,8 +54,12 @@ class Stats extends StatelessWidget {
               horizontalMargin: 0,
               columns: const [
                 DataColumn(
-                    label: SizedBox(
-                        width: 50, child: Text('name', style: heading))),
+                  numeric: true,
+                  label: SizedBox(
+                    width: 50,
+                    child: Text('name', style: heading),
+                  ),
+                ),
                 DataColumn(
                     label: SizedBox(
                         width: 50, child: Text('stat', style: heading))),
@@ -66,10 +85,13 @@ class Stats extends StatelessWidget {
     return DataRow(
       cells: [
         const DataCell(
-          Text("IOB", style: row),
+          Text("IOB", style: heading),
         ),
         DataCell(
-          Text("${summary.state.iob}u", style: row),
+          SmartText(
+              textAlign: TextAlign.center,
+              texts: ["${summary.state.iob}", "u"],
+              styles: const [row, small]),
         ),
       ],
     );
@@ -79,10 +101,11 @@ class Stats extends StatelessWidget {
     return DataRow(
       cells: [
         const DataCell(
-          Text("COB", style: row),
+          Text("COB", style: heading),
         ),
         DataCell(
-          Text("${summary.state.cob}g", style: row),
+          SmartText(
+              texts: ["${summary.state.cob}", "g"], styles: const [row, small]),
         ),
       ],
     );
@@ -91,9 +114,11 @@ class Stats extends StatelessWidget {
   DataRow power(Summary summary) {
     return DataRow(
       cells: [
-        const DataCell(Text("Power", style: row)),
+        const DataCell(Text("Power", style: heading)),
         DataCell(
-          Text("${summary.state.battery}%", style: row),
+          SmartText(
+              texts: ["${summary.state.battery}", "%"],
+              styles: const [row, small]),
         ),
       ],
     );
@@ -102,9 +127,11 @@ class Stats extends StatelessWidget {
   DataRow cage(Summary summary) {
     return DataRow(
       cells: [
-        const DataCell(Text("cage", style: row)),
+        const DataCell(Text("cage", style: heading)),
         DataCell(
-          Text("${summary.state.cage}h", style: row),
+          SmartText(
+              texts: ["${summary.state.cage}", "h"],
+              styles: const [row, small]),
         ),
       ],
     );
@@ -116,7 +143,7 @@ class Stats extends StatelessWidget {
     if (profileBasal == null) {
       return const DataRow(
         cells: [
-          DataCell(Text("Basal", style: row)),
+          DataCell(Text("Basal", style: heading)),
           DataCell(
             Text("none", style: row),
           ),
@@ -127,10 +154,9 @@ class Stats extends StatelessWidget {
     if (tempBasal != null) {
       return DataRow(
         cells: [
-          const DataCell(Text("Basal*", style: row)),
+          const DataCell(Text("Basal*", style: heading)),
           DataCell(
-            Text(getBasalDescription(tempBasal.absolute, tempBasal.remaining),
-                style: row),
+            getBasalDescription(tempBasal.absolute, tempBasal.remaining),
           ),
         ],
       );
@@ -138,20 +164,41 @@ class Stats extends StatelessWidget {
 
     return DataRow(
       cells: [
-        const DataCell(Text("Basal", style: row)),
-        DataCell(
-          Text(getBasalDescription(profileBasal.value, null), style: row),
-        ),
+        const DataCell(Text("Basal", style: heading)),
+        DataCell(getBasalDescription(profileBasal.value, null)),
       ],
     );
   }
 
-  String getBasalDescription(double value, Duration? remaining) {
-    var str = "${value.toStringAsFixed(2)}u";
-    if (remaining != null) {
-      str += " ${Dates.dateAgoShort(remaining, hours: false)}";
+  (List<String>, List<TextStyle>) dateAgoShort(Duration diff) {
+    if (diff.inMinutes == 0) {
+      return (const ["now"], const [row]);
     }
-    return str;
+
+    List<String> texts = [];
+    List<TextStyle> styles = [];
+    if (diff.inHours > 0) {
+      texts.add("${diff.inHours}");
+      styles.add(row);
+      texts.add("h");
+      styles.add(small);
+    }
+    texts.add("${diff.inMinutes % 60}");
+    styles.add(row);
+    texts.add("m");
+    styles.add(small);
+    return (texts, styles);
+  }
+
+  SmartText getBasalDescription(double value, Duration? remaining) {
+    var texts = ["${toMax2dp(value)}", "u/h "];
+    var styles = [row, small];
+    if (remaining != null) {
+      var (daTexts, daStyles) = dateAgoShort(remaining);
+      texts.addAll(daTexts);
+      styles.addAll(daStyles);
+    }
+    return SmartText(texts: texts, styles: styles);
   }
 
   DataRow target(Summary summary, Unit unit) {
@@ -161,7 +208,7 @@ class Stats extends StatelessWidget {
     if (profileLowTarget == null || profileHighTarget == null) {
       return const DataRow(
         cells: [
-          DataCell(Text("Target", style: row)),
+          DataCell(Text("Target", style: heading)),
           DataCell(
             Text("none", style: row),
           ),
@@ -172,12 +219,10 @@ class Stats extends StatelessWidget {
     if (tempTarget != null) {
       return DataRow(
         cells: [
-          const DataCell(Text("Target*", style: row)),
+          const DataCell(Text("Target*", style: heading)),
           DataCell(
-            Text(
-                targetDesciption(tempTarget.targetBottom, tempTarget.targetTop,
-                    unit, tempTarget.remaining),
-                style: row),
+            targetDesciption(tempTarget.targetBottom, tempTarget.targetTop,
+                unit, tempTarget.remaining),
           ),
         ],
       );
@@ -185,26 +230,41 @@ class Stats extends StatelessWidget {
 
     return DataRow(
       cells: [
-        const DataCell(Text("Target", style: row)),
+        const DataCell(Text("Target", style: heading)),
         DataCell(
-          Text(
-              targetDesciption(
-                  profileLowTarget.value, profileHighTarget.value, unit, null),
-              style: row),
+          targetDesciption(
+              profileLowTarget.value, profileHighTarget.value, unit, null),
         ),
       ],
     );
   }
 
-  String targetDesciption(num low, num high, Unit unit, Duration? remaining) {
-    var str = "${unit.str(low)}${unit.name}";
-    if (low != high) {
-      str = "${unit.str(low)}-${unit.str(high)}${unit.name}";
+  SmartText targetDesciption(
+      num low, num high, Unit unit, Duration? remaining) {
+    List<String> texts = [];
+    List<TextStyle> styles = [];
+    if (low == high) {
+      texts.add(unit.str(low));
+      styles.add(row);
+    } else {
+      texts.add(unit.str(low));
+      styles.add(row);
+      texts.add("-");
+      styles.add(small);
+      texts.add(unit.str(high));
+      styles.add(row);
     }
+
+    texts.add(unit.name);
+    styles.add(small);
+
     if (remaining != null) {
-      str += " ${Dates.dateAgoShort(remaining, hours: false)}";
+      var (daTexts, daStyles) = dateAgoShort(remaining);
+      texts.addAll(daTexts);
+      styles.addAll(daStyles);
     }
-    return str;
+
+    return SmartText(texts: texts, styles: styles);
   }
 
   DataRow fifteenMinDiff(Summary summary, Unit unit) {
@@ -212,7 +272,7 @@ class Stats extends StatelessWidget {
     if (sgvs.isEmpty) {
       return const DataRow(
         cells: [
-          DataCell(Text("15min diff", style: row)),
+          DataCell(Text("15m Δ", style: heading)),
           DataCell(
             Text("none", style: row),
           ),
@@ -222,9 +282,11 @@ class Stats extends StatelessWidget {
     var diff = summary.lastSGV!.sgv - sgvs.first.sgv;
     return DataRow(
       cells: [
-        const DataCell(Text("15min diff", style: row)),
+        const DataCell(Text("15m Δ", style: heading)),
         DataCell(
-          Text("${unit.str(diff)}${unit.name}", style: row),
+          SmartText(
+              texts: [(unit.str(diff)), (unit.name)],
+              styles: const [row, small]),
         ),
       ],
     );
@@ -246,9 +308,9 @@ class Stats extends StatelessWidget {
 
     return DataRow(
       cells: [
-        const DataCell(Text("% in range", style: row)),
+        const DataCell(Text("TIR", style: heading)),
         DataCell(
-          Text("$percent%", style: row),
+          SmartText(texts: [percent, "%"], styles: const [row, small]),
         ),
       ],
     );

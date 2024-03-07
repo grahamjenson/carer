@@ -1,7 +1,5 @@
 import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/t1d_cn.dart';
-import 'package:carer/nsclient/summary.dart';
 import 'package:carer/pages/settingspage.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
@@ -53,7 +51,7 @@ class Bar extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
             ),
