@@ -293,7 +293,40 @@ class SettingsPage extends StatelessWidget {
               littleTextBigIcon("Fast Rise", UniconsLine.arrow_up_left),
             ],
           ),
-        )
+        ),
+        SettingsTile(
+          title: const Text("No Data Alarm"),
+          trailing: ToggleButtons(
+            isSelected: [
+              10 == settings.alarmSettings.noDataAlarmMinutes,
+              20 == settings.alarmSettings.noDataAlarmMinutes,
+              30 == settings.alarmSettings.noDataAlarmMinutes,
+            ],
+            onPressed: (int index) {
+              var value = -1;
+              switch (index) {
+                case 0:
+                  value = 10;
+                  break;
+                case 1:
+                  value = 20;
+                  break;
+                case 2:
+                  value = 30;
+                  break;
+              }
+              if (value == settings.alarmSettings.noDataAlarmMinutes) {
+                value = -1; // disable
+              }
+              settings.alarmSettings.noDataAlarmMinutes = value;
+            },
+            children: [
+              littleTextBigIcon("10m", UniconsLine.clock_two),
+              littleTextBigIcon("20m", UniconsLine.clock_five),
+              littleTextBigIcon("30m", UniconsLine.clock_eight),
+            ],
+          ),
+        ),
       ],
     );
   }

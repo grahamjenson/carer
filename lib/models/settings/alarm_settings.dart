@@ -10,6 +10,11 @@ enum AlarmSettingsNames {
 
   fastDropAlarm,
   fastRiseAlarm,
+
+  noDataAlarmMinutes,
+
+  predictionAlgorithm,
+  predictiveSnooze,
 }
 
 enum PredictionAlgorithm { dumb, smart }
@@ -18,15 +23,23 @@ class AlarmSettings {
   SharedPreferences prefs;
   Settings settings;
 
+  // Boundary Alarms
   bool _urgentLowlarm = false;
   bool _lowAlarm = false;
   bool _highAlarm = false;
   bool _urgentHighAlarm = false;
 
+  // Diff Alarms
   bool _fastDropAlarm = false;
   bool _fastRiseAlarm = false;
+  final int _consecutiveReadings = 1;
 
+// smart alarms
   PredictionAlgorithm? _predictionAlgorithm;
+  final bool _smartSnooze = false;
+
+  // data alarms
+  int _noDataAlarmMinutes = 30;
 
   AlarmSettings({required this.prefs, required this.settings});
 
@@ -65,6 +78,13 @@ class AlarmSettings {
         prefs.getBool(AlarmSettingsNames.fastRiseAlarm.name);
     if (fastRiseAlarmPref != null) {
       _fastRiseAlarm = fastRiseAlarmPref;
+    }
+
+    // data alarms
+    var noDataAlarmMinutesPref =
+        prefs.getInt(AlarmSettingsNames.noDataAlarmMinutes.name);
+    if (noDataAlarmMinutesPref != null) {
+      _noDataAlarmMinutes = noDataAlarmMinutesPref;
     }
   }
 
@@ -124,8 +144,20 @@ class AlarmSettings {
     settings.notifyListeners();
   }
 
-  PredictionAlgorithm? get predictionAlgorithm => _predictionAlgorithm;
-  set predictionAlgorithm(PredictionAlgorithm? value) {
-    _predictionAlgorithm = value;
+  ////
+  // Data Alarms
+  ////
+
+  // noDataAlarmMinutes
+  int get noDataAlarmMinutes => _noDataAlarmMinutes;
+  set noDataAlarmMinutes(int value) {
+    var validValues = [-1, 10, 20, 30];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.noDataAlarmMinutes.name, value);
+    _noDataAlarmMinutes = value;
+    settings.notifyListeners();
   }
 }
