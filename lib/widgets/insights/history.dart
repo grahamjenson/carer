@@ -114,19 +114,25 @@ class History extends StatelessWidget {
       texts.add("h");
       styles.add(small);
     }
-    texts.add("${diff.inMinutes % 60}");
+    texts.add((diff.inMinutes % 60).toString().padLeft(2, "0"));
     styles.add(row);
     texts.add("m");
     styles.add(small);
     return SmartText(texts: texts, styles: styles);
   }
 
-  SmartText insulinSmartText(SummaryTreatment treatment) {
+  Widget insulinSmartText(SummaryTreatment treatment) {
+    if (treatment.insulin == 0) {
+      return const SizedBox.shrink();
+    }
     return SmartText(
         texts: ["${treatment.insulin}", "u"], styles: const [row, small]);
   }
 
-  SmartText carbsSmartText(SummaryTreatment treatment) {
+  Widget carbsSmartText(SummaryTreatment treatment) {
+    if (treatment.carbs == 0) {
+      return const SizedBox.shrink();
+    }
     return SmartText(
         texts: ["${treatment.carbs}", "g"], styles: const [row, small]);
   }
