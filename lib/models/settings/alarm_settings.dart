@@ -17,7 +17,7 @@ enum AlarmSettingsNames {
   predictiveSnooze,
 }
 
-enum PredictionAlgorithm { dumb, smart }
+enum PredictionAlgorithm { none, simple, profile }
 
 class AlarmSettings {
   SharedPreferences prefs;
@@ -32,11 +32,11 @@ class AlarmSettings {
   // Diff Alarms
   bool _fastDropAlarm = false;
   bool _fastRiseAlarm = false;
-  final int _consecutiveReadings = 1;
 
 // smart alarms
-  PredictionAlgorithm? _predictionAlgorithm;
-  final bool _smartSnooze = false;
+  PredictionAlgorithm _predictionAlgorithm = PredictionAlgorithm.none;
+
+  bool _predictiveSnooze = false;
 
   // data alarms
   int _noDataAlarmMinutes = 30;
@@ -158,6 +158,26 @@ class AlarmSettings {
 
     prefs.setInt(AlarmSettingsNames.noDataAlarmMinutes.name, value);
     _noDataAlarmMinutes = value;
+    settings.notifyListeners();
+  }
+
+  ////
+  /// Smart Alarms
+  ////
+
+  // predictionAlgorithm
+  PredictionAlgorithm get predictionAlgorithm => _predictionAlgorithm;
+  set predictionAlgorithm(PredictionAlgorithm value) {
+    prefs.setString(AlarmSettingsNames.predictionAlgorithm.name, value.name);
+    _predictionAlgorithm = value;
+    settings.notifyListeners();
+  }
+
+  // predictiveSnooze
+  bool get predictiveSnooze => _predictiveSnooze;
+  set predictiveSnooze(bool value) {
+    prefs.setBool(AlarmSettingsNames.predictiveSnooze.name, value);
+    _predictiveSnooze = value;
     settings.notifyListeners();
   }
 }

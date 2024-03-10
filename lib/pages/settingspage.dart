@@ -1,4 +1,3 @@
-
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
@@ -19,11 +18,11 @@ class SettingsPage extends StatelessWidget {
         ),
         body: SettingsList(
           sections: [
-            NightscoutSettings(),
-            const T1DSettings(),
-            const UISettings(),
-            const AlarmsSettings(),
-            const DebugSettings(),
+            NightscoutSettingsWidget(),
+            const T1DSettingsWidget(),
+            const UISettingsWidget(),
+            const AlarmsSettingsWidget(),
+            const DebugSettingsWidget(),
           ],
         ));
   }

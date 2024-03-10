@@ -18,6 +18,7 @@ class History extends StatelessWidget {
   static const row = TextStyle(
     color: mainColor,
     fontSize: 20,
+    fontFeatures: [FontFeature.tabularFigures()],
   );
   static const small = TextStyle(
     color: mainColor,
@@ -56,16 +57,16 @@ class History extends StatelessWidget {
                         DataColumn(
                             numeric: true,
                             label: SizedBox(
-                                width: 50, child: Text('ago', style: heading))),
+                                width: 40, child: Text('ago', style: heading))),
                         DataColumn(
                             numeric: true,
                             label: SizedBox(
-                                width: 50,
+                                width: 40,
                                 child: Text('insulin', style: heading))),
                         DataColumn(
                             numeric: true,
                             label: SizedBox(
-                                width: 50,
+                                width: 40,
                                 child: Text('carbs', style: heading))),
                       ],
                       rows: history))),
@@ -87,9 +88,6 @@ class History extends StatelessWidget {
   }
 
   DataRow? historyRow(ATreatment treatment) {
-    const row =
-        TextStyle(color: mainColor, fontSize: 14, fontWeight: FontWeight.bold);
-
     if (treatment is SummaryTreatment) {
       return DataRow(cells: [
         DataCell(dateAgoShort(treatment.age)),
@@ -113,8 +111,14 @@ class History extends StatelessWidget {
       styles.add(row);
       texts.add("h");
       styles.add(small);
+      texts.add((diff.inMinutes % 60).toString().padLeft(2, "0"));
+      styles.add(row);
+      texts.add("m");
+      styles.add(small);
+      return SmartText(texts: texts, styles: styles);
     }
-    texts.add((diff.inMinutes % 60).toString().padLeft(2, "0"));
+
+    texts.add((diff.inMinutes % 60).toString());
     styles.add(row);
     texts.add("m");
     styles.add(small);

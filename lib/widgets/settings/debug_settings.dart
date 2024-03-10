@@ -1,4 +1,3 @@
-
 import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +5,8 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
 
-class DebugSettings extends AbstractSettingsSection {
-  const DebugSettings({super.key});
+class DebugSettingsWidget extends AbstractSettingsSection {
+  const DebugSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 
-class NightscoutSettings extends AbstractSettingsSection {
-  NightscoutSettings({super.key});
+class NightscoutSettingsWidget extends AbstractSettingsSection {
+  NightscoutSettingsWidget({super.key});
   final TextEditingController controller = TextEditingController();
 
   @override

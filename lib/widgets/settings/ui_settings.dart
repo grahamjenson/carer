@@ -5,8 +5,8 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:unicons/unicons.dart';
 
-class UISettings extends AbstractSettingsSection {
-  const UISettings({super.key});
+class UISettingsWidget extends AbstractSettingsSection {
+  const UISettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

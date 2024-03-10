@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 
-class T1DSettings extends AbstractSettingsSection {
-  const T1DSettings({super.key});
+class T1DSettingsWidget extends AbstractSettingsSection {
+  const T1DSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
