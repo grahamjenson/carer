@@ -22,8 +22,12 @@ class UISettingsWidget extends AbstractSettingsSection {
             },
           ),
           SettingsTile(
-            title: const Text("Boundary Alarms"),
+            title: const Text("Display"),
             trailing: ToggleButtons(
+              constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+              renderBorder: true,
+              borderRadius: BorderRadius.circular(10),
+              borderWidth: 0,
               isSelected: [
                 settings.uiSettings.showChart,
                 settings.uiSettings.showHistory,

@@ -20,6 +20,8 @@ class SmartText extends StatelessWidget {
 
     return RichText(
       textAlign: textAlign,
+      overflow: TextOverflow.visible,
+      softWrap: false,
       text: TextSpan(
           text: texts[0], style: styles[0], children: childrenTextSpans),
     );

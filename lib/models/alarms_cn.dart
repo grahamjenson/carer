@@ -23,7 +23,27 @@ class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
   Settings settings;
 
-  Set<Alarms> alarms = <Alarms>{};
+  final Set<Alarms> _triggeredAlarms = <Alarms>{};
+  Set<Alarms> get triggeredAlarms => _triggeredAlarms;
+  set triggeredAlarms(Set<Alarms> value) {
+    if (se.equals(value, _triggeredAlarms)) {
+      return;
+    }
+    _triggeredAlarms.clear();
+    _triggeredAlarms.addAll(value);
+    notifyListeners();
+  }
+
+  final Set<Alarms> _alarms = <Alarms>{};
+  Set<Alarms> get alarms => _alarms;
+  set alarms(Set<Alarms> value) {
+    if (se.equals(value, _alarms)) {
+      return;
+    }
+    _alarms.clear();
+    _alarms.addAll(value);
+    notifyListeners();
+  }
 
   // Minutes of sleep time
   DateTime _sleepUntil = DateTime.now();
@@ -90,18 +110,18 @@ class AlarmsCN extends ChangeNotifier {
         break;
     }
 
-    // Filter Alarms that are not enabled
+    // Set alarms that have been triggered
+    triggeredAlarms = newAlarms;
     filterAlarms(newAlarms);
+    // Set alarms that
+    alarms = newAlarms;
 
-    if (!se.equals(newAlarms, alarms)) {
-      notifyListeners();
-      // Set alarms
-      alarms = newAlarms;
-      if (alarms.isEmpty) {
-        clearAlarm();
-      } else {
-        createAlarms(alarms);
-      }
+    // Set alarms
+
+    if (alarms.isEmpty) {
+      clearAlarm();
+    } else {
+      createAlarms(alarms);
     }
   }
 

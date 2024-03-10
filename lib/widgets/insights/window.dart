@@ -9,7 +9,7 @@ class Window extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         border: Border.all(color: mainColor, width: 1),

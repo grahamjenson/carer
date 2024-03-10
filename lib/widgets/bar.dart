@@ -15,21 +15,6 @@ class Bar extends StatelessWidget {
     return Consumer2<Settings, AlarmsCN>(
         builder: (context, settings, alarms, child) {
       // TODO dont show sleep option if all alarms are turned off
-      Widget sleep = SlideAction(
-          height: 40,
-          sliderButtonIconSize: 40,
-          sliderButtonIconPadding: 0,
-          textStyle: const TextStyle(color: Colors.white, fontSize: 16),
-          innerColor: Colors.white,
-          outerColor: mainColor,
-          alignment: Alignment.centerLeft,
-          text: "Snooze ${Dates.shortSecondsLeft(alarms.sleepDuration)}",
-          sliderRotate: false,
-          onSubmit: () async {
-            var sleepTime = await openSleepDialog(context);
-            sleepTime ??= 0;
-            alarms.sleepDurationSeconds = sleepTime;
-          });
 
       return BottomAppBar(
         color: Colors.transparent,
@@ -38,7 +23,7 @@ class Bar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Flexible(flex: 1, child: sleep),
+            getSleepButton(context, alarms),
             const Expanded(
               child: SizedBox.shrink(),
             ),
@@ -59,6 +44,36 @@ class Bar extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Widget getSleepButton(BuildContext context, AlarmsCN alarms) {
+    var text = "Snooze";
+    if (alarms.sleepDuration != 0) {
+      text = Dates.shortSecondsLeft(alarms.sleepDuration);
+    }
+    if (alarms.triggeredAlarms.isNotEmpty) {
+      for (var alarm in alarms.triggeredAlarms) {
+        text += "${alarm.name} ";
+      }
+    }
+    return TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: mainColor,
+        ),
+        child: Stack(children: [
+          Center(child: Icon(Icons.bedtime, color: Colors.black.withAlpha(75))),
+          Center(
+            child: Text(
+              text,
+              style: const TextStyle(color: Colors.black),
+            ),
+          ),
+        ]),
+        onPressed: () async {
+          var sleepTime = await openSleepDialog(context);
+          sleepTime ??= 0;
+          alarms.sleepDurationSeconds = sleepTime;
+        });
   }
 }
 

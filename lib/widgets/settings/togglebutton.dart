@@ -1,51 +1,56 @@
+import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 class ToggleButton extends StatelessWidget {
   final String text;
   final IconData icon;
-  final IconData? superscriptIcon;
 
-  const ToggleButton(
-      {super.key,
-      required this.text,
-      required this.icon,
-      this.superscriptIcon});
+  const ToggleButton({
+    super.key,
+    required this.text,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (superscriptIcon != null) {
-      return SizedBox(
-          width: 40,
-          height: 40,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Flexible(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.topRight,
-                      child: Icon(superscriptIcon, size: 10))),
-              Flexible(flex: 6, child: Icon(icon, size: 25)),
-              Flexible(
-                  flex: 2,
-                  child: Text(text,
-                      style: const TextStyle(fontSize: 8, height: 0.5))),
-            ],
-          ));
-    }
-
     return SizedBox(
-        width: 50,
-        height: 50,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        width: 40,
+        height: 40,
+        child: Stack(
           children: [
-            Flexible(flex: 3, child: Icon(icon, size: 35)),
-            Flexible(
-                flex: 1,
-                child: Text(text,
-                    style: const TextStyle(fontSize: 8, height: 0.5))),
+            Center(
+                child: Icon(
+              icon,
+              size: 30,
+              color: mainColor.withAlpha(50),
+            )),
+            Center(child: buildText()),
+          ],
+        ));
+  }
+
+  Widget buildText() {
+    return Text(text,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 10,
+          shadows: [
+            Shadow(
+                // bottomLeft
+                offset: Offset(-1, -1),
+                color: Colors.black),
+            Shadow(
+                // bottomRight
+                offset: Offset(1, -1),
+                color: Colors.black),
+            Shadow(
+                // topRight
+                offset: Offset(1, 1),
+                color: Colors.black),
+            Shadow(
+                // topLeft
+                offset: Offset(-1, 1),
+                color: Colors.black),
           ],
         ));
   }

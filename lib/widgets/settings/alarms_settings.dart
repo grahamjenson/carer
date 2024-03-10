@@ -9,6 +9,11 @@ import 'package:unicons/unicons.dart';
 class AlarmsSettingsWidget extends AbstractSettingsSection {
   const AlarmsSettingsWidget({super.key});
 
+  static const TextStyle description = TextStyle(
+    fontSize: 12,
+    color: Colors.grey,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Consumer<Settings>(builder: (context, settings, child) {
@@ -16,7 +21,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
       return SettingsSection(
         title: const Text('Alarms'),
         tiles: [
-          bounarySettings(alarmSettings),
+          targetSettings(alarmSettings),
           diffSettings(alarmSettings),
           noDataAlarmSettings(alarmSettings),
           predictionAlarms(alarmSettings),
@@ -26,13 +31,19 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     });
   }
 
-  SettingsTile bounarySettings(AlarmSettings settings) {
+  SettingsTile targetSettings(AlarmSettings settings) {
     return SettingsTile(
-      title: const Text("Boundary Alarms"),
-      descriptionInlineIos: false,
-      description:
-          const Text("Alarm when boundary is crossed (for number of readings)"),
+      title: const Text("Range"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Out of target/urgent range",
+        style: description,
+      ),
       trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
         isSelected: [
           settings.urgentLowAlarm,
           settings.lowAlarm,
@@ -67,11 +78,17 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   SettingsTile diffSettings(AlarmSettings settings) {
     return SettingsTile(
-      title: const Text("Difference Alarms"),
-      descriptionInlineIos: false,
-      description:
-          const Text("Alarm when rising or dropping (for number of readings)"),
+      title: const Text("Rise/Drop"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Rising or dropping quickly",
+        style: description,
+      ),
       trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
         isSelected: [
           settings.fastDropAlarm,
           settings.fastRiseAlarm,
@@ -96,11 +113,12 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   SettingsTile noDataAlarmSettings(AlarmSettings settings) {
     return SettingsTile(
-      title: const Text("No Data Alarm"),
-      descriptionInlineIos: false,
-      description:
-          const Text("Alarm when no readings are received for a period"),
+      title: const Text("No Data"),
       trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
         isSelected: [
           10 == settings.noDataAlarmMinutes,
           20 == settings.noDataAlarmMinutes,
@@ -135,11 +153,17 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   SettingsTile predictionAlarms(AlarmSettings settings) {
     return SettingsTile(
-      title: const Text("Prediction Alarms"),
-      descriptionInlineIos: false,
+      title: const Text("Prediction"),
+      descriptionInlineIos: true,
       description: const Text(
-          "Alarm when predicted to go out of bounds (in a timeframe)"),
+        "Predicted out of range",
+        style: description,
+      ),
       trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
         isSelected: [
           settings.predictionAlgorithm == PredictionAlgorithm.simple,
           settings.predictionAlgorithm == PredictionAlgorithm.profile,
@@ -172,12 +196,19 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   SettingsTile predictiveSnooze(AlarmSettings settings) {
     return SettingsTile(
       title: const Text("Predictive Snooze"),
-      descriptionInlineIos: false,
+      descriptionInlineIos: true,
       description: const Text(
-          "Snooze Alarm if predicted to be in bounds (in a timeframe)"),
+        "Snooze if predicted to recover",
+        style: description,
+      ),
       trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
         isSelected: [
-          settings.predictionAlgorithm == PredictionAlgorithm.simple,
+          settings.predictiveSnooze == PredictionAlgorithm.simple,
+          settings.predictiveSnooze == PredictionAlgorithm.profile,
         ],
         onPressed: (int index) {
           PredictionAlgorithm value = PredictionAlgorithm.none;
@@ -189,18 +220,20 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               value = PredictionAlgorithm.profile;
               break;
           }
-          if (value == settings.predictionAlgorithm) {
+          if (value == settings.predictiveSnooze) {
             value = PredictionAlgorithm.none; // disable
           }
-          settings.predictionAlgorithm = value;
+          settings.predictiveSnooze = value;
         },
         children: const [
           ToggleButton(
             text: "Simple",
             icon: UniconsLine.bed,
-            superscriptIcon: UniconsLine.temperature_empty,
           ),
-          // ToggleButton(text: "Smart Model 1", icon: UniconsLine.temperature),
+          ToggleButton(
+            text: "Profile",
+            icon: UniconsLine.bed,
+          ),
           // ToggleButton(text: "Smart Model 2", icon: UniconsLine.temperature_plus),
         ],
       ),

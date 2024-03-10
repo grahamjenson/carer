@@ -53,21 +53,22 @@ class History extends StatelessWidget {
                       dataRowMinHeight: 14,
                       dataRowMaxHeight: 20,
                       horizontalMargin: 0,
-                      columns: const [
+                      columns: [
                         DataColumn(
                             numeric: true,
-                            label: SizedBox(
-                                width: 40, child: Text('ago', style: heading))),
+                            label: Container(
+                                alignment: Alignment.center,
+                                child: const Text('', style: heading))),
                         DataColumn(
                             numeric: true,
-                            label: SizedBox(
-                                width: 40,
-                                child: Text('insulin', style: heading))),
+                            label: Container(
+                                alignment: Alignment.center,
+                                child: const Text('', style: heading))),
                         DataColumn(
                             numeric: true,
-                            label: SizedBox(
-                                width: 40,
-                                child: Text('carbs', style: heading))),
+                            label: Container(
+                                alignment: Alignment.center,
+                                child: const Text('', style: heading))),
                       ],
                       rows: history))),
         ),

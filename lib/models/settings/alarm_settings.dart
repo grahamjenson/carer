@@ -36,7 +36,7 @@ class AlarmSettings {
 // smart alarms
   PredictionAlgorithm _predictionAlgorithm = PredictionAlgorithm.none;
 
-  bool _predictiveSnooze = false;
+  PredictionAlgorithm _predictiveSnooze = PredictionAlgorithm.none;
 
   // data alarms
   int _noDataAlarmMinutes = 30;
@@ -85,6 +85,23 @@ class AlarmSettings {
         prefs.getInt(AlarmSettingsNames.noDataAlarmMinutes.name);
     if (noDataAlarmMinutesPref != null) {
       _noDataAlarmMinutes = noDataAlarmMinutesPref;
+    }
+
+    // smart alarms
+    var predictionAlgorithmPref =
+        prefs.getString(AlarmSettingsNames.predictionAlgorithm.name);
+    if (predictionAlgorithmPref != null) {
+      _predictionAlgorithm = PredictionAlgorithm.values.firstWhere(
+          (e) => e.name == predictionAlgorithmPref,
+          orElse: () => PredictionAlgorithm.none);
+    }
+
+    var predictiveSnoozePref =
+        prefs.getString(AlarmSettingsNames.predictiveSnooze.name);
+    if (predictiveSnoozePref != null) {
+      _predictiveSnooze = PredictionAlgorithm.values.firstWhere(
+          (e) => e.name == predictiveSnoozePref,
+          orElse: () => PredictionAlgorithm.none);
     }
   }
 
@@ -174,9 +191,9 @@ class AlarmSettings {
   }
 
   // predictiveSnooze
-  bool get predictiveSnooze => _predictiveSnooze;
-  set predictiveSnooze(bool value) {
-    prefs.setBool(AlarmSettingsNames.predictiveSnooze.name, value);
+  PredictionAlgorithm get predictiveSnooze => _predictiveSnooze;
+  set predictiveSnooze(PredictionAlgorithm value) {
+    prefs.setString(AlarmSettingsNames.predictiveSnooze.name, value.name);
     _predictiveSnooze = value;
     settings.notifyListeners();
   }
