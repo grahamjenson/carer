@@ -112,9 +112,9 @@ class AlarmsCN extends ChangeNotifier {
 
     // Set alarms that have been triggered
     triggeredAlarms = newAlarms;
-    print("Triggered Alarms $triggeredAlarms");
+
     alarms = filterAlarms(newAlarms);
-    print("Final Alarms $alarms");
+
     // Set alarms
 
     if (alarms.isEmpty) {
@@ -125,12 +125,10 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   void clearAlarm() {
-    print("Clear Alarm");
     player.stop();
   }
 
   void createAlarms(Set<Alarms> alarms) {
-    print("Create Alarms $alarms");
     player.play(AssetSource("alarm.mp3"));
   }
 

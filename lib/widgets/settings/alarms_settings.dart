@@ -22,7 +22,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         title: const Text('Alarms'),
         tiles: [
           targetSettings(context, alarmSettings),
-          diffSettings(alarmSettings),
+          diffSettings(context, alarmSettings),
           noDataAlarmSettings(alarmSettings),
           predictionAlarms(alarmSettings),
           predictiveSnooze(alarmSettings),
@@ -57,12 +57,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               break;
             case 1:
               settings.lowAlarm = !settings.lowAlarm;
-              if (settings.lowAlarm) {
-                var x = await alertDialogOfButtons<int>(
-                    context, "Alert when Low for:", ["15m", "20m"], [15, 20]);
-                print("asdsadsa $x");
-              }
-
               break;
             case 2:
               settings.highAlarm = !settings.highAlarm;
@@ -82,7 +76,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
-  SettingsTile diffSettings(AlarmSettings settings) {
+  SettingsTile diffSettings(BuildContext context, AlarmSettings settings) {
     return SettingsTile(
       title: const Text("Rise/Drop"),
       descriptionInlineIos: true,
@@ -109,9 +103,17 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               break;
           }
         },
-        children: const [
-          ToggleButton(text: "Fast Drop", icon: UniconsLine.arrow_down_left),
-          ToggleButton(text: "Fast Rise", icon: UniconsLine.arrow_up_left),
+        children: [
+          ToggleButton(
+              text: "Fast Drop ${settings.fastDropAlarmMinutes}m",
+              icon: UniconsLine.arrow_down_left,
+              onLongPress: () async {
+                var x = await alertDialogOfButtons<int>(context,
+                    "Alert Dropping for:", ["15m", "20m", "30m"], [15, 20, 30]);
+                settings.fastDropAlarmMinutes = x;
+              }),
+          const ToggleButton(
+              text: "Fast Rise", icon: UniconsLine.arrow_up_left),
         ],
       ),
     );

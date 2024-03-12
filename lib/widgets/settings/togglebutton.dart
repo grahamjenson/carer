@@ -6,27 +6,29 @@ class ToggleButton extends StatelessWidget {
   final IconData? icon;
   final double height;
   final double width;
+  final GestureLongPressCallback? onLongPress;
 
-  const ToggleButton({
-    super.key,
-    required this.text,
-    this.icon,
-    this.height = 40,
-    this.width = 40,
-  });
+  const ToggleButton(
+      {super.key,
+      required this.text,
+      this.icon,
+      this.height = 40,
+      this.width = 40,
+      this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
-    print("fjoisdjfoidsjoifds $height");
-    return SizedBox(
-        width: width,
-        height: height,
-        child: Stack(
-          children: [
-            Center(child: buildIcon()),
-            Center(child: buildText()),
-          ],
-        ));
+    return GestureDetector(
+        onLongPress: onLongPress,
+        child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              children: [
+                Center(child: buildIcon()),
+                Center(child: buildText()),
+              ],
+            )));
   }
 
   Widget buildIcon() {
@@ -69,6 +71,7 @@ class ToggleButton extends StatelessWidget {
 
 Future<T> alertDialogOfButtons<T>(
     BuildContext context, String title, List<String> titles, List<T> values) {
+  assert(titles.length == values.length);
   return showDialog<int>(
       context: context,
       builder: (context) => AlertDialog(

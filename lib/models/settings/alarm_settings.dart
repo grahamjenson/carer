@@ -9,6 +9,8 @@ enum AlarmSettingsNames {
   urgentHighAlarm,
 
   fastDropAlarm,
+  fastDropAlarmMinutes,
+
   fastRiseAlarm,
 
   noDataAlarmMinutes,
@@ -31,6 +33,7 @@ class AlarmSettings {
 
   // Diff Alarms
   bool _fastDropAlarm = false;
+  int _fastDropAlarmMinutes = 30;
   bool _fastRiseAlarm = false;
 
 // smart alarms
@@ -150,6 +153,18 @@ class AlarmSettings {
   set fastDropAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.fastDropAlarm.name, value);
     _fastDropAlarm = value;
+    settings.notifyListeners();
+  }
+
+  int get fastDropAlarmMinutes => _fastDropAlarmMinutes;
+  set fastDropAlarmMinutes(int value) {
+    var validValues = [15, 20, 30];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.fastDropAlarmMinutes.name, value);
+    _fastDropAlarmMinutes = value;
     settings.notifyListeners();
   }
 

@@ -5,8 +5,8 @@ import 'package:carer/models/models.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:carer/utils/math.dart';
-import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
 class TimeValue {
