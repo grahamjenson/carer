@@ -112,10 +112,9 @@ class AlarmsCN extends ChangeNotifier {
 
     // Set alarms that have been triggered
     triggeredAlarms = newAlarms;
-    filterAlarms(newAlarms);
-    // Set alarms that
-    alarms = newAlarms;
-
+    print("Triggered Alarms $triggeredAlarms");
+    alarms = filterAlarms(newAlarms);
+    print("Final Alarms $alarms");
     // Set alarms
 
     if (alarms.isEmpty) {
@@ -135,11 +134,11 @@ class AlarmsCN extends ChangeNotifier {
     player.play(AssetSource("alarm.mp3"));
   }
 
-  filterAlarms(Set<Alarms> alarms) {
+  Set<Alarms> filterAlarms(Set<Alarms> alarms) {
     if (sleepDuration.inSeconds > 0) {
       // We are sleeping, no alarms right now
       alarms.clear();
-      return;
+      return alarms;
     }
 
     if (!settings.alarmSettings.highAlarm) {
@@ -159,5 +158,6 @@ class AlarmsCN extends ChangeNotifier {
     if (!settings.alarmSettings.fastDropAlarm) {
       alarms.remove(Alarms.diffVeryLow);
     }
+    return alarms;
   }
 }

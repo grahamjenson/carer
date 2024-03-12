@@ -21,7 +21,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
       return SettingsSection(
         title: const Text('Alarms'),
         tiles: [
-          targetSettings(alarmSettings),
+          targetSettings(context, alarmSettings),
           diffSettings(alarmSettings),
           noDataAlarmSettings(alarmSettings),
           predictionAlarms(alarmSettings),
@@ -31,7 +31,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     });
   }
 
-  SettingsTile targetSettings(AlarmSettings settings) {
+  SettingsTile targetSettings(BuildContext context, AlarmSettings settings) {
     return SettingsTile(
       title: const Text("Range"),
       descriptionInlineIos: true,
@@ -50,13 +50,19 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           settings.highAlarm,
           settings.urgentHighAlarm,
         ],
-        onPressed: (int index) {
+        onPressed: (int index) async {
           switch (index) {
             case 0:
               settings.urgentLowAlarm = !settings.urgentLowAlarm;
               break;
             case 1:
               settings.lowAlarm = !settings.lowAlarm;
+              if (settings.lowAlarm) {
+                var x = await alertDialogOfButtons<int>(
+                    context, "Alert when Low for:", ["15m", "20m"], [15, 20]);
+                print("asdsadsa $x");
+              }
+
               break;
             case 2:
               settings.highAlarm = !settings.highAlarm;
