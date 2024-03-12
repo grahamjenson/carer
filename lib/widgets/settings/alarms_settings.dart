@@ -19,7 +19,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     return Consumer<Settings>(builder: (context, settings, child) {
       var alarmSettings = settings.alarmSettings;
       return SettingsSection(
-        title: const Text('Alarms'),
+        title: const Text('Alarms\n(Long Press for info and settings)'),
         tiles: [
           targetSettings(context, alarmSettings),
           diffSettings(context, alarmSettings),

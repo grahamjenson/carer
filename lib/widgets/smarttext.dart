@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class SmartText extends StatelessWidget {
   final List<String> texts;
-  final List<TextStyle> styles;
+  final List<TextStyle?> styles;
   final TextAlign textAlign;
   const SmartText(
       {super.key,
