@@ -66,7 +66,7 @@ class Bar extends StatelessWidget {
     if (alarms.sleepDuration.inSeconds > 0) {
       return TextButton(
           style: TextButton.styleFrom(
-            backgroundColor: Colors.black,
+            backgroundColor: mainColor.withAlpha(20),
           ),
           onPressed: onPressed,
           onLongPress: onLongPressed,
@@ -74,12 +74,14 @@ class Bar extends StatelessWidget {
               width: 60,
               child: Stack(children: [
                 Center(
-                    child: Icon(Icons.bedtime, color: mainColor.withAlpha(40))),
+                    child: Icon(Icons.bedtime, color: mainColor.withAlpha(30))),
                 Center(
                   child: Text(
                     Dates.shortSecondsLeft(alarms.sleepDuration),
                     style: const TextStyle(
-                        color: mainColor, fontWeight: FontWeight.bold),
+                        color: mainColor,
+                        fontWeight: FontWeight.bold,
+                        height: 0.8),
                   ),
                 ),
               ])));

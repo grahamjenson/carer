@@ -2,6 +2,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
@@ -127,18 +128,20 @@ class History extends StatelessWidget {
   }
 
   Widget insulinSmartText(SummaryTreatment treatment) {
-    if (treatment.insulin == 0) {
+    if (treatment.insulin == 0 || treatment.insulin == null) {
       return const SizedBox.shrink();
     }
     return SmartText(
-        texts: ["${treatment.insulin}", "u"], styles: const [row, small]);
+        texts: ["${toMax2dp(treatment.insulin!)}", "u"],
+        styles: const [row, small]);
   }
 
   Widget carbsSmartText(SummaryTreatment treatment) {
-    if (treatment.carbs == 0) {
+    if (treatment.carbs == 0 || treatment.carbs == null) {
       return const SizedBox.shrink();
     }
     return SmartText(
-        texts: ["${treatment.carbs}", "g"], styles: const [row, small]);
+        texts: ["${toMax2dp(treatment.carbs!)}", "g"],
+        styles: const [row, small]);
   }
 }
