@@ -69,20 +69,14 @@ class Bar extends StatelessWidget {
           onPressed: onPressed,
           onLongPress: onLongPressed,
           child: SizedBox(
-              width: 60,
-              child: Stack(children: [
-                Center(
-                    child: Icon(Icons.bedtime, color: mainColor.withAlpha(30))),
-                Center(
-                  child: Text(
-                    Dates.shortSecondsLeft(alarms.sleepDuration),
-                    style: const TextStyle(
-                        color: mainColor,
-                        fontWeight: FontWeight.bold,
-                        height: 0.8),
-                  ),
-                ),
-              ])));
+            width: 50,
+            child: Text(
+              textAlign: TextAlign.center,
+              Dates.shortSecondsLeft(alarms.sleepDuration),
+              style: const TextStyle(
+                  color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
+            ),
+          ));
     }
 
     return TextButton(
@@ -102,12 +96,12 @@ class Bar extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // List<Widget> alarmsBoxes = [];
-    // if (alarms.triggeredAlarms.isNotEmpty) {
-    //   for (var alarm in alarms.triggeredAlarms) {
-    //     alarmsBoxes.add(Text("${alarm.name} "));
-    //   }
-    // }
+    List<Widget> alarmsBoxes = [];
+    if (alarms.triggeredAlarms.isNotEmpty) {
+      for (var alarm in alarms.triggeredAlarms) {
+        alarmsBoxes.add(Text("${alarm.name} "));
+      }
+    }
 
     // return SizedBox(
     //     child: Row(
@@ -125,7 +119,11 @@ class Bar extends StatelessWidget {
         onPressed: () {
           showOverlay(
             (context, t) {
-              return CustomAnimationToast(value: t);
+              return CustomAnimationToast(
+                  value: t,
+                  str: alarms.triggeredAlarms
+                      .map((alarm) => alarm.name)
+                      .join(' '));
             },
             duration: const Duration(milliseconds: 200),
           );
@@ -238,7 +236,9 @@ Future<int?> openSleepDialog(BuildContext context) {
 }
 
 class IosStyleToast extends StatelessWidget {
-  const IosStyleToast({super.key});
+  final String str;
+
+  const IosStyleToast({super.key, required this.str});
 
   @override
   Widget build(BuildContext context) {
@@ -259,14 +259,14 @@ class IosStyleToast extends StatelessWidget {
                   vertical: 8,
                   horizontal: 16,
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Icon(
+                    const Icon(
                       Icons.check,
                       color: Colors.white,
                     ),
-                    Text('Succeed')
+                    Text(str)
                   ],
                 ),
               ),
@@ -286,7 +286,9 @@ class CustomAnimationToast extends StatelessWidget {
 
   static final Tween<double> tweenOpacity = Tween<double>(begin: 0, end: 1);
 
-  const CustomAnimationToast({super.key, required this.value});
+  final String str;
+  const CustomAnimationToast(
+      {super.key, required this.value, required this.str});
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +296,7 @@ class CustomAnimationToast extends StatelessWidget {
       offset: tweenOffset.transform(value),
       child: Opacity(
         opacity: tweenOpacity.transform(value),
-        child: const IosStyleToast(),
+        child: IosStyleToast(str: str),
       ),
     );
   }
