@@ -3,6 +3,7 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:carer/pages/settingspage.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
+import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -107,29 +108,34 @@ class Bar extends StatelessWidget {
     //     child: Row(
     //   children: alarmsBoxes,
     // ));
-
+    OverlaySupportEntry? diss;
     return Container(
-      padding: const EdgeInsets.only(left: 5),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          backgroundColor: mainColor.withAlpha(40),
-        ),
-        child: const SizedBox(
-            width: 20, child: Icon(Icons.alarm, color: mainColor)),
-        onPressed: () {
-          showOverlay(
-            (context, t) {
-              return CustomAnimationToast(
-                  value: t,
-                  str: alarms.triggeredAlarms
-                      .map((alarm) => alarm.name)
-                      .join(' '));
-            },
-            duration: const Duration(milliseconds: 200),
-          );
-        },
-      ),
-    );
+        padding: const EdgeInsets.only(left: 5),
+        child: GestureDetector(
+          onTapDown: (TapDownDetails d) {
+            diss = showOverlay(
+              (context, t) {
+                return CustomAnimationToast(
+                    value: t,
+                    str: alarms.triggeredAlarms
+                        .map((alarm) => alarm.name)
+                        .join('asd '));
+              },
+              duration: const Duration(seconds: 10),
+            );
+          },
+          onTapUp: (TapUpDetails details) {
+            print("safjosiafjiosa");
+            diss?.dismiss();
+          },
+          child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: mainColor.withAlpha(40),
+              ),
+              onPressed: null,
+              child: const SizedBox(
+                  width: 20, child: Icon(Icons.alarm, color: mainColor))),
+        ));
   }
 }
 
@@ -251,27 +257,15 @@ class IosStyleToast extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
               child: Container(
-                color: Colors.black87,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 16,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                    ),
-                    Text(str)
-                  ],
-                ),
-              ),
+            color: Colors.black,
+            height: 150,
+            width: 150,
+            child: Window(
+              title: "Alarms",
+              child: Text(str),
             ),
-          ),
+          )),
         ),
       ),
     );
