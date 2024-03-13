@@ -111,28 +111,26 @@ class Bar extends StatelessWidget {
     OverlaySupportEntry? diss;
     return Container(
         padding: const EdgeInsets.only(left: 5),
-        child: GestureDetector(
-          onTapDown: (TapDownDetails d) {
+        child: Listener(
+          onPointerDown: (e) {
             diss = showOverlay(
               (context, t) {
                 return CustomAnimationToast(
                     value: t,
                     str: alarms.triggeredAlarms
                         .map((alarm) => alarm.name)
-                        .join('asd '));
+                        .join('\n'));
               },
               duration: const Duration(seconds: 10),
             );
           },
-          onTapUp: (TapUpDetails details) {
-            print("safjosiafjiosa");
-            diss?.dismiss();
-          },
+          onPointerUp: (e) => diss?.dismiss(),
+          onPointerMove: (e) => diss?.dismiss(),
           child: TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: mainColor.withAlpha(40),
               ),
-              onPressed: null,
+              onPressed: () {},
               child: const SizedBox(
                   width: 20, child: Icon(Icons.alarm, color: mainColor))),
         ));
