@@ -2,7 +2,6 @@ import 'package:carer/models/models.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';

@@ -208,19 +208,6 @@ class SummaryTreatment extends ATreatment {
     }
   }
 
-  @override
-  String get description {
-    if (insulin != null && carbs != null) {
-      return "$insulinStr, $carbStr";
-    } else if (insulin != null) {
-      return insulinStr;
-    } else if (carbs != null) {
-      return carbStr;
-    } else {
-      return "";
-    }
-  }
-
   factory SummaryTreatment.fromJson(Map<String, dynamic> json) {
     return SummaryTreatment(
       mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
