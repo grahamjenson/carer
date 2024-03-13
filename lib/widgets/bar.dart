@@ -5,8 +5,8 @@ import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
-import 'package:slide_to_act/slide_to_act.dart';
 
 class Bar extends StatelessWidget {
   const Bar({super.key});
@@ -25,7 +25,7 @@ class Bar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             getSleepButton(context, alarms),
-            getActiveAlarms(alarms),
+            getActiveAlarms(context, alarms),
             const Expanded(
               child: SizedBox.shrink(),
             ),
@@ -49,13 +49,11 @@ class Bar extends StatelessWidget {
   }
 
   Widget getSleepButton(BuildContext context, AlarmsCN alarms) {
+    // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
     onPressed() async {
-      var sleepTime = await openSleepDialog(context);
-      sleepTime ??= 0;
-      alarms.sleepDurationSeconds = sleepTime;
+      alarms.sleepDurationSeconds = 0;
     }
 
-    // Todo design some safetly around accidentally turning on snooze using long press
     onLongPressed() async {
       var sleepTime = await openSleepDialog(context);
       sleepTime ??= 0;
@@ -88,34 +86,52 @@ class Bar extends StatelessWidget {
     }
 
     return TextButton(
-        style: TextButton.styleFrom(
-          backgroundColor: mainColor.withAlpha(40),
-        ),
-        onPressed: onPressed,
-        onLongPress: onLongPressed,
-        child: const SizedBox(
-            width: 60,
-            child: Stack(children: [
-              Center(child: Icon(Icons.bedtime, color: mainColor)),
-            ])));
+      style: TextButton.styleFrom(
+        backgroundColor: mainColor.withAlpha(40),
+      ),
+      onPressed: onPressed,
+      onLongPress: onLongPressed,
+      child: const SizedBox(
+          width: 50, child: Icon(Icons.bedtime, color: mainColor)),
+    );
   }
 
-  Widget getActiveAlarms(AlarmsCN alarms) {
+  Widget getActiveAlarms(BuildContext context, AlarmsCN alarms) {
     // Returns a small container that contains the active alarm
     if (alarms.triggeredAlarms.isEmpty) {
       return const SizedBox.shrink();
     }
-    List<Widget> alarmsBoxes = [];
-    if (alarms.triggeredAlarms.isNotEmpty) {
-      for (var alarm in alarms.triggeredAlarms) {
-        alarmsBoxes.add(Text("${alarm.name} "));
-      }
-    }
 
-    return SizedBox(
-        child: Row(
-      children: alarmsBoxes,
-    ));
+    // List<Widget> alarmsBoxes = [];
+    // if (alarms.triggeredAlarms.isNotEmpty) {
+    //   for (var alarm in alarms.triggeredAlarms) {
+    //     alarmsBoxes.add(Text("${alarm.name} "));
+    //   }
+    // }
+
+    // return SizedBox(
+    //     child: Row(
+    //   children: alarmsBoxes,
+    // ));
+
+    return Container(
+      padding: const EdgeInsets.only(left: 5),
+      child: TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: mainColor.withAlpha(40),
+        ),
+        child: const SizedBox(
+            width: 20, child: Icon(Icons.alarm, color: mainColor)),
+        onPressed: () {
+          showOverlay(
+            (context, t) {
+              return CustomAnimationToast(value: t);
+            },
+            duration: const Duration(milliseconds: 200),
+          );
+        },
+      ),
+    );
   }
 }
 
@@ -123,6 +139,7 @@ Future<int?> openSleepDialog(BuildContext context) {
   const List<int> minutesTimes = [5, 10, 20, 30];
   const List<int> hoursTimes = [1, 2, 12, 24];
   const List<int> timeTimes = [6, 7, 21, 22];
+  const TextStyle textStyle = TextStyle(fontSize: 24, height: 0.5);
 
   var cancelRow = TextButton.icon(
     onPressed: () {
@@ -132,7 +149,7 @@ Future<int?> openSleepDialog(BuildContext context) {
     icon: const Icon(Icons.cancel),
   );
   var height = 80.0;
-  var width = 80;
+
   var minutesRow = ToggleButtons(
     constraints: BoxConstraints(maxHeight: height, maxWidth: height),
     renderBorder: true,
@@ -148,6 +165,7 @@ Future<int?> openSleepDialog(BuildContext context) {
         text: "${minutesTimes[index]}m",
         height: height,
         width: height,
+        textStyle: textStyle,
       ),
     ),
   );
@@ -167,6 +185,7 @@ Future<int?> openSleepDialog(BuildContext context) {
         text: "${hoursTimes[index]}h",
         height: height,
         width: height,
+        textStyle: textStyle,
       ),
     ),
   );
@@ -187,6 +206,7 @@ Future<int?> openSleepDialog(BuildContext context) {
         text: Dates.stringOf24HourTime(timeTimes[index]),
         height: height,
         width: height,
+        textStyle: textStyle,
       ),
     ),
   );
@@ -215,4 +235,67 @@ Future<int?> openSleepDialog(BuildContext context) {
       ),
     ),
   );
+}
+
+class IosStyleToast extends StatelessWidget {
+  const IosStyleToast({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: DefaultTextStyle(
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                color: Colors.black87,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
+                child: const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.check,
+                      color: Colors.white,
+                    ),
+                    Text('Succeed')
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomAnimationToast extends StatelessWidget {
+  final double value;
+
+  static final Tween<Offset> tweenOffset =
+      Tween<Offset>(begin: const Offset(0, 10), end: const Offset(0, 0));
+
+  static final Tween<double> tweenOpacity = Tween<double>(begin: 0, end: 1);
+
+  const CustomAnimationToast({super.key, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.translate(
+      offset: tweenOffset.transform(value),
+      child: Opacity(
+        opacity: tweenOpacity.transform(value),
+        child: const IosStyleToast(),
+      ),
+    );
+  }
 }

@@ -6,6 +6,7 @@ class ToggleButton extends StatelessWidget {
   final IconData? icon;
   final double height;
   final double width;
+  final TextStyle textStyle;
   final GestureLongPressCallback? onLongPress;
 
   const ToggleButton(
@@ -14,6 +15,7 @@ class ToggleButton extends StatelessWidget {
       this.icon,
       this.height = 40,
       this.width = 40,
+      this.textStyle = const TextStyle(fontSize: 10, color: mainColor),
       this.onLongPress});
 
   @override
@@ -32,40 +34,41 @@ class ToggleButton extends StatelessWidget {
   }
 
   Widget buildIcon() {
-    if (icon != null) {
+    if (icon == null) {
       return const SizedBox.shrink();
     }
     return Icon(
       icon,
       size: height - 10,
-      color: mainColor.withAlpha(50),
+      color: mainColor.withAlpha(100),
     );
   }
 
   Widget buildText() {
-    return Text(text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: height / 4.0,
-          shadows: const [
-            Shadow(
-                // bottomLeft
-                offset: Offset(-1, -1),
-                color: Colors.black),
-            Shadow(
-                // bottomRight
-                offset: Offset(1, -1),
-                color: Colors.black),
-            Shadow(
-                // topRight
-                offset: Offset(1, 1),
-                color: Colors.black),
-            Shadow(
-                // topLeft
-                offset: Offset(-1, 1),
-                color: Colors.black),
-          ],
-        ));
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        shadows: [
+          Shadow(
+              // bottomLeft
+              offset: Offset(-1, -1),
+              color: Colors.black),
+          Shadow(
+              // bottomRight
+              offset: Offset(1, -1),
+              color: Colors.black),
+          Shadow(
+              // topRight
+              offset: Offset(1, 1),
+              color: Colors.black),
+          Shadow(
+              // topLeft
+              offset: Offset(-1, 1),
+              color: Colors.black),
+        ],
+      ).merge(textStyle),
+    );
   }
 }
 

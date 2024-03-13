@@ -4,6 +4,7 @@ import 'package:carer/models/summary_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/pages/homepage.dart';
 import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -39,16 +40,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Carer',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 0, 50, 0),
-            brightness: Brightness.dark),
-        useMaterial3: true,
+    return OverlaySupport.global(
+      child: MaterialApp(
+        title: 'Carer',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 0, 50, 0),
+              brightness: Brightness.dark),
+          useMaterial3: true,
+        ),
+        home: const HomePage(),
       ),
-      home: const HomePage(),
     );
   }
 }

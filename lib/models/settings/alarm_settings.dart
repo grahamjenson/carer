@@ -5,7 +5,9 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 enum AlarmSettingsNames {
   urgentLowAlarm,
   lowAlarm,
+  lowMinutes,
   highAlarm,
+  highMinutes,
   urgentHighAlarm,
 
   fastDropAlarm,
@@ -17,6 +19,9 @@ enum AlarmSettingsNames {
 
   predictionAlgorithm,
   predictiveSnooze,
+
+  volumeOverride,
+  volumeProgressionMinutes,
 }
 
 enum PredictionAlgorithm { none, simple, profile }
@@ -28,7 +33,9 @@ class AlarmSettings {
   // Boundary Alarms
   bool _urgentLowlarm = false;
   bool _lowAlarm = false;
+  int _lowMinutes = 30;
   bool _highAlarm = false;
+  int _highMinutes = 30;
   bool _urgentHighAlarm = false;
 
   // Diff Alarms
@@ -36,13 +43,17 @@ class AlarmSettings {
   int _fastDropAlarmMinutes = 30;
   bool _fastRiseAlarm = false;
 
-// smart alarms
+  // smart alarms
   PredictionAlgorithm _predictionAlgorithm = PredictionAlgorithm.none;
 
   PredictionAlgorithm _predictiveSnooze = PredictionAlgorithm.none;
 
   // data alarms
   int _noDataAlarmMinutes = 30;
+
+  // volume
+  int _volumeOverride = 50;
+  int _volumeProgressionMinutes = 2;
 
   AlarmSettings({required this.prefs, required this.settings});
 
@@ -59,9 +70,19 @@ class AlarmSettings {
       _lowAlarm = lowAlarmPref;
     }
 
+    var lowMinutesPref = prefs.getInt(AlarmSettingsNames.lowMinutes.name);
+    if (lowMinutesPref != null) {
+      _lowMinutes = lowMinutesPref;
+    }
+
     var highAlarmPref = prefs.getBool(AlarmSettingsNames.highAlarm.name);
     if (highAlarmPref != null) {
       _highAlarm = highAlarmPref;
+    }
+
+    var highMinutesPref = prefs.getInt(AlarmSettingsNames.highMinutes.name);
+    if (highMinutesPref != null) {
+      _highMinutes = highMinutesPref;
     }
 
     var urgentHighAlarmPref =
@@ -106,6 +127,19 @@ class AlarmSettings {
           (e) => e.name == predictiveSnoozePref,
           orElse: () => PredictionAlgorithm.none);
     }
+
+    // volume
+    var volumeOverridePref =
+        prefs.getInt(AlarmSettingsNames.volumeOverride.name);
+    if (volumeOverridePref != null) {
+      _volumeOverride = volumeOverridePref;
+    }
+
+    var volumeProgressionMinutesPref =
+        prefs.getInt(AlarmSettingsNames.volumeProgressionMinutes.name);
+    if (volumeProgressionMinutesPref != null) {
+      _volumeProgressionMinutes = volumeProgressionMinutesPref;
+    }
   }
 
   ////
@@ -133,6 +167,30 @@ class AlarmSettings {
   set highAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.highAlarm.name, value);
     _highAlarm = value;
+    settings.notifyListeners();
+  }
+
+  int get lowMinutes => _lowMinutes;
+  set lowMinutes(int value) {
+    var validValues = [15, 20, 30, 45, 60];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.lowMinutes.name, value);
+    _lowMinutes = value;
+    settings.notifyListeners();
+  }
+
+  int get highMinutes => _highMinutes;
+  set highMinutes(int value) {
+    var validValues = [15, 20, 30, 45, 60];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.highMinutes.name, value);
+    _highMinutes = value;
     settings.notifyListeners();
   }
 
@@ -210,6 +268,34 @@ class AlarmSettings {
   set predictiveSnooze(PredictionAlgorithm value) {
     prefs.setString(AlarmSettingsNames.predictiveSnooze.name, value.name);
     _predictiveSnooze = value;
+    settings.notifyListeners();
+  }
+
+  ////
+  /// Volume
+  ////
+
+  int get volumeOverride => _volumeOverride;
+  set volumeOverride(int value) {
+    prefs.setInt(AlarmSettingsNames.volumeOverride.name, value);
+    if (value < 0) {
+      value = 0;
+    } else if (value > 100) {
+      value = 100;
+    }
+    _volumeOverride = value;
+    settings.notifyListeners();
+  }
+
+  int get volumeProgressionMinutes => _volumeProgressionMinutes;
+  set volumeProgressionMinutes(int value) {
+    var validValues = [1, 2, 3, 4, 5];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.volumeProgressionMinutes.name, value);
+    _volumeProgressionMinutes = value;
     settings.notifyListeners();
   }
 }
