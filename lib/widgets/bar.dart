@@ -125,12 +125,11 @@ class Bar extends StatelessWidget {
             );
           },
           onPointerUp: (e) => diss?.dismiss(),
-          onPointerMove: (e) => diss?.dismiss(),
           child: TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: mainColor.withAlpha(40),
               ),
-              onPressed: () {},
+              onPressed: null,
               child: const SizedBox(
                   width: 20, child: Icon(Icons.alarm, color: mainColor))),
         ));
