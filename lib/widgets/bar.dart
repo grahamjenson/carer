@@ -8,6 +8,7 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
+import 'package:unicons/unicons.dart';
 
 class Bar extends StatelessWidget {
   const Bar({super.key});
@@ -131,7 +132,12 @@ class Bar extends StatelessWidget {
               ),
               onPressed: null,
               child: const SizedBox(
-                  width: 20, child: Icon(Icons.alarm, color: mainColor))),
+                  width: 20,
+                  child: Icon(
+                    UniconsLine.bell,
+                    color: mainColor,
+                    weight: 0.1,
+                  ))),
         ));
   }
 }

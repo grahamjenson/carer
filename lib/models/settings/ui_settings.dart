@@ -38,7 +38,7 @@ class UISettings {
     prefs.setBool(UISettingsNames.screenActive.name, value);
     _screenActive = value;
     WakelockPlus.toggle(enable: value);
-    settings.notifyListeners();
+    settings.notify();
   }
 
   // ShowHistory
@@ -46,7 +46,7 @@ class UISettings {
   set showHistory(bool value) {
     prefs.setBool(UISettingsNames.showHistory.name, value);
     _showHistory = value;
-    settings.notifyListeners();
+    settings.notify();
   }
 
   // ShowChart
@@ -54,7 +54,7 @@ class UISettings {
   set showChart(bool value) {
     prefs.setBool(UISettingsNames.showChart.name, value);
     _showChart = value;
-    settings.notifyListeners();
+    settings.notify();
   }
 
   // ShowStats
@@ -62,6 +62,6 @@ class UISettings {
   set showStats(bool value) {
     prefs.setBool(UISettingsNames.showStats.name, value);
     _showStats = value;
-    settings.notifyListeners();
+    settings.notify();
   }
 }

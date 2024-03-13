@@ -90,6 +90,6 @@ class TargetSettings {
       return;
     }
     await prefs.setInt(setting.name, value);
-    settings.notifyListeners();
+    settings.notify();
   }
 }

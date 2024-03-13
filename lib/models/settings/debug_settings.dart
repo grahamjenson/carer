@@ -54,14 +54,14 @@ class DebugSettings {
   set debug(bool value) {
     prefs.setBool(DebugSettingNames.debug.name, value);
     _debug = value;
-    settings.notifyListeners();
+    settings.notify();
   }
 
   DebugSummary get debugSummary => _debugSummary;
   set debugSummary(DebugSummary value) {
     prefs.setString(DebugSettingNames.debugSummary.name, value.name);
     _debugSummary = value;
-    settings.notifyListeners();
+    settings.notify();
   }
 }
 

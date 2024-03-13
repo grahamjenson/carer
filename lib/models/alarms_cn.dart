@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/utils/math.dart';
 import 'package:carer/models/t1d_cn.dart';
+import 'package:carer/utils/math.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -60,6 +60,7 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   final player = AudioPlayer();
+  final testplayer = AudioPlayer();
 
   AlarmsCN({required this.t1d, required this.settings}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
@@ -122,6 +123,14 @@ class AlarmsCN extends ChangeNotifier {
     } else {
       createAlarms(alarms);
     }
+  }
+
+  Future<void> test() {
+    return testplayer.play(AssetSource("alarm.mp3")).then((value) {
+      return Future.delayed(const Duration(seconds: 10));
+    }).then((v) {
+      return testplayer.stop();
+    });
   }
 
   void clearAlarm() {

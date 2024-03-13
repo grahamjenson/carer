@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/widgets/colours.dart';
@@ -7,7 +8,6 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:unicons/unicons.dart';
 
 class AlarmsSettingsWidget extends AbstractSettingsSection {
   const AlarmsSettingsWidget({super.key});
@@ -20,7 +20,8 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Settings>(builder: (context, settings, child) {
+    return Consumer2<Settings, AlarmsCN>(
+        builder: (context, settings, alarms, child) {
       var alarmSettings = settings.alarmSettings;
       return SettingsSection(
         title: const Text('Alarms (Long Press for info and settings)'),
@@ -33,6 +34,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           SettingsTile(title: const Divider()),
           volumeSettings(context, alarmSettings),
           progressiveVolume(context, alarmSettings),
+          testAlert(context, alarms),
         ],
       );
     });
@@ -311,10 +313,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               Expanded(
                   flex: 1,
                   child: InkWell(
-                      child: const Icon(
-                        UniconsLine.volume_down,
-                        color: mainColor,
-                      ),
+                      child: const Icon(Icons.volume_down, color: mainColor),
                       onTap: () {
                         settings.volumeOverride =
                             max(minRange, settings.volumeOverride - 10).toInt();
@@ -337,7 +336,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                 flex: 1,
                 child: InkWell(
                   child: const Icon(
-                    UniconsLine.volume_up,
+                    Icons.volume_up,
                     color: mainColor,
                   ),
                   onTap: () {
@@ -386,6 +385,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               value = 5;
               break;
           }
+          if (settings.volumeProgressionMinutes == value) {
+            value = -1; // disable
+          }
           settings.volumeProgressionMinutes = value;
         },
         children: const [
@@ -417,5 +419,21 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         ],
       ),
     );
+  }
+
+  SettingsTile testAlert(BuildContext context, AlarmsCN alarms) {
+    double width = MediaQuery.of(context).size.width;
+    return SettingsTile(
+        title: const Text(""),
+        trailing: SizedBox(
+            width: width - 100,
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () async {
+                  await alarms.test();
+                },
+                child: const Text("Test Alert"),
+              ),
+            )));
   }
 }

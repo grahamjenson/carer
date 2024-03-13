@@ -3,7 +3,6 @@ import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings/target_settings.dart';
 import 'package:carer/models/settings/ui_settings.dart';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,6 +67,10 @@ class Settings extends ChangeNotifier {
     }
 
     return ('', '');
+  }
+
+  void notify() {
+    notifyListeners();
   }
 
   String get nightscoutURL => _nightscoutURL;
