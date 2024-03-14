@@ -6,6 +6,7 @@ import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
 enum Alarms {
   targetVeryLow,
@@ -22,6 +23,8 @@ const se = SetEquality();
 class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
   Settings settings;
+
+  static const String alarmFile = "alarm.mp3";
 
   final Set<Alarms> _triggeredAlarms = <Alarms>{};
   Set<Alarms> get triggeredAlarms => _triggeredAlarms;
@@ -59,7 +62,7 @@ class AlarmsCN extends ChangeNotifier {
     notifyListeners();
   }
 
-  final player = AudioPlayer();
+  final alarmPlayer = AudioPlayer();
   final testplayer = AudioPlayer();
 
   AlarmsCN({required this.t1d, required this.settings}) {
@@ -119,26 +122,95 @@ class AlarmsCN extends ChangeNotifier {
     // Set alarms
 
     if (alarms.isEmpty) {
-      clearAlarm();
+      stopAlarm(alarmPlayer);
     } else {
-      createAlarms(alarms);
+      playAlarm(alarmPlayer);
     }
   }
 
-  Future<void> test() {
-    return testplayer.play(AssetSource("alarm.mp3")).then((value) {
-      return Future.delayed(const Duration(seconds: 10));
+  void stopAlarm(AudioPlayer player) {
+    if (player.state == PlayerState.playing) {
+      player.stop();
+    }
+  }
+
+  Future<void> playAlarm(AudioPlayer player) async {
+    if (player.state == PlayerState.playing) {
+      return;
+    }
+
+    var override = settings.alarmSettings.volumeOveride;
+    var progression = settings.alarmSettings.volumeProgressionMinutes != -1;
+    var progressionMinutes = settings.alarmSettings.volumeProgressionMinutes;
+    var finalVolume = settings.alarmSettings.volumeOverrideValue;
+
+    // TODO: Check if the system supports override (e.g. web), if not set to false
+
+    // There are 4 possible states here:
+    // 1. No override, no progression, just play alarm
+    // 2. no override with Progression, play alarm but increase volume using the player (so we dont touch the system volume)
+    // 3. Override with no progression, in which we set the volume to override and then play alarm (when is stops we reset volume)
+    // 4. Override with progression, in which case we play the alarm and it progressivly get louder
+    if (!override && !progression) {
+      return playAlarmWithoutOverrideWithoutProgression(player);
+    } else if (!override && progression) {
+      return playAlarmWithoutOverrideWithProgression(player);
+    } else if (override && !progression) {
+      return playAlarmWithOverrideWithoutProgression(player);
+    } else if (override && progression) {
+      return playAlarmWithOverrideWithProgression(player);
+    }
+  }
+
+  Future<void> playAlarmWithoutOverrideWithoutProgression(
+      AudioPlayer player) async {
+    return player.play(AssetSource(alarmFile));
+  }
+
+  Future<void> playAlarmWithoutOverrideWithProgression(
+      AudioPlayer player) async {
+    var progression = 0.1;
+
+    return player
+        .play(AssetSource(alarmFile), volume: progression)
+        .then((v) => Future.delayed(const Duration(seconds: 5)))
+        .then((v) => player.setVolume(0.5))
+        .then((v) => Future.delayed(const Duration(seconds: 5)))
+        .then((v) => player.setVolume(1));
+  }
+
+  Future<void> playAlarmWithOverrideWithoutProgression(
+      AudioPlayer player) async {
+    await FlutterVolumeController.setVolume(
+        settings.alarmSettings.volumeOverrideValue / 100);
+
+    return player.play(AssetSource(alarmFile));
+  }
+
+  Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
+    await FlutterVolumeController.setVolume(
+        0.3 * settings.alarmSettings.volumeOverrideValue / 100);
+
+    return player
+        .play(AssetSource(alarmFile))
+        .then((v) => Future.delayed(const Duration(seconds: 5)))
+        .then((v) => FlutterVolumeController.setVolume(
+            0.5 * settings.alarmSettings.volumeOverrideValue / 100))
+        .then((v) => Future.delayed(const Duration(seconds: 5)))
+        .then((v) => FlutterVolumeController.setVolume(
+            settings.alarmSettings.volumeOverrideValue / 100));
+  }
+
+  Future<void> testAlarm() async {
+    if (testplayer.state == PlayerState.playing) {
+      return stopAlarm(testplayer);
+    }
+
+    return playAlarm(testplayer).then((value) {
+      return Future.delayed(const Duration(seconds: 60));
     }).then((v) {
-      return testplayer.stop();
+      return stopAlarm(testplayer);
     });
-  }
-
-  void clearAlarm() {
-    player.stop();
-  }
-
-  void createAlarms(Set<Alarms> alarms) {
-    player.play(AssetSource("alarm.mp3"));
   }
 
   Set<Alarms> filterAlarms(Set<Alarms> alarms) {

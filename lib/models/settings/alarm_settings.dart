@@ -12,15 +12,19 @@ enum AlarmSettingsNames {
 
   fastDropAlarm,
   fastDropAlarmMinutes,
+  fastDropAlarmDelta,
 
   fastRiseAlarm,
+  fastRiseAlarmMinutes,
+  fastRiseAlarmDelta,
 
   noDataAlarmMinutes,
 
   predictionAlgorithm,
   predictiveSnooze,
 
-  volumeOverride,
+  volumeOveride,
+  volumeOverrideValue,
   volumeProgressionMinutes,
 }
 
@@ -41,7 +45,10 @@ class AlarmSettings {
   // Diff Alarms
   bool _fastDropAlarm = false;
   int _fastDropAlarmMinutes = 30;
+  int _fastDropAlarmDelta = 20;
   bool _fastRiseAlarm = false;
+  int _fastRiseAlarmMinutes = 30;
+  int _fastRiseAlarmDelta = 20;
 
   // smart alarms
   PredictionAlgorithm _predictionAlgorithm = PredictionAlgorithm.none;
@@ -52,7 +59,8 @@ class AlarmSettings {
   int _noDataAlarmMinutes = 30;
 
   // volume
-  int _volumeOverride = 50;
+  bool _volumeOveride = false;
+  int _volumeOverrideValue = 50;
   int _volumeProgressionMinutes = 2;
 
   AlarmSettings({required this.prefs, required this.settings});
@@ -129,10 +137,10 @@ class AlarmSettings {
     }
 
     // volume
-    var volumeOverridePref =
-        prefs.getInt(AlarmSettingsNames.volumeOverride.name);
-    if (volumeOverridePref != null) {
-      _volumeOverride = volumeOverridePref;
+    var volumeOverrideValuePref =
+        prefs.getInt(AlarmSettingsNames.volumeOverrideValue.name);
+    if (volumeOverrideValuePref != null) {
+      _volumeOverrideValue = volumeOverrideValuePref;
     }
 
     var volumeProgressionMinutesPref =
@@ -226,11 +234,37 @@ class AlarmSettings {
     settings.notify();
   }
 
+  int get fastDropAlarmDelta => _fastDropAlarmDelta;
+  set fastDropAlarmDelta(int value) {
+    prefs.setInt(AlarmSettingsNames.fastDropAlarmDelta.name, value);
+    _fastDropAlarmDelta = value;
+    settings.notify();
+  }
+
   // fastRise
   bool get fastRiseAlarm => _fastRiseAlarm;
   set fastRiseAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.fastRiseAlarm.name, value);
     _fastRiseAlarm = value;
+    settings.notify();
+  }
+
+  int get fastRiseAlarmMinutes => _fastRiseAlarmMinutes;
+  set fastRiseAlarmMinutes(int value) {
+    var validValues = [15, 20, 30];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.fastRiseAlarmMinutes.name, value);
+    _fastRiseAlarmMinutes = value;
+    settings.notify();
+  }
+
+  int get fastRiseAlarmDelta => _fastRiseAlarmDelta;
+  set fastRiseAlarmDelta(int value) {
+    prefs.setInt(AlarmSettingsNames.fastRiseAlarmDelta.name, value);
+    _fastRiseAlarmDelta = value;
     settings.notify();
   }
 
@@ -274,16 +308,24 @@ class AlarmSettings {
   ////
   /// Volume
   ////
+  ///
 
-  int get volumeOverride => _volumeOverride;
-  set volumeOverride(int value) {
-    prefs.setInt(AlarmSettingsNames.volumeOverride.name, value);
+  bool get volumeOveride => _volumeOveride;
+  set volumeOveride(bool value) {
+    prefs.setBool(AlarmSettingsNames.volumeOveride.name, value);
+    _volumeOveride = value;
+    settings.notify();
+  }
+
+  int get volumeOverrideValue => _volumeOverrideValue;
+  set volumeOverrideValue(int value) {
+    prefs.setInt(AlarmSettingsNames.volumeOverrideValue.name, value);
     if (value < 0) {
       value = 0;
     } else if (value > 100) {
       value = 100;
     }
-    _volumeOverride = value;
+    _volumeOverrideValue = value;
     settings.notify();
   }
 

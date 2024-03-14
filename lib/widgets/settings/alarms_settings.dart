@@ -32,6 +32,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           predictionAlarms(alarmSettings),
           predictiveSnooze(alarmSettings),
           SettingsTile(title: const Divider()),
+          volumeOverride(context, alarmSettings),
           volumeSettings(context, alarmSettings),
           progressiveVolume(context, alarmSettings),
           testAlert(context, alarms),
@@ -75,23 +76,33 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               break;
           }
         },
-        children: const [
-          ToggleButton(
+        children: [
+          const ToggleButton(
             text: "Urgent Low",
             height: _size,
             width: _size,
           ),
           ToggleButton(
-            text: "Low",
-            height: _size,
-            width: _size,
-          ),
+              text: "Low\n${settings.lowMinutes}m",
+              height: _size,
+              width: _size,
+              icon: Icons.touch_app_outlined,
+              onLongPress: () async {
+                var lowMinutes = await alertDialogOfButtons<int>(context,
+                    "Alert Low for:", ["15m", "20m", "30m"], [15, 20, 30]);
+                settings.lowMinutes = lowMinutes;
+              }),
           ToggleButton(
-            text: "High",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
+              text: "High\n${settings.highMinutes}m",
+              height: _size,
+              width: _size,
+              icon: Icons.touch_app_outlined,
+              onLongPress: () async {
+                var highMinutes = await alertDialogOfButtons<int>(context,
+                    "Alert High for:", ["15m", "20m", "30m"], [15, 20, 30]);
+                settings.highMinutes = highMinutes;
+              }),
+          const ToggleButton(
             text: "Urgent High",
             height: _size,
             width: _size,
@@ -133,15 +144,22 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               height: _size,
               width: _size,
               text: "Fast Drop\n${settings.fastDropAlarmMinutes}m",
+              icon: Icons.touch_app_outlined,
               onLongPress: () async {
-                var x = await alertDialogOfButtons<int>(context,
+                var minutes = await alertDialogOfButtons<int>(context,
                     "Alert Dropping for:", ["15m", "20m", "30m"], [15, 20, 30]);
-                settings.fastDropAlarmMinutes = x;
+                settings.fastDropAlarmMinutes = minutes;
               }),
-          const ToggleButton(
-            text: "Fast Rise",
+          ToggleButton(
+            text: "Fast Rise\n${settings.fastRiseAlarmMinutes}m",
+            icon: Icons.touch_app_outlined,
             height: _size,
             width: _size,
+            onLongPress: () async {
+              var minutes = await alertDialogOfButtons<int>(context,
+                  "Alert Rising for:", ["15m", "20m", "30m"], [15, 20, 30]);
+              settings.fastRiseAlarmMinutes = minutes;
+            },
           ),
         ],
       ),
@@ -299,13 +317,30 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
+  SettingsTile volumeOverride(BuildContext context, AlarmSettings settings) {
+    return SettingsTile.switchTile(
+      title: const Text("Volume Override"),
+      initialValue: settings.volumeOveride,
+      onToggle: (bool value) {
+        settings.volumeOveride = value;
+      },
+    );
+  }
+
   SettingsTile volumeSettings(BuildContext context, AlarmSettings settings) {
     int minRange = 0;
     int maxRange = 100;
     double width = MediaQuery.of(context).size.width;
+    if (!settings.volumeOveride) {
+      return SettingsTile(
+        title: const Text("Volume"),
+        trailing: const Text("Override is off"),
+      );
+    }
+
     return SettingsTile(
         //title: Text('Range High ${settings.rangeHigh}'),
-        title: const Text("Volume Override"),
+        title: const Text("Volume"),
         trailing: SizedBox(
           width: width - 230,
           child: Row(
@@ -315,8 +350,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: const Icon(Icons.volume_down, color: mainColor),
                       onTap: () {
-                        settings.volumeOverride =
-                            max(minRange, settings.volumeOverride - 10).toInt();
+                        settings.volumeOverrideValue =
+                            max(minRange, settings.volumeOverrideValue - 10)
+                                .toInt();
                       })),
               Expanded(
                   flex: 12,
@@ -325,11 +361,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                       height: 20,
                       child: Slider(
                         divisions: 50,
-                        value: settings.volumeOverride.toDouble(),
+                        value: settings.volumeOverrideValue.toDouble(),
                         min: 0,
                         max: 100,
                         onChanged: (double value) {
-                          settings.volumeOverride = value.toInt();
+                          settings.volumeOverrideValue = value.toInt();
                         },
                       ))),
               Expanded(
@@ -340,9 +376,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                     color: mainColor,
                   ),
                   onTap: () {
-                    settings.volumeOverride =
-                        min(maxRange, settings.volumeOverride.toDouble() + 10)
-                            .toInt();
+                    settings.volumeOverrideValue = min(maxRange,
+                            settings.volumeOverrideValue.toDouble() + 10)
+                        .toInt();
                   },
                 ),
               ),
@@ -423,6 +459,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   SettingsTile testAlert(BuildContext context, AlarmsCN alarms) {
     double width = MediaQuery.of(context).size.width;
+
     return SettingsTile(
         title: const Text(""),
         trailing: SizedBox(
@@ -430,7 +467,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             child: Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  await alarms.test();
+                  await alarms.testAlarm();
                 },
                 child: const Text("Test Alert"),
               ),
