@@ -63,7 +63,7 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   final alarmPlayer = AudioPlayer();
-  final testplayer = AudioPlayer();
+  final List<AudioPlayer> testPlayers = [];
 
   AlarmsCN({required this.t1d, required this.settings}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
@@ -140,8 +140,8 @@ class AlarmsCN extends ChangeNotifier {
     }
 
     var override = settings.alarmSettings.volumeOveride;
-    var progression = settings.alarmSettings.volumeProgressionMinutes != -1;
-    var progressionMinutes = settings.alarmSettings.volumeProgressionMinutes;
+    var progression = settings.alarmSettings.volumeProgressionSeconds != -1;
+    var progressionMinutes = settings.alarmSettings.volumeProgressionSeconds;
     var finalVolume = settings.alarmSettings.volumeOverrideValue;
 
     // TODO: Check if the system supports override (e.g. web), if not set to false
@@ -169,14 +169,23 @@ class AlarmsCN extends ChangeNotifier {
 
   Future<void> playAlarmWithoutOverrideWithProgression(
       AudioPlayer player) async {
-    var progression = 0.1;
+    print("playAlarmWithoutOverrideWithProgression");
 
-    return player
-        .play(AssetSource(alarmFile), volume: progression)
-        .then((v) => Future.delayed(const Duration(seconds: 5)))
-        .then((v) => player.setVolume(0.5))
-        .then((v) => Future.delayed(const Duration(seconds: 5)))
-        .then((v) => player.setVolume(1));
+    var progressionSeconds = settings.alarmSettings.volumeProgressionSeconds;
+
+    await player.play(AssetSource(alarmFile), volume: 0);
+
+    for (var i = 0; i < 100; i++) {
+      if (player.state != PlayerState.playing) {
+        return;
+      }
+      var wait = ((progressionSeconds / 100) * 1000).toInt();
+      print(wait);
+      await Future.delayed(Duration(milliseconds: wait));
+      var volume = i / 99;
+      print(volume);
+      await player.setVolume(volume);
+    }
   }
 
   Future<void> playAlarmWithOverrideWithoutProgression(
@@ -201,16 +210,24 @@ class AlarmsCN extends ChangeNotifier {
             settings.alarmSettings.volumeOverrideValue / 100));
   }
 
-  Future<void> testAlarm() async {
-    if (testplayer.state == PlayerState.playing) {
-      return stopAlarm(testplayer);
+  Future<void> stopAllTestAlarms() async {
+    if (testPlayers.isNotEmpty) {
+      for (var element in testPlayers) {
+        element.stop();
+      }
+      testPlayers.clear();
+      return;
     }
+  }
 
-    return playAlarm(testplayer).then((value) {
-      return Future.delayed(const Duration(seconds: 60));
-    }).then((v) {
-      return stopAlarm(testplayer);
-    });
+  Future<void> testAlarm() async {
+    stopAllTestAlarms();
+    // This is to make sure that
+    var tp = AudioPlayer();
+    testPlayers.add(tp);
+    await playAlarm(tp);
+    await Future.delayed(const Duration(seconds: 60));
+    stopAlarm(tp);
   }
 
   Set<Alarms> filterAlarms(Set<Alarms> alarms) {

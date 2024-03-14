@@ -25,7 +25,7 @@ enum AlarmSettingsNames {
 
   volumeOveride,
   volumeOverrideValue,
-  volumeProgressionMinutes,
+  volumeProgressionSeconds,
 }
 
 enum PredictionAlgorithm { none, simple, profile }
@@ -61,7 +61,7 @@ class AlarmSettings {
   // volume
   bool _volumeOveride = false;
   int _volumeOverrideValue = 50;
-  int _volumeProgressionMinutes = 2;
+  int _volumeProgressionSeconds = 2;
 
   AlarmSettings({required this.prefs, required this.settings});
 
@@ -143,10 +143,10 @@ class AlarmSettings {
       _volumeOverrideValue = volumeOverrideValuePref;
     }
 
-    var volumeProgressionMinutesPref =
-        prefs.getInt(AlarmSettingsNames.volumeProgressionMinutes.name);
-    if (volumeProgressionMinutesPref != null) {
-      _volumeProgressionMinutes = volumeProgressionMinutesPref;
+    var volumeProgressionSecondsPref =
+        prefs.getInt(AlarmSettingsNames.volumeProgressionSeconds.name);
+    if (volumeProgressionSecondsPref != null) {
+      _volumeProgressionSeconds = volumeProgressionSecondsPref;
     }
   }
 
@@ -329,15 +329,15 @@ class AlarmSettings {
     settings.notify();
   }
 
-  int get volumeProgressionMinutes => _volumeProgressionMinutes;
-  set volumeProgressionMinutes(int value) {
-    var validValues = [-1, 1, 2, 3, 4, 5];
+  int get volumeProgressionSeconds => _volumeProgressionSeconds;
+  set volumeProgressionSeconds(int value) {
+    var validValues = [-1, 10, 20, 30, 60, 120];
     if (!validValues.contains(value)) {
       return;
     }
 
-    prefs.setInt(AlarmSettingsNames.volumeProgressionMinutes.name, value);
-    _volumeProgressionMinutes = value;
+    prefs.setInt(AlarmSettingsNames.volumeProgressionSeconds.name, value);
+    _volumeProgressionSeconds = value;
     settings.notify();
   }
 }

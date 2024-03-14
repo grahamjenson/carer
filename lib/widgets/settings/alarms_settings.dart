@@ -331,24 +331,30 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     int minRange = 0;
     int maxRange = 100;
     double width = MediaQuery.of(context).size.width;
+
+    var color = mainColor;
     if (!settings.volumeOveride) {
-      return SettingsTile(
-        title: const Text("Volume"),
-        trailing: const Text("Override is off"),
-      );
+      color = Colors.grey;
+    }
+
+    ValueChanged<double>? sliderCallback =
+        (double value) => settings.volumeOverrideValue = value.toInt();
+
+    if (!settings.volumeOveride) {
+      sliderCallback = null;
     }
 
     return SettingsTile(
-        //title: Text('Range High ${settings.rangeHigh}'),
-        title: const Text("Volume"),
+        enabled: settings.volumeOveride,
+        title: const Text(""),
         trailing: SizedBox(
-          width: width - 230,
+          width: width - 80,
           child: Row(
             children: [
               Expanded(
                   flex: 1,
                   child: InkWell(
-                      child: const Icon(Icons.volume_down, color: mainColor),
+                      child: Icon(Icons.volume_down, color: color),
                       onTap: () {
                         settings.volumeOverrideValue =
                             max(minRange, settings.volumeOverrideValue - 10)
@@ -364,16 +370,14 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                         value: settings.volumeOverrideValue.toDouble(),
                         min: 0,
                         max: 100,
-                        onChanged: (double value) {
-                          settings.volumeOverrideValue = value.toInt();
-                        },
+                        onChanged: sliderCallback,
                       ))),
               Expanded(
                 flex: 1,
                 child: InkWell(
-                  child: const Icon(
+                  child: Icon(
                     Icons.volume_up,
-                    color: mainColor,
+                    color: color,
                   ),
                   onTap: () {
                     settings.volumeOverrideValue = min(maxRange,
@@ -396,37 +400,52 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderRadius: BorderRadius.circular(10),
         borderWidth: 4,
         isSelected: [
-          1 == settings.volumeProgressionMinutes,
-          2 == settings.volumeProgressionMinutes,
-          3 == settings.volumeProgressionMinutes,
-          4 == settings.volumeProgressionMinutes,
-          5 == settings.volumeProgressionMinutes,
+          10 == settings.volumeProgressionSeconds,
+          20 == settings.volumeProgressionSeconds,
+          30 == settings.volumeProgressionSeconds,
+          60 == settings.volumeProgressionSeconds,
+          120 == settings.volumeProgressionSeconds,
         ],
         onPressed: (int index) {
           var value = -1;
           switch (index) {
             case 0:
-              value = 1;
+              value = 10;
               break;
             case 1:
-              value = 2;
+              value = 20;
               break;
             case 2:
-              value = 3;
+              value = 30;
               break;
             case 3:
-              value = 4;
+              value = 60;
               break;
             case 4:
-              value = 5;
+              value = 120;
               break;
           }
-          if (settings.volumeProgressionMinutes == value) {
+          if (settings.volumeProgressionSeconds == value) {
             value = -1; // disable
           }
-          settings.volumeProgressionMinutes = value;
+          settings.volumeProgressionSeconds = value;
         },
         children: const [
+          ToggleButton(
+            text: "10s",
+            height: _size,
+            width: _size,
+          ),
+          ToggleButton(
+            text: "20s",
+            height: _size,
+            width: _size,
+          ),
+          ToggleButton(
+            text: "30s",
+            height: _size,
+            width: _size,
+          ),
           ToggleButton(
             text: "1m",
             height: _size,
@@ -434,21 +453,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           ),
           ToggleButton(
             text: "2m",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "3m",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "4m",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "5m",
             height: _size,
             width: _size,
           ),
