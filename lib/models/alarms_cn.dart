@@ -64,12 +64,14 @@ class AlarmsCN extends ChangeNotifier {
 
   final alarmPlayer = AudioPlayer();
   final List<AudioPlayer> testPlayers = [];
+  double? originalVolume;
 
   AlarmsCN({required this.t1d, required this.settings}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
 
-    settings.addListener(() {
+    settings.addListener(() async {
       checkAlarms();
+      await stopAllTestAlarms();
     });
 
     t1d.addListener(() {
@@ -131,6 +133,7 @@ class AlarmsCN extends ChangeNotifier {
   void stopAlarm(AudioPlayer player) {
     if (player.state == PlayerState.playing) {
       player.stop();
+      resetOriginalVolume();
     }
   }
 
@@ -169,65 +172,99 @@ class AlarmsCN extends ChangeNotifier {
 
   Future<void> playAlarmWithoutOverrideWithProgression(
       AudioPlayer player) async {
-    print("playAlarmWithoutOverrideWithProgression");
-
     var progressionSeconds = settings.alarmSettings.volumeProgressionSeconds;
 
     await player.play(AssetSource(alarmFile), volume: 0);
 
-    for (var i = 0; i < 100; i++) {
+    for (var i = 1; i < 100; i++) {
       if (player.state != PlayerState.playing) {
         return;
       }
-      var wait = ((progressionSeconds / 100) * 1000).toInt();
-      print(wait);
+      var wait = (progressionSeconds * 1000) ~/ 100;
+
       await Future.delayed(Duration(milliseconds: wait));
       var volume = i / 99;
-      print(volume);
       await player.setVolume(volume);
     }
   }
 
   Future<void> playAlarmWithOverrideWithoutProgression(
       AudioPlayer player) async {
-    await FlutterVolumeController.setVolume(
-        settings.alarmSettings.volumeOverrideValue / 100);
+    originalVolume = await FlutterVolumeController.getVolume();
+    var volumeOverride = settings.alarmSettings.volumeOverrideValue;
+
+    await FlutterVolumeController.setVolume(volumeOverride / 100);
 
     return player.play(AssetSource(alarmFile));
   }
 
   Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
-    await FlutterVolumeController.setVolume(
-        0.3 * settings.alarmSettings.volumeOverrideValue / 100);
+    var finalVolume = settings.alarmSettings.volumeOverrideValue;
+    var progressionSeconds = settings.alarmSettings.volumeProgressionSeconds;
 
-    return player
-        .play(AssetSource(alarmFile))
-        .then((v) => Future.delayed(const Duration(seconds: 5)))
-        .then((v) => FlutterVolumeController.setVolume(
-            0.5 * settings.alarmSettings.volumeOverrideValue / 100))
-        .then((v) => Future.delayed(const Duration(seconds: 5)))
-        .then((v) => FlutterVolumeController.setVolume(
-            settings.alarmSettings.volumeOverrideValue / 100));
-  }
+    originalVolume = await FlutterVolumeController.getVolume();
 
-  Future<void> stopAllTestAlarms() async {
-    if (testPlayers.isNotEmpty) {
-      for (var element in testPlayers) {
-        element.stop();
+    await FlutterVolumeController.setVolume(0);
+
+    await player.play(AssetSource(alarmFile));
+
+    for (var i = 1; i < 100; i++) {
+      if (player.state != PlayerState.playing) {
+        return;
       }
-      testPlayers.clear();
-      return;
+      var wait = (progressionSeconds * 1000) ~/ 100;
+
+      await Future.delayed(Duration(milliseconds: wait));
+      var volume = (i / 99) * (finalVolume / 100);
+      if (player.state != PlayerState.playing) {
+        return;
+      }
+
+      await FlutterVolumeController.setVolume(volume);
     }
   }
 
+  void resetOriginalVolume() {
+    if (originalVolume != null) {
+      print("reset oriignal volume to $originalVolume");
+      FlutterVolumeController.setVolume(originalVolume!);
+    }
+    originalVolume = null;
+  }
+
+  bool stopAllTestAlarmsNow = false;
+  Future<bool> stopAllTestAlarms() async {
+    if (stopAllTestAlarmsNow) {
+      return false; // A stupid way of forcing this method to be only called once concurrently
+    }
+    stopAllTestAlarmsNow = true;
+    if (testPlayers.isNotEmpty) {
+      for (var element in testPlayers) {
+        await element.stop();
+      }
+      testPlayers.clear();
+      resetOriginalVolume();
+      settings.alarmSettings.testAlarmPlaying = false;
+      stopAllTestAlarmsNow = false;
+      return true;
+    }
+    stopAllTestAlarmsNow = false;
+    return false;
+  }
+
   Future<void> testAlarm() async {
-    stopAllTestAlarms();
+    if (await stopAllTestAlarms()) {
+      return;
+    }
+
+    settings.alarmSettings.testAlarmPlaying = true;
     // This is to make sure that
     var tp = AudioPlayer();
     testPlayers.add(tp);
     await playAlarm(tp);
-    await Future.delayed(const Duration(seconds: 60));
-    stopAlarm(tp);
+    await Future.delayed(
+        const Duration(seconds: 60)); // set a max limit so at least they die
+    stopAllTestAlarms();
   }
 
   Set<Alarms> filterAlarms(Set<Alarms> alarms) {

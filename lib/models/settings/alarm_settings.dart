@@ -63,6 +63,9 @@ class AlarmSettings {
   int _volumeOverrideValue = 50;
   int _volumeProgressionSeconds = 2;
 
+  // ephemeral properters
+  bool _testAlarmPlaying = false;
+
   AlarmSettings({required this.prefs, required this.settings});
 
   void populate() {
@@ -137,6 +140,12 @@ class AlarmSettings {
     }
 
     // volume
+    var volumeOveridePref =
+        prefs.getBool(AlarmSettingsNames.volumeOveride.name);
+    if (volumeOveridePref != null) {
+      _volumeOveride = volumeOveridePref;
+    }
+
     var volumeOverrideValuePref =
         prefs.getInt(AlarmSettingsNames.volumeOverrideValue.name);
     if (volumeOverrideValuePref != null) {
@@ -338,6 +347,12 @@ class AlarmSettings {
 
     prefs.setInt(AlarmSettingsNames.volumeProgressionSeconds.name, value);
     _volumeProgressionSeconds = value;
+    settings.notify();
+  }
+
+  bool get testAlarmPlaying => _testAlarmPlaying;
+  set testAlarmPlaying(bool value) {
+    _testAlarmPlaying = value;
     settings.notify();
   }
 }

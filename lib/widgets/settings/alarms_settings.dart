@@ -35,7 +35,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           volumeOverride(context, alarmSettings),
           volumeSettings(context, alarmSettings),
           progressiveVolume(context, alarmSettings),
-          testAlert(context, alarms),
+          testAlert(context, alarmSettings, alarms),
         ],
       );
     });
@@ -461,8 +461,14 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
-  SettingsTile testAlert(BuildContext context, AlarmsCN alarms) {
+  SettingsTile testAlert(
+      BuildContext context, AlarmSettings settings, AlarmsCN alarms) {
     double width = MediaQuery.of(context).size.width;
+
+    String text = "Test Alarm";
+    if (settings.testAlarmPlaying) {
+      text = "Stop Test";
+    }
 
     return SettingsTile(
         title: const Text(""),
@@ -473,7 +479,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                 onPressed: () async {
                   await alarms.testAlarm();
                 },
-                child: const Text("Test Alert"),
+                child: Text(text),
               ),
             )));
   }
