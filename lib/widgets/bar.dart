@@ -251,16 +251,13 @@ class IosStyleToast extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: DefaultTextStyle(
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium!
-            .copyWith(color: Colors.white),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-              child: Container(
+    return DefaultTextStyle(
+      style:
+          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+      child: SafeArea(
+        child: Align(
+          alignment: const Alignment(-0.7, 0.7),
+          child: Container(
             color: Colors.black,
             height: 150,
             width: 150,
@@ -268,7 +265,7 @@ class IosStyleToast extends StatelessWidget {
               title: "Alarms",
               child: Text(str),
             ),
-          )),
+          ),
         ),
       ),
     );
@@ -279,9 +276,7 @@ class CustomAnimationToast extends StatelessWidget {
   final double value;
 
   static final Tween<Offset> tweenOffset =
-      Tween<Offset>(begin: const Offset(0, 10), end: const Offset(0, 0));
-
-  static final Tween<double> tweenOpacity = Tween<double>(begin: 0, end: 1);
+      Tween<Offset>(begin: const Offset(-200, 0), end: const Offset(0, 0));
 
   final String str;
   const CustomAnimationToast(
@@ -291,10 +286,7 @@ class CustomAnimationToast extends StatelessWidget {
   Widget build(BuildContext context) {
     return Transform.translate(
       offset: tweenOffset.transform(value),
-      child: Opacity(
-        opacity: tweenOpacity.transform(value),
-        child: IosStyleToast(str: str),
-      ),
+      child: IosStyleToast(str: str),
     );
   }
 }

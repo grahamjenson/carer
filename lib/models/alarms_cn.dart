@@ -1,22 +1,12 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:carer/models/alarms/alarms.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
-import 'package:carer/utils/math.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
-
-enum Alarms {
-  targetVeryLow,
-  targetLow,
-  targetHigh,
-  targetVeryHigh,
-
-  diffVeryLow,
-  diffVeryHigh,
-}
 
 const se = SetEquality();
 
@@ -26,9 +16,11 @@ class AlarmsCN extends ChangeNotifier {
 
   static const String alarmFile = "alarm.mp3";
 
-  final Set<Alarms> _triggeredAlarms = <Alarms>{};
-  Set<Alarms> get triggeredAlarms => _triggeredAlarms;
-  set triggeredAlarms(Set<Alarms> value) {
+  late final Set<Alarm> allAlarms;
+
+  final Set<Alarm> _triggeredAlarms = <Alarm>{};
+  Set<Alarm> get triggeredAlarms => _triggeredAlarms;
+  set triggeredAlarms(Set<Alarm> value) {
     if (se.equals(value, _triggeredAlarms)) {
       return;
     }
@@ -37,14 +29,14 @@ class AlarmsCN extends ChangeNotifier {
     notifyListeners();
   }
 
-  final Set<Alarms> _alarms = <Alarms>{};
-  Set<Alarms> get alarms => _alarms;
-  set alarms(Set<Alarms> value) {
-    if (se.equals(value, _alarms)) {
+  final Set<Alarm> _activeAlarms = <Alarm>{};
+  Set<Alarm> get activeAlarms => _activeAlarms;
+  set activeAlarms(Set<Alarm> value) {
+    if (se.equals(value, _activeAlarms)) {
       return;
     }
-    _alarms.clear();
-    _alarms.addAll(value);
+    _activeAlarms.clear();
+    _activeAlarms.addAll(value);
     notifyListeners();
   }
 
@@ -54,6 +46,10 @@ class AlarmsCN extends ChangeNotifier {
   set sleepUntil(DateTime value) {
     _sleepUntil = value;
     notifyListeners();
+  }
+
+  bool get sleeping {
+    return sleepDuration.inSeconds <= 0;
   }
 
   Duration get sleepDuration => _sleepUntil.difference(DateTime.now());
@@ -67,6 +63,16 @@ class AlarmsCN extends ChangeNotifier {
   double? originalVolume;
 
   AlarmsCN({required this.t1d, required this.settings}) {
+    allAlarms = {
+      UrgentLowAlarm(settings: settings, t1d: t1d),
+      LowAlarm(settings: settings, t1d: t1d),
+      HighAlarm(settings: settings, t1d: t1d),
+      UrgentHighAlarm(settings: settings, t1d: t1d),
+      //
+      FastDropAlarm(settings: settings, t1d: t1d),
+      FastRiseAlarm(settings: settings, t1d: t1d),
+    };
+
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
 
     settings.addListener(() async {
@@ -80,50 +86,29 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   void checkAlarms() {
-    var newAlarms = <Alarms>{};
+    var newTriggeredAlarms = <Alarm>{};
+    var newActiveAlarms = <Alarm>{};
 
-    switch (t1d.targetRange5) {
-      case Range5.veryLow:
-        newAlarms.add(Alarms.targetVeryLow);
-        break;
-      case Range5.low:
-        newAlarms.add(Alarms.targetLow);
-        break;
-      case Range5.high:
-        newAlarms.add(Alarms.targetHigh);
-        break;
-      case Range5.veryHigh:
-        newAlarms.add(Alarms.targetVeryHigh);
-        break;
-      default:
-        break;
-    }
+    for (var alarm in allAlarms) {
+      var triggered = alarm.trigger();
+      var active = alarm.active();
+      // Build the lists
 
-    switch (t1d.diffRange7) {
-      case Range7.veryVeryLow:
-        newAlarms.add(Alarms.diffVeryLow);
-        break;
-      case Range7.veryLow:
-        newAlarms.add(Alarms.diffVeryLow);
-        break;
-      case Range7.veryHigh:
-        newAlarms.add(Alarms.diffVeryHigh);
-        break;
-      case Range7.veryVeryHigh:
-        newAlarms.add(Alarms.diffVeryHigh);
-        break;
-      default:
-        break;
+      if (triggered) {
+        newTriggeredAlarms.add(alarm);
+      }
+      // If Sleeping do not add
+      if (triggered && active && sleeping) {
+        newActiveAlarms.add(alarm);
+      }
     }
 
     // Set alarms that have been triggered
-    triggeredAlarms = newAlarms;
-
-    alarms = filterAlarms(newAlarms);
+    triggeredAlarms = newTriggeredAlarms;
+    activeAlarms = newActiveAlarms;
 
     // Set alarms
-
-    if (alarms.isEmpty) {
+    if (activeAlarms.isEmpty) {
       stopAlarm(alarmPlayer);
     } else {
       playAlarm(alarmPlayer);
@@ -226,7 +211,6 @@ class AlarmsCN extends ChangeNotifier {
 
   void resetOriginalVolume() {
     if (originalVolume != null) {
-      print("reset oriignal volume to $originalVolume");
       FlutterVolumeController.setVolume(originalVolume!);
     }
     originalVolume = null;
@@ -265,32 +249,5 @@ class AlarmsCN extends ChangeNotifier {
     await Future.delayed(
         const Duration(seconds: 60)); // set a max limit so at least they die
     stopAllTestAlarms();
-  }
-
-  Set<Alarms> filterAlarms(Set<Alarms> alarms) {
-    if (sleepDuration.inSeconds > 0) {
-      // We are sleeping, no alarms right now
-      alarms.clear();
-      return alarms;
-    }
-
-    if (!settings.alarmSettings.highAlarm) {
-      alarms.remove(Alarms.targetHigh);
-      alarms.remove(Alarms.targetVeryHigh);
-    }
-
-    if (!settings.alarmSettings.lowAlarm) {
-      alarms.remove(Alarms.targetLow);
-      alarms.remove(Alarms.targetVeryLow);
-    }
-
-    if (!settings.alarmSettings.fastRiseAlarm) {
-      alarms.remove(Alarms.diffVeryHigh);
-    }
-
-    if (!settings.alarmSettings.fastDropAlarm) {
-      alarms.remove(Alarms.diffVeryLow);
-    }
-    return alarms;
   }
 }

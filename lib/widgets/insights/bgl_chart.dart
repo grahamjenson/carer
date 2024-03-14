@@ -257,7 +257,6 @@ class BGLChart extends StatelessWidget {
             }
 
             if (spot is BasalSpot) {
-              print("FJSAOJFIOASIOF");
               var line = const FlLine(
                 color: Colors.transparent,
                 strokeWidth: 0,
