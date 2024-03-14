@@ -399,6 +399,9 @@ class AlarmSettings {
   // ephermeral
   bool get testAlarmPlaying => _testAlarmPlaying;
   set testAlarmPlaying(bool value) {
+    if (value == _testAlarmPlaying) {
+      return;
+    }
     _testAlarmPlaying = value;
     settings.notify();
   }

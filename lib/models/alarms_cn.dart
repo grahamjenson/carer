@@ -117,11 +117,13 @@ class AlarmsCN extends ChangeNotifier {
     }
   }
 
-  void stopAlarm(AudioPlayer player) {
+  Future<bool> stopAlarm(AudioPlayer player) async {
     if (player.state == PlayerState.playing) {
-      player.stop();
+      await player.stop();
       resetOriginalVolume();
+      return true;
     }
+    return false;
   }
 
   Future<void> playAlarm(AudioPlayer player) async {
@@ -217,13 +219,11 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   Future<bool> stopTestAlarm() async {
-    if (testPlayer.state == PlayerState.playing) {
-      await testPlayer.stop();
+    var stopped = await stopAlarm(testPlayer);
+    if (stopped) {
       settings.alarmSettings.testAlarmPlaying = false;
-      return true;
     }
-
-    return false;
+    return stopped;
   }
 
   Future<void> testAlarm() async {

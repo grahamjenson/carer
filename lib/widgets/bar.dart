@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/pages/settingspage.dart';
@@ -276,16 +278,20 @@ class CustomAnimationToast extends StatelessWidget {
   final double value;
 
   static final Tween<Offset> tweenOffset =
-      Tween<Offset>(begin: const Offset(-200, 0), end: const Offset(0, 0));
+      Tween<Offset>(begin: const Offset(-400, 0), end: const Offset(0, 0));
 
   final String str;
   const CustomAnimationToast(
       {super.key, required this.value, required this.str});
 
+  double logTransform(double value, {double base = 20}) {
+    return log((base - 1) * value + 1) / log(base);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
-      offset: tweenOffset.transform(value),
+      offset: tweenOffset.transform(logTransform(value)),
       child: IosStyleToast(str: str),
     );
   }

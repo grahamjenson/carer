@@ -480,7 +480,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           settings.alarmAsset == AlarmSounds.hybridas,
         ],
         onPressed: (int index) {
-          PredictionAlgorithm value = PredictionAlgorithm.none;
           switch (index) {
             case 0:
               settings.alarmAsset = AlarmSounds.nightguard;
