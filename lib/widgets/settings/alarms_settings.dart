@@ -35,6 +35,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           volumeOverride(context, alarmSettings),
           volumeSettings(context, alarmSettings),
           progressiveVolume(context, alarmSettings),
+          alarmFileSelect(alarmSettings),
           testAlert(context, alarmSettings, alarms),
         ],
       );
@@ -455,6 +456,58 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             text: "2m",
             height: _size,
             width: _size,
+          ),
+        ],
+      ),
+    );
+  }
+
+  SettingsTile alarmFileSelect(AlarmSettings settings) {
+    return SettingsTile(
+      title: const Text("Alarm Sound"),
+      descriptionInlineIos: true,
+      trailing: ToggleButtons(
+        constraints: const BoxConstraints(
+          maxHeight: _size,
+          maxWidth: _size * 1.5,
+        ),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 4,
+        isSelected: [
+          settings.alarmAsset == AlarmSounds.nightguard,
+          settings.alarmAsset == AlarmSounds.letsgo,
+          settings.alarmAsset == AlarmSounds.hybridas,
+        ],
+        onPressed: (int index) {
+          PredictionAlgorithm value = PredictionAlgorithm.none;
+          switch (index) {
+            case 0:
+              settings.alarmAsset = AlarmSounds.nightguard;
+              break;
+            case 1:
+              settings.alarmAsset = AlarmSounds.letsgo;
+              break;
+            case 2:
+              settings.alarmAsset = AlarmSounds.hybridas;
+              break;
+          }
+        },
+        children: const [
+          ToggleButton(
+            text: "NightGuard",
+            height: _size,
+            width: _size * 1.5,
+          ),
+          ToggleButton(
+            text: "Lets Go",
+            height: _size,
+            width: _size * 1.5,
+          ),
+          ToggleButton(
+            text: "Hybridas",
+            height: _size,
+            width: _size * 1.5,
           ),
         ],
       ),

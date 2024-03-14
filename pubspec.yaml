@@ -74,8 +74,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/bgl.svg
     - assets/alarm.mp3
+    - assets/letsgo.mp3
+    - assets/hybridas.mp3
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

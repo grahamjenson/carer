@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/models/alarms/alarms.dart';
+import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
 import 'package:collection/collection.dart';
@@ -13,8 +14,8 @@ const se = SetEquality();
 class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
   Settings settings;
-
-  static const String alarmFile = "alarm.mp3";
+  AlarmSettings get alarmSettings => settings.alarmSettings;
+  String get alarmFile => alarmSettings.alarmAsset.asset;
 
   late final Set<Alarm> allAlarms;
 
@@ -59,7 +60,8 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   final alarmPlayer = AudioPlayer();
-  final List<AudioPlayer> testPlayers = [];
+  final testPlayer = AudioPlayer();
+
   double? originalVolume;
 
   AlarmsCN({required this.t1d, required this.settings}) {
@@ -77,7 +79,7 @@ class AlarmsCN extends ChangeNotifier {
 
     settings.addListener(() async {
       checkAlarms();
-      await stopAllTestAlarms();
+      await stopTestAlarm();
     });
 
     t1d.addListener(() {
@@ -127,10 +129,8 @@ class AlarmsCN extends ChangeNotifier {
       return;
     }
 
-    var override = settings.alarmSettings.volumeOveride;
-    var progression = settings.alarmSettings.volumeProgressionSeconds != -1;
-    var progressionMinutes = settings.alarmSettings.volumeProgressionSeconds;
-    var finalVolume = settings.alarmSettings.volumeOverrideValue;
+    var override = alarmSettings.volumeOveride;
+    var progression = alarmSettings.volumeProgressionSeconds != -1;
 
     // TODO: Check if the system supports override (e.g. web), if not set to false
 
@@ -157,7 +157,7 @@ class AlarmsCN extends ChangeNotifier {
 
   Future<void> playAlarmWithoutOverrideWithProgression(
       AudioPlayer player) async {
-    var progressionSeconds = settings.alarmSettings.volumeProgressionSeconds;
+    var progressionSeconds = alarmSettings.volumeProgressionSeconds;
 
     await player.play(AssetSource(alarmFile), volume: 0);
 
@@ -216,38 +216,23 @@ class AlarmsCN extends ChangeNotifier {
     originalVolume = null;
   }
 
-  bool stopAllTestAlarmsNow = false;
-  Future<bool> stopAllTestAlarms() async {
-    if (stopAllTestAlarmsNow) {
-      return false; // A stupid way of forcing this method to be only called once concurrently
-    }
-    stopAllTestAlarmsNow = true;
-    if (testPlayers.isNotEmpty) {
-      for (var element in testPlayers) {
-        await element.stop();
-      }
-      testPlayers.clear();
-      resetOriginalVolume();
+  Future<bool> stopTestAlarm() async {
+    if (testPlayer.state == PlayerState.playing) {
+      await testPlayer.stop();
       settings.alarmSettings.testAlarmPlaying = false;
-      stopAllTestAlarmsNow = false;
       return true;
     }
-    stopAllTestAlarmsNow = false;
+
     return false;
   }
 
   Future<void> testAlarm() async {
-    if (await stopAllTestAlarms()) {
+    if (await stopTestAlarm()) {
       return;
     }
 
     settings.alarmSettings.testAlarmPlaying = true;
     // This is to make sure that
-    var tp = AudioPlayer();
-    testPlayers.add(tp);
-    await playAlarm(tp);
-    await Future.delayed(
-        const Duration(seconds: 60)); // set a max limit so at least they die
-    stopAllTestAlarms();
+    await playAlarm(testPlayer);
   }
 }

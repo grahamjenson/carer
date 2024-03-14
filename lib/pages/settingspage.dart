@@ -18,7 +18,7 @@ class SettingsPage extends StatelessWidget {
         onPopInvoked: (bool didPop) {
           print(didPop);
           if (didPop) {
-            alarms.stopAllTestAlarms();
+            alarms.stopTestAlarm();
           }
         },
         child: Scaffold(

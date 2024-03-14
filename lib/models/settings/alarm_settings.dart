@@ -30,6 +30,36 @@ enum AlarmSettingsNames {
 
 enum PredictionAlgorithm { none, simple, profile }
 
+enum AlarmSounds { nightguard, letsgo, hybridas }
+
+extension AlarmSoundsExtension on AlarmSounds {
+  String get name {
+    switch (this) {
+      case AlarmSounds.nightguard:
+        return 'Nightguard';
+      case AlarmSounds.letsgo:
+        return 'Lets Go';
+      case AlarmSounds.hybridas:
+        return 'Hybridas';
+      default:
+        return 'Nightguard';
+    }
+  }
+
+  String get asset {
+    switch (this) {
+      case AlarmSounds.nightguard:
+        return 'alarm.mp3';
+      case AlarmSounds.letsgo:
+        return 'letsgo.mp3';
+      case AlarmSounds.hybridas:
+        return 'hybridas.mp3';
+      default:
+        return 'alarm.mp3';
+    }
+  }
+}
+
 class AlarmSettings {
   SharedPreferences prefs;
   Settings settings;
@@ -62,6 +92,8 @@ class AlarmSettings {
   bool _volumeOveride = false;
   int _volumeOverrideValue = 50;
   int _volumeProgressionSeconds = 2;
+
+  AlarmSounds _alarmAsset = AlarmSounds.nightguard;
 
   // ephemeral properters
   bool _testAlarmPlaying = false;
@@ -156,6 +188,13 @@ class AlarmSettings {
         prefs.getInt(AlarmSettingsNames.volumeProgressionSeconds.name);
     if (volumeProgressionSecondsPref != null) {
       _volumeProgressionSeconds = volumeProgressionSecondsPref;
+    }
+
+    var alarmAssetPref = prefs.getString('alarmAsset');
+    if (alarmAssetPref != null) {
+      _alarmAsset = AlarmSounds.values.firstWhere(
+          (e) => e.name == alarmAssetPref,
+          orElse: () => AlarmSounds.nightguard);
     }
   }
 
@@ -350,6 +389,14 @@ class AlarmSettings {
     settings.notify();
   }
 
+  AlarmSounds get alarmAsset => _alarmAsset;
+  set alarmAsset(AlarmSounds value) {
+    prefs.setString('alarmAsset', value.name);
+    _alarmAsset = value;
+    settings.notify();
+  }
+
+  // ephermeral
   bool get testAlarmPlaying => _testAlarmPlaying;
   set testAlarmPlaying(bool value) {
     _testAlarmPlaying = value;
