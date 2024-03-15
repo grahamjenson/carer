@@ -89,8 +89,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               width: _size,
               icon: Icons.touch_app_outlined,
               onLongPress: () async {
-                var lowMinutes = await alertDialogOfButtons<int>(context,
-                    "Alert Low for:", ["15m", "20m", "30m"], [15, 20, 30]);
+                var lowMinutes = await alertDialogOfButtons<int>(
+                    context,
+                    "Alert Low for:",
+                    ["0m", "5m", "10m", "15m", "20m", "30m"],
+                    [0, 5, 10, 15, 20, 30]);
                 settings.lowMinutes = lowMinutes;
               }),
           ToggleButton(
@@ -99,8 +102,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               width: _size,
               icon: Icons.touch_app_outlined,
               onLongPress: () async {
-                var highMinutes = await alertDialogOfButtons<int>(context,
-                    "Alert High for:", ["15m", "20m", "30m"], [15, 20, 30]);
+                var highMinutes = await alertDialogOfButtons<int>(
+                    context,
+                    "Alert High for:",
+                    ["0m", "5m", "10m", "15m", "20m", "30m"],
+                    [0, 5, 10, 15, 20, 30]);
                 settings.highMinutes = highMinutes;
               }),
           const ToggleButton(

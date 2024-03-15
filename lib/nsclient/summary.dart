@@ -572,6 +572,10 @@ class Summary {
     return DateTime.now().difference(dateRetrieved).inSeconds;
   }
 
+  List<SGV> sgvsLastMins(int mins) {
+    return sgvs.lastMins(mins);
+  }
+
   (TimeValue?, TempBasal?) basalAtTime(DateTime date) {
     var tempBasal = tempBasals.atDate(date);
     var basal = profile.basal.atDate(date);

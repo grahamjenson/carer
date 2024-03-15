@@ -6,16 +6,19 @@ import 'dart:async';
 
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
+import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 
 class T1DCN extends ChangeNotifier {
   Settings settings;
   SummaryCN summaryCn;
+  Summary get summary => summaryCn.summary;
 
   // Target information
   Range5 targetRange5 = Range5.mid;
   double targetRange5Proportion = 0.0;
+  final List<Range5> targetRangesPerMinute = [];
 
   // Diff information
   Range7 diffRange7 = Range7.mid;
@@ -36,7 +39,7 @@ class T1DCN extends ChangeNotifier {
   }
 
   void summaryAgeMissedDataError() {
-    summaryAgeInMinutes = summaryCn.summary.ageInSeconds() / 60;
+    summaryAgeInMinutes = summary.ageInSeconds() / 60;
     if (summaryAgeInMinutes > 5.5) {
       oldSummary = true;
     } else {
@@ -45,9 +48,16 @@ class T1DCN extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<Range5> targetRange5ForMins(int minutes) {
+    return summary.sgvsLastMins(minutes).map((e) {
+      var (t, _) = targetRange(settings, e.sgv);
+      return t;
+    }).toList();
+  }
+
   void checkSummary() {
-    var lastSGV = summaryCn.summary.lastSGV;
-    var delta = summaryCn.summary.delta;
+    var lastSGV = summary.lastSGV;
+    var delta = summary.delta;
     if (lastSGV == null || delta == null) {
       return;
     }

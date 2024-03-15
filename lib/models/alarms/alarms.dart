@@ -1,9 +1,11 @@
+import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/utils/math.dart';
 
 abstract class Alarm {
   final Settings settings;
+  AlarmSettings get alarmSettings => settings.alarmSettings;
   final T1DCN t1d;
 
   const Alarm({required this.settings, required this.t1d});
@@ -31,7 +33,7 @@ class UrgentLowAlarm extends Alarm {
 
   @override
   bool active() {
-    return settings.alarmSettings.urgentLowAlarm;
+    return alarmSettings.urgentLowAlarm;
   }
 }
 
@@ -42,16 +44,26 @@ class LowAlarm extends Alarm {
   String get name => 'Low Alarm';
 
   @override
-  String get description => 'Triggers when BGL is below the low target';
+  String get description =>
+      'Triggers when all BGLs for a time period are below the low target';
 
   @override
   bool trigger() {
-    return t1d.targetRange5 == Range5.low;
+    var latest =
+        t1d.targetRange5 == Range5.low || t1d.targetRange5 == Range5.veryLow;
+    if (!latest) {
+      return false;
+    }
+    List<Range5> targets = t1d.targetRange5ForMins(alarmSettings.lowMinutes);
+    if (targets.isEmpty) {
+      return true;
+    }
+    return targets.every((e) => e == Range5.low || e == Range5.veryLow);
   }
 
   @override
   bool active() {
-    return settings.alarmSettings.lowAlarm;
+    return alarmSettings.lowAlarm;
   }
 }
 
@@ -62,16 +74,26 @@ class HighAlarm extends Alarm {
   String get name => 'High Alarm';
 
   @override
-  String get description => 'Triggers when BGL is above the high target';
+  String get description =>
+      'Triggers when all BGLs for a time period are above the high target';
 
   @override
   bool trigger() {
-    return t1d.targetRange5 == Range5.high;
+    var latest =
+        t1d.targetRange5 == Range5.high || t1d.targetRange5 == Range5.veryHigh;
+    if (!latest) {
+      return false;
+    }
+    List<Range5> targets = t1d.targetRange5ForMins(alarmSettings.highMinutes);
+    if (targets.isEmpty) {
+      return true;
+    }
+    return targets.every((e) => e == Range5.high || e == Range5.veryHigh);
   }
 
   @override
   bool active() {
-    return settings.alarmSettings.highAlarm;
+    return alarmSettings.highAlarm;
   }
 }
 
@@ -91,7 +113,7 @@ class UrgentHighAlarm extends Alarm {
 
   @override
   bool active() {
-    return settings.alarmSettings.urgentHighAlarm;
+    return alarmSettings.urgentHighAlarm;
   }
 }
 
@@ -112,7 +134,7 @@ class FastRiseAlarm extends Alarm {
 
   @override
   bool active() {
-    return settings.alarmSettings.fastRiseAlarm;
+    return alarmSettings.fastRiseAlarm;
   }
 }
 
@@ -133,6 +155,6 @@ class FastDropAlarm extends Alarm {
 
   @override
   bool active() {
-    return settings.alarmSettings.fastDropAlarm;
+    return alarmSettings.fastDropAlarm;
   }
 }
