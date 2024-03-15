@@ -16,7 +16,6 @@ class SettingsPage extends StatelessWidget {
     return Consumer<AlarmsCN>(builder: (context, alarms, child) {
       return PopScope(
         onPopInvoked: (bool didPop) {
-          print(didPop);
           if (didPop) {
             alarms.stopTestAlarm();
           }

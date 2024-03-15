@@ -61,6 +61,10 @@ class AlarmsCN extends ChangeNotifier {
 
   final alarmPlayer = AudioPlayer();
   final testPlayer = AudioPlayer();
+  final audioContext = const AudioContext(
+    android: AudioContextAndroid(),
+    iOS: AudioContextIOS(),
+  );
 
   double? originalVolume;
 
@@ -152,16 +156,24 @@ class AlarmsCN extends ChangeNotifier {
     }
   }
 
+  Future<void> playerPlay(AudioPlayer player, {double? volume}) {
+    return player.play(
+      AssetSource(alarmFile),
+      ctx: audioContext,
+      volume: volume,
+    );
+  }
+
   Future<void> playAlarmWithoutOverrideWithoutProgression(
       AudioPlayer player) async {
-    return player.play(AssetSource(alarmFile));
+    return playerPlay(player);
   }
 
   Future<void> playAlarmWithoutOverrideWithProgression(
       AudioPlayer player) async {
     var progressionSeconds = alarmSettings.volumeProgressionSeconds;
 
-    await player.play(AssetSource(alarmFile), volume: 0);
+    await playerPlay(player, volume: 0);
 
     for (var i = 1; i < 100; i++) {
       if (player.state != PlayerState.playing) {
@@ -182,7 +194,7 @@ class AlarmsCN extends ChangeNotifier {
 
     await FlutterVolumeController.setVolume(volumeOverride / 100);
 
-    return player.play(AssetSource(alarmFile));
+    return playerPlay(player);
   }
 
   Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
@@ -193,7 +205,7 @@ class AlarmsCN extends ChangeNotifier {
 
     await FlutterVolumeController.setVolume(0);
 
-    await player.play(AssetSource(alarmFile));
+    await playerPlay(player);
 
     for (var i = 1; i < 100; i++) {
       if (player.state != PlayerState.playing) {

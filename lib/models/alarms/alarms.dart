@@ -106,7 +106,8 @@ class FastRiseAlarm extends Alarm {
 
   @override
   bool trigger() {
-    return t1d.diffRange7 == Range7.high;
+    return t1d.diffRange7 == Range7.veryHigh ||
+        t1d.diffRange7 == Range7.veryVeryHigh;
   }
 
   @override
@@ -126,7 +127,8 @@ class FastDropAlarm extends Alarm {
 
   @override
   bool trigger() {
-    return t1d.diffRange7 == Range7.low;
+    return t1d.diffRange7 == Range7.veryLow ||
+        t1d.diffRange7 == Range7.veryVeryLow;
   }
 
   @override
