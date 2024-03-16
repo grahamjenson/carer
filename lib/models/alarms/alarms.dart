@@ -41,7 +41,7 @@ class LowAlarm extends Alarm {
   const LowAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'Low Alarm';
+  String get name => 'Low Alarm ${alarmSettings.lowMinutes}m';
 
   @override
   String get description =>
@@ -71,7 +71,7 @@ class HighAlarm extends Alarm {
   const HighAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'High Alarm';
+  String get name => 'High Alarm ${alarmSettings.highMinutes}m';
 
   @override
   String get description =>
@@ -121,7 +121,7 @@ class FastRiseAlarm extends Alarm {
   const FastRiseAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'Fast Rise Alarm';
+  String get name => 'Fast Rise Alarm ${alarmSettings.fastRiseAlarmMinutes}';
 
   @override
   String get description => 'Triggers when BGL is rising quickly';
@@ -142,7 +142,7 @@ class FastDropAlarm extends Alarm {
   const FastDropAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'Fast Drop Alarm';
+  String get name => 'Fast Drop Alarm ${alarmSettings.fastDropAlarmMinutes}';
 
   @override
   String get description => 'Triggers when BGL is dropping quickly';
