@@ -122,6 +122,11 @@ class SGV {
         return (sgv / MGtoMMOL).toStringAsFixed(1);
     }
   }
+
+  @override
+  String toString() {
+    return "SGV: $sgv@${mills.hour}:${mills.minute}";
+  }
 }
 
 abstract class ATreatment {
@@ -589,31 +594,5 @@ class Summary {
     var profileTargetHigh = profile.targetHigh.atDate(date);
 
     return (profileTargetLow, profileTargetHigh, temptarget);
-  }
-
-  // return a list of tempBasals treatments and targets in order
-  List<ATreatment> history() {
-    List<ATreatment> history = [];
-
-    // add the tempBasals
-    history.addAll(tempBasals.tempBasals);
-
-    // add the treatments
-    history.addAll(treatments.treatments);
-
-    // add the targets
-    history.addAll(targets.targets);
-
-    // sort the history by date
-    history.sort((a, b) => b.date.compareTo(a.date));
-
-    // filter history to items that only happend in late 6 hours
-    history = history
-        .where((element) => element.date.isAfter(DateTime.now().subtract(
-              const Duration(hours: 24),
-            )))
-        .toList();
-
-    return history;
   }
 }
