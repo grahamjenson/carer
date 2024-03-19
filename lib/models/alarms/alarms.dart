@@ -128,8 +128,16 @@ class FastRiseAlarm extends Alarm {
 
   @override
   bool trigger() {
+    // Dont trigger if High or Very High, fast drop when high is what we want
+    if (t1d.targetRange5 == Range5.low || t1d.targetRange5 == Range5.veryLow) {
+      return false;
+    }
+
     // Get the diffs for the last n minutes and make sure they are all above the set delta
     var diffs = t1d.diffPer5Minute(alarmSettings.fastRiseAlarmMinutes);
+    if (diffs.isEmpty) {
+      return false;
+    }
     if (diffs.every((element) => element > alarmSettings.fastRiseAlarmDelta)) {
       return true;
     }
@@ -153,8 +161,18 @@ class FastDropAlarm extends Alarm {
 
   @override
   bool trigger() {
+    // Dont trigger if High or Very High, fast drop when high is what we want
+    if (t1d.targetRange5 == Range5.high ||
+        t1d.targetRange5 == Range5.veryHigh) {
+      return false;
+    }
+
     // Get the diffs for the last n minutes and make sure they are all below the set delta
     var diffs = t1d.diffPer5Minute(alarmSettings.fastDropAlarmMinutes);
+    if (diffs.isEmpty) {
+      return false;
+    }
+
     if (diffs.every((element) => element < -alarmSettings.fastDropAlarmDelta)) {
       return true;
     }

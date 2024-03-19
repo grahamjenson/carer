@@ -150,13 +150,6 @@ Future<int?> openSleepDialog(BuildContext context) {
   const List<int> timeTimes = [6, 7, 21, 22];
   const TextStyle textStyle = TextStyle(fontSize: 24, height: 0.5);
 
-  var cancelRow = TextButton.icon(
-    onPressed: () {
-      return Navigator.of(context).pop(0);
-    },
-    label: const Text("Cancel"),
-    icon: const Icon(Icons.cancel),
-  );
   var height = 80.0;
 
   var minutesRow = ToggleButtons(
@@ -239,7 +232,7 @@ Future<int?> openSleepDialog(BuildContext context) {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           // Generate 100 widgets that display their index in the List.
-          children: [minutesRow, hoursRow, timeRow, cancelRow],
+          children: [minutesRow, hoursRow, timeRow],
         ),
       ),
     ),

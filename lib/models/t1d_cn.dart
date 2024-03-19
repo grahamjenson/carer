@@ -57,8 +57,7 @@ class T1DCN extends ChangeNotifier {
 
   void checkSummary() {
     var lastSGV = summary.lastSGV;
-    var delta = summary.delta;
-    if (lastSGV == null || delta == null) {
+    if (lastSGV == null) {
       return;
     }
 
@@ -68,7 +67,7 @@ class T1DCN extends ChangeNotifier {
     targetRange5Proportion = trp;
 
     // Calculating Diff Range
-    var (dr, drp) = diffRange(lastSGV.sgv, delta.sgv);
+    var (dr, drp) = diffRange(lastSGV.sgv, lastSGV.diffPer5Mins);
     diffRange7 = dr;
     diffRange7Proportion = drp;
 
@@ -77,45 +76,12 @@ class T1DCN extends ChangeNotifier {
 
   //// Munging
 
-  // TODO test
-  List<SGV> cleanedSGVs(int minutes) {
-    var sgvs = summary.sgvsLastMins(minutes);
-
-    Duration minTimeDiff = const Duration(minutes: 1);
-
-    // There are a bunch of ways that there could be multiple SGVS witing a minute.
-    // e.g. when there ia a calibration, or a new sensor giving a close new reading
-    // This may lead to very strange results, like diffs nearing infinity
-    // So we remove that possibility by removing any SGVs that are within a minute of each other
-    List<SGV> cleanedSgvs = [];
-
-    for (int i = 1; i < sgvs.length; i++) {
-      var tbefore = sgvs[i - 1].mills;
-      var tafter = sgvs[i].mills;
-
-      if (tafter.difference(tbefore) >= minTimeDiff) {
-        cleanedSgvs.add(sgvs[i - 1]);
-      }
-    }
-    cleanedSgvs.add(sgvs.last);
-
-    return cleanedSgvs;
-  }
-
-  // TODO test
   List<int> diffPer5Minute(int minutes) {
     List<int> diffs = [];
-    // we assume that there is a linear difference between all the sgvs
-    var sgvs = cleanedSGVs(minutes);
-    for (int i = 0; i < sgvs.length - 1; i++) {
-      var first = sgvs[i];
-      var second = sgvs[i + 1];
-      var diff = first.sgv - second.sgv;
-      // This fun bit of code is meant to be here if there is no information available for a reading or two
-      var mins5 =
-          ((second.mills.difference(first.mills).inSeconds / 60) / 5).round();
-      var diffPerMin = (diff / mins5);
-      diffs.addAll(List.filled(mins5, diffPerMin.toInt()));
+    var sgvs = summary.sgvsLastMins(minutes);
+
+    for (var sgv in sgvs) {
+      diffs.add(sgv.diffPer5Mins);
     }
 
     return diffs;

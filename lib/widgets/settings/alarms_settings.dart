@@ -153,8 +153,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               text: "Fast Drop\n${settings.fastDropAlarmMinutes}m",
               icon: Icons.touch_app_outlined,
               onLongPress: () async {
-                var minutes = await alertDialogOfButtons<int>(context,
-                    "Alert Dropping for:", ["15m", "20m", "30m"], [15, 20, 30]);
+                var minutes = await alertDialogOfButtons<int>(
+                    context,
+                    "Alert Dropping for:",
+                    ["5m", "10m", "15m", "20m", "30m"],
+                    [5, 10, 15, 20, 30]);
                 settings.fastDropAlarmMinutes = minutes;
               }),
           ToggleButton(
@@ -163,8 +166,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             height: _size,
             width: _size,
             onLongPress: () async {
-              var minutes = await alertDialogOfButtons<int>(context,
-                  "Alert Rising for:", ["15m", "20m", "30m"], [15, 20, 30]);
+              var minutes = await alertDialogOfButtons<int>(
+                  context,
+                  "Alert Rising for:",
+                  ["5m", "10m", "15m", "20m", "30m"],
+                  [5, 10, 15, 20, 30]);
               settings.fastRiseAlarmMinutes = minutes;
             },
           ),

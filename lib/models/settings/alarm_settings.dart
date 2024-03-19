@@ -272,7 +272,7 @@ class AlarmSettings {
 
   int get fastDropAlarmMinutes => _fastDropAlarmMinutes;
   set fastDropAlarmMinutes(int value) {
-    var validValues = [15, 20, 30];
+    var validValues = [5, 10, 15, 20, 30];
     if (!validValues.contains(value)) {
       return;
     }
@@ -299,7 +299,7 @@ class AlarmSettings {
 
   int get fastRiseAlarmMinutes => _fastRiseAlarmMinutes;
   set fastRiseAlarmMinutes(int value) {
-    var validValues = [15, 20, 30];
+    var validValues = [5, 10, 15, 20, 30];
     if (!validValues.contains(value)) {
       return;
     }
