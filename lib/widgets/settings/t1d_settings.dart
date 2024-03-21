@@ -23,6 +23,13 @@ class T1DSettingsWidget extends AbstractSettingsSection {
       var uhighStr = unit.str(uhigh);
       var ulowStr = unit.str(ulow);
 
+      var deltaMin = 8;
+      var deltaMax = 36;
+      var drop = settings.alarmSettings.fastDropDelta;
+      var dropStr = unit.str(drop);
+      var rise = settings.alarmSettings.fastRiseDelta;
+      var riseStr = unit.str(rise);
+
       const minRange = 50.0;
       const maxRange = 280.0;
       double diff = 1;
@@ -42,7 +49,6 @@ class T1DSettingsWidget extends AbstractSettingsSection {
             },
           ),
           SettingsTile(
-            //title: Text('Range High ${settings.rangeHigh}'),
             title: Row(children: [
               const Expanded(flex: 2, child: Text("Target")),
               Expanded(
@@ -87,7 +93,6 @@ class T1DSettingsWidget extends AbstractSettingsSection {
             ]),
           ),
           SettingsTile(
-            //title: Text('Range High ${settings.rangeHigh}'),
             title: Row(children: [
               const Expanded(flex: 2, child: Text("Urgent")),
               Expanded(
@@ -125,6 +130,54 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   },
                 ),
               ),
+            ]),
+          ),
+          SettingsTile(
+            title: Row(children: [
+              const Expanded(flex: 3, child: Text("Fast Drop")),
+              Expanded(
+                  flex: 6,
+                  child: Container(
+                      alignment: Alignment.center,
+                      height: 20,
+                      child: Slider(
+                        value: drop.toDouble(),
+                        divisions: deltaMax - deltaMin,
+                        min: deltaMin.toDouble(),
+                        max: deltaMax.toDouble(),
+                        onChanged: (double val) {
+                          settings.alarmSettings.fastDropDelta = val.round();
+                        },
+                      ))),
+              Expanded(
+                  flex: 1,
+                  child: InkWell(
+                    child: Text(dropStr, textAlign: TextAlign.start),
+                  )),
+            ]),
+          ),
+          SettingsTile(
+            title: Row(children: [
+              const Expanded(flex: 3, child: Text("Fast Rise")),
+              Expanded(
+                  flex: 6,
+                  child: Container(
+                      alignment: Alignment.center,
+                      height: 20,
+                      child: Slider(
+                        value: rise.toDouble(),
+                        divisions: deltaMax - deltaMin,
+                        min: deltaMin.toDouble(),
+                        max: deltaMax.toDouble(),
+                        onChanged: (double val) {
+                          settings.alarmSettings.fastRiseDelta = val.round();
+                        },
+                      ))),
+              Expanded(
+                  flex: 1,
+                  child: InkWell(
+                    child: Text(riseStr, textAlign: TextAlign.start),
+                  )),
             ]),
           ),
         ],

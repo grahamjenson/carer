@@ -67,7 +67,9 @@ class T1DCN extends ChangeNotifier {
     targetRange5Proportion = trp;
 
     // Calculating Diff Range
-    var (dr, drp) = diffRange(lastSGV.sgv, lastSGV.diffPer5Mins);
+    var (dr, drp) = diffRange(settings.alarmSettings.fastDropDelta,
+        settings.alarmSettings.fastRiseDelta, lastSGV.diffPer5Mins);
+
     diffRange7 = dr;
     diffRange7Proportion = drp;
 

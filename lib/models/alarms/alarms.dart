@@ -15,6 +15,9 @@ abstract class Alarm {
 
   bool trigger();
   bool active();
+  bool smartSnooze() {
+    return false;
+  }
 }
 
 class UrgentLowAlarm extends Alarm {
@@ -41,7 +44,7 @@ class LowAlarm extends Alarm {
   const LowAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'Low Alarm ${alarmSettings.lowMinutes}m';
+  String get name => 'Low Alarm ${alarmSettings.lowMinutes}m ${smartSnooze()}';
 
   @override
   String get description =>
@@ -65,13 +68,24 @@ class LowAlarm extends Alarm {
   bool active() {
     return alarmSettings.lowAlarm;
   }
+
+  @override
+  bool smartSnooze() {
+    var diffs = t1d.diffPer5Minute(5);
+    if (diffs.isEmpty) {
+      return false;
+    }
+
+    return diffs.last > 0;
+  }
 }
 
 class HighAlarm extends Alarm {
   const HighAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'High Alarm ${alarmSettings.highMinutes}m';
+  String get name =>
+      'High Alarm ${alarmSettings.highMinutes}m ${smartSnooze()}';
 
   @override
   String get description =>
@@ -94,6 +108,16 @@ class HighAlarm extends Alarm {
   @override
   bool active() {
     return alarmSettings.highAlarm;
+  }
+
+  @override
+  bool smartSnooze() {
+    var diffs = t1d.diffPer5Minute(5);
+    if (diffs.isEmpty) {
+      return false;
+    }
+
+    return diffs.last < 0;
   }
 }
 
@@ -138,7 +162,7 @@ class FastRiseAlarm extends Alarm {
     if (diffs.isEmpty) {
       return false;
     }
-    if (diffs.every((element) => element > alarmSettings.fastRiseAlarmDelta)) {
+    if (diffs.every((element) => element > alarmSettings.fastRiseDelta)) {
       return true;
     }
     return false;
@@ -173,7 +197,7 @@ class FastDropAlarm extends Alarm {
       return false;
     }
 
-    if (diffs.every((element) => element < -alarmSettings.fastDropAlarmDelta)) {
+    if (diffs.every((element) => element < -alarmSettings.fastDropDelta)) {
       return true;
     }
     return false;
@@ -182,5 +206,30 @@ class FastDropAlarm extends Alarm {
   @override
   bool active() {
     return alarmSettings.fastDropAlarm;
+  }
+}
+
+class NoDataAlarm extends Alarm {
+  const NoDataAlarm({required super.settings, required super.t1d});
+
+  @override
+  String get name => 'No Data Alarm ${alarmSettings.noDataAlarmMinutes}';
+
+  @override
+  String get description => 'Triggers when no data is received';
+
+  @override
+  bool trigger() {
+    if (t1d.summary.lastSGV == null) {
+      return false;
+    }
+
+    return t1d.summary.lastSGV!.age.inMinutes >
+        alarmSettings.noDataAlarmMinutes;
+  }
+
+  @override
+  bool active() {
+    return alarmSettings.noDataAlarmMinutes != -1;
   }
 }

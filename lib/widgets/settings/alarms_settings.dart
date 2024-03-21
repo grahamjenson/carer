@@ -87,7 +87,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               text: "Low\n${settings.lowMinutes}m",
               height: _size,
               width: _size,
-              icon: Icons.touch_app_outlined,
+              icon: Icons.more_vert,
               onLongPress: () async {
                 var lowMinutes = await alertDialogOfButtons<int>(
                     context,
@@ -100,7 +100,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               text: "High\n${settings.highMinutes}m",
               height: _size,
               width: _size,
-              icon: Icons.touch_app_outlined,
+              icon: Icons.more_vert,
               onLongPress: () async {
                 var highMinutes = await alertDialogOfButtons<int>(
                     context,
@@ -151,7 +151,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               height: _size,
               width: _size,
               text: "Fast Drop\n${settings.fastDropAlarmMinutes}m",
-              icon: Icons.touch_app_outlined,
+              icon: Icons.more_vert,
               onLongPress: () async {
                 var minutes = await alertDialogOfButtons<int>(
                     context,
@@ -162,7 +162,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               }),
           ToggleButton(
             text: "Fast Rise\n${settings.fastRiseAlarmMinutes}m",
-            icon: Icons.touch_app_outlined,
+            icon: Icons.more_vert,
             height: _size,
             width: _size,
             onLongPress: () async {
@@ -246,16 +246,12 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderWidth: 0,
         isSelected: [
           settings.predictionAlgorithm == PredictionAlgorithm.simple,
-          settings.predictionAlgorithm == PredictionAlgorithm.profile,
         ],
         onPressed: (int index) {
           PredictionAlgorithm value = PredictionAlgorithm.none;
           switch (index) {
             case 0:
               value = PredictionAlgorithm.simple;
-              break;
-            case 1:
-              value = PredictionAlgorithm.profile;
               break;
           }
           if (value == settings.predictionAlgorithm) {
@@ -269,64 +265,23 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             height: _size,
             width: _size,
           ),
-          ToggleButton(
-            text: "Profile",
-            height: _size,
-            width: _size,
-          ),
-          // ToggleButton(text: "Smart Model 1", ),
-          // ToggleButton(text: "Smart Model 2", ),
         ],
       ),
     );
   }
 
   SettingsTile predictiveSnooze(AlarmSettings settings) {
-    return SettingsTile(
-      title: const Text("Predictive Snooze"),
+    return SettingsTile.switchTile(
+      title: const Text("Smart Snooze"),
       descriptionInlineIos: true,
       description: const Text(
-        "Snooze if predicted to recover",
+        "Ignore when  good direction",
         style: description,
       ),
-      trailing: ToggleButtons(
-        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
-        renderBorder: true,
-        borderRadius: BorderRadius.circular(10),
-        borderWidth: 0,
-        isSelected: [
-          settings.predictiveSnooze == PredictionAlgorithm.simple,
-          settings.predictiveSnooze == PredictionAlgorithm.profile,
-        ],
-        onPressed: (int index) {
-          PredictionAlgorithm value = PredictionAlgorithm.none;
-          switch (index) {
-            case 0:
-              value = PredictionAlgorithm.simple;
-              break;
-            case 1:
-              value = PredictionAlgorithm.profile;
-              break;
-          }
-          if (value == settings.predictiveSnooze) {
-            value = PredictionAlgorithm.none; // disable
-          }
-          settings.predictiveSnooze = value;
-        },
-        children: const [
-          ToggleButton(
-            text: "Simple",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "Profile",
-            height: _size,
-            width: _size,
-          ),
-          // ToggleButton(text: "Smart Model 2", ),
-        ],
-      ),
+      initialValue: settings.smartSnooze,
+      onToggle: (bool value) {
+        settings.smartSnooze = value;
+      },
     );
   }
 

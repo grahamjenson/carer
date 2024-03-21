@@ -27,7 +27,7 @@ class ToggleButton extends StatelessWidget {
             height: height,
             child: Stack(
               children: [
-                Center(child: buildIcon()),
+                Positioned(right: 0, child: buildIcon()),
                 Center(child: buildText()),
               ],
             )));
@@ -39,7 +39,7 @@ class ToggleButton extends StatelessWidget {
     }
     return Icon(
       icon,
-      size: height - 10,
+      size: height / 3,
       color: mainColor.withAlpha(100),
     );
   }

@@ -49,7 +49,7 @@ class AlarmsCN extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get sleeping {
+  bool get notSleeping {
     return sleepDuration.inSeconds <= 0;
   }
 
@@ -77,6 +77,8 @@ class AlarmsCN extends ChangeNotifier {
       //
       FastDropAlarm(settings: settings, t1d: t1d),
       FastRiseAlarm(settings: settings, t1d: t1d),
+      //
+      NoDataAlarm(settings: settings, t1d: t1d),
     };
 
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
@@ -98,13 +100,14 @@ class AlarmsCN extends ChangeNotifier {
     for (var alarm in allAlarms) {
       var triggered = alarm.trigger();
       var active = alarm.active();
+      var smartSnooze = alarmSettings.smartSnooze && alarm.smartSnooze();
       // Build the lists
 
       if (triggered) {
         newTriggeredAlarms.add(alarm);
       }
       // If Sleeping do not add
-      if (triggered && active && sleeping) {
+      if (triggered && active && notSleeping && !smartSnooze) {
         newActiveAlarms.add(alarm);
       }
     }

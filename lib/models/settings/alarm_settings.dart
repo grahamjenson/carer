@@ -12,16 +12,16 @@ enum AlarmSettingsNames {
 
   fastDropAlarm,
   fastDropAlarmMinutes,
-  fastDropAlarmDelta,
+  fastDropDelta,
 
   fastRiseAlarm,
   fastRiseAlarmMinutes,
-  fastRiseAlarmDelta,
+  fastRiseDelta,
 
   noDataAlarmMinutes,
 
   predictionAlgorithm,
-  predictiveSnooze,
+  smartSnooze,
 
   volumeOveride,
   volumeOverrideValue,
@@ -75,15 +75,15 @@ class AlarmSettings {
   // Diff Alarms
   bool _fastDropAlarm = false;
   int _fastDropAlarmMinutes = 30;
-  int _fastDropAlarmDelta = 20;
+  int _fastDropDelta = 20;
   bool _fastRiseAlarm = false;
   int _fastRiseAlarmMinutes = 30;
-  int _fastRiseAlarmDelta = 20;
+  int _fastRiseDelta = 20;
 
   // smart alarms
   PredictionAlgorithm _predictionAlgorithm = PredictionAlgorithm.none;
 
-  PredictionAlgorithm _predictiveSnooze = PredictionAlgorithm.none;
+  bool _smartSnooze = false;
 
   // data alarms
   int _noDataAlarmMinutes = 30;
@@ -163,12 +163,9 @@ class AlarmSettings {
           orElse: () => PredictionAlgorithm.none);
     }
 
-    var predictiveSnoozePref =
-        prefs.getString(AlarmSettingsNames.predictiveSnooze.name);
-    if (predictiveSnoozePref != null) {
-      _predictiveSnooze = PredictionAlgorithm.values.firstWhere(
-          (e) => e.name == predictiveSnoozePref,
-          orElse: () => PredictionAlgorithm.none);
+    var smartSnoozePref = prefs.getBool(AlarmSettingsNames.smartSnooze.name);
+    if (smartSnoozePref != null) {
+      _smartSnooze = smartSnoozePref;
     }
 
     // volume
@@ -282,10 +279,10 @@ class AlarmSettings {
     settings.notify();
   }
 
-  int get fastDropAlarmDelta => _fastDropAlarmDelta;
-  set fastDropAlarmDelta(int value) {
-    prefs.setInt(AlarmSettingsNames.fastDropAlarmDelta.name, value);
-    _fastDropAlarmDelta = value;
+  int get fastDropDelta => _fastDropDelta;
+  set fastDropDelta(int value) {
+    prefs.setInt(AlarmSettingsNames.fastDropDelta.name, value);
+    _fastDropDelta = value;
     settings.notify();
   }
 
@@ -309,10 +306,10 @@ class AlarmSettings {
     settings.notify();
   }
 
-  int get fastRiseAlarmDelta => _fastRiseAlarmDelta;
-  set fastRiseAlarmDelta(int value) {
-    prefs.setInt(AlarmSettingsNames.fastRiseAlarmDelta.name, value);
-    _fastRiseAlarmDelta = value;
+  int get fastRiseDelta => _fastRiseDelta;
+  set fastRiseDelta(int value) {
+    prefs.setInt(AlarmSettingsNames.fastRiseDelta.name, value);
+    _fastRiseDelta = value;
     settings.notify();
   }
 
@@ -345,11 +342,10 @@ class AlarmSettings {
     settings.notify();
   }
 
-  // predictiveSnooze
-  PredictionAlgorithm get predictiveSnooze => _predictiveSnooze;
-  set predictiveSnooze(PredictionAlgorithm value) {
-    prefs.setString(AlarmSettingsNames.predictiveSnooze.name, value.name);
-    _predictiveSnooze = value;
+  bool get smartSnooze => _smartSnooze;
+  set smartSnooze(bool value) {
+    prefs.setBool(AlarmSettingsNames.smartSnooze.name, value);
+    _smartSnooze = value;
     settings.notify();
   }
 
