@@ -218,14 +218,26 @@ class NoDataAlarm extends Alarm {
   @override
   String get description => 'Triggers when no data is received';
 
+  // This allows the alarm to still trigger with "default" even when not active
+  int alarmMinutes() {
+    var mins = alarmSettings.noDataAlarmMinutes;
+    if (mins == -1) {
+      mins = 20;
+    }
+    return mins;
+  }
+
   @override
   bool trigger() {
+    if (alarmSettings.noDataAlarmMinutes == -1) {
+      return false;
+    }
+
     if (t1d.summary.lastSGV == null) {
       return false;
     }
 
-    return t1d.summary.lastSGV!.age.inMinutes >
-        alarmSettings.noDataAlarmMinutes;
+    return t1d.summary.lastSGV!.age.inMinutes > alarmMinutes();
   }
 
   @override
