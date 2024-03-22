@@ -1,6 +1,7 @@
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
 import 'package:carer/nsclient/summary.dart';
+import 'package:carer/utils/math.dart';
 
 abstract class Predictor {
   final Settings settings;
@@ -24,9 +25,9 @@ class SimplePredictor extends Predictor {
     if (diffs.isEmpty) {
       return null;
     }
-    int mean = (diffs.reduce((a, b) => a + b) / diffs.length).round();
+
     return SGV(
-        sgv: lastSGV.sgv + (mean * (minutes / 5).round()),
+        sgv: lastSGV.sgv + (mean(diffs) * (minutes / 5).round()),
         mills: DateTime.now().add(Duration(minutes: minutes)));
   }
 }

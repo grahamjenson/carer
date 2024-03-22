@@ -79,6 +79,8 @@ class AlarmsCN extends ChangeNotifier {
       FastRiseAlarm(settings: settings, t1d: t1d),
       //
       NoDataAlarm(settings: settings, t1d: t1d),
+      //
+      PredictiveLowAlarm(settings: settings, t1d: t1d),
     };
 
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());

@@ -63,3 +63,7 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 double toMax2dp(num value) {
   return (value * 100.0).round() / 100.0;
 }
+
+int mean(List<int> l) {
+  return (l.reduce((a, b) => a + b) / l.length).round();
+}

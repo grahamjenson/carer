@@ -20,15 +20,14 @@ enum AlarmSettingsNames {
 
   noDataAlarmMinutes,
 
-  predictionAlgorithm,
+  lowPredictionAlarm,
+  lowPredictionMinutes,
   smartSnooze,
 
   volumeOveride,
   volumeOverrideValue,
   volumeProgressionSeconds,
 }
-
-enum PredictionAlgorithm { none, simple, profile }
 
 enum AlarmSounds { nightguard, letsgo, hybridas }
 
@@ -81,7 +80,8 @@ class AlarmSettings {
   int _fastRiseDelta = 20;
 
   // smart alarms
-  PredictionAlgorithm _predictionAlgorithm = PredictionAlgorithm.none;
+  bool _lowPredictionAlarm = false;
+  int _lowPredictionMinutes = 30;
 
   bool _smartSnooze = false;
 
@@ -134,6 +134,19 @@ class AlarmSettings {
       _urgentHighAlarm = urgentHighAlarmPref;
     }
 
+    // Prediction alarms
+    var lowPredictionAlarmPref =
+        prefs.getBool(AlarmSettingsNames.lowPredictionAlarm.name);
+    if (lowPredictionAlarmPref != null) {
+      _lowPredictionAlarm = lowPredictionAlarmPref;
+    }
+
+    var lowPredictionMinutesPref =
+        prefs.getInt(AlarmSettingsNames.lowPredictionMinutes.name);
+    if (lowPredictionMinutesPref != null) {
+      _lowPredictionMinutes = lowPredictionMinutesPref;
+    }
+
     // Diff Alarms
     var fastDropAlarmPref =
         prefs.getBool(AlarmSettingsNames.fastDropAlarm.name);
@@ -154,14 +167,7 @@ class AlarmSettings {
       _noDataAlarmMinutes = noDataAlarmMinutesPref;
     }
 
-    // smart alarms
-    var predictionAlgorithmPref =
-        prefs.getString(AlarmSettingsNames.predictionAlgorithm.name);
-    if (predictionAlgorithmPref != null) {
-      _predictionAlgorithm = PredictionAlgorithm.values.firstWhere(
-          (e) => e.name == predictionAlgorithmPref,
-          orElse: () => PredictionAlgorithm.none);
-    }
+    // smart snooze
 
     var smartSnoozePref = prefs.getBool(AlarmSettingsNames.smartSnooze.name);
     if (smartSnoozePref != null) {
@@ -256,6 +262,29 @@ class AlarmSettings {
   }
 
   ////
+  // Prediction alarms
+  ////
+
+  bool get lowPredictionAlarm => _lowPredictionAlarm;
+  set lowPredictionAlarm(bool value) {
+    prefs.setBool(AlarmSettingsNames.lowPredictionAlarm.name, value);
+    _lowPredictionAlarm = value;
+    settings.notify();
+  }
+
+  int get lowPredictionMinutes => _lowPredictionMinutes;
+  set lowPredictionMinutes(int value) {
+    var validValues = [5, 10, 15, 20, 30];
+    if (!validValues.contains(value)) {
+      return;
+    }
+
+    prefs.setInt(AlarmSettingsNames.lowPredictionMinutes.name, value);
+    _lowPredictionMinutes = value;
+    settings.notify();
+  }
+
+  ////
   // Diff Alarms
   ////
 
@@ -333,14 +362,6 @@ class AlarmSettings {
   ////
   /// Smart Alarms
   ////
-
-  // predictionAlgorithm
-  PredictionAlgorithm get predictionAlgorithm => _predictionAlgorithm;
-  set predictionAlgorithm(PredictionAlgorithm value) {
-    prefs.setString(AlarmSettingsNames.predictionAlgorithm.name, value.name);
-    _predictionAlgorithm = value;
-    settings.notify();
-  }
 
   bool get smartSnooze => _smartSnooze;
   set smartSnooze(bool value) {

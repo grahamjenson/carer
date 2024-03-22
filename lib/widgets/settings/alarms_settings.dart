@@ -29,7 +29,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           targetSettings(context, alarmSettings),
           diffSettings(context, alarmSettings),
           noDataAlarmSettings(alarmSettings),
-          predictionAlarms(alarmSettings),
+          predictionAlarms(context, alarmSettings),
           predictiveSnooze(alarmSettings),
           SettingsTile(title: const Divider()),
           volumeOverride(context, alarmSettings),
@@ -231,42 +231,40 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
-  SettingsTile predictionAlarms(AlarmSettings settings) {
+  SettingsTile predictionAlarms(BuildContext context, AlarmSettings settings) {
     return SettingsTile(
-      title: const Text("Prediction"),
+      title: const Text("Prediciton alarms"),
       descriptionInlineIos: true,
-      description: const Text(
-        "Predicted out of range",
-        style: description,
-      ),
       trailing: ToggleButtons(
-        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
-        renderBorder: true,
-        borderRadius: BorderRadius.circular(10),
-        borderWidth: 0,
-        isSelected: [
-          settings.predictionAlgorithm == PredictionAlgorithm.simple,
-        ],
-        onPressed: (int index) {
-          PredictionAlgorithm value = PredictionAlgorithm.none;
-          switch (index) {
-            case 0:
-              value = PredictionAlgorithm.simple;
-              break;
-          }
-          if (value == settings.predictionAlgorithm) {
-            value = PredictionAlgorithm.none; // disable
-          }
-          settings.predictionAlgorithm = value;
-        },
-        children: const [
-          ToggleButton(
-            text: "Simple",
-            height: _size,
-            width: _size,
-          ),
-        ],
-      ),
+          constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
+          renderBorder: true,
+          borderRadius: BorderRadius.circular(10),
+          borderWidth: 0,
+          isSelected: [
+            settings.lowPredictionAlarm,
+          ],
+          onPressed: (int index) {
+            switch (index) {
+              case 0:
+                settings.lowPredictionAlarm = !settings.lowPredictionAlarm;
+                break;
+            }
+          },
+          children: [
+            ToggleButton(
+                text: "Low\n${settings.lowPredictionMinutes}m",
+                height: _size,
+                width: _size,
+                icon: Icons.more_vert,
+                onLongPress: () async {
+                  var lowMinutes = await alertDialogOfButtons<int>(
+                      context,
+                      "Alert Low for:",
+                      ["0m", "5m", "10m", "15m", "20m", "30m"],
+                      [0, 5, 10, 15, 20, 30]);
+                  settings.lowPredictionMinutes = lowMinutes;
+                }),
+          ]),
     );
   }
 

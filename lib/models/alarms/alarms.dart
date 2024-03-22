@@ -20,6 +20,42 @@ abstract class Alarm {
   }
 }
 
+class PredictiveLowAlarm extends Alarm {
+  const PredictiveLowAlarm({required super.settings, required super.t1d});
+
+  @override
+  String get name => 'PredictiveLowAlarm Low Alarm';
+
+  @override
+  String get description =>
+      'Triggers when it predicts a low in ${alarmSettings.lowPredictionMinutes}m';
+
+  @override
+  bool trigger() {
+    var lastSGV = t1d.summary.lastSGV;
+    if (lastSGV == null) {
+      return false;
+    }
+    var diffs = t1d.diffPer5Minute(15);
+    if (diffs.isEmpty) {
+      return false;
+    }
+
+    var meanDiff = mean(diffs);
+    var meanDiffPerMinute = meanDiff / 5;
+    var predictedDiff = meanDiffPerMinute * alarmSettings.lowPredictionMinutes;
+    var predictedSGV = (lastSGV.sgv + predictedDiff).round();
+
+    var (range, _) = targetRange(settings, predictedSGV);
+    return range == Range5.veryLow || range == Range5.low;
+  }
+
+  @override
+  bool active() {
+    return alarmSettings.lowPredictionAlarm;
+  }
+}
+
 class UrgentLowAlarm extends Alarm {
   const UrgentLowAlarm({required super.settings, required super.t1d});
 
@@ -71,7 +107,7 @@ class LowAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var diffs = t1d.diffPer5Minute(5);
+    var diffs = t1d.diffPer5Minute(10);
     if (diffs.isEmpty) {
       return false;
     }
@@ -112,7 +148,7 @@ class HighAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var diffs = t1d.diffPer5Minute(5);
+    var diffs = t1d.diffPer5Minute(10);
     if (diffs.isEmpty) {
       return false;
     }
