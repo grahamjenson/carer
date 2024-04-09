@@ -74,7 +74,7 @@ class AlarmSettings {
   // Diff Alarms
   bool _fastDropAlarm = false;
   int _fastDropAlarmMinutes = 30;
-  int _fastDropDelta = 20;
+  int _fastDropDelta = -20;
   bool _fastRiseAlarm = false;
   int _fastRiseAlarmMinutes = 30;
   int _fastRiseDelta = 20;
@@ -310,6 +310,9 @@ class AlarmSettings {
 
   int get fastDropDelta => _fastDropDelta;
   set fastDropDelta(int value) {
+    if (value > -8) {
+      value = -8;
+    }
     prefs.setInt(AlarmSettingsNames.fastDropDelta.name, value);
     _fastDropDelta = value;
     settings.notify();
@@ -337,6 +340,9 @@ class AlarmSettings {
 
   int get fastRiseDelta => _fastRiseDelta;
   set fastRiseDelta(int value) {
+    if (value < 8) {
+      value = 8;
+    }
     prefs.setInt(AlarmSettingsNames.fastRiseDelta.name, value);
     _fastRiseDelta = value;
     settings.notify();

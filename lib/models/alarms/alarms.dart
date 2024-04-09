@@ -233,7 +233,7 @@ class FastDropAlarm extends Alarm {
       return false;
     }
 
-    if (diffs.every((element) => element < -alarmSettings.fastDropDelta)) {
+    if (diffs.every((element) => element < alarmSettings.fastDropDelta)) {
       return true;
     }
     return false;

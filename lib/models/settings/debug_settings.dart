@@ -79,7 +79,7 @@ Summary highSummary(Settings settings) {
       sgvs: SGVs(sgvs: [
         SGV(
             sgv: counter ~/ 1.1,
-            mills: DateTime.now()..subtract(const Duration(minutes: 8))),
+            mills: DateTime.now()..subtract(const Duration(minutes: 10))),
         SGV(
             sgv: counter,
             mills: DateTime.now()..subtract(const Duration(minutes: 4))),
@@ -104,10 +104,8 @@ Summary lowSummary(Settings settings) {
       sgvs: SGVs(sgvs: [
         SGV(
             sgv: counter ~/ 0.7,
-            mills: DateTime.now()..subtract(const Duration(minutes: 8))),
-        SGV(
-            sgv: counter,
-            mills: DateTime.now()..subtract(const Duration(minutes: 4))),
+            mills: DateTime.now()..subtract(const Duration(minutes: 30))),
+        SGV(sgv: counter, mills: DateTime.now()),
       ]),
       tempBasals: Summary.empty.tempBasals,
       treatments: Summary.empty.treatments,

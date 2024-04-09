@@ -76,7 +76,7 @@ class T1DCN extends ChangeNotifier {
     notifyListeners();
   }
 
-  //// Munging
+  //// Mungingx
 
   List<int> diffPer5Minute(int minutes) {
     List<int> diffs = [];
