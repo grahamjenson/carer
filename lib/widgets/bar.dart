@@ -87,8 +87,8 @@ class Bar extends StatelessWidget {
       backgroundColor: mainColor.withAlpha(40),
       buttonColor: mainColor.withAlpha(80),
       icon: const Icon(Icons.bedtime, color: mainColor),
-      width: 80,
-      height: 30,
+      width: 150,
+      height: 35,
       action: onLongPressed,
     );
   }
