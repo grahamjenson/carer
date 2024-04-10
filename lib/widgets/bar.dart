@@ -7,6 +7,7 @@ import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
+import 'package:carer/widgets/sleepbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
@@ -71,9 +72,8 @@ class Bar extends StatelessWidget {
             backgroundColor: mainColor.withAlpha(20),
           ),
           onPressed: onPressed,
-          onLongPress: onLongPressed,
           child: SizedBox(
-            width: 50,
+            width: 60,
             child: Text(
               textAlign: TextAlign.center,
               Dates.shortSecondsLeft(alarms.sleepDuration),
@@ -83,14 +83,13 @@ class Bar extends StatelessWidget {
           ));
     }
 
-    return TextButton(
-      style: TextButton.styleFrom(
-        backgroundColor: mainColor.withAlpha(40),
-      ),
-      onPressed: onPressed,
-      onLongPress: onLongPressed,
-      child: const SizedBox(
-          width: 50, child: Icon(Icons.bedtime, color: mainColor)),
+    return SleepButton(
+      backgroundColor: mainColor.withAlpha(40),
+      buttonColor: mainColor.withAlpha(80),
+      icon: const Icon(Icons.bedtime, color: mainColor),
+      width: 80,
+      height: 30,
+      action: onLongPressed,
     );
   }
 
