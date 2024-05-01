@@ -52,7 +52,12 @@ class Settings extends ChangeNotifier {
 
   @override
   String toString() {
-    return 'Settings{nightscoutURL: $nightscoutURL, unit: $unit, screenActive: $screenActive, targetHigh: $targetHigh, targetLow: $targetLow}';
+    var string = "{";
+    for (var key in prefs.getKeys()) {
+      string += "$key: ${prefs.get(key)}\n";
+    }
+    string += "}";
+    return string;
   }
 
   // NIGHT SCOUT URL

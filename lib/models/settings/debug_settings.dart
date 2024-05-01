@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum DebugSettingNames {
   debug,
   debugSummary,
+  logErrors,
 }
 
 enum DebugSummary {
@@ -34,6 +35,8 @@ class DebugSettings {
   DebugSettings({required this.prefs, required this.settings});
 
   bool _debug = false;
+  bool _logErrors = true;
+
   DebugSummary _debugSummary = DebugSummary.off;
 
   void populate() {
@@ -48,6 +51,11 @@ class DebugSettings {
           (e) => e.name == debugSummaryPref,
           orElse: () => DebugSummary.off);
     }
+
+    var logErrorsPref = prefs.getBool(DebugSettingNames.logErrors.name);
+    if (logErrorsPref != null) {
+      _logErrors = logErrorsPref;
+    }
   }
 
   bool get debug => _debug;
@@ -61,6 +69,13 @@ class DebugSettings {
   set debugSummary(DebugSummary value) {
     prefs.setString(DebugSettingNames.debugSummary.name, value.name);
     _debugSummary = value;
+    settings.notify();
+  }
+
+  bool get logErrors => _logErrors;
+  set logErrors(bool value) {
+    prefs.setBool(DebugSettingNames.logErrors.name, value);
+    _logErrors = value;
     settings.notify();
   }
 }

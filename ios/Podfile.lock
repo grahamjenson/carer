@@ -9,6 +9,11 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - Sentry/HybridSDK (8.25.0)
+  - sentry_flutter (8.1.0):
+    - Flutter
+    - FlutterMacOS
+    - Sentry/HybridSDK (= 8.25.0)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -21,8 +26,13 @@ DEPENDENCIES:
   - flutter_volume_controller (from `.symlinks/plugins/flutter_volume_controller/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Sentry
 
 EXTERNAL SOURCES:
   audioplayers_darwin:
@@ -35,6 +45,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  sentry_flutter:
+    :path: ".symlinks/plugins/sentry_flutter/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   wakelock_plus:
@@ -46,9 +58,11 @@ SPEC CHECKSUMS:
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
   package_info_plus: 115f4ad11e0698c8c1c5d8a689390df880f47e85
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  Sentry: cd86fc55628f5b7c572cabe66cc8f95a9d2f165a
+  sentry_flutter: ca7760fc008dc3bc2981730dc0c1d2f892178370
   shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
 
 PODFILE CHECKSUM: 03a55e6a1740eee76ea0a809f937cc561f424316
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2
