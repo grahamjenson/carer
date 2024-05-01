@@ -91,6 +91,7 @@ Summary highSummary(Settings settings) {
   }
 
   return Summary(
+      raw: "",
       sgvs: SGVs(sgvs: [
         SGV(
             sgv: counter ~/ 1.1,
@@ -116,6 +117,7 @@ Summary lowSummary(Settings settings) {
   }
 
   return Summary(
+      raw: "",
       sgvs: SGVs(sgvs: [
         SGV(
             sgv: counter ~/ 0.7,
@@ -139,6 +141,7 @@ Summary normalSummary(Settings settings) {
   }
 
   return Summary(
+      raw: "",
       sgvs: SGVs(sgvs: [
         SGV(
             sgv: counter ~/ 1.1,

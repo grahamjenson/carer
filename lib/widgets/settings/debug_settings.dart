@@ -49,15 +49,15 @@ class DebugSettingsWidget extends AbstractSettingsSection {
             trailing: TextButton(
               onPressed: () async {
                 try {
-                  throw Exception("Error with context");
+                  throw Exception("ContextError");
                 } catch (exception, stackTrace) {
                   await Sentry.captureException(
                     exception,
                     stackTrace: stackTrace,
-                    hint: Hint.withMap({
-                      'settings': settings,
-                      'summary': summary,
-                    }),
+                    withScope: (scope) {
+                      scope.setContexts('settings', settings.toString());
+                      scope.setContexts('summary', summary.summary.raw);
+                    },
                   );
                 }
               },

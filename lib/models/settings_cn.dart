@@ -52,11 +52,15 @@ class Settings extends ChangeNotifier {
 
   @override
   String toString() {
-    var string = "{";
+    var string = "{\n";
     for (var key in prefs.getKeys()) {
-      string += "$key: ${prefs.get(key)}\n";
+      if (key == SettingNames.nightscoutUrl.name) {
+        string += "$key: \"[Filtered]\",\n";
+        continue;
+      }
+      string += "$key: ${prefs.get(key)},\n";
     }
-    string += "}";
+    string += "\n}";
     return string;
   }
 

@@ -22,3 +22,7 @@ samples, guidance on mobile development, and a full API reference.
 1. https://uppbeat.io/t/hybridas/open-spaces
 1. https://uppbeat.io/t/mountaineer/lets-go
 
+
+# Sentry Docs
+
+To upload the symbols and such need `SENTRY_AUTH_TOKEN` in env and run `flutter packages pub run sentry_dart_plugin`

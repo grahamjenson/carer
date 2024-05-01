@@ -548,8 +548,10 @@ class Summary {
   final Targets targets;
   final SummaryState state;
   final Profile profile;
+  final String raw;
 
   const Summary({
+    required this.raw,
     required this.sgvs,
     required this.tempBasals,
     required this.treatments,
@@ -560,6 +562,7 @@ class Summary {
   });
 
   static const Summary empty = Summary(
+      raw: "",
       sgvs: SGVs(sgvs: []),
       tempBasals: TempBasals(tempBasals: []),
       treatments: SummaryTreatments(treatments: []),
@@ -588,6 +591,7 @@ class Summary {
     try {
       var json = jsonDecode(jsonString);
       return Summary(
+        raw: jsonString,
         sgvs: SGVs.fromJson(json['sgvs']),
         tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
         treatments:
