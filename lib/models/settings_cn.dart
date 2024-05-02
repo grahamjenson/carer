@@ -55,11 +55,12 @@ class Settings extends ChangeNotifier {
     var string = "{\n";
     for (var key in prefs.getKeys()) {
       if (key == SettingNames.nightscoutUrl.name) {
-        string += "$key: \"[Filtered]\",\n";
+        string += "\"$key\": \"[Filtered]\",\n";
         continue;
       }
-      string += "$key: ${prefs.get(key)},\n";
+      string += "\"$key\": \"${prefs.get(key)}\",\n";
     }
+    string += "\"end\": true\n";
     string += "\n}";
     return string;
   }

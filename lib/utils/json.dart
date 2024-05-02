@@ -1,0 +1,16 @@
+import 'dart:convert';
+
+JsonDecoder decoder = const JsonDecoder();
+JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+
+String prettyPrintJson(String input) {
+  try {
+    var object = decoder.convert(input);
+    var prettyString = encoder.convert(object);
+    var str = "";
+    prettyString.split('\n').forEach((element) => str += "$element\n");
+    return str;
+  } catch (e) {
+    return input;
+  }
+}

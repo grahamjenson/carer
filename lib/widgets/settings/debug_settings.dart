@@ -1,10 +1,10 @@
 import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
+import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 class DebugSettingsWidget extends AbstractSettingsSection {
@@ -43,26 +43,16 @@ class DebugSettingsWidget extends AbstractSettingsSection {
       return SettingsSection(
         title: const Text('Debug'),
         tiles: [
-          SettingsTile(
-            title: const Text("Log Error with Context"),
+          SettingsTile.navigation(
+            title: const Text("Log Error"),
             descriptionInlineIos: true,
-            trailing: TextButton(
-              onPressed: () async {
-                try {
-                  throw Exception("ContextError");
-                } catch (exception, stackTrace) {
-                  await Sentry.captureException(
-                    exception,
-                    stackTrace: stackTrace,
-                    withScope: (scope) {
-                      scope.setContexts('settings', settings.toString());
-                      scope.setContexts('summary', summary.summary.raw);
-                    },
-                  );
-                }
-              },
-              child: const Text("Log"),
-            ),
+            leading: const Icon(UniconsLine.bug),
+            onPressed: (context) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LogErrorPage()),
+              );
+            },
           ),
           SettingsTile.switchTile(
             title: const Text('Debug'),
