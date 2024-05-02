@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 enum AlarmSettingsNames {
+  disableAlarms,
+
   urgentLowAlarm,
   lowAlarm,
   lowMinutes,
@@ -63,6 +65,8 @@ class AlarmSettings {
   SharedPreferences prefs;
   Settings settings;
 
+  bool _disableAlarms = false;
+
   // Boundary Alarms
   bool _urgentLowlarm = false;
   bool _lowAlarm = false;
@@ -101,6 +105,13 @@ class AlarmSettings {
   AlarmSettings({required this.prefs, required this.settings});
 
   void populate() {
+    // Disable alarms
+    var disableAlarmsPref =
+        prefs.getBool(AlarmSettingsNames.disableAlarms.name);
+    if (disableAlarmsPref != null) {
+      _disableAlarms = disableAlarmsPref;
+    }
+
     // Boundary Alarms
     var urgentLowAlarmPref =
         prefs.getBool(AlarmSettingsNames.urgentLowAlarm.name);
@@ -199,6 +210,13 @@ class AlarmSettings {
           (e) => e.name == alarmAssetPref,
           orElse: () => AlarmSounds.nightguard);
     }
+  }
+
+  bool get disableAlarms => _disableAlarms;
+  set disableAlarms(bool value) {
+    prefs.setBool(AlarmSettingsNames.disableAlarms.name, value);
+    _disableAlarms = value;
+    settings.notify();
   }
 
   ////

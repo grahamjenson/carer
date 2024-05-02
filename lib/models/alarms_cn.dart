@@ -98,6 +98,7 @@ class AlarmsCN extends ChangeNotifier {
   void checkAlarms() {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
+    var disabledAllAlarms = alarmSettings.disableAlarms;
 
     for (var alarm in allAlarms) {
       var triggered = alarm.trigger();
@@ -109,7 +110,11 @@ class AlarmsCN extends ChangeNotifier {
         newTriggeredAlarms.add(alarm);
       }
       // If Sleeping do not add
-      if (triggered && active && notSleeping && !smartSnooze) {
+      if (!disabledAllAlarms &&
+          triggered &&
+          active &&
+          notSleeping &&
+          !smartSnooze) {
         newActiveAlarms.add(alarm);
       }
     }

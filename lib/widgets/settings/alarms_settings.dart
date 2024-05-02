@@ -24,8 +24,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         builder: (context, settings, alarms, child) {
       var alarmSettings = settings.alarmSettings;
       return SettingsSection(
-        title: const Text('Alarms (Long Press for info and settings)'),
+        title: const Text('Alarms'),
         tiles: [
+          disableAlarms(context, alarmSettings),
           targetSettings(context, alarmSettings),
           diffSettings(context, alarmSettings),
           noDataAlarmSettings(alarmSettings),
@@ -40,6 +41,56 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         ],
       );
     });
+  }
+
+  SettingsTile disableAlarms(
+      BuildContext context, AlarmSettings alarmSettings) {
+    return SettingsTile.switchTile(
+      title: const Text("Disable Alarms"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Turn off all alarms",
+        style: description,
+      ),
+      initialValue: alarmSettings.disableAlarms,
+      onToggle: (bool disable) async {
+        if (!disable) {
+          alarmSettings.disableAlarms = false;
+          return;
+        }
+        // show the dialog
+        bool? areYouSure = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            Widget cancelButton = TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            );
+            Widget disableButton = TextButton(
+              child: const Text("Disable"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            );
+
+            // set up the AlertDialog
+            return AlertDialog(
+              title: const Text("Disable Alarms"),
+              content: const Text("Disable all alarms (not recommended)?"),
+              actions: [
+                cancelButton,
+                disableButton,
+              ],
+            );
+          },
+        );
+        if (areYouSure == true) {
+          alarmSettings.disableAlarms = true;
+        }
+      },
+    );
   }
 
   SettingsTile targetSettings(BuildContext context, AlarmSettings settings) {
