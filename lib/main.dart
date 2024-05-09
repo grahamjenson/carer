@@ -2,7 +2,7 @@ import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
-import 'package:carer/pages/homepage.dart';
+import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';

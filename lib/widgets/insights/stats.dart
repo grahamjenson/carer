@@ -31,9 +31,6 @@ class Stats extends StatelessWidget {
 
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
-      if (!settings.uiSettings.showStats) {
-        return const SizedBox.shrink();
-      }
       var summary = summaryCn.summary;
       return Window(
         title: "Stats",

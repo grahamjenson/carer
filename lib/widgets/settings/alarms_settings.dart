@@ -27,10 +27,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         title: const Text('Alarms'),
         tiles: [
           disableAlarms(context, alarmSettings),
-          targetSettings(context, alarmSettings),
+          rangeAlarms(context, alarmSettings),
+          predictionAlarms(context, alarmSettings),
           diffSettings(context, alarmSettings),
           noDataAlarmSettings(alarmSettings),
-          predictionAlarms(context, alarmSettings),
           predictiveSnooze(alarmSettings),
           SettingsTile(title: const Divider()),
           volumeOverride(context, alarmSettings),
@@ -93,9 +93,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
-  SettingsTile targetSettings(BuildContext context, AlarmSettings settings) {
+  SettingsTile rangeAlarms(BuildContext context, AlarmSettings settings) {
     return SettingsTile(
       title: const Text("Range"),
+      enabled: !settings.disableAlarms,
       descriptionInlineIos: true,
       description: const Text(
         "Out of range",

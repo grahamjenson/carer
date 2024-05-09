@@ -148,6 +148,9 @@ class SGV {
   }
 
   int get diffPer5Mins {
+    if (diffMinutes == 0) {
+      return 0; // TODO
+    }
     return (_diff / diffMinutes * 5).round();
   }
 

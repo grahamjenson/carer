@@ -2,17 +2,40 @@ import 'package:carer/models/settings_cn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-enum UISettingsNames { screenActive, showHistory, showStats, showChart }
+enum UISettingsNames {
+  screenActive,
+  uiLayoutVertical,
+  uiLayoutHorizontal,
+  uiTheme
+}
+
+enum UITheme {
+  // NS Settings
+  normal("Normal");
+
+  final String viewName;
+
+  const UITheme(this.viewName);
+}
+
+enum UILayout {
+  // NS Settings
+  showBGLChartHistoryStats("Everything"),
+  showBGL("BGL");
+
+  final String viewName;
+
+  const UILayout(this.viewName);
+}
 
 class UISettings {
   SharedPreferences prefs;
   Settings settings;
 
   bool _screenActive = true;
-  bool _showHistory = true;
-  bool _showStats = true;
-  bool _showChart = true;
-
+  UILayout _uiLayoutVertical = UILayout.showBGL;
+  UILayout _uiLayoutHorizontal = UILayout.showBGL;
+  UITheme _uiTheme = UITheme.normal;
   UISettings({required this.prefs, required this.settings});
 
   void populate() {
@@ -21,14 +44,26 @@ class UISettings {
       _screenActive = screenActivePref;
     }
 
-    var showHistoryPref = prefs.getBool(UISettingsNames.showHistory.name);
-    if (showHistoryPref != null) {
-      _showHistory = showHistoryPref;
+    var uiLayoutVerticalPref =
+        prefs.getString(UISettingsNames.uiLayoutVertical.name);
+    if (uiLayoutVerticalPref != null) {
+      _uiLayoutVertical = UILayout.values.firstWhere(
+          (e) => e.name == uiLayoutVerticalPref,
+          orElse: () => UILayout.showBGL);
     }
 
-    var showStatsPref = prefs.getBool(UISettingsNames.showStats.name);
-    if (showStatsPref != null) {
-      _showStats = showStatsPref;
+    var uiLayoutHorizontalPref =
+        prefs.getString(UISettingsNames.uiLayoutHorizontal.name);
+    if (uiLayoutHorizontalPref != null) {
+      _uiLayoutHorizontal = UILayout.values.firstWhere(
+          (e) => e.name == uiLayoutHorizontalPref,
+          orElse: () => UILayout.showBGL);
+    }
+
+    var uiThemePref = prefs.getString(UISettingsNames.uiTheme.name);
+    if (uiThemePref != null) {
+      _uiTheme = UITheme.values.firstWhere((e) => e.name == uiThemePref,
+          orElse: () => UITheme.normal);
     }
   }
 
@@ -41,27 +76,27 @@ class UISettings {
     settings.notify();
   }
 
-  // ShowHistory
-  bool get showHistory => _showHistory;
-  set showHistory(bool value) {
-    prefs.setBool(UISettingsNames.showHistory.name, value);
-    _showHistory = value;
+  // UI Layout Vertical
+  UILayout get uiLayoutVertical => _uiLayoutVertical;
+  set uiLayoutVertical(UILayout value) {
+    prefs.setString(UISettingsNames.uiLayoutVertical.name, value.name);
+    _uiLayoutVertical = value;
     settings.notify();
   }
 
-  // ShowChart
-  bool get showChart => _showChart;
-  set showChart(bool value) {
-    prefs.setBool(UISettingsNames.showChart.name, value);
-    _showChart = value;
+  // UI Layout Horizontal
+  UILayout get uiLayoutHorizontal => _uiLayoutHorizontal;
+  set uiLayoutHorizontal(UILayout value) {
+    prefs.setString(UISettingsNames.uiLayoutHorizontal.name, value.name);
+    _uiLayoutHorizontal = value;
     settings.notify();
   }
 
-  // ShowStats
-  bool get showStats => _showStats;
-  set showStats(bool value) {
-    prefs.setBool(UISettingsNames.showStats.name, value);
-    _showStats = value;
+  // UI Theme
+  UITheme get uiTheme => _uiTheme;
+  set uiTheme(UITheme value) {
+    prefs.setString(UISettingsNames.uiTheme.name, value.name);
+    _uiTheme = value;
     settings.notify();
   }
 }

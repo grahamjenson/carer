@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/pages/settingspage.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
+import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:carer/widgets/sleepbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';

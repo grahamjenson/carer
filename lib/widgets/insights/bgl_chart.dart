@@ -58,10 +58,6 @@ class BGLChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
-      if (!settings.uiSettings.showChart) {
-        return const SizedBox.shrink();
-      }
-
       int minsAgo = 125;
       // Breaking down the objects
       Summary summary = summaryCn.summary;

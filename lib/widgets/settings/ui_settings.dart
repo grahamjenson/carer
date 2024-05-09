@@ -1,9 +1,8 @@
+import 'package:carer/models/settings/ui_settings.dart';
 import 'package:carer/models/settings_cn.dart';
-import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:unicons/unicons.dart';
 
 class UISettingsWidget extends AbstractSettingsSection {
   const UISettingsWidget({super.key});
@@ -22,38 +21,52 @@ class UISettingsWidget extends AbstractSettingsSection {
             },
           ),
           SettingsTile(
-            title: const Text("Display"),
-            trailing: ToggleButtons(
-              constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
-              renderBorder: true,
-              borderRadius: BorderRadius.circular(10),
-              borderWidth: 0,
-              isSelected: [
-                settings.uiSettings.showChart,
-                settings.uiSettings.showHistory,
-                settings.uiSettings.showStats,
-              ],
-              onPressed: (int index) {
-                switch (index) {
-                  case 0:
-                    settings.uiSettings.showChart =
-                        !settings.uiSettings.showChart;
-                    break;
-                  case 1:
-                    settings.uiSettings.showHistory =
-                        !settings.uiSettings.showHistory;
-                    break;
-                  case 2:
-                    settings.uiSettings.showStats =
-                        !settings.uiSettings.showStats;
-                    break;
-                }
+            title: const Text("Vertical Layout"),
+            trailing: DropdownButton(
+              alignment: Alignment.topLeft,
+              items: UILayout.values
+                  .map((e) => DropdownMenuItem(
+                        value: e,
+                        child: SizedBox(width: 130, child: Text(e.viewName)),
+                      ))
+                  .toList(),
+              value: settings.uiSettings.uiLayoutVertical,
+              onChanged: (value) {
+                if (value == null) return;
+                settings.uiSettings.uiLayoutVertical = value;
               },
-              children: const [
-                ToggleButton(text: "Chart", icon: UniconsLine.chart_line),
-                ToggleButton(text: "History", icon: UniconsLine.history),
-                ToggleButton(text: "Stats", icon: UniconsLine.chart_pie_alt),
-              ],
+            ),
+          ),
+          SettingsTile(
+            title: const Text("Horizontal Layout"),
+            trailing: DropdownButton(
+              items: UILayout.values
+                  .map((e) => DropdownMenuItem(
+                        value: e,
+                        child: SizedBox(width: 130, child: Text(e.viewName)),
+                      ))
+                  .toList(),
+              value: settings.uiSettings.uiLayoutHorizontal,
+              onChanged: (value) {
+                if (value == null) return;
+                settings.uiSettings.uiLayoutHorizontal = value;
+              },
+            ),
+          ),
+          SettingsTile(
+            title: const Text("Theme"),
+            trailing: DropdownButton(
+              items: UITheme.values
+                  .map((e) => DropdownMenuItem(
+                        value: e,
+                        child: SizedBox(width: 130, child: Text(e.viewName)),
+                      ))
+                  .toList(),
+              value: settings.uiSettings.uiTheme,
+              onChanged: (value) {
+                if (value == null) return;
+                settings.uiSettings.uiTheme = value;
+              },
             ),
           ),
         ],

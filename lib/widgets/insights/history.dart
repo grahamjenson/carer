@@ -7,7 +7,6 @@ import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class History extends StatelessWidget {
@@ -31,9 +30,6 @@ class History extends StatelessWidget {
     return Consumer2<Settings, SummaryCN>(
         builder: (context, settings, summaryCn, child) {
       var history = historyContainers(settings, summaryCn);
-      if (!settings.uiSettings.showHistory) {
-        return const SizedBox.shrink();
-      }
 
       return Window(
         title: "History",
