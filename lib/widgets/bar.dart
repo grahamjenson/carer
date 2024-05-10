@@ -18,37 +18,48 @@ class Bar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<Settings, AlarmsCN>(
         builder: (context, settings, alarms, child) {
-      // TODO dont show sleep option if all alarms are turned off
-
+      var tiles = [
+        const Expanded(
+          child: SizedBox.shrink(),
+        ),
+        getSettingsButton(context),
+      ];
+      if (!settings.alarmSettings.disableAlarms) {
+        tiles = [
+          getSleepButton(context, alarms),
+          getActiveAlarms(context, alarms),
+          const Expanded(
+            child: SizedBox.shrink(),
+          ),
+          getSettingsButton(context),
+        ];
+      }
       return BottomAppBar(
         color: Colors.transparent,
         padding: const EdgeInsets.only(left: 8, right: 8),
         height: 40,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            getSleepButton(context, alarms),
-            getActiveAlarms(context, alarms),
-            const Expanded(
-              child: SizedBox.shrink(),
-            ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              icon: const Icon(
-                Icons.settings,
-                color: mainColor,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
-                );
-              },
-            ),
-          ],
+          children: tiles,
         ),
       );
     });
+  }
+
+  Widget getSettingsButton(BuildContext context) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      icon: const Icon(
+        Icons.settings,
+        color: mainColor,
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsPage()),
+        );
+      },
+    );
   }
 
   Widget getSleepButton(BuildContext context, AlarmsCN alarms) {

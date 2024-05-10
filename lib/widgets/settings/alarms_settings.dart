@@ -4,6 +4,8 @@ import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/widgets/colours.dart';
+import 'package:carer/widgets/settings/alarms_dialogs/high_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_dialogs/low_alarm_page.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -23,9 +25,13 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     return Consumer2<Settings, AlarmsCN>(
         builder: (context, settings, alarms, child) {
       var alarmSettings = settings.alarmSettings;
-      return SettingsSection(
-        title: const Text('Alarms'),
-        tiles: [
+
+      var tiles = [
+        disableAlarms(context, alarmSettings),
+      ];
+
+      if (!alarmSettings.disableAlarms) {
+        tiles = [
           disableAlarms(context, alarmSettings),
           rangeAlarms(context, alarmSettings),
           predictionAlarms(context, alarmSettings),
@@ -38,7 +44,12 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           progressiveVolume(context, alarmSettings),
           alarmFileSelect(alarmSettings),
           testAlert(context, alarmSettings, alarms),
-        ],
+        ];
+      }
+
+      return SettingsSection(
+        title: const Text('Alarms'),
+        tiles: tiles,
       );
     });
   }
@@ -119,10 +130,16 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               settings.urgentLowAlarm = !settings.urgentLowAlarm;
               break;
             case 1:
-              settings.lowAlarm = !settings.lowAlarm;
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LowAlarmPage()),
+              );
               break;
             case 2:
-              settings.highAlarm = !settings.highAlarm;
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HighAlarmPage()),
+              );
               break;
             case 3:
               settings.urgentHighAlarm = !settings.urgentHighAlarm;
@@ -136,31 +153,17 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             width: _size,
           ),
           ToggleButton(
-              text: "Low\n${settings.lowMinutes}m",
-              height: _size,
-              width: _size,
-              icon: Icons.more_vert,
-              onLongPress: () async {
-                var lowMinutes = await alertDialogOfButtons<int>(
-                    context,
-                    "Alert Low for:",
-                    ["0m", "5m", "10m", "15m", "20m", "30m"],
-                    [0, 5, 10, 15, 20, 30]);
-                settings.lowMinutes = lowMinutes;
-              }),
+            text: "Low\n${settings.lowMinutes}m",
+            height: _size,
+            width: _size,
+            icon: Icons.more_vert,
+          ),
           ToggleButton(
-              text: "High\n${settings.highMinutes}m",
-              height: _size,
-              width: _size,
-              icon: Icons.more_vert,
-              onLongPress: () async {
-                var highMinutes = await alertDialogOfButtons<int>(
-                    context,
-                    "Alert High for:",
-                    ["0m", "5m", "10m", "15m", "20m", "30m"],
-                    [0, 5, 10, 15, 20, 30]);
-                settings.highMinutes = highMinutes;
-              }),
+            text: "High\n${settings.highMinutes}m",
+            height: _size,
+            width: _size,
+            icon: Icons.more_vert,
+          ),
           const ToggleButton(
             text: "Urgent High",
             height: _size,

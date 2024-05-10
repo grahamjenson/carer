@@ -70,6 +70,27 @@ class ToggleButton extends StatelessWidget {
       ).merge(textStyle),
     );
   }
+
+  static ToggleButtons selectOne<T>(
+      T value, List<String> titles, List<T> values, Function(T) onSelected) {
+    assert(titles.length == values.length);
+    return ToggleButtons(
+      constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
+      renderBorder: true,
+      borderRadius: BorderRadius.circular(10),
+      borderWidth: 0,
+      isSelected: List<bool>.generate(6, (int index) => values[index] == value),
+      onPressed: (int index) {
+        onSelected(values[index]);
+      },
+      children: List<ToggleButton>.generate(
+        titles.length,
+        (int index) => ToggleButton(
+          text: titles[index],
+        ),
+      ),
+    );
+  }
 }
 
 Future<T> alertDialogOfButtons<T>(
