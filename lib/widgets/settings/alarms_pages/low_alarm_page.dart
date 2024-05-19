@@ -17,15 +17,6 @@ class LowAlarmPage extends StatelessWidget {
     return Consumer<Settings>(builder: (context, settings, child) {
       var alarmSettings = settings.alarmSettings;
 
-// onLongPress: () async {
-//                 var lowMinutes = await alertDialogOfButtons<int>(
-//                     context,
-//                     "Alert Low for:",
-//                     ["0m", "5m", "10m", "15m", "20m", "30m"],
-//                     [0, 5, 10, 15, 20, 30]);
-//                 settings.lowMinutes = lowMinutes;
-//               }
-
       return Scaffold(
         appBar: AppBar(
           title: const Text('Low Alarm'),

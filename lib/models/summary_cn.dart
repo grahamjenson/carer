@@ -61,7 +61,7 @@ class SummaryCN extends ChangeNotifier {
   updateSummary() {
     var (nsURL, nsToken) = settings.nightscoutURLAndToken;
     NSClient().getSummary(nsURL, nsToken).catchError((e) {
-      log("GETTING SUMMARY ERROR: $e");
+      log("GETTING SUMMARY ERROR: $e, $nsURL");
       _summaryToBeUpdated = true;
       return Summary.empty;
     }).then((value) {

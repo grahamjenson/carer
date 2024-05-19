@@ -1,4 +1,4 @@
-package com.example.carer
+package nz.t1d.carer
 
 import io.flutter.embedding.android.FlutterActivity
 

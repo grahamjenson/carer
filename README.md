@@ -26,3 +26,7 @@ samples, guidance on mobile development, and a full API reference.
 # Sentry Docs
 
 To upload the symbols and such need `SENTRY_AUTH_TOKEN` in env and run `flutter packages pub run sentry_dart_plugin`
+
+
+# setting up some debug stuff
+1. ln -s /Users/<user>/Library/Containers/nz.t1d.carer/Data/Documents macosData

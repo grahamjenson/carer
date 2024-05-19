@@ -137,7 +137,7 @@ class History extends StatelessWidget {
       return const SizedBox.shrink();
     }
     return SmartText(
-        texts: ["${toMax2dp(treatment.carbs!)}", "g"],
+        texts: ["${treatment.carbs!.round()}", "g"],
         styles: const [row, small]);
   }
 }

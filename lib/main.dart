@@ -2,6 +2,7 @@ import 'package:carer/models/alarms_cn.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/models/summary_cn.dart';
 import 'package:carer/models/t1d_cn.dart';
+import 'package:carer/sql/db.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -27,6 +28,10 @@ void main() async {
 
 void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Create Database
+  print("THIS IS HERE");
+  await openDatabaseAndCreateTables();
 
   // Load the settings from Shared Preferences before starting
   var settings = Settings();
