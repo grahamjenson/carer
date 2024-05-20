@@ -1,0 +1,146 @@
+// This key-value store is a wrapper around sqllite for key value storage.
+// It will make it easier to have a single location for all persisted entities.
+// Hopefully, this will make it easier to manage the data.
+
+import 'package:carer/sql/statements/kv.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+class KeyValueStore {
+  final Database db;
+  final Map<String, dynamic> _kvdbCache = {};
+
+  KeyValueStore(this.db);
+
+  // Constructor
+  static Future<KeyValueStore> create() async {
+    final db = await openDatabaseAndCreateTables();
+    var kvdb = KeyValueStore(db);
+    kvdb._populate();
+    return kvdb;
+  }
+
+  // Open the database and create the tables
+  static Future<Database> openDatabaseAndCreateTables(
+      {String dbname = "kv.db"}) async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, dbname);
+
+    print("Opening keyvalue DB at $path");
+    var db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        var batch = db.batch();
+        batch.execute(KVTables.kvTable);
+        await batch.commit();
+      },
+    );
+
+    return db;
+  }
+
+  // populate the cache
+  void _populate() async {
+    var results = await db.query(KVTables.kvTableName);
+    for (var result in results) {
+      if (result['key'] == null || result['value'] == null) {
+        continue;
+      }
+      _kvdbCache["${result['key']}"] = "${result['value']}";
+    }
+  }
+
+  int count() {
+    return _kvdbCache.length;
+  }
+
+  reloadCache() async {
+    _kvdbCache.clear();
+    _populate();
+  }
+
+  Future<int> deleteAll() async {
+    _kvdbCache.clear();
+    int ret = await db.delete(KVTables.kvTableName);
+    return ret;
+  }
+
+  close() async {
+    await db.close();
+  }
+
+  Future<bool> delete(String key) async {
+    _kvdbCache.remove(key);
+    int ret = await db.rawDelete(KVQueries.delete, [key]);
+    return ret == 1;
+  }
+
+  // Getter Setters
+  Set<String> getKeys() => Set<String>.from(_kvdbCache.keys);
+
+  /// Reads a value of any type from persistent storage.
+  Object? get(String key) => _kvdbCache[key];
+
+  /// Reads a value from persistent storage, throwing an exception if it's not a
+  /// bool.
+  bool? getBool(String key) => _kvdbCache[key] as bool?;
+
+  /// Reads a value from persistent storage, throwing an exception if it's not
+  /// an int.
+  int? getInt(String key) => _kvdbCache[key] as int?;
+
+  /// Reads a value from persistent storage, throwing an exception if it's not a
+  /// double.
+  double? getDouble(String key) => _kvdbCache[key] as double?;
+
+  /// Reads a value from persistent storage, throwing an exception if it's not a
+  /// String.
+  String? getString(String key) => _kvdbCache[key] as String?;
+
+  /// Returns true if the persistent storage contains the given [key].
+  bool containsKey(String key) => _kvdbCache.containsKey(key);
+
+  /// Reads a set of string values from persistent storage, throwing an
+  /// exception if it's not a string set.
+  List<String>? getStringList(String key) {
+    List<dynamic>? list = _kvdbCache[key] as List<dynamic>?;
+    if (list != null && list is! List<String>) {
+      list = list.cast<String>().toList();
+      _kvdbCache[key] = list;
+    }
+    // Make a copy of the list so that later mutations won't propagate
+    return list?.toList() as List<String>?;
+  }
+
+  /// Saves a boolean [value] to persistent storage in the background.
+  Future<bool> setBool(String key, bool value) => _setValue('Bool', key, value);
+
+  /// Saves an integer [value] to persistent storage in the background.
+  Future<bool> setInt(String key, int value) => _setValue('Int', key, value);
+
+  /// Saves a double [value] to persistent storage in the background.
+  ///
+  /// Android doesn't support storing doubles, so it will be stored as a float.
+  Future<bool> setDouble(String key, double value) =>
+      _setValue('Double', key, value);
+
+  /// Saves a string [value] to persistent storage in the background.
+  Future<bool> setString(String key, String value) =>
+      _setValue('String', key, value);
+
+  Future<bool> _setValue(String valueType, String key, Object value) async {
+    ArgumentError.checkNotNull(value, 'value');
+
+    if (value is List<String>) {
+      // Make a copy of the list so that later mutations won't propagate
+      _kvdbCache[key] = value.toList();
+    } else {
+      _kvdbCache[key] = value;
+    }
+
+    int ret = await db
+        .rawInsert(KVQueries.upsert, [key, value, valueType, value, valueType]);
+    return ret == 1;
+  }
+}

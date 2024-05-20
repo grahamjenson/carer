@@ -30,8 +30,7 @@ void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Create Database
-  print("THIS IS HERE");
-  await openDatabaseAndCreateTables();
+  var db = await CarerDB.create();
 
   // Load the settings from Shared Preferences before starting
   var settings = Settings();

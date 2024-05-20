@@ -1,5 +1,5 @@
 import 'package:carer/models/settings_cn.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:carer/sql/key_value_store.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 enum AlarmSettingsNames {
@@ -62,7 +62,7 @@ extension AlarmSoundsExtension on AlarmSounds {
 }
 
 class AlarmSettings {
-  SharedPreferences prefs;
+  KeyValueStore prefs;
   Settings settings;
 
   bool _disableAlarms = false;

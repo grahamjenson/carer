@@ -3,8 +3,8 @@ import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings/target_settings.dart';
 import 'package:carer/models/settings/ui_settings.dart';
+import 'package:carer/sql/key_value_store.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum SettingNames {
   // NS Settings
@@ -15,7 +15,7 @@ enum SettingNames {
 }
 
 class Settings extends ChangeNotifier {
-  late SharedPreferences prefs;
+  late KeyValueStore prefs;
   late DebugSettings debugSettings;
   late TargetSettings targetSettings;
   late UISettings uiSettings;
@@ -25,17 +25,7 @@ class Settings extends ChangeNotifier {
   Unit _unit = Unit.mmol;
 
   Future<void> populate() async {
-    prefs = await SharedPreferences.getInstance();
-
-    var urlPref = prefs.getString(SettingNames.nightscoutUrl.name);
-    if (urlPref != null && urlPref.isNotEmpty) {
-      _nightscoutURL = urlPref;
-    }
-
-    var unitPref = prefs.getBool(SettingNames.unit.name);
-    if (unitPref != null) {
-      _unit = UnitExtension.fromBool(unitPref);
-    }
+    prefs = await KeyValueStore.create();
 
     uiSettings = UISettings(prefs: prefs, settings: this);
     uiSettings.populate();

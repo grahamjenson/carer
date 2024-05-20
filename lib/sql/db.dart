@@ -1,127 +1,45 @@
+import 'package:carer/sql/statements/db_tables.dart';
+import 'package:carer/sql/statements/kv.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-////
-// READINGS
-////
+class CarerDB {
+  final Database db;
+  CarerDB(this.db);
 
-// create glucose
-createSGVTable(Batch batch) {
-  batch.execute('''
-    CREATE TABLE sgvs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      date TEXT
-    )
-  ''');
-}
+  static Future<CarerDB> create() async {
+    final db = await openDatabaseAndCreateTables();
+    return CarerDB(db);
+  }
 
-////
-// TREATMENTS
-////
+  // Open the database and create the tables
+  static Future<Database> openDatabaseAndCreateTables() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'carer.db');
+    print("Opening database at $path");
+    var db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        var batch = db.batch();
 
-// create insulin
-createInsulinTable(Batch batch) {
-  batch.execute('''
-    CREATE TABLE insulin (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      date TEXT
-    )
-  ''');
-}
+        batch.execute(DBTables.sgvTable);
+        batch.execute(DBTables.insulinTable);
+        batch.execute(DBTables.carbsTable);
+        batch.execute(DBTables.tempbasalTable);
+        batch.execute(DBTables.temptargetsTable);
+        batch.execute(DBTables.profileTable);
 
-// create carbs
-createCarbsTable(Batch batch) {
-  batch.execute('''
-    CREATE TABLE carbs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      date TEXT
-    )
-  ''');
-}
+        // Also add a key value store for state and caching calculations
+        batch.execute(KVTables.kvTable);
 
-// create basal
-createTempBasalTable(Batch batch) {
-  batch.execute('''
-    CREATE TABLE tempbasal (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      date TEXT
-    )
-  ''');
-}
+        await batch.commit();
+      },
+      // I am assuming these values will destroy and recreate the database on any version change.
+      onDowngrade: onDatabaseDowngradeDelete,
+      onUpgrade: onDatabaseDowngradeDelete,
+    );
 
-// create targets
-createTempTargetsTable(Batch batch) {
-  batch.execute('''
-    CREATE TABLE temptargets (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      date TEXT
-    )
-  ''');
-}
-
-////
-// PROFILE
-////
-
-// create profile table
-createProfileTable(Batch batch) {
-  // Should we denormalize and have [24] array for each type of basal, carb ratio, etc?
-  // Yes, then we can do comparisons easier
-  batch.execute('''
-    CREATE TABLE profile (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
-      age INTEGER,
-      weight REAL,
-      height REAL
-    )
-  ''');
-}
-
-////
-// State Information
-////
-
-// create state table
-createStateTable(Batch batch) {
-  batch.execute('''
-    CREATE TABLE state (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value TEXT,
-      date TEXT
-    )
-  ''');
-}
-
-// Open the database and create the tables
-Future<Database> openDatabaseAndCreateTables() async {
-  final databasePath = await getDatabasesPath();
-  final path = join(databasePath, 'carer.db');
-  int version = 1;
-  print("Opening database at $path");
-  var db = await openDatabase(
-    path,
-    version: version,
-    onCreate: (db, version) async {
-      var batch = db.batch();
-      // Create Tables
-      createSGVTable(batch);
-      createInsulinTable(batch);
-      createCarbsTable(batch);
-      createTempBasalTable(batch);
-      createTempTargetsTable(batch);
-      createProfileTable(batch);
-      createStateTable(batch);
-      await batch.commit();
-    },
-    onDowngrade: onDatabaseDowngradeDelete,
-    onUpgrade: onDatabaseDowngradeDelete,
-  );
-
-  return db;
+    return db;
+  }
 }

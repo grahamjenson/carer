@@ -1,6 +1,6 @@
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:carer/sql/key_value_store.dart';
 
 enum DebugSettingNames {
   debug,
@@ -29,7 +29,7 @@ enum DebugSummary {
 }
 
 class DebugSettings {
-  SharedPreferences prefs;
+  KeyValueStore prefs;
   Settings settings;
 
   DebugSettings({required this.prefs, required this.settings});

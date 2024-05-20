@@ -1,5 +1,5 @@
 import 'package:carer/models/settings_cn.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:carer/sql/key_value_store.dart';
 
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
@@ -12,7 +12,7 @@ enum TargetSettingNames {
 }
 
 class TargetSettings {
-  SharedPreferences prefs;
+  KeyValueStore prefs;
   Settings settings;
 
   TargetSettings({required this.prefs, required this.settings});
