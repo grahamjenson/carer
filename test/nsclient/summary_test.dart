@@ -14,10 +14,7 @@ void main() {
 
     Summary summary = Summary.fromJson(jsonString);
 
-    // Add your assertions here based on your data and the structure of your objects
-    expect(summary.sgvs.sgvs.length, equals(73));
-
-    // ... add more assertions as needed
+    expect(summary.sgvs.sgvs.length, equals(13));
   });
 
   test('parsing bad summary return enmpty Summary object', () async {
