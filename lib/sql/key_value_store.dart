@@ -16,7 +16,7 @@ class KeyValueStore {
   static Future<KeyValueStore> create() async {
     final db = await openDatabaseAndCreateTables();
     var kvdb = KeyValueStore(db);
-    kvdb._populate();
+    await kvdb._populate();
     return kvdb;
   }
 
@@ -41,14 +41,36 @@ class KeyValueStore {
   }
 
   // populate the cache
-  void _populate() async {
+  Future<bool> _populate() async {
     var results = await db.query(KVTables.kvTableName);
     for (var result in results) {
-      if (result['key'] == null || result['value'] == null) {
+      if (result['k'] == null || result['v'] == null || result['t'] == null) {
         continue;
       }
-      _kvdbCache["${result['key']}"] = "${result['value']}";
+
+      String key = "${result['k']}";
+      String value = "${result['v']}";
+      String type = "${result['t']}";
+
+      switch (type) {
+        case 'Bool':
+          _kvdbCache[key] = value == '1';
+          break;
+        case 'Int':
+          _kvdbCache[key] = int.parse(value);
+          break;
+        case 'Double':
+          _kvdbCache[key] = double.parse(value);
+          break;
+        case 'String':
+          _kvdbCache[key] = value;
+          break;
+        default:
+          _kvdbCache[key] = value;
+          break;
+      }
     }
+    return true;
   }
 
   int count() {
@@ -57,7 +79,7 @@ class KeyValueStore {
 
   reloadCache() async {
     _kvdbCache.clear();
-    _populate();
+    await _populate();
   }
 
   Future<int> deleteAll() async {
@@ -84,19 +106,19 @@ class KeyValueStore {
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// bool.
-  bool? getBool(String key) => _kvdbCache[key] as bool?;
+  bool? getBool(String key) => _kvdbCache[key];
 
   /// Reads a value from persistent storage, throwing an exception if it's not
   /// an int.
-  int? getInt(String key) => _kvdbCache[key] as int?;
+  int? getInt(String key) => _kvdbCache[key];
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// double.
-  double? getDouble(String key) => _kvdbCache[key] as double?;
+  double? getDouble(String key) => _kvdbCache[key];
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// String.
-  String? getString(String key) => _kvdbCache[key] as String?;
+  String? getString(String key) => _kvdbCache[key];
 
   /// Returns true if the persistent storage contains the given [key].
   bool containsKey(String key) => _kvdbCache.containsKey(key);
@@ -132,11 +154,10 @@ class KeyValueStore {
   Future<bool> _setValue(String valueType, String key, Object value) async {
     ArgumentError.checkNotNull(value, 'value');
 
-    if (value is List<String>) {
-      // Make a copy of the list so that later mutations won't propagate
-      _kvdbCache[key] = value.toList();
-    } else {
-      _kvdbCache[key] = value;
+    _kvdbCache[key] = value;
+
+    if (valueType == 'Bool') {
+      value = (value as bool) ? '1' : '0';
     }
 
     int ret = await db

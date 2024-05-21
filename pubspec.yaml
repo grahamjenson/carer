@@ -1,5 +1,6 @@
 name: carer
-description: "A new Flutter project."
+description: "The Carer App gives information to people caring for people with Type 1 Diabetes. It is a companion app that can offer suggestions BUT it is not a medical device and should not be used to make medical decisions."
+
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -32,7 +33,7 @@ dependencies:
     sdk: flutter
 
   path: any
-  
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -56,14 +57,15 @@ dependencies:
   sentry_flutter: 8.1.0 # locking this version as they keep releasing without new pods
   flutter_local_notifications: ^17.1.2
   sqflite: ^2.3.3+1
-  sqflite_common_ffi: ^2.3.3
+
   
 
 dev_dependencies:
   sentry_dart_plugin: ^1.0.0
-
+  sqflite_common_ffi: ^2.3.3 # sqflite has to use system version of sqlite in test  
   flutter_test:
     sdk: flutter
+  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

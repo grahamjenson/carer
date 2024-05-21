@@ -5,17 +5,19 @@ import 'package:carer/models/settings/debug_settings.dart';
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
+import 'package:carer/sql/db.dart';
 import 'package:flutter/material.dart';
 
 class SummaryCN extends ChangeNotifier {
   Settings settings;
+  CarerDB db;
 
   // When this updates lots of things will change
   Summary summary = Summary.empty;
   bool _summaryToBeUpdated = true;
   String _updateReason = "";
 
-  SummaryCN({required this.settings}) {
+  SummaryCN({required this.settings, required this.db}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => update());
     update();
     settings.addListener(() {

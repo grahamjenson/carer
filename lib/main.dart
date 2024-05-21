@@ -39,7 +39,7 @@ void runCarer() async {
   // Make sure screen wont fall asleep if set
   WakelockPlus.toggle(enable: settings.screenActive);
 
-  final summary = SummaryCN(settings: settings);
+  final summary = SummaryCN(settings: settings, db: db);
   final t1d = T1DCN(settings: settings, summaryCn: summary);
   final alarms = AlarmsCN(t1d: t1d, settings: settings);
 

@@ -21,9 +21,6 @@ class Settings extends ChangeNotifier {
   late UISettings uiSettings;
   late AlarmSettings alarmSettings;
 
-  String _nightscoutURL = '';
-  Unit _unit = Unit.mmol;
-
   Future<void> populate() async {
     prefs = await KeyValueStore.create();
 
@@ -73,18 +70,20 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get nightscoutURL => _nightscoutURL;
+  String get nightscoutURL =>
+      prefs.getString(SettingNames.nightscoutUrl.name) ?? '';
+
   set nightscoutURL(String value) {
     prefs.setString(SettingNames.nightscoutUrl.name, value);
-    _nightscoutURL = value;
     notifyListeners();
   }
 
   // UNIT
-  Unit get unit => _unit;
+  Unit get unit =>
+      UnitExtension.fromBool(prefs.getBool(SettingNames.unit.name));
+
   set unit(Unit value) {
     prefs.setBool(SettingNames.unit.name, value.toBool());
-    _unit = value;
     notifyListeners();
   }
 

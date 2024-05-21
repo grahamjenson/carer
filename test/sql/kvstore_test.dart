@@ -27,37 +27,74 @@ void main() {
       await store.close();
     });
 
-    test('insert and upsert', () async {
-      await store.setString('key', 'value');
-      expect(store.get('key'), 'value');
+    test("populate from clean cache", () async {
+      expect(store.count(), 0);
+      await store.setString("a", 'x');
+      expect(store.get('a'), 'x');
+      await store.reloadCache();
+      expect(store.get('a'), 'x');
+    });
 
-      await store.setString('key', 'value2');
-      expect(store.get('key'), 'value2');
+    test('insert and upsert', () async {
+      await store.setString('a', 'x');
+      expect(store.get('a'), 'x');
+
+      await store.setString('a', 'y');
+      expect(store.get('a'), 'y');
     });
 
     test('delete', () async {
-      await store.setString('key', 'value');
-      expect(store.get('key'), 'value');
+      await store.setString('a', 'x');
+      expect(store.get('a'), 'x');
 
-      await store.delete('key');
-      expect(store.get('key'), null);
+      await store.delete('a');
+      expect(store.get('a'), null);
     });
 
     test('deleteAll', () async {
-      await store.setString('key', 'value');
-      await store.setString('key2', 'value2');
-      expect(store.get('key'), 'value');
-      expect(store.get('key2'), 'value2');
+      await store.setString('a', 'x');
+      await store.setString('b', 'y');
+      expect(store.get('a'), 'x');
+      expect(store.get('b'), 'y');
 
       await store.deleteAll();
-      expect(store.get('key'), null);
-      expect(store.get('key2'), null);
+      expect(store.get('a'), null);
+      expect(store.get('b'), null);
     });
 
     test('getKeys', () async {
-      await store.setString('key', 'value');
-      await store.setString('key2', 'value2');
-      expect(store.getKeys(), ['key', 'key2']);
+      await store.setString('a', 'x');
+      await store.setString('b', 'y');
+      expect(store.getKeys(), ['a', 'b']);
+    });
+
+    // Test all the types work
+    test('storing bool', () async {
+      await store.setBool('a', true);
+      expect(store.getBool('a'), true);
+      await store.reloadCache();
+      expect(store.getBool('a'), true);
+    });
+
+    test('storing int', () async {
+      await store.setInt('a', 1);
+      expect(store.getInt('a'), 1);
+      await store.reloadCache();
+      expect(store.getInt('a'), 1);
+    });
+
+    test('storing double', () async {
+      await store.setDouble('a', 1.1);
+      expect(store.getDouble('a'), 1.1);
+      await store.reloadCache();
+      expect(store.getDouble('a'), 1.1);
+    });
+
+    test('storing String', () async {
+      await store.setString('a', 'x');
+      expect(store.getString('a'), 'x');
+      await store.reloadCache();
+      expect(store.getString('a'), 'x');
     });
   });
 }
