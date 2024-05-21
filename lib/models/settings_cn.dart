@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carer/models/models.dart';
 import 'package:carer/models/settings/alarm_settings.dart';
 import 'package:carer/models/settings/debug_settings.dart';
@@ -25,16 +27,12 @@ class Settings extends ChangeNotifier {
     prefs = await KeyValueStore.create();
 
     uiSettings = UISettings(prefs: prefs, settings: this);
-    uiSettings.populate();
 
     targetSettings = TargetSettings(prefs: prefs, settings: this);
-    targetSettings.populate();
 
     alarmSettings = AlarmSettings(prefs: prefs, settings: this);
-    alarmSettings.populate();
 
     debugSettings = DebugSettings(prefs: prefs, settings: this);
-    debugSettings.populate();
   }
 
   @override

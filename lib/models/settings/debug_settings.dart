@@ -34,48 +34,31 @@ class DebugSettings {
 
   DebugSettings({required this.prefs, required this.settings});
 
-  bool _debug = false;
-  bool _logErrors = true;
-
-  DebugSummary _debugSummary = DebugSummary.off;
-
-  void populate() {
-    var debugPref = prefs.getBool(DebugSettingNames.debug.name);
-    if (debugPref != null) {
-      _debug = debugPref;
-    }
-
-    var debugSummaryPref = prefs.getString(DebugSettingNames.debugSummary.name);
-    if (debugSummaryPref != null) {
-      _debugSummary = DebugSummary.values.firstWhere(
-          (e) => e.name == debugSummaryPref,
-          orElse: () => DebugSummary.off);
-    }
-
-    var logErrorsPref = prefs.getBool(DebugSettingNames.logErrors.name);
-    if (logErrorsPref != null) {
-      _logErrors = logErrorsPref;
-    }
-  }
-
-  bool get debug => _debug;
+  bool get debug =>
+      prefs.getBool(DebugSettingNames.debug.name, defaultValue: false)!;
   set debug(bool value) {
     prefs.setBool(DebugSettingNames.debug.name, value);
-    _debug = value;
+
     settings.notify();
   }
 
-  DebugSummary get debugSummary => _debugSummary;
+  DebugSummary get debugSummary {
+    var debugSummaryPref = prefs.getString(DebugSettingNames.debugSummary.name,
+        defaultValue: DebugSummary.off.name);
+    return DebugSummary.values.firstWhere((e) => e.name == debugSummaryPref,
+        orElse: () => DebugSummary.off);
+  }
+
   set debugSummary(DebugSummary value) {
     prefs.setString(DebugSettingNames.debugSummary.name, value.name);
-    _debugSummary = value;
     settings.notify();
   }
 
-  bool get logErrors => _logErrors;
+  bool get logErrors =>
+      prefs.getBool(DebugSettingNames.logErrors.name, defaultValue: true)!;
   set logErrors(bool value) {
     prefs.setBool(DebugSettingNames.logErrors.name, value);
-    _logErrors = value;
+
     settings.notify();
   }
 }

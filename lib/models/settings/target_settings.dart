@@ -17,37 +17,21 @@ class TargetSettings {
 
   TargetSettings({required this.prefs, required this.settings});
 
-  Map<String, int> targets = {
-    TargetSettingNames.targetHigh.name: 180,
-    TargetSettingNames.targetLow.name: 72,
-    TargetSettingNames.urgentHigh.name: 270,
-    TargetSettingNames.urgentLow.name: 55
-  };
-
-  void populate() {
-    for (var setting in targets.entries) {
-      var value = prefs.getInt(setting.key);
-      if (value != null) {
-        targets[setting.key] = value;
-      }
-    }
-  }
-
   // getters
   int get targetHigh {
-    return targets[TargetSettingNames.targetHigh.name]!;
+    return prefs.getInt(TargetSettingNames.targetHigh.name, defaultValue: 180)!;
   }
 
   int get targetLow {
-    return targets[TargetSettingNames.targetLow.name]!;
+    return prefs.getInt(TargetSettingNames.targetLow.name, defaultValue: 72)!;
   }
 
   int get urgentHigh {
-    return targets[TargetSettingNames.urgentHigh.name]!;
+    return prefs.getInt(TargetSettingNames.urgentHigh.name, defaultValue: 270)!;
   }
 
   int get urgentLow {
-    return targets[TargetSettingNames.urgentLow.name]!;
+    return prefs.getInt(TargetSettingNames.urgentLow.name, defaultValue: 55)!;
   }
 
   // setters
@@ -78,17 +62,22 @@ class TargetSettings {
   }
 
   Future<void> setTarget(TargetSettingNames setting, int value) async {
-    var clone = Map<String, int>.from(targets);
+    var clone = {
+      TargetSettingNames.targetHigh.name: targetHigh,
+      TargetSettingNames.targetLow.name: targetLow,
+      TargetSettingNames.urgentHigh.name: urgentHigh,
+      TargetSettingNames.urgentLow.name: urgentLow,
+    };
+    // Override the propesed setting
     clone[setting.name] = value;
-    if (validTargets(
+    if (!validTargets(
         clone[TargetSettingNames.urgentLow.name]!,
         clone[TargetSettingNames.targetLow.name]!,
         clone[TargetSettingNames.targetHigh.name]!,
         clone[TargetSettingNames.urgentHigh.name]!)) {
-      targets = clone;
-    } else {
       return;
     }
+
     await prefs.setInt(setting.name, value);
     settings.notify();
   }

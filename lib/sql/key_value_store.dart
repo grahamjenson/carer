@@ -102,38 +102,31 @@ class KeyValueStore {
   Set<String> getKeys() => Set<String>.from(_kvdbCache.keys);
 
   /// Reads a value of any type from persistent storage.
-  Object? get(String key) => _kvdbCache[key];
+  Object? get(String key, {Object? defaultValue}) =>
+      _kvdbCache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// bool.
-  bool? getBool(String key) => _kvdbCache[key];
+  bool? getBool(String key, {bool? defaultValue}) =>
+      _kvdbCache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not
   /// an int.
-  int? getInt(String key) => _kvdbCache[key];
+  int? getInt(String key, {int? defaultValue}) =>
+      _kvdbCache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// double.
-  double? getDouble(String key) => _kvdbCache[key];
+  double? getDouble(String key, {double? defaultValue}) =>
+      _kvdbCache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// String.
-  String? getString(String key) => _kvdbCache[key];
+  String? getString(String key, {String? defaultValue}) =>
+      _kvdbCache[key] ?? defaultValue;
 
   /// Returns true if the persistent storage contains the given [key].
   bool containsKey(String key) => _kvdbCache.containsKey(key);
-
-  /// Reads a set of string values from persistent storage, throwing an
-  /// exception if it's not a string set.
-  List<String>? getStringList(String key) {
-    List<dynamic>? list = _kvdbCache[key] as List<dynamic>?;
-    if (list != null && list is! List<String>) {
-      list = list.cast<String>().toList();
-      _kvdbCache[key] = list;
-    }
-    // Make a copy of the list so that later mutations won't propagate
-    return list?.toList() as List<String>?;
-  }
 
   /// Saves a boolean [value] to persistent storage in the background.
   Future<bool> setBool(String key, bool value) => _setValue('Bool', key, value);

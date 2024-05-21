@@ -27,14 +27,6 @@ void main() {
       await store.close();
     });
 
-    test("populate from clean cache", () async {
-      expect(store.count(), 0);
-      await store.setString("a", 'x');
-      expect(store.get('a'), 'x');
-      await store.reloadCache();
-      expect(store.get('a'), 'x');
-    });
-
     test('insert and upsert', () async {
       await store.setString('a', 'x');
       expect(store.get('a'), 'x');
@@ -70,6 +62,10 @@ void main() {
 
     // Test all the types work
     test('storing bool', () async {
+      expect(store.getBool('a'), null);
+      expect(store.getBool('a', defaultValue: true), true);
+      expect(store.getBool('a', defaultValue: false), false);
+
       await store.setBool('a', true);
       expect(store.getBool('a'), true);
       await store.reloadCache();
@@ -77,6 +73,9 @@ void main() {
     });
 
     test('storing int', () async {
+      expect(store.getInt('a'), null);
+      expect(store.getInt('a', defaultValue: 3), 3);
+
       await store.setInt('a', 1);
       expect(store.getInt('a'), 1);
       await store.reloadCache();
@@ -84,6 +83,9 @@ void main() {
     });
 
     test('storing double', () async {
+      expect(store.getDouble('a'), null);
+      expect(store.getDouble('a', defaultValue: 1.5), 1.5);
+
       await store.setDouble('a', 1.1);
       expect(store.getDouble('a'), 1.1);
       await store.reloadCache();
@@ -91,6 +93,9 @@ void main() {
     });
 
     test('storing String', () async {
+      expect(store.getString('a'), null);
+      expect(store.getString('a', defaultValue: "z"), 'z');
+
       await store.setString('a', 'x');
       expect(store.getString('a'), 'x');
       await store.reloadCache();

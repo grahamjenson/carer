@@ -1,6 +1,5 @@
 import 'package:carer/models/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 enum AlarmSettingsNames {
   disableAlarms,
@@ -65,157 +64,15 @@ class AlarmSettings {
   KeyValueStore prefs;
   Settings settings;
 
-  bool _disableAlarms = false;
-
-  // Boundary Alarms
-  bool _urgentLowlarm = false;
-  bool _lowAlarm = false;
-  int _lowMinutes = 30;
-  bool _highAlarm = false;
-  int _highMinutes = 30;
-  bool _urgentHighAlarm = false;
-
-  // Diff Alarms
-  bool _fastDropAlarm = false;
-  int _fastDropAlarmMinutes = 30;
-  int _fastDropDelta = -20;
-  bool _fastRiseAlarm = false;
-  int _fastRiseAlarmMinutes = 30;
-  int _fastRiseDelta = 20;
-
-  // smart alarms
-  bool _lowPredictionAlarm = false;
-  int _lowPredictionMinutes = 30;
-
-  bool _smartSnooze = false;
-
-  // data alarms
-  int _noDataAlarmMinutes = 30;
-
-  // volume
-  bool _volumeOveride = false;
-  int _volumeOverrideValue = 50;
-  int _volumeProgressionSeconds = 2;
-
-  AlarmSounds _alarmAsset = AlarmSounds.nightguard;
-
   // ephemeral properters
   bool _testAlarmPlaying = false;
-
   AlarmSettings({required this.prefs, required this.settings});
 
-  void populate() {
-    // Disable alarms
-    var disableAlarmsPref =
-        prefs.getBool(AlarmSettingsNames.disableAlarms.name);
-    if (disableAlarmsPref != null) {
-      _disableAlarms = disableAlarmsPref;
-    }
+  bool get disableAlarms => prefs.getBool(AlarmSettingsNames.disableAlarms.name,
+      defaultValue: false)!;
 
-    // Boundary Alarms
-    var urgentLowAlarmPref =
-        prefs.getBool(AlarmSettingsNames.urgentLowAlarm.name);
-    if (urgentLowAlarmPref != null) {
-      _urgentLowlarm = urgentLowAlarmPref;
-    }
-
-    var lowAlarmPref = prefs.getBool(AlarmSettingsNames.lowAlarm.name);
-    if (lowAlarmPref != null) {
-      _lowAlarm = lowAlarmPref;
-    }
-
-    var lowMinutesPref = prefs.getInt(AlarmSettingsNames.lowMinutes.name);
-    if (lowMinutesPref != null) {
-      _lowMinutes = lowMinutesPref;
-    }
-
-    var highAlarmPref = prefs.getBool(AlarmSettingsNames.highAlarm.name);
-    if (highAlarmPref != null) {
-      _highAlarm = highAlarmPref;
-    }
-
-    var highMinutesPref = prefs.getInt(AlarmSettingsNames.highMinutes.name);
-    if (highMinutesPref != null) {
-      _highMinutes = highMinutesPref;
-    }
-
-    var urgentHighAlarmPref =
-        prefs.getBool(AlarmSettingsNames.urgentHighAlarm.name);
-    if (urgentHighAlarmPref != null) {
-      _urgentHighAlarm = urgentHighAlarmPref;
-    }
-
-    // Prediction alarms
-    var lowPredictionAlarmPref =
-        prefs.getBool(AlarmSettingsNames.lowPredictionAlarm.name);
-    if (lowPredictionAlarmPref != null) {
-      _lowPredictionAlarm = lowPredictionAlarmPref;
-    }
-
-    var lowPredictionMinutesPref =
-        prefs.getInt(AlarmSettingsNames.lowPredictionMinutes.name);
-    if (lowPredictionMinutesPref != null) {
-      _lowPredictionMinutes = lowPredictionMinutesPref;
-    }
-
-    // Diff Alarms
-    var fastDropAlarmPref =
-        prefs.getBool(AlarmSettingsNames.fastDropAlarm.name);
-    if (fastDropAlarmPref != null) {
-      _fastDropAlarm = fastDropAlarmPref;
-    }
-
-    var fastRiseAlarmPref =
-        prefs.getBool(AlarmSettingsNames.fastRiseAlarm.name);
-    if (fastRiseAlarmPref != null) {
-      _fastRiseAlarm = fastRiseAlarmPref;
-    }
-
-    // data alarms
-    var noDataAlarmMinutesPref =
-        prefs.getInt(AlarmSettingsNames.noDataAlarmMinutes.name);
-    if (noDataAlarmMinutesPref != null) {
-      _noDataAlarmMinutes = noDataAlarmMinutesPref;
-    }
-
-    // smart snooze
-
-    var smartSnoozePref = prefs.getBool(AlarmSettingsNames.smartSnooze.name);
-    if (smartSnoozePref != null) {
-      _smartSnooze = smartSnoozePref;
-    }
-
-    // volume
-    var volumeOveridePref =
-        prefs.getBool(AlarmSettingsNames.volumeOveride.name);
-    if (volumeOveridePref != null) {
-      _volumeOveride = volumeOveridePref;
-    }
-
-    var volumeOverrideValuePref =
-        prefs.getInt(AlarmSettingsNames.volumeOverrideValue.name);
-    if (volumeOverrideValuePref != null) {
-      _volumeOverrideValue = volumeOverrideValuePref;
-    }
-
-    var volumeProgressionSecondsPref =
-        prefs.getInt(AlarmSettingsNames.volumeProgressionSeconds.name);
-    if (volumeProgressionSecondsPref != null) {
-      _volumeProgressionSeconds = volumeProgressionSecondsPref;
-    }
-
-    var alarmAssetPref = prefs.getString('alarmAsset');
-    if (alarmAssetPref != null) {
-      _alarmAsset = AlarmSounds.values.firstWhere(
-          (e) => e.name == alarmAssetPref,
-          orElse: () => AlarmSounds.nightguard);
-    }
-  }
-
-  bool get disableAlarms => _disableAlarms;
   set disableAlarms(bool value) {
     prefs.setBool(AlarmSettingsNames.disableAlarms.name, value);
-    _disableAlarms = value;
     settings.notify();
   }
 
@@ -224,30 +81,31 @@ class AlarmSettings {
   ////
 
   // urgentLowAlarm
-  bool get urgentLowAlarm => _urgentLowlarm;
+  bool get urgentLowAlarm => prefs
+      .getBool(AlarmSettingsNames.urgentLowAlarm.name, defaultValue: false)!;
   set urgentLowAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.urgentLowAlarm.name, value);
-    _urgentLowlarm = value;
     settings.notify();
   }
 
-  bool get lowAlarm => _lowAlarm;
+  bool get lowAlarm =>
+      prefs.getBool(AlarmSettingsNames.lowAlarm.name, defaultValue: false)!;
   set lowAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.lowAlarm.name, value);
-    _lowAlarm = value;
-    WakelockPlus.toggle(enable: value);
     settings.notify();
   }
 
   // highAlarm
-  bool get highAlarm => _highAlarm;
+  bool get highAlarm =>
+      prefs.getBool(AlarmSettingsNames.highAlarm.name, defaultValue: false)!;
   set highAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.highAlarm.name, value);
-    _highAlarm = value;
+
     settings.notify();
   }
 
-  int get lowMinutes => _lowMinutes;
+  int get lowMinutes =>
+      prefs.getInt(AlarmSettingsNames.lowMinutes.name, defaultValue: 30)!;
   set lowMinutes(int value) {
     var validValues = [0, 5, 10, 15, 20, 30, 45, 60];
     if (!validValues.contains(value)) {
@@ -255,11 +113,12 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.lowMinutes.name, value);
-    _lowMinutes = value;
+
     settings.notify();
   }
 
-  int get highMinutes => _highMinutes;
+  int get highMinutes =>
+      prefs.getInt(AlarmSettingsNames.highMinutes.name, defaultValue: 30)!;
   set highMinutes(int value) {
     var validValues = [0, 5, 10, 15, 20, 30, 45, 60];
     if (!validValues.contains(value)) {
@@ -267,15 +126,15 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.highMinutes.name, value);
-    _highMinutes = value;
+
     settings.notify();
   }
 
   // urgentHighAlarm
-  bool get urgentHighAlarm => _urgentHighAlarm;
+  bool get urgentHighAlarm => prefs
+      .getBool(AlarmSettingsNames.urgentHighAlarm.name, defaultValue: false)!;
   set urgentHighAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.urgentHighAlarm.name, value);
-    _urgentHighAlarm = value;
     settings.notify();
   }
 
@@ -283,14 +142,17 @@ class AlarmSettings {
   // Prediction alarms
   ////
 
-  bool get lowPredictionAlarm => _lowPredictionAlarm;
+  bool get lowPredictionAlarm =>
+      prefs.getBool(AlarmSettingsNames.lowPredictionAlarm.name,
+          defaultValue: false)!;
   set lowPredictionAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.lowPredictionAlarm.name, value);
-    _lowPredictionAlarm = value;
+
     settings.notify();
   }
 
-  int get lowPredictionMinutes => _lowPredictionMinutes;
+  int get lowPredictionMinutes => prefs
+      .getInt(AlarmSettingsNames.lowPredictionMinutes.name, defaultValue: 30)!;
   set lowPredictionMinutes(int value) {
     var validValues = [5, 10, 15, 20, 30];
     if (!validValues.contains(value)) {
@@ -298,7 +160,7 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.lowPredictionMinutes.name, value);
-    _lowPredictionMinutes = value;
+
     settings.notify();
   }
 
@@ -307,14 +169,15 @@ class AlarmSettings {
   ////
 
   // fasrDrop
-  bool get fastDropAlarm => _fastDropAlarm;
+  bool get fastDropAlarm => prefs.getBool(AlarmSettingsNames.fastDropAlarm.name,
+      defaultValue: false)!;
   set fastDropAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.fastDropAlarm.name, value);
-    _fastDropAlarm = value;
     settings.notify();
   }
 
-  int get fastDropAlarmMinutes => _fastDropAlarmMinutes;
+  int get fastDropAlarmMinutes => prefs
+      .getInt(AlarmSettingsNames.fastDropAlarmMinutes.name, defaultValue: 30)!;
   set fastDropAlarmMinutes(int value) {
     var validValues = [5, 10, 15, 20, 30];
     if (!validValues.contains(value)) {
@@ -322,29 +185,32 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.fastDropAlarmMinutes.name, value);
-    _fastDropAlarmMinutes = value;
+
     settings.notify();
   }
 
-  int get fastDropDelta => _fastDropDelta;
+  int get fastDropDelta =>
+      prefs.getInt(AlarmSettingsNames.fastDropDelta.name, defaultValue: -20)!;
   set fastDropDelta(int value) {
     if (value > -8) {
       value = -8;
     }
     prefs.setInt(AlarmSettingsNames.fastDropDelta.name, value);
-    _fastDropDelta = value;
+
     settings.notify();
   }
 
   // fastRise
-  bool get fastRiseAlarm => _fastRiseAlarm;
+  bool get fastRiseAlarm => prefs.getBool(AlarmSettingsNames.fastRiseAlarm.name,
+      defaultValue: false)!;
   set fastRiseAlarm(bool value) {
     prefs.setBool(AlarmSettingsNames.fastRiseAlarm.name, value);
-    _fastRiseAlarm = value;
+
     settings.notify();
   }
 
-  int get fastRiseAlarmMinutes => _fastRiseAlarmMinutes;
+  int get fastRiseAlarmMinutes => prefs
+      .getInt(AlarmSettingsNames.fastRiseAlarmMinutes.name, defaultValue: 30)!;
   set fastRiseAlarmMinutes(int value) {
     var validValues = [5, 10, 15, 20, 30];
     if (!validValues.contains(value)) {
@@ -352,17 +218,17 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.fastRiseAlarmMinutes.name, value);
-    _fastRiseAlarmMinutes = value;
     settings.notify();
   }
 
-  int get fastRiseDelta => _fastRiseDelta;
+  int get fastRiseDelta =>
+      prefs.getInt(AlarmSettingsNames.fastRiseDelta.name, defaultValue: 20)!;
   set fastRiseDelta(int value) {
     if (value < 8) {
       value = 8;
     }
     prefs.setInt(AlarmSettingsNames.fastRiseDelta.name, value);
-    _fastRiseDelta = value;
+
     settings.notify();
   }
 
@@ -371,7 +237,8 @@ class AlarmSettings {
   ////
 
   // noDataAlarmMinutes
-  int get noDataAlarmMinutes => _noDataAlarmMinutes;
+  int get noDataAlarmMinutes => prefs
+      .getInt(AlarmSettingsNames.noDataAlarmMinutes.name, defaultValue: 30)!;
   set noDataAlarmMinutes(int value) {
     var validValues = [-1, 10, 20, 30];
     if (!validValues.contains(value)) {
@@ -379,7 +246,6 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.noDataAlarmMinutes.name, value);
-    _noDataAlarmMinutes = value;
     settings.notify();
   }
 
@@ -387,10 +253,11 @@ class AlarmSettings {
   /// Smart Alarms
   ////
 
-  bool get smartSnooze => _smartSnooze;
+  bool get smartSnooze =>
+      prefs.getBool(AlarmSettingsNames.smartSnooze.name, defaultValue: false)!;
   set smartSnooze(bool value) {
     prefs.setBool(AlarmSettingsNames.smartSnooze.name, value);
-    _smartSnooze = value;
+
     settings.notify();
   }
 
@@ -399,14 +266,16 @@ class AlarmSettings {
   ////
   ///
 
-  bool get volumeOveride => _volumeOveride;
+  bool get volumeOveride => prefs.getBool(AlarmSettingsNames.volumeOveride.name,
+      defaultValue: false)!;
   set volumeOveride(bool value) {
     prefs.setBool(AlarmSettingsNames.volumeOveride.name, value);
-    _volumeOveride = value;
+
     settings.notify();
   }
 
-  int get volumeOverrideValue => _volumeOverrideValue;
+  int get volumeOverrideValue => prefs
+      .getInt(AlarmSettingsNames.volumeOverrideValue.name, defaultValue: 50)!;
   set volumeOverrideValue(int value) {
     prefs.setInt(AlarmSettingsNames.volumeOverrideValue.name, value);
     if (value < 0) {
@@ -414,11 +283,13 @@ class AlarmSettings {
     } else if (value > 100) {
       value = 100;
     }
-    _volumeOverrideValue = value;
+
     settings.notify();
   }
 
-  int get volumeProgressionSeconds => _volumeProgressionSeconds;
+  int get volumeProgressionSeconds =>
+      prefs.getInt(AlarmSettingsNames.volumeProgressionSeconds.name,
+          defaultValue: 10)!;
   set volumeProgressionSeconds(int value) {
     var validValues = [-1, 10, 20, 30, 60, 120];
     if (!validValues.contains(value)) {
@@ -426,14 +297,18 @@ class AlarmSettings {
     }
 
     prefs.setInt(AlarmSettingsNames.volumeProgressionSeconds.name, value);
-    _volumeProgressionSeconds = value;
+
     settings.notify();
   }
 
-  AlarmSounds get alarmAsset => _alarmAsset;
+  AlarmSounds get alarmAsset {
+    var asset = prefs.getString('alarmAsset', defaultValue: 'Nightguard');
+    return AlarmSounds.values.firstWhere((e) => e.name == asset,
+        orElse: () => AlarmSounds.nightguard);
+  }
+
   set alarmAsset(AlarmSounds value) {
     prefs.setString('alarmAsset', value.name);
-    _alarmAsset = value;
     settings.notify();
   }
 
