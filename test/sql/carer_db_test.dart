@@ -27,7 +27,7 @@ void main() {
       await db.close();
     });
 
-    test('getSGVs', () async {
+    test('batchCreateOrUpdateSGVs', () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
         {'value': 1, 'date': 1},
@@ -47,10 +47,35 @@ void main() {
 
       ret = await db.batchCreateOrUpdateSGVs([
         {'value': 2, 'date': 2},
-        {'value': 3, 'date': 2}, // new at same date
+        {'value': 1, 'date': 2}, // new at same date
       ]);
       expect(await db.countSGVs(), 3);
+      // Should be ordered by date, then lowest value
+      expect((await db.lastSGV())!['value'], 1);
       expect(ret, 2);
+    });
+
+    test('batchCreateOrUpdateSGVs errors', () async {
+      List<Map<String, Object>> badInputs = [
+        {},
+        {'value': 1},
+        {'date': 1},
+        {'value': 1, 'date': -1},
+        {'value': -1, 'date': 1},
+        {'value': 1, 'date': 1, 'extra': 1},
+        {'value': 1, 'date': '1'},
+        {'value': '1', 'date': 1},
+        {'value': '1', 'date': '1'},
+      ];
+
+      for (var badInput in badInputs) {
+        try {
+          await db.batchCreateOrUpdateSGVs([badInput]);
+          fail('Should have thrown for $badInput');
+        } catch (e) {
+          expect(e, isA<ArgumentError>());
+        }
+      }
     });
   });
 }

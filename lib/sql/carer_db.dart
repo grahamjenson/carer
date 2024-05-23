@@ -20,13 +20,19 @@ class CarerDB {
   /////
 
   Future<Map<String, Object?>?> lastSGV() async {
+    // Order is highest date, then lowest value, then latest id
+    // This way it is Most recent, most dangeroud.
     var sql = """
-      SELECT * FROM ${DBTables.sgvTableName} ORDER BY date DESC LIMIT 1
+      SELECT * FROM ${DBTables.sgvTableName} ORDER BY date DESC, value ASC LIMIT 1
     """;
     return (await _db.rawQuery(sql)).firstOrNull;
   }
 
   Future<int> batchCreateOrUpdateSGVs(List<Map<String, Object>> sgvs) async {
+    if (sgvs.any((sgv) => !_validateSVGMap(sgv))) {
+      throw ArgumentError("Invalid SGV map");
+    }
+
     var batch = _db.batch();
     var upsert =
         """INSERT INTO ${DBTables.sgvTableName} (value, date) VALUES (?, ?) 
@@ -39,6 +45,33 @@ class CarerDB {
     }
     var results = await batch.commit(continueOnError: true);
     return results.length;
+  }
+
+  bool _validateSVGMap(Map<String, Object> sgv) {
+    if (sgv.isEmpty) {
+      return false;
+    }
+    var allowedKeys = ["value", "date"];
+    if (!sgv.keys.every((element) => allowedKeys.contains(element))) {
+      return false;
+    }
+
+    var value = sgv["value"];
+    var date = sgv["date"];
+    if (value == null || date == null) {
+      return false;
+    }
+    if (value is! int || date is! int) {
+      return false;
+    }
+    if (value < 0 || value > 1000) {
+      return false;
+    }
+    if (date < 0) {
+      return false;
+    }
+
+    return true;
   }
 
   Future<int?> countSGVs(
