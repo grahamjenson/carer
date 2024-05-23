@@ -44,6 +44,13 @@ void main() {
       ]);
       expect(await db.countSGVs(), 2);
       expect(ret, 2);
+
+      ret = await db.batchCreateOrUpdateSGVs([
+        {'value': 2, 'date': 2},
+        {'value': 3, 'date': 2}, // new at same date
+      ]);
+      expect(await db.countSGVs(), 3);
+      expect(ret, 2);
     });
   });
 }

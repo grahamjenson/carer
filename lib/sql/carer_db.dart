@@ -21,14 +21,15 @@ class CarerDB {
 
   Future<Map<String, Object?>?> lastSGV() async {
     var sql = """
-      SELECT * FROM sgvs ORDER BY date DESC LIMIT 1
+      SELECT * FROM ${DBTables.sgvTableName} ORDER BY date DESC LIMIT 1
     """;
     return (await _db.rawQuery(sql)).firstOrNull;
   }
 
   Future<int> batchCreateOrUpdateSGVs(List<Map<String, Object>> sgvs) async {
     var batch = _db.batch();
-    var upsert = """INSERT INTO sgvs (value, date) VALUES (?, ?) 
+    var upsert =
+        """INSERT INTO ${DBTables.sgvTableName} (value, date) VALUES (?, ?) 
     ON CONFLICT(value, date) DO UPDATE SET value = ?, date = ?""";
 
     for (var sgv in sgvs) {
@@ -46,7 +47,7 @@ class CarerDB {
       SELECT
         COUNT(*)
       FROM
-        sgvs
+        ${DBTables.sgvTableName}
       WHERE
         date > ? AND value >= ? AND value <= ?
     """;
@@ -59,7 +60,7 @@ class CarerDB {
     // grouped into 1 min intervals (select latest/lowest one)
     // reference previous sgv
     var sql = """
-      SELECT * FROM sgvs WHERE date > ? ORDER BY date DESC
+      SELECT * FROM ${DBTables.sgvTableName} WHERE date > ? ORDER BY date DESC
     """;
     return _db.rawQuery(
         sql, [DateTime.now().millisecondsSinceEpoch - minsAgo * 60 * 1000]);
@@ -100,9 +101,22 @@ class CarerDB {
     return db;
   }
 
-  Future<int> deleteAll() async {
-    int ret = await _db.delete(KVTables.kvTableName);
-    return ret;
+  Future<void> deleteAll() async {
+    var batch = _db.batch();
+
+    batch.delete(DBTables.sgvTableName);
+    batch.delete(DBTables.insulinTableName);
+    batch.delete(DBTables.carbsTableName);
+    batch.delete(DBTables.tempbasalTableName);
+    batch.delete(DBTables.temptargetsTableName);
+    batch.delete(DBTables.profileTableName);
+
+    // Delete KV table as well (settings are in different DB)
+    batch.delete(KVTables.kvTableName);
+
+    await batch.commit();
+
+    return;
   }
 
   close() async {

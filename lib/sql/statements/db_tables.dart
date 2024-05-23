@@ -1,6 +1,13 @@
 class DBTables {
+  static const sgvTableName = 'sgvs';
+  static const insulinTableName = 'insulin';
+  static const carbsTableName = 'carbs';
+  static const tempbasalTableName = 'tempbasal';
+  static const temptargetsTableName = 'temptargets';
+  static const profileTableName = 'profile';
+
   static const String sgvTable = '''
-    CREATE TABLE sgvs (
+    CREATE TABLE $sgvTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value INTEGER,
       date INTEGER,
@@ -9,7 +16,7 @@ class DBTables {
   ''';
 
   static const String insulinTable = '''
-    CREATE TABLE insulin (
+    CREATE TABLE $insulinTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
       date INTEGER
@@ -17,7 +24,7 @@ class DBTables {
   ''';
 
   static const String carbsTable = '''
-    CREATE TABLE carbs (
+    CREATE TABLE $carbsTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
       date INTEGER
@@ -25,7 +32,7 @@ class DBTables {
   ''';
 
   static const String tempbasalTable = '''
-    CREATE TABLE tempbasal (
+    CREATE TABLE $tempbasalTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
       date INTEGER
@@ -33,7 +40,7 @@ class DBTables {
   ''';
 
   static const String temptargetsTable = '''
-    CREATE TABLE temptargets (
+    CREATE TABLE $temptargetsTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
       date INTEGER
@@ -47,7 +54,7 @@ class DBTables {
 // Should we denormalize and have [24] array for each type of basal, carb ratio, etc?
 // Yes, then we can do comparisons easier
   static const String profileTable = '''
-    CREATE TABLE profile (
+    CREATE TABLE $profileTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       age INTEGER,
