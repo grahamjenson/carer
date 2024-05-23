@@ -10,7 +10,7 @@ class KeyValueStore {
   final Database _db;
   final Map<String, dynamic> _kvdbCache = {};
 
-  static final Future<KeyValueStore> _instance = _createInstance();
+  static Future<KeyValueStore> _instance = _createInstance();
   static Future<KeyValueStore> get instance => _instance;
 
   KeyValueStore(this._db);
@@ -92,7 +92,9 @@ class KeyValueStore {
   }
 
   close() async {
+    // Close then recreate the instance
     await _db.close();
+    _instance = _createInstance();
   }
 
   Future<bool> delete(String key) async {

@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CarerDB {
-  static final Future<CarerDB> _instance = _createInstance();
+  static Future<CarerDB> _instance = _createInstance();
   static Future<CarerDB> get instance => _instance;
 
   final Database _db;
@@ -28,30 +28,30 @@ class CarerDB {
 
   Future<int> batchCreateOrUpdateSGVs(List<Map<String, Object>> sgvs) async {
     var batch = _db.batch();
-    var upsert = """INSERT INTO sgvs (value, date) VALUES (?, ?)
+    var upsert = """INSERT INTO sgvs (value, date) VALUES (?, ?) 
     ON CONFLICT(value, date) DO UPDATE SET value = ?, date = ?""";
 
     for (var sgv in sgvs) {
       // upsert based
-      batch.rawInsert(
+      batch.rawQuery(
           upsert, [sgv["value"], sgv["date"], sgv["value"], sgv["date"]]);
     }
     var results = await batch.commit(continueOnError: true);
-    print("ret: $results");
-
-    return 0;
+    return results.length;
   }
 
-  Future<int?> countSGVs({int? since, int? rangeLow, int? rangeHigh}) async {
+  Future<int?> countSGVs(
+      {int since = 0, int rangeLow = -1, int rangeHigh = 1000}) async {
     var sql = """
       SELECT
         COUNT(*)
       FROM
         sgvs
       WHERE
-        mills > ?
+        date > ? AND value >= ? AND value <= ?
     """;
-    return Sqflite.firstIntValue(await _db.rawQuery(sql, [since]));
+    return Sqflite.firstIntValue(
+        await _db.rawQuery(sql, [since, rangeLow, rangeHigh]));
   }
 
   Future<List<Map<String, Object?>>> sgvsLastMins(int minsAgo) async {
@@ -107,5 +107,6 @@ class CarerDB {
 
   close() async {
     await _db.close();
+    _instance = _createInstance();
   }
 }

@@ -10,8 +10,6 @@ void main() {
     final file = File(files["summary"]!);
     final jsonString = await file.readAsString();
 
-    print(jsonString);
-
     Summary summary = Summary.fromJson(jsonString);
 
     expect(summary.sgvs.sgvs.length, equals(13));
