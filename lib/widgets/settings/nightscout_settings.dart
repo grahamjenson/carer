@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +12,7 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Settings>(builder: (context, settings, child) {
+    return Consumer<SettingsCN>(builder: (context, settings, child) {
       var maxWidth =
           min(650, max(0, MediaQuery.of(context).size.width - 200)).toDouble();
       return SettingsSection(

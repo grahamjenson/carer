@@ -1,6 +1,6 @@
-import 'package:carer/models/settings/debug_settings.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/change_notifiers/settings/debug_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -12,7 +12,7 @@ class DebugSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summary, child) {
       var debugSettings = [];
       if (settings.debug) {

@@ -4,15 +4,16 @@
 
 import 'dart:async';
 
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/models/models.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 
 class T1DCN extends ChangeNotifier {
-  Settings settings;
-  SummaryCN summaryCn;
+  SettingsCN settings;
+  UpdateCN summaryCn;
   Summary get summary => summaryCn.summary;
 
   // Target information
@@ -48,21 +49,21 @@ class T1DCN extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Range5> targetRange5ForMins(int minutes) {
-    return summary.sgvsLastMins(minutes).map((e) {
-      var (t, _) = targetRange(settings, e.sgv);
+  Future<List<Range5>> targetRange5ForMins(int minutes) async {
+    return (await SGVs.lastMins(minutes)).sgvs.map((e) {
+      var (t, _) = targetRange(settings, e.value);
       return t;
     }).toList();
   }
 
-  void checkSummary() {
-    var lastSGV = summary.lastSGV;
+  void checkSummary() async {
+    var lastSGV = await SGVs.lastSGV();
     if (lastSGV == null) {
       return;
     }
 
     // Calculating Target Range
-    var (tr, trp) = targetRange(settings, lastSGV.sgv);
+    var (tr, trp) = targetRange(settings, lastSGV.value);
     targetRange5 = tr;
     targetRange5Proportion = trp;
 
@@ -78,11 +79,11 @@ class T1DCN extends ChangeNotifier {
 
   //// Mungingx
 
-  List<int> diffPer5Minute(int minutes) {
+  Future<List<int>> diffPer5Minute(int minutes) async {
     List<int> diffs = [];
-    var sgvs = summary.sgvsLastMins(minutes);
+    var sgvs = await SGVs.lastMins(minutes);
 
-    for (var sgv in sgvs) {
+    for (var sgv in sgvs.sgvs) {
       diffs.add(sgv.diffPer5Mins);
     }
 

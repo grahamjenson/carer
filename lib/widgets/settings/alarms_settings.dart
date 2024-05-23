@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:carer/models/alarms_cn.dart';
-import 'package:carer/models/settings/alarm_settings.dart';
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/alarms_cn.dart';
+import 'package:carer/change_notifiers/settings/alarm_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
@@ -22,7 +22,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Settings, AlarmsCN>(
+    return Consumer2<SettingsCN, AlarmsCN>(
         builder: (context, settings, alarms, child) {
       var alarmSettings = settings.alarmSettings;
 

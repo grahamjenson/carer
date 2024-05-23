@@ -1,5 +1,6 @@
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/models/models.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
@@ -19,23 +20,30 @@ class BGL extends StatefulWidget {
 class _BGLState extends State<BGL> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
-      const loader = Center(child: CircularProgressIndicator());
-      if (summaryCn.summary.dateRetrieved == Dates.earliest) {
-        return loader;
-      }
-
-      var lastSGV = summaryCn.summary.lastSGV;
-      if (lastSGV == null) {
-        return loader;
-      }
-
-      return bgl(lastSGV, settings, context);
+      return FutureBuilder<Widget>(
+          future: futureWindow(summaryCn.summary, settings),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return snapshot.data!;
+            } else {
+              return const CircularProgressIndicator();
+            }
+          });
     });
   }
 
-  Widget bgl(SGV sgv, Settings settings, BuildContext context) {
+  Future<Widget> futureWindow(Summary summary, SettingsCN settings) async {
+    const loader = Center(child: CircularProgressIndicator());
+    if (summary.dateRetrieved == Dates.earliest) {
+      return loader;
+    }
+    var lastSGVs = await SGVs.lastMins(30);
+    var sgv = lastSGVs.sgvs.lastOrNull;
+    if (sgv == null) {
+      return loader;
+    }
     var unit = settings.unit;
 
     return AspectRatio(

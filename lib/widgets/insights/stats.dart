@@ -1,6 +1,7 @@
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/models/constants.dart';
 import 'package:carer/models/models.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -29,52 +30,64 @@ class Stats extends StatelessWidget {
     const heading =
         TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
 
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
       var summary = summaryCn.summary;
-      return Window(
-        title: "Stats",
-        child: Expanded(
-          child: SingleChildScrollView(
-              child: Container(
-            alignment: Alignment.center,
-            child: DataTable(
-              border: const TableBorder(
-                verticalInside: BorderSide(color: mainColor),
-              ),
-              columnSpacing: 10,
-              dividerThickness: 0.01,
-              headingRowHeight: 0,
-              dataRowMinHeight: 14,
-              dataRowMaxHeight: 20,
-              horizontalMargin: 0,
-              columns: const [
-                DataColumn(
-                  numeric: true,
-                  label: SizedBox(
-                    width: 50,
-                    child: Text('name', style: heading),
-                  ),
-                ),
-                DataColumn(
-                    label: SizedBox(
-                        width: 50, child: Text('stat', style: heading))),
-              ],
-              rows: [
-                iob(summary),
-                cob(summary),
-                power(summary),
-                cage(summary),
-                basal(summary),
-                target(summary, settings.unit),
-                fifteenMinDiff(summary, settings.unit),
-                todaysInRange(summary, settings.targetLow, settings.targetHigh),
-              ],
-            ),
-          )),
-        ),
-      );
+      return FutureBuilder<Window>(
+          future: futureWindow(summary, settings),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return snapshot.data!;
+            } else {
+              return const CircularProgressIndicator();
+            }
+          });
     });
+  }
+
+  Future<Window> futureWindow(Summary summary, SettingsCN settings) async {
+    return Window(
+      title: "Stats",
+      child: Expanded(
+        child: SingleChildScrollView(
+            child: Container(
+          alignment: Alignment.center,
+          child: DataTable(
+            border: const TableBorder(
+              verticalInside: BorderSide(color: mainColor),
+            ),
+            columnSpacing: 10,
+            dividerThickness: 0.01,
+            headingRowHeight: 0,
+            dataRowMinHeight: 14,
+            dataRowMaxHeight: 20,
+            horizontalMargin: 0,
+            columns: const [
+              DataColumn(
+                numeric: true,
+                label: SizedBox(
+                  width: 50,
+                  child: Text('name', style: heading),
+                ),
+              ),
+              DataColumn(
+                  label:
+                      SizedBox(width: 50, child: Text('stat', style: heading))),
+            ],
+            rows: [
+              iob(summary),
+              cob(summary),
+              power(summary),
+              cage(summary),
+              basal(summary),
+              target(summary, settings.unit),
+              await fifteenMinDiff(summary, settings.unit),
+              await todaysInRange(settings.targetLow, settings.targetHigh),
+            ],
+          ),
+        )),
+      ),
+    );
   }
 
   DataRow iob(Summary summary) {
@@ -263,9 +276,9 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  DataRow fifteenMinDiff(Summary summary, Unit unit) {
-    var sgvs = summary.sgvs.lastMins(15);
-    if (sgvs.isEmpty) {
+  Future<DataRow> fifteenMinDiff(Summary summary, Unit unit) async {
+    var sgvs = await SGVs.lastMins(15);
+    if (sgvs.sgvs.isEmpty) {
       return const DataRow(
         cells: [
           DataCell(Text("15m Δ", style: heading)),
@@ -275,7 +288,7 @@ class Stats extends StatelessWidget {
         ],
       );
     }
-    var diff = summary.lastSGV!.sgv - sgvs.first.sgv;
+    var diff = sgvs.sgvs.last.value - sgvs.sgvs.first.value;
     return DataRow(
       cells: [
         const DataCell(Text("15m Δ", style: heading)),
@@ -288,19 +301,10 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow todaysInRange(Summary summary, int low, int high) {
-    // TODO summary does not include this.
-
-    var sgvsTodayInRange = summary.sgvs.sgvs
-        .where((s) => s.sgv >= low && s.sgv <= high)
-        // Checks if mills is today
-        .toList()
-        .length;
-
-    // Total readings today is mins in Today / 5
-
-    var total = summary.sgvs.sgvs.length;
-    var percent = ((sgvsTodayInRange / total) * 100).toStringAsFixed(0);
+  Future<DataRow> todaysInRange(int low, int high) async {
+    var percent =
+        (await SGVs.percentInRangeToday(low, high) * 100.0).toStringAsFixed(0);
+    // get mills at start of day
 
     return DataRow(
       cells: [

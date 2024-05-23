@@ -19,7 +19,7 @@ void main() {
     late KeyValueStore store;
 
     setUp(() async {
-      store = await KeyValueStore.create();
+      store = await KeyValueStore.instance;
     });
 
     tearDown(() async {

@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:carer/models/models.dart';
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/models/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +11,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Settings>(builder: (context, settings, child) {
+    return Consumer<SettingsCN>(builder: (context, settings, child) {
       var unit = settings.unit;
       var high = settings.targetHigh.toDouble();
       var low = settings.targetLow.toDouble();

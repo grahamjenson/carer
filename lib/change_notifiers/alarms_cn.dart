@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:carer/models/alarms/alarms.dart';
-import 'package:carer/models/settings/alarm_settings.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/t1d_cn.dart';
+import 'package:carer/change_notifiers/alarms/alarms.dart';
+import 'package:carer/change_notifiers/settings/alarm_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/t1d_cn.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
@@ -13,7 +13,7 @@ const se = SetEquality();
 
 class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
-  Settings settings;
+  SettingsCN settings;
   AlarmSettings get alarmSettings => settings.alarmSettings;
   String get alarmFile => alarmSettings.alarmAsset.asset;
 
@@ -95,15 +95,15 @@ class AlarmsCN extends ChangeNotifier {
     });
   }
 
-  void checkAlarms() {
+  void checkAlarms() async {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
     var disabledAllAlarms = alarmSettings.disableAlarms;
 
     for (var alarm in allAlarms) {
-      var triggered = alarm.trigger();
+      var triggered = await alarm.trigger();
       var active = alarm.active();
-      var smartSnooze = alarmSettings.smartSnooze && alarm.smartSnooze();
+      var smartSnooze = alarmSettings.smartSnooze && await alarm.smartSnooze();
       // Build the lists
 
       if (triggered) {

@@ -1,4 +1,4 @@
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -14,7 +14,7 @@ class HighAlarmPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Settings>(builder: (context, settings, child) {
+    return Consumer<SettingsCN>(builder: (context, settings, child) {
       var alarmSettings = settings.alarmSettings;
 
       return Scaffold(

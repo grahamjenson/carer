@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:carer/models/models.dart';
-import 'package:carer/models/settings/alarm_settings.dart';
-import 'package:carer/models/settings/debug_settings.dart';
-import 'package:carer/models/settings/target_settings.dart';
-import 'package:carer/models/settings/ui_settings.dart';
+import 'package:carer/change_notifiers/settings/alarm_settings.dart';
+import 'package:carer/change_notifiers/settings/debug_settings.dart';
+import 'package:carer/change_notifiers/settings/target_settings.dart';
+import 'package:carer/change_notifiers/settings/ui_settings.dart';
+import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +16,7 @@ enum SettingNames {
   unit,
 }
 
-class Settings extends ChangeNotifier {
+class SettingsCN extends ChangeNotifier {
   late KeyValueStore prefs;
   late DebugSettings debugSettings;
   late TargetSettings targetSettings;
@@ -24,7 +24,8 @@ class Settings extends ChangeNotifier {
   late AlarmSettings alarmSettings;
 
   Future<void> populate() async {
-    prefs = await KeyValueStore.create();
+    // Get instance to the KVStore
+    prefs = await KeyValueStore.instance;
 
     uiSettings = UISettings(prefs: prefs, settings: this);
 

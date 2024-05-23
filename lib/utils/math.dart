@@ -1,4 +1,4 @@
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 
 enum Range5 { veryLow, low, mid, high, veryHigh }
 
@@ -7,7 +7,7 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
 
-(Range5, double) targetRange(Settings settings, int sgv) {
+(Range5, double) targetRange(SettingsCN settings, int sgv) {
   var low = settings.targetLow.toDouble();
   var high = settings.targetHigh.toDouble();
   var veryHigh = settings.urgentHigh.toDouble();

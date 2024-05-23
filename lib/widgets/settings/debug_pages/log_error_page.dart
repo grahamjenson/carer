@@ -1,5 +1,5 @@
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/utils/json.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +12,7 @@ class LogErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summary, child) {
       var settingsString = prettyPrintJson(settings.toString());
       var summaryString = prettyPrintJson(summary.summary.raw);

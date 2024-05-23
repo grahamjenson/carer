@@ -1,6 +1,7 @@
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/models/constants.dart';
 import 'package:carer/models/models.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
@@ -56,86 +57,97 @@ class BGLChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
-      int minsAgo = 125;
       // Breaking down the objects
       Summary summary = summaryCn.summary;
-
-      double maxY = settings.urgentHigh + 36;
-      double minY = 0;
-      double minX = -1 * minsAgo.toDouble(); // mins ago
-      double maxX = 0; // now
-
-      // convert the last hours of summary sgvs into flspots
-      var bglSpotData = bglSpots(summary, minsAgo);
-      var (basalSpotData, maxBasal) = basalSpots(summary, minsAgo);
-      var (lowTargets, highTargets) = targetSpots(summary, minsAgo);
-      var treatments = treatmentsSpots(summary, minsAgo);
-
-      var bglLineData = LineChartBarData(
-        color: mainColor,
-        spots: bglSpotData,
-        barWidth: 1,
-        dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
-      );
-
-      var lineChartData = LineChartData(
-        rangeAnnotations: rangeAnnotations(settings),
-        gridData: gridData(),
-        titlesData: titleData(settings, maxBasal),
-        borderData: borderData(),
-        maxX: maxX,
-        minX: minX,
-        minY: minY,
-        maxY: maxY,
-        lineBarsData: [
-          bglLineData,
-          LineChartBarData(
-            color: mainColor,
-            spots: basalSpotData,
-            barWidth: 2,
-            dotData: const FlDotData(show: false),
-          ),
-          LineChartBarData(
-            spots: treatments,
-            barWidth: 0,
-            dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter),
-          ),
-          LineChartBarData(
-            color: mainColor.withAlpha(140),
-            spots: lowTargets,
-            barWidth: 2,
-            dotData: const FlDotData(show: false),
-          ),
-          LineChartBarData(
-            color: mainColor.withAlpha(140),
-            spots: highTargets,
-            barWidth: 2,
-            dotData: const FlDotData(show: false),
-          ),
-        ],
-        lineTouchData: lineTouchData(settings),
-        betweenBarsData: [
-          BetweenBarsData(
-              fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
-        ],
-      );
-
-      return Window(
-        title: "Chart",
-        child: Expanded(
-            child: Padding(
-                padding: const EdgeInsets.only(
-                  right: 10,
-                  top: 5,
-                ),
-                child: LineChart(
-                  lineChartData,
-                  duration: Duration.zero,
-                ))),
-      );
+      return FutureBuilder<Window>(
+          future: futureWindow(summary, settings),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return snapshot.data!;
+            } else {
+              return const CircularProgressIndicator();
+            }
+          });
     });
+  }
+
+  Future<Window> futureWindow(Summary summary, SettingsCN settings) async {
+    int minsAgo = 125;
+    double maxY = settings.urgentHigh + 36;
+    double minY = 0;
+    double minX = -1 * minsAgo.toDouble(); // mins ago
+    double maxX = 0; // now
+
+    // convert the last hours of summary sgvs into flspots
+    var bglSpotData = await bglSpots(summary, minsAgo);
+    var (basalSpotData, maxBasal) = basalSpots(summary, minsAgo);
+    var (lowTargets, highTargets) = targetSpots(summary, minsAgo);
+    var treatments = treatmentsSpots(summary, minsAgo);
+
+    var bglLineData = LineChartBarData(
+      color: mainColor,
+      spots: bglSpotData,
+      barWidth: 1,
+      dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+    );
+
+    var lineChartData = LineChartData(
+      rangeAnnotations: rangeAnnotations(settings),
+      gridData: gridData(),
+      titlesData: titleData(settings, maxBasal),
+      borderData: borderData(),
+      maxX: maxX,
+      minX: minX,
+      minY: minY,
+      maxY: maxY,
+      lineBarsData: [
+        bglLineData,
+        LineChartBarData(
+          color: mainColor,
+          spots: basalSpotData,
+          barWidth: 2,
+          dotData: const FlDotData(show: false),
+        ),
+        LineChartBarData(
+          spots: treatments,
+          barWidth: 0,
+          dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter),
+        ),
+        LineChartBarData(
+          color: mainColor.withAlpha(140),
+          spots: lowTargets,
+          barWidth: 2,
+          dotData: const FlDotData(show: false),
+        ),
+        LineChartBarData(
+          color: mainColor.withAlpha(140),
+          spots: highTargets,
+          barWidth: 2,
+          dotData: const FlDotData(show: false),
+        ),
+      ],
+      lineTouchData: lineTouchData(settings),
+      betweenBarsData: [
+        BetweenBarsData(
+            fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
+      ],
+    );
+
+    return Window(
+      title: "Chart",
+      child: Expanded(
+          child: Padding(
+              padding: const EdgeInsets.only(
+                right: 10,
+                top: 5,
+              ),
+              child: LineChart(
+                lineChartData,
+                duration: Duration.zero,
+              ))),
+    );
   }
 
   List<FlSpot> treatmentsSpots(Summary summary, int minsAgo) {
@@ -163,13 +175,13 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  List<FlSpot> bglSpots(Summary summary, int minsAgo) {
-    List<SGV> sgvs = summary.sgvs.lastMins(minsAgo);
+  Future<List<FlSpot>> bglSpots(Summary summary, int minsAgo) async {
+    SGVs sgvs = await SGVs.lastMins(minsAgo);
     List<FlSpot> spots = [];
-    for (var i = 0; i < sgvs.length; i++) {
-      var sgv = sgvs[i];
-      spots
-          .add(BGLSpot(-sgv.age.inMinutes.toDouble(), sgv.sgv.toDouble(), sgv));
+    for (var i = 0; i < sgvs.sgvs.length; i++) {
+      var sgv = sgvs.sgvs[i];
+      spots.add(
+          BGLSpot(-sgv.age.inMinutes.toDouble(), sgv.value.toDouble(), sgv));
     }
     return spots;
   }
@@ -226,7 +238,7 @@ class BGLChart extends StatelessWidget {
     return (lowTargets, highTargets);
   }
 
-  LineTouchData lineTouchData(Settings settings) {
+  LineTouchData lineTouchData(SettingsCN settings) {
     return LineTouchData(
       enabled: true,
       touchTooltipData: LineTouchTooltipData(
@@ -278,7 +290,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlTitlesData titleData(Settings settings, double maxBasal) {
+  FlTitlesData titleData(SettingsCN settings, double maxBasal) {
     return FlTitlesData(
       show: true,
       rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal)),
@@ -313,7 +325,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  RangeAnnotations rangeAnnotations(Settings settings) {
+  RangeAnnotations rangeAnnotations(SettingsCN settings) {
     return RangeAnnotations(
       horizontalRangeAnnotations: [
         HorizontalRangeAnnotation(
@@ -386,7 +398,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  SideTitles leftTitleWidgets(Settings settings) {
+  SideTitles leftTitleWidgets(SettingsCN settings) {
     return SideTitles(
       showTitles: true,
       interval: 1,
@@ -424,7 +436,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  GetDotPainterCallback bglHighlightPainter(Settings settings) {
+  GetDotPainterCallback bglHighlightPainter(SettingsCN settings) {
     return (
       FlSpot spot,
       double xPercentage,

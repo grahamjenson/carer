@@ -1,4 +1,4 @@
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
 
 // find where in the target range and by what proportion a number is
@@ -13,7 +13,7 @@ enum TargetSettingNames {
 
 class TargetSettings {
   KeyValueStore prefs;
-  Settings settings;
+  SettingsCN settings;
 
   TargetSettings({required this.prefs, required this.settings});
 

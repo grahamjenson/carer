@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:carer/models/constants.dart';
-import 'package:carer/models/models.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:carer/utils/math.dart';
@@ -77,81 +76,22 @@ class TimeValues {
   }
 }
 
-class SGV {
+class SummarySGV {
   final int sgv;
   final DateTime mills;
-  SGV? previousSGV;
 
-  SGV({
+  SummarySGV({
     required this.sgv,
     required this.mills,
   });
 
   get date => mills;
 
-  factory SGV.fromJson(Map<String, dynamic> json) {
-    return SGV(
+  factory SummarySGV.fromJson(Map<String, dynamic> json) {
+    return SummarySGV(
       sgv: json['sgv'],
       mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
     );
-  }
-
-  Duration get age {
-    return DateTime.now().difference(mills);
-  }
-
-  double sgvU(Unit unit) {
-    return unit.val(sgv);
-  }
-
-  String diffUWithSign(Unit unit) {
-    var sgv = unit.val(diffPer5Mins);
-    var sgvStr = sgv.toStringAsFixed(1);
-    if (sgv == 0) {
-      sgvStr = "+0";
-    } else if (sgv > 0) {
-      sgvStr = "+${sgv.toStringAsFixed(1)}";
-    }
-    return sgvStr;
-  }
-
-  String sgvStr(Unit unit) {
-    switch (unit) {
-      case Unit.mg:
-        return sgv.toString();
-      case Unit.mmol:
-        return (sgv / MGtoMMOL).toStringAsFixed(1);
-    }
-  }
-
-  int get _diff {
-    if (previousSGV == null) {
-      return 0;
-    }
-    return sgv - previousSGV!.sgv;
-  }
-
-  // // also sanity check the last two sgvs
-  // // second most recent sgv should be within 5 minutes of most recent
-  // var last = sgvs.last;
-  // var secondLast = sgvs[sgvs.length - 2];
-
-  // if ((secondLast.age.inMinutes - last.age.inMinutes).abs() > 6) {
-  //   return null;
-  // }
-
-  int get diffMinutes {
-    if (previousSGV == null) {
-      return 5;
-    }
-    return ((previousSGV!.age.inSeconds - age.inSeconds) / 60).round();
-  }
-
-  int get diffPer5Mins {
-    if (diffMinutes == 0) {
-      return 0; // TODO
-    }
-    return (_diff / diffMinutes * 5).round();
   }
 
   @override
@@ -325,59 +265,18 @@ class SummaryState {
   }
 }
 
-class SGVs {
-  final List<SGV> sgvs;
+class SummarySGVs {
+  final List<SummarySGV> sgvs;
 
-  const SGVs({
+  const SummarySGVs({
     required this.sgvs,
   });
 
-  factory SGVs.fromJson(List<dynamic> json) {
-    List<SGV> sgvs = json.map((sgvJson) => SGV.fromJson(sgvJson)).toList();
-    // sort sgvs by age
-    sgvs.sort((a, b) => a.mills.compareTo(b.mills));
+  factory SummarySGVs.fromJson(List<dynamic> json) {
+    List<SummarySGV> sgvs =
+        json.map((sgvJson) => SummarySGV.fromJson(sgvJson)).toList();
 
-    const Duration minTimeDiff = Duration(minutes: 1);
-    // Cleaning up the SGVs
-    // There are a bunch of ways that there could be multiple SGVS within a minute.
-    // e.g. when there ia a calibration, or a new sensor giving a close new reading
-    // To do this we make a linked list of SGVs and remote ones until we find one that is more than a minute away
-
-    // TODO TEST
-    // Construct the linked list
-    for (int i = sgvs.length - 1; i >= 0; i--) {
-      sgvs[i].previousSGV = i > 0 ? sgvs[i - 1] : null;
-    }
-
-    SGV? latestSGV = sgvs.last;
-
-    // SGV? previousSGV = latestSGV.previousSGV;
-    // while (latestSGV != null && previousSGV != null) {
-    //   if (latestSGV.mills.difference(previousSGV.mills) < minTimeDiff) {
-    //     // keep current latest and go to next previous
-    //     previousSGV = previousSGV.previousSGV;
-    //   } else {
-    //     latestSGV.previousSGV = previousSGV;
-    //     latestSGV = previousSGV;
-    //   }
-    // }
-
-    // Deconstruct the linked list
-    List<SGV> cleanedSgvs = [];
-    latestSGV = sgvs.last;
-    while (latestSGV != null) {
-      cleanedSgvs.insert(0, latestSGV);
-      latestSGV = latestSGV.previousSGV;
-    }
-
-    // print(sgvs.length);
-    // print(cleanedSgvs.length);
-    return SGVs(sgvs: cleanedSgvs);
-  }
-
-  // return the last sgvs for minutes
-  List<SGV> lastMins(int minutes) {
-    return sgvs.where((sgv) => sgv.age.inMinutes < minutes).toList();
+    return SummarySGVs(sgvs: sgvs);
   }
 }
 
@@ -545,7 +444,7 @@ class Profile {
 
 class Summary {
   final int dateRetrievedmills;
-  final SGVs sgvs;
+  final SummarySGVs sgvs;
   final TempBasals tempBasals;
   final SummaryTreatments treatments;
   final Targets targets;
@@ -566,7 +465,7 @@ class Summary {
 
   static const Summary empty = Summary(
       raw: "",
-      sgvs: SGVs(sgvs: []),
+      sgvs: SummarySGVs(sgvs: []),
       tempBasals: TempBasals(tempBasals: []),
       treatments: SummaryTreatments(treatments: []),
       targets: Targets(targets: []),
@@ -595,7 +494,7 @@ class Summary {
       var json = jsonDecode(jsonString);
       return Summary(
         raw: jsonString,
-        sgvs: SGVs.fromJson(json['sgvs']),
+        sgvs: SummarySGVs.fromJson(json['sgvs']),
         tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
         treatments:
             SummaryTreatments.fromJson(json['treatments']['treatments']),
@@ -614,20 +513,8 @@ class Summary {
     return DateTime.fromMillisecondsSinceEpoch(dateRetrievedmills);
   }
 
-  // function returns the last SGV
-  SGV? get lastSGV {
-    if (sgvs.sgvs.isEmpty) {
-      return null;
-    }
-    return sgvs.sgvs.last;
-  }
-
   int ageInSeconds() {
     return DateTime.now().difference(dateRetrieved).inSeconds;
-  }
-
-  List<SGV> sgvsLastMins(int mins) {
-    return sgvs.lastMins(mins);
   }
 
   (TimeValue?, TempBasal?) basalAtTime(DateTime date) {

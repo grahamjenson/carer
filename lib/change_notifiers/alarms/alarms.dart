@@ -1,10 +1,11 @@
-import 'package:carer/models/settings/alarm_settings.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/t1d_cn.dart';
+import 'package:carer/change_notifiers/settings/alarm_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/t1d_cn.dart';
+import 'package:carer/models/models.dart';
 import 'package:carer/utils/math.dart';
 
 abstract class Alarm {
-  final Settings settings;
+  final SettingsCN settings;
   AlarmSettings get alarmSettings => settings.alarmSettings;
   final T1DCN t1d;
 
@@ -13,9 +14,9 @@ abstract class Alarm {
   String get name;
   String get description;
 
-  bool trigger();
+  Future<bool> trigger();
   bool active();
-  bool smartSnooze() {
+  Future<bool> smartSnooze() async {
     return false;
   }
 }
@@ -31,12 +32,12 @@ class PredictiveLowAlarm extends Alarm {
       'Triggers when it predicts a low in ${alarmSettings.lowPredictionMinutes}m';
 
   @override
-  bool trigger() {
-    var lastSGV = t1d.summary.lastSGV;
+  Future<bool> trigger() async {
+    var lastSGV = await SGVs.lastSGV();
     if (lastSGV == null) {
       return false;
     }
-    var diffs = t1d.diffPer5Minute(15);
+    var diffs = await t1d.diffPer5Minute(15);
     if (diffs.isEmpty) {
       return false;
     }
@@ -44,7 +45,7 @@ class PredictiveLowAlarm extends Alarm {
     var meanDiff = mean(diffs);
     var meanDiffPerMinute = meanDiff / 5;
     var predictedDiff = meanDiffPerMinute * alarmSettings.lowPredictionMinutes;
-    var predictedSGV = (lastSGV.sgv + predictedDiff).round();
+    var predictedSGV = (lastSGV.value + predictedDiff).round();
 
     var (range, _) = targetRange(settings, predictedSGV);
     return range == Range5.veryLow || range == Range5.low;
@@ -66,7 +67,7 @@ class UrgentLowAlarm extends Alarm {
   String get description => 'Triggers when BGL is below the urgent low target';
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     return t1d.targetRange5 == Range5.veryLow;
   }
 
@@ -80,20 +81,21 @@ class LowAlarm extends Alarm {
   const LowAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name => 'Low Alarm ${alarmSettings.lowMinutes}m ${smartSnooze()}';
+  String get name => 'Low Alarm ${alarmSettings.lowMinutes}m';
 
   @override
   String get description =>
       'Triggers when all BGLs for a time period are below the low target';
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     var latest =
         t1d.targetRange5 == Range5.low || t1d.targetRange5 == Range5.veryLow;
     if (!latest) {
       return false;
     }
-    List<Range5> targets = t1d.targetRange5ForMins(alarmSettings.lowMinutes);
+    List<Range5> targets =
+        await t1d.targetRange5ForMins(alarmSettings.lowMinutes);
     if (targets.isEmpty) {
       return true;
     }
@@ -106,8 +108,8 @@ class LowAlarm extends Alarm {
   }
 
   @override
-  bool smartSnooze() {
-    var diffs = t1d.diffPer5Minute(10);
+  Future<bool> smartSnooze() async {
+    var diffs = await t1d.diffPer5Minute(10);
     if (diffs.isEmpty) {
       return false;
     }
@@ -120,21 +122,21 @@ class HighAlarm extends Alarm {
   const HighAlarm({required super.settings, required super.t1d});
 
   @override
-  String get name =>
-      'High Alarm ${alarmSettings.highMinutes}m ${smartSnooze()}';
+  String get name => 'High Alarm ${alarmSettings.highMinutes}m';
 
   @override
   String get description =>
       'Triggers when all BGLs for a time period are above the high target';
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     var latest =
         t1d.targetRange5 == Range5.high || t1d.targetRange5 == Range5.veryHigh;
     if (!latest) {
       return false;
     }
-    List<Range5> targets = t1d.targetRange5ForMins(alarmSettings.highMinutes);
+    List<Range5> targets =
+        await t1d.targetRange5ForMins(alarmSettings.highMinutes);
     if (targets.isEmpty) {
       return true;
     }
@@ -147,8 +149,8 @@ class HighAlarm extends Alarm {
   }
 
   @override
-  bool smartSnooze() {
-    var diffs = t1d.diffPer5Minute(10);
+  Future<bool> smartSnooze() async {
+    var diffs = await t1d.diffPer5Minute(10);
     if (diffs.isEmpty) {
       return false;
     }
@@ -167,7 +169,7 @@ class UrgentHighAlarm extends Alarm {
   String get description => 'Triggers when BGL is above the urgent high target';
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     return t1d.targetRange5 == Range5.veryHigh;
   }
 
@@ -187,14 +189,14 @@ class FastRiseAlarm extends Alarm {
   String get description => 'Triggers when BGL is rising quickly';
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     // Dont trigger if High or Very High, fast drop when high is what we want
     if (t1d.targetRange5 == Range5.low || t1d.targetRange5 == Range5.veryLow) {
       return false;
     }
 
     // Get the diffs for the last n minutes and make sure they are all above the set delta
-    var diffs = t1d.diffPer5Minute(alarmSettings.fastRiseAlarmMinutes);
+    var diffs = await t1d.diffPer5Minute(alarmSettings.fastRiseAlarmMinutes);
     if (diffs.isEmpty) {
       return false;
     }
@@ -220,7 +222,7 @@ class FastDropAlarm extends Alarm {
   String get description => 'Triggers when BGL is dropping quickly';
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     // Dont trigger if High or Very High, fast drop when high is what we want
     if (t1d.targetRange5 == Range5.high ||
         t1d.targetRange5 == Range5.veryHigh) {
@@ -228,7 +230,7 @@ class FastDropAlarm extends Alarm {
     }
 
     // Get the diffs for the last n minutes and make sure they are all below the set delta
-    var diffs = t1d.diffPer5Minute(alarmSettings.fastDropAlarmMinutes);
+    var diffs = await t1d.diffPer5Minute(alarmSettings.fastDropAlarmMinutes);
     if (diffs.isEmpty) {
       return false;
     }
@@ -264,16 +266,16 @@ class NoDataAlarm extends Alarm {
   }
 
   @override
-  bool trigger() {
+  Future<bool> trigger() async {
     if (alarmSettings.noDataAlarmMinutes == -1) {
       return false;
     }
-
-    if (t1d.summary.lastSGV == null) {
+    var lastSGV = await SGVs.lastSGV();
+    if (lastSGV == null) {
       return false;
     }
 
-    return t1d.summary.lastSGV!.age.inMinutes > alarmMinutes();
+    return lastSGV.age.inMinutes > alarmMinutes();
   }
 
   @override

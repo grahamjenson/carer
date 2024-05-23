@@ -1,5 +1,5 @@
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
@@ -27,7 +27,7 @@ class History extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
       var history = historyContainers(settings, summaryCn);
 
@@ -73,7 +73,7 @@ class History extends StatelessWidget {
     });
   }
 
-  List<DataRow> historyContainers(Settings settings, SummaryCN summaryCn) {
+  List<DataRow> historyContainers(SettingsCN settings, UpdateCN summaryCn) {
     if (summaryCn.summary.dateRetrieved == Dates.earliest) {
       return [];
     }

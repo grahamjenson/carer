@@ -1,6 +1,6 @@
-import 'package:carer/models/settings/ui_settings.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
+import 'package:carer/change_notifiers/settings/ui_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/widgets/bar.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/current_time.dart';
@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
     final aspectRatio = MediaQuery.of(context).size.aspectRatio;
     final isHorizontal = aspectRatio > 1.0;
 
-    return Consumer2<Settings, SummaryCN>(
+    return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
       UILayout layout = settings.uiSettings.uiLayoutVertical;
       if (isHorizontal) {

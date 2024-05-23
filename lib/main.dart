@@ -1,8 +1,7 @@
-import 'package:carer/models/alarms_cn.dart';
-import 'package:carer/models/settings_cn.dart';
-import 'package:carer/models/summary_cn.dart';
-import 'package:carer/models/t1d_cn.dart';
-import 'package:carer/sql/db.dart';
+import 'package:carer/change_notifiers/alarms_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/t1d_cn.dart';
+import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -29,17 +28,14 @@ void main() async {
 void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Create Database
-  var db = await CarerDB.create();
-
   // Load the settings from Shared Preferences before starting
-  var settings = Settings();
+  var settings = SettingsCN();
   await settings.populate();
 
   // Make sure screen wont fall asleep if set
   WakelockPlus.toggle(enable: settings.screenActive);
 
-  final summary = SummaryCN(settings: settings, db: db);
+  final summary = UpdateCN(settings: settings);
   final t1d = T1DCN(settings: settings, summaryCn: summary);
   final alarms = AlarmsCN(t1d: t1d, settings: settings);
 
@@ -55,7 +51,7 @@ void runCarer() async {
 }
 
 class MyApp extends StatelessWidget {
-  final Settings settings;
+  final SettingsCN settings;
   const MyApp({super.key, required this.settings});
 
   // This widget is the root of your application.

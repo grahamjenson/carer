@@ -1,5 +1,5 @@
-import 'package:carer/models/settings/ui_settings.dart';
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings/ui_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +9,7 @@ class UISettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Settings>(builder: (context, settings, child) {
+    return Consumer<SettingsCN>(builder: (context, settings, child) {
       return SettingsSection(
         title: const Text('UI'),
         tiles: [

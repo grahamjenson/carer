@@ -1,25 +1,25 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:carer/models/settings/debug_settings.dart';
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/models/models.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/sql/db.dart';
 import 'package:flutter/material.dart';
 
-class SummaryCN extends ChangeNotifier {
-  Settings settings;
-  CarerDB db;
+class UpdateCN extends ChangeNotifier {
+  SettingsCN settings;
 
   // When this updates lots of things will change
   Summary summary = Summary.empty;
   bool _summaryToBeUpdated = true;
   String _updateReason = "";
 
-  SummaryCN({required this.settings, required this.db}) {
+  UpdateCN({required this.settings}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => update());
     update();
+
+    // If settings update grab latest summary
     settings.addListener(() {
       _summaryToBeUpdated = true;
       _updateReason = "Added Listener";
@@ -27,53 +27,54 @@ class SummaryCN extends ChangeNotifier {
   }
 
   update() {
+    checkUpdateSummary();
+
+    if (_summaryToBeUpdated) {
+      log("UPDATING SUMMARY: $_updateReason");
+      _updateReason = "";
+      _summaryToBeUpdated = false;
+      updateSummary();
+    }
+  }
+
+  checkUpdateSummary() async {
     if (summary.ageInSeconds() > 15) {
       _summaryToBeUpdated = true;
       _updateReason = "Age older than 15";
     }
+    var lastSGV = await SGVs.lastSGV();
+    if (lastSGV != null) {
+      var sgvage = lastSGV.age.inSeconds;
 
-    if (summary.lastSGV != null) {
-      var sgvage = summary.lastSGV!.age.inSeconds;
       // Check more frequently when the SGV is about to expire
       if (sgvage > 305 && sgvage < 320) {
         _summaryToBeUpdated = true;
         _updateReason = "Last SGV older than 300";
       }
     }
-
-    if (_summaryToBeUpdated) {
-      // clenaup
-
-      // Calling update
-      if (settings.debugSettings.debug &&
-          settings.debugSettings.debugSummary != DebugSummary.off) {
-        log("USING DEBUG SUMMARY: $_updateReason");
-        _updateReason = "";
-        _summaryToBeUpdated = false;
-        useDebugSummary();
-      } else {
-        log("UPDATING SUMMARY: $_updateReason");
-        _updateReason = "";
-        _summaryToBeUpdated = false;
-        updateSummary();
-      }
-    }
   }
 
-  updateSummary() {
+  updateSummary() async {
     var (nsURL, nsToken) = settings.nightscoutURLAndToken;
     NSClient().getSummary(nsURL, nsToken).catchError((e) {
       log("GETTING SUMMARY ERROR: $e, $nsURL");
       _summaryToBeUpdated = true;
       return Summary.empty;
-    }).then((value) {
+    }).then((value) async {
+      // Assign the raw summary value
       summary = value;
+
+      // convert the summary to models
+      List<SGV> sgvs = [];
+
+      for (var sgv in summary.sgvs.sgvs) {
+        sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
+      }
+
+      int ret = await SGVs.createOrUpdateSGVs(sgvs);
+      print("updateSummary ret: $ret");
+
       notifyListeners();
     });
-  }
-
-  useDebugSummary() {
-    summary = settings.debugSettings.debugSummary.summary(settings);
-    notifyListeners();
   }
 }

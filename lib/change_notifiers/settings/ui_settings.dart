@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -32,7 +32,7 @@ enum UILayout {
 
 class UISettings {
   KeyValueStore prefs;
-  Settings settings;
+  SettingsCN settings;
 
   UISettings({required this.prefs, required this.settings}) {
     // Sometimes the app "forgets" that it is meant to keep the screen active

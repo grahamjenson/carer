@@ -2,8 +2,9 @@ class DBTables {
   static const String sgvTable = '''
     CREATE TABLE sgvs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      date TEXT
+      value INTEGER,
+      date INTEGER,
+      UNIQUE(value, date)
     )
   ''';
 
@@ -11,7 +12,7 @@ class DBTables {
     CREATE TABLE insulin (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
-      date TEXT
+      date INTEGER
     )
   ''';
 
@@ -19,7 +20,7 @@ class DBTables {
     CREATE TABLE carbs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
-      date TEXT
+      date INTEGER
     )
   ''';
 
@@ -27,7 +28,7 @@ class DBTables {
     CREATE TABLE tempbasal (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
-      date TEXT
+      date INTEGER
     )
   ''';
 
@@ -35,7 +36,7 @@ class DBTables {
     CREATE TABLE temptargets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
-      date TEXT
+      date INTEGER
     )
   ''';
 

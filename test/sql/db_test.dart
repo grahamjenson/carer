@@ -1,0 +1,41 @@
+// test the CarerDB that it inserts and upserts data
+
+import 'package:carer/sql/db.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+/// Initialize sqflite for test.
+void sqfliteTestInit() {
+  // Initialize ffi implementation
+  sqfliteFfiInit();
+  // Set global factory
+  databaseFactory = databaseFactoryFfi;
+}
+
+void main() {
+  sqfliteTestInit();
+
+  group('CarerDB', () {
+    late CarerDB db;
+
+    setUp(() async {
+      db = await CarerDB.instance;
+    });
+
+    tearDown(() async {
+      await db.deleteAll();
+      await db.close();
+    });
+
+    test('getSGVs', () async {
+      // create SGVs
+      var ret = db.batchCreateOrUpdateSGVs([
+        {'value': 1, 'date': 1},
+        {'value': 2, 'date': 2},
+      ]);
+      expect(ret, 2);
+
+      // fetch SGVs
+    });
+  });
+}

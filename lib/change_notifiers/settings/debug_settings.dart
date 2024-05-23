@@ -1,4 +1,4 @@
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/sql/key_value_store.dart';
 
@@ -14,7 +14,7 @@ enum DebugSummary {
   normal,
   high;
 
-  Summary summary(Settings settings) {
+  Summary summary(SettingsCN settings) {
     switch (this) {
       case DebugSummary.off:
         return Summary.empty;
@@ -30,7 +30,7 @@ enum DebugSummary {
 
 class DebugSettings {
   KeyValueStore prefs;
-  Settings settings;
+  SettingsCN settings;
 
   DebugSettings({required this.prefs, required this.settings});
 
@@ -65,7 +65,7 @@ class DebugSettings {
 
 var counter = 0;
 
-Summary highSummary(Settings settings) {
+Summary highSummary(SettingsCN settings) {
   var start = settings.targetHigh - 6;
   var end = 15 * 18;
   counter += 6;
@@ -75,11 +75,11 @@ Summary highSummary(Settings settings) {
 
   return Summary(
       raw: "",
-      sgvs: SGVs(sgvs: [
-        SGV(
+      sgvs: SummarySGVs(sgvs: [
+        SummarySGV(
             sgv: counter ~/ 1.1,
             mills: DateTime.now()..subtract(const Duration(minutes: 10))),
-        SGV(
+        SummarySGV(
             sgv: counter,
             mills: DateTime.now()..subtract(const Duration(minutes: 4))),
       ]),
@@ -91,7 +91,7 @@ Summary highSummary(Settings settings) {
       dateRetrievedmills: 10);
 }
 
-Summary lowSummary(Settings settings) {
+Summary lowSummary(SettingsCN settings) {
   var start = settings.urgentLow - 18;
   var end = settings.targetLow + 18;
   counter -= 6;
@@ -101,11 +101,11 @@ Summary lowSummary(Settings settings) {
 
   return Summary(
       raw: "",
-      sgvs: SGVs(sgvs: [
-        SGV(
+      sgvs: SummarySGVs(sgvs: [
+        SummarySGV(
             sgv: counter ~/ 0.7,
             mills: DateTime.now()..subtract(const Duration(minutes: 30))),
-        SGV(sgv: counter, mills: DateTime.now()),
+        SummarySGV(sgv: counter, mills: DateTime.now()),
       ]),
       tempBasals: Summary.empty.tempBasals,
       treatments: Summary.empty.treatments,
@@ -115,7 +115,7 @@ Summary lowSummary(Settings settings) {
       dateRetrievedmills: 10);
 }
 
-Summary normalSummary(Settings settings) {
+Summary normalSummary(SettingsCN settings) {
   var start = settings.targetLow - 18;
   var end = settings.targetHigh + 18;
   counter += 6;
@@ -125,11 +125,11 @@ Summary normalSummary(Settings settings) {
 
   return Summary(
       raw: "",
-      sgvs: SGVs(sgvs: [
-        SGV(
+      sgvs: SummarySGVs(sgvs: [
+        SummarySGV(
             sgv: counter ~/ 1.1,
             mills: DateTime.now()..subtract(const Duration(minutes: 8))),
-        SGV(
+        SummarySGV(
             sgv: counter,
             mills: DateTime.now()..subtract(const Duration(minutes: 4))),
       ]),

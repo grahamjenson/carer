@@ -7,13 +7,16 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class KeyValueStore {
-  final Database db;
+  final Database _db;
   final Map<String, dynamic> _kvdbCache = {};
 
-  KeyValueStore(this.db);
+  static final Future<KeyValueStore> _instance = _createInstance();
+  static Future<KeyValueStore> get instance => _instance;
+
+  KeyValueStore(this._db);
 
   // Constructor
-  static Future<KeyValueStore> create() async {
+  static Future<KeyValueStore> _createInstance() async {
     final db = await openDatabaseAndCreateTables();
     var kvdb = KeyValueStore(db);
     await kvdb._populate();
@@ -42,7 +45,7 @@ class KeyValueStore {
 
   // populate the cache
   Future<bool> _populate() async {
-    var results = await db.query(KVTables.kvTableName);
+    var results = await _db.query(KVTables.kvTableName);
     for (var result in results) {
       if (result['k'] == null || result['v'] == null || result['t'] == null) {
         continue;
@@ -84,17 +87,17 @@ class KeyValueStore {
 
   Future<int> deleteAll() async {
     _kvdbCache.clear();
-    int ret = await db.delete(KVTables.kvTableName);
+    int ret = await _db.delete(KVTables.kvTableName);
     return ret;
   }
 
   close() async {
-    await db.close();
+    await _db.close();
   }
 
   Future<bool> delete(String key) async {
     _kvdbCache.remove(key);
-    int ret = await db.rawDelete(KVQueries.delete, [key]);
+    int ret = await _db.rawDelete(KVQueries.delete, [key]);
     return ret == 1;
   }
 
@@ -153,7 +156,7 @@ class KeyValueStore {
       value = (value as bool) ? '1' : '0';
     }
 
-    int ret = await db
+    int ret = await _db
         .rawInsert(KVQueries.upsert, [key, value, valueType, value, valueType]);
     return ret == 1;
   }

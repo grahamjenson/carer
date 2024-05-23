@@ -1,4 +1,4 @@
-import 'package:carer/models/settings_cn.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
 
 enum AlarmSettingsNames {
@@ -62,7 +62,7 @@ extension AlarmSoundsExtension on AlarmSounds {
 
 class AlarmSettings {
   KeyValueStore prefs;
-  Settings settings;
+  SettingsCN settings;
 
   // ephemeral properters
   bool _testAlarmPlaying = false;

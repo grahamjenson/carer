@@ -1,4 +1,4 @@
-import 'package:carer/models/alarms_cn.dart';
+import 'package:carer/change_notifiers/alarms_cn.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/nightscout_settings.dart';
