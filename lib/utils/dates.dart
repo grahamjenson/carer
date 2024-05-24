@@ -1,3 +1,5 @@
+import 'package:clock/clock.dart';
+
 class Dates {
   static String dateAgoFromMills(Duration? diff) {
     if (diff == null) {
@@ -54,7 +56,7 @@ class Dates {
   }
 
   static int secondsTillNext24HourTime(int timeAsHour) {
-    DateTime now = DateTime.now();
+    DateTime now = clock.now();
     DateTime nextTime = DateTime(now.year, now.month, now.day, timeAsHour);
 
     if (now.isAfter(nextTime)) {

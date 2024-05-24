@@ -2,15 +2,10 @@
 
 import 'package:carer/sql/key_value_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../test_utils.dart';
 
 /// Initialize sqflite for test.
-void sqfliteTestInit() {
-  // Initialize ffi implementation
-  sqfliteFfiInit();
-  // Set global factory
-  databaseFactory = databaseFactoryFfi;
-}
 
 void main() {
   sqfliteTestInit();

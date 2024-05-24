@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
@@ -50,14 +50,14 @@ class T1DCN extends ChangeNotifier {
   }
 
   Future<List<Range5>> targetRange5ForMins(int minutes) async {
-    return (await SGVs.lastMins(minutes)).sgvs.map((e) {
+    return (await SGV.lastMins(minutes)).map((e) {
       var (t, _) = targetRange(settings, e.value);
       return t;
     }).toList();
   }
 
   void checkSummary() async {
-    var lastSGV = await SGVs.lastSGV();
+    var lastSGV = await SGV.lastSGV();
     if (lastSGV == null) {
       return;
     }
@@ -81,9 +81,9 @@ class T1DCN extends ChangeNotifier {
 
   Future<List<int>> diffPer5Minute(int minutes) async {
     List<int> diffs = [];
-    var sgvs = await SGVs.lastMins(minutes);
+    var sgvs = await SGV.lastMins(minutes);
 
-    for (var sgv in sgvs.sgvs) {
+    for (var sgv in sgvs) {
       diffs.add(sgv.diffPer5Mins);
     }
 

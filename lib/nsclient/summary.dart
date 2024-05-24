@@ -4,6 +4,7 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:carer/utils/math.dart';
+import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -104,7 +105,7 @@ abstract class ATreatment {
   DateTime get date;
   IconData get icon;
   Duration get age {
-    return DateTime.now().difference(date);
+    return clock.now().difference(date);
   }
 }
 
@@ -131,7 +132,7 @@ class TempBasal extends ATreatment {
   }
 
   Duration get remaining {
-    return dateEnd.difference(DateTime.now());
+    return dateEnd.difference(clock.now());
   }
 
   factory TempBasal.fromJson(Map<String, dynamic> json) {
@@ -218,7 +219,7 @@ class TempTarget extends ATreatment {
   }
 
   Duration get remaining {
-    return dateEnd.difference(DateTime.now());
+    return dateEnd.difference(clock.now());
   }
 
   factory TempTarget.fromJson(Map<String, dynamic> json) {
@@ -344,7 +345,7 @@ class SummaryTreatments {
   List<SummaryTreatment> summarizedTreatments(int minsAgo, int window) {
     List<SummaryTreatment> spots = [];
     var lastTreatments = lastMins(minsAgo);
-    var now = DateTime.now();
+    var now = clock.now();
     // always start the window in the same place to make sure the same treatments are grouped together
     var startDate = now.subtract(Duration(minutes: minsAgo));
 
@@ -501,7 +502,7 @@ class Summary {
         targets: Targets.fromJson(json['treatments']['targets']),
         state: SummaryState.fromJson(json['state']),
         profile: Profile.fromJson(json['profile']),
-        dateRetrievedmills: DateTime.now().millisecondsSinceEpoch,
+        dateRetrievedmills: clock.now().millisecondsSinceEpoch,
       );
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
@@ -514,7 +515,7 @@ class Summary {
   }
 
   int ageInSeconds() {
-    return DateTime.now().difference(dateRetrieved).inSeconds;
+    return clock.now().difference(dateRetrieved).inSeconds;
   }
 
   (TimeValue?, TempBasal?) basalAtTime(DateTime date) {

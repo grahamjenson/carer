@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:carer/widgets/colours.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
 class CurrentTimeWidget extends StatefulWidget {
@@ -15,7 +17,7 @@ class CurrentTimeWidgetState extends State<CurrentTimeWidget> {
 
   @override
   void initState() {
-    _timeString = _formatDateTime(DateTime.now());
+    _timeString = _formatDateTime(clock.now());
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
     super.initState();
@@ -28,7 +30,7 @@ class CurrentTimeWidgetState extends State<CurrentTimeWidget> {
   }
 
   void _getTime() {
-    final String formattedDateTime = _formatDateTime(DateTime.now());
+    final String formattedDateTime = _formatDateTime(clock.now());
     setState(() {
       _timeString = formattedDateTime;
     });

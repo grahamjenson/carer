@@ -57,6 +57,7 @@ dependencies:
   sentry_flutter: 8.1.0 # locking this version as they keep releasing without new pods
   flutter_local_notifications: ^17.1.2
   sqflite: ^2.3.3+1
+  clock: ^1.1.1
 
   
 

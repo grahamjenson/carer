@@ -1,7 +1,8 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/utils/math.dart';
+import 'package:clock/clock.dart';
 
 abstract class Predictor {
   final SettingsCN settings;
@@ -17,7 +18,7 @@ class SimplePredictor extends Predictor {
 
   @override
   Future<SGV?> predictBGL(int minutes) async {
-    var lastSGV = await SGVs.lastSGV();
+    var lastSGV = await SGV.lastSGV();
     if (lastSGV == null) {
       return null;
     }
@@ -28,6 +29,6 @@ class SimplePredictor extends Predictor {
 
     return SGV(
         value: lastSGV.value + (mean(diffs) * (minutes / 5).round()),
-        date: DateTime.now().add(Duration(minutes: minutes)));
+        date: clock.now().add(Duration(minutes: minutes)));
   }
 }

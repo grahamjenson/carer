@@ -1,6 +1,7 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:clock/clock.dart';
 
 enum DebugSettingNames {
   debug,
@@ -78,10 +79,10 @@ Summary highSummary(SettingsCN settings) {
       sgvs: SummarySGVs(sgvs: [
         SummarySGV(
             sgv: counter ~/ 1.1,
-            mills: DateTime.now()..subtract(const Duration(minutes: 10))),
+            mills: clock.now()..subtract(const Duration(minutes: 10))),
         SummarySGV(
             sgv: counter,
-            mills: DateTime.now()..subtract(const Duration(minutes: 4))),
+            mills: clock.now()..subtract(const Duration(minutes: 4))),
       ]),
       tempBasals: Summary.empty.tempBasals,
       treatments: Summary.empty.treatments,
@@ -104,8 +105,8 @@ Summary lowSummary(SettingsCN settings) {
       sgvs: SummarySGVs(sgvs: [
         SummarySGV(
             sgv: counter ~/ 0.7,
-            mills: DateTime.now()..subtract(const Duration(minutes: 30))),
-        SummarySGV(sgv: counter, mills: DateTime.now()),
+            mills: clock.now()..subtract(const Duration(minutes: 30))),
+        SummarySGV(sgv: counter, mills: clock.now()),
       ]),
       tempBasals: Summary.empty.tempBasals,
       treatments: Summary.empty.treatments,
@@ -128,10 +129,10 @@ Summary normalSummary(SettingsCN settings) {
       sgvs: SummarySGVs(sgvs: [
         SummarySGV(
             sgv: counter ~/ 1.1,
-            mills: DateTime.now()..subtract(const Duration(minutes: 8))),
+            mills: clock.now()..subtract(const Duration(minutes: 8))),
         SummarySGV(
             sgv: counter,
-            mills: DateTime.now()..subtract(const Duration(minutes: 4))),
+            mills: clock.now()..subtract(const Duration(minutes: 4))),
       ]),
       tempBasals: Summary.empty.tempBasals,
       treatments: Summary.empty.treatments,

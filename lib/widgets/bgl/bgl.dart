@@ -1,6 +1,6 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
@@ -39,7 +39,7 @@ class _BGLState extends State<BGL> {
     if (summary.dateRetrieved == Dates.earliest) {
       return loader;
     }
-    var sgv = await SGVs.lastSGV();
+    var sgv = await SGV.lastSGV();
     if (sgv == null) {
       return loader;
     }

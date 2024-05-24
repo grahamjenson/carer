@@ -5,6 +5,7 @@ import 'package:carer/change_notifiers/alarms/alarms.dart';
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
+import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
@@ -42,7 +43,7 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   // Minutes of sleep time
-  DateTime _sleepUntil = DateTime.now();
+  DateTime _sleepUntil = clock.now();
   DateTime get sleepUntil => _sleepUntil;
   set sleepUntil(DateTime value) {
     _sleepUntil = value;
@@ -53,9 +54,9 @@ class AlarmsCN extends ChangeNotifier {
     return sleepDuration.inSeconds <= 0;
   }
 
-  Duration get sleepDuration => _sleepUntil.difference(DateTime.now());
+  Duration get sleepDuration => _sleepUntil.difference(clock.now());
   set sleepDurationSeconds(int value) {
-    _sleepUntil = DateTime.now().add(Duration(seconds: value));
+    _sleepUntil = clock.now().add(Duration(seconds: value));
     notifyListeners();
   }
 

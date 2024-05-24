@@ -1,7 +1,7 @@
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/utils/math.dart';
 
 abstract class Alarm {
@@ -33,7 +33,7 @@ class PredictiveLowAlarm extends Alarm {
 
   @override
   Future<bool> trigger() async {
-    var lastSGV = await SGVs.lastSGV();
+    var lastSGV = await SGV.lastSGV();
     if (lastSGV == null) {
       return false;
     }
@@ -270,7 +270,7 @@ class NoDataAlarm extends Alarm {
     if (alarmSettings.noDataAlarmMinutes == -1) {
       return false;
     }
-    var lastSGV = await SGVs.lastSGV();
+    var lastSGV = await SGV.lastSGV();
     if (lastSGV == null) {
       return false;
     }

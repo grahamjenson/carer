@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +42,7 @@ class UpdateCN extends ChangeNotifier {
       _summaryToBeUpdated = true;
       _updateReason = "Age older than 15";
     }
-    var lastSGV = await SGVs.lastSGV();
+    var lastSGV = await SGV.lastSGV();
     if (lastSGV != null) {
       var sgvage = lastSGV.age.inSeconds;
 
@@ -71,7 +71,7 @@ class UpdateCN extends ChangeNotifier {
         sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
       }
 
-      int ret = await SGVs.createOrUpdateSGVs(sgvs);
+      int ret = await SGV.createOrUpdateSGVs(sgvs);
       print("updateSummary ret: $ret");
 
       notifyListeners();

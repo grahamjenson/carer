@@ -1,12 +1,13 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
+import 'package:clock/clock.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -176,10 +177,10 @@ class BGLChart extends StatelessWidget {
   }
 
   Future<List<FlSpot>> bglSpots(Summary summary, int minsAgo) async {
-    SGVs sgvs = await SGVs.lastMins(minsAgo);
+    List<SGV> sgvs = await SGV.lastMins(minsAgo);
     List<FlSpot> spots = [];
-    for (var i = 0; i < sgvs.sgvs.length; i++) {
-      var sgv = sgvs.sgvs[i];
+    for (var i = 0; i < sgvs.length; i++) {
+      var sgv = sgvs[i];
       spots.add(
           BGLSpot(-sgv.age.inMinutes.toDouble(), sgv.value.toDouble(), sgv));
     }
@@ -191,7 +192,7 @@ class BGLChart extends StatelessWidget {
     // Check the basal at every minute
     for (int i = 0; i < minsAgo; i++) {
       var (basal, tempbasal) =
-          summary.basalAtTime(DateTime.now().subtract(Duration(minutes: i)));
+          summary.basalAtTime(clock.now().subtract(Duration(minutes: i)));
       if (tempbasal != null) {
         spots.add(
             BasalSpot(-i.toDouble(), tempbasal.absolute, tempbasal.absolute));
@@ -225,7 +226,7 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> highTargets = [];
     for (int i = 0; i < minsAgo; i++) {
       var (lowTarget, highTarget, tempTarget) =
-          summary.targetAtTime(DateTime.now().subtract(Duration(minutes: i)));
+          summary.targetAtTime(clock.now().subtract(Duration(minutes: i)));
       if (tempTarget != null) {
         lowTargets
             .add(FlSpot(-i.toDouble(), tempTarget.targetBottom.toDouble()));

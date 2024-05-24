@@ -1,12 +1,13 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
-import 'package:carer/models/models.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -147,7 +148,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow basal(Summary summary) {
-    var (profileBasal, tempBasal) = summary.basalAtTime(DateTime.now());
+    var (profileBasal, tempBasal) = summary.basalAtTime(clock.now());
     // Something is very wrong if there is no profile basal, so just checking that
     if (profileBasal == null) {
       return const DataRow(
@@ -212,7 +213,7 @@ class Stats extends StatelessWidget {
 
   DataRow target(Summary summary, Unit unit) {
     var (profileLowTarget, profileHighTarget, tempTarget) =
-        summary.targetAtTime(DateTime.now());
+        summary.targetAtTime(clock.now());
     // Something is very wrong if there is no profile target, so just checking that
     if (profileLowTarget == null || profileHighTarget == null) {
       return const DataRow(
@@ -277,8 +278,8 @@ class Stats extends StatelessWidget {
   }
 
   Future<DataRow> fifteenMinDiff(Summary summary, Unit unit) async {
-    var sgvs = await SGVs.lastMins(15);
-    if (sgvs.sgvs.isEmpty) {
+    var sgvs = await SGV.lastMins(15);
+    if (sgvs.isEmpty) {
       return const DataRow(
         cells: [
           DataCell(Text("15m Δ", style: heading)),
@@ -288,7 +289,7 @@ class Stats extends StatelessWidget {
         ],
       );
     }
-    var diff = sgvs.sgvs.last.value - sgvs.sgvs.first.value;
+    var diff = sgvs.last.value - sgvs.first.value;
     return DataRow(
       cells: [
         const DataCell(Text("15m Δ", style: heading)),
@@ -303,7 +304,7 @@ class Stats extends StatelessWidget {
 
   Future<DataRow> todaysInRange(int low, int high) async {
     var percent =
-        (await SGVs.percentInRangeToday(low, high) * 100.0).toStringAsFixed(0);
+        (await SGV.percentInRangeToday(low, high) * 100.0).toStringAsFixed(0);
     // get mills at start of day
 
     return DataRow(
