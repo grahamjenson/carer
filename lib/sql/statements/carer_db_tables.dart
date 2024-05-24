@@ -10,13 +10,14 @@ class DBTables {
     CREATE TABLE $sgvTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value INTEGER,
-      date INTEGER,
-      UNIQUE(value, date)
+      timestamp INTEGER,
+      datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+      UNIQUE(value, timestamp)
     )
   ''';
 
   static const String sgvIndex = '''
-    CREATE INDEX sgv_date_index ON $sgvTableName (date)
+    CREATE INDEX sgv_date_index ON $sgvTableName (timestamp)
   ''';
 
   static const String insulinTable = '''

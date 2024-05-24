@@ -29,8 +29,8 @@ void main() {
     test('batchCreateOrUpdateSGVs', () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
-        {'value': 1, 'date': 1},
-        {'value': 2, 'date': 2},
+        {'value': 1, 'timestamp': 1},
+        {'value': 2, 'timestamp': 2},
       ]);
       expect(ret, 2);
       expect(await db.countSGVs(), 2);
@@ -40,8 +40,8 @@ void main() {
 
       // fetch SGVs
       ret = await db.batchCreateOrUpdateSGVs([
-        {'value': 1, 'date': 1},
-        {'value': 2, 'date': 2},
+        {'value': 1, 'timestamp': 1},
+        {'value': 2, 'timestamp': 2},
       ]);
       expect(await db.countSGVs(), 2);
       expect(ret, 2);
@@ -50,8 +50,8 @@ void main() {
       expect(sgvs.first['value'], 2);
 
       ret = await db.batchCreateOrUpdateSGVs([
-        {'value': 2, 'date': 2},
-        {'value': 1, 'date': 2}, // new at same date
+        {'value': 2, 'timestamp': 2},
+        {'value': 1, 'timestamp': 2}, // new at same date
       ]);
       expect(await db.countSGVs(), 3);
       // Should be ordered by date, then lowest value
@@ -65,13 +65,13 @@ void main() {
       List<Map<String, Object>> badInputs = [
         {},
         {'value': 1},
-        {'date': 1},
-        {'value': 1, 'date': -1},
-        {'value': -1, 'date': 1},
-        {'value': 1, 'date': 1, 'extra': 1},
-        {'value': 1, 'date': '1'},
-        {'value': '1', 'date': 1},
-        {'value': '1', 'date': '1'},
+        {'timestamp': 1},
+        {'value': 1, 'timestamp': -1},
+        {'value': -1, 'timestamp': 1},
+        {'value': 1, 'timestamp': 1, 'extra': 1},
+        {'value': 1, 'timestamp': '1'},
+        {'value': '1', 'timestamp': 1},
+        {'value': '1', 'timestamp': '1'},
       ];
 
       for (var badInput in badInputs) {
@@ -87,10 +87,10 @@ void main() {
     test("countSGVs", () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
-        {'date': 1, 'value': 4},
-        {'date': 2, 'value': 3},
-        {'date': 3, 'value': 2},
-        {'date': 4, 'value': 1},
+        {'timestamp': 1, 'value': 4},
+        {'timestamp': 2, 'value': 3},
+        {'timestamp': 3, 'value': 2},
+        {'timestamp': 4, 'value': 1},
       ]);
       expect(ret, 4);
       expect(await db.countSGVs(), 4);
@@ -105,10 +105,10 @@ void main() {
     test("sgvs", () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
-        {'date': 1, 'value': 4},
-        {'date': 2, 'value': 3},
-        {'date': 3, 'value': 2},
-        {'date': 4, 'value': 1},
+        {'timestamp': 1, 'value': 4},
+        {'timestamp': 2, 'value': 3},
+        {'timestamp': 3, 'value': 2},
+        {'timestamp': 4, 'value': 1},
       ]);
       expect(ret, 4);
 

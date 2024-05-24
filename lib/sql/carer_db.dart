@@ -1,4 +1,4 @@
-import 'package:carer/sql/statements/db_tables.dart';
+import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/sql/statements/kv.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -26,14 +26,18 @@ class CarerDB {
     print("Opening database at $path");
     var db = await openDatabase(
       path,
-      version: 4,
+      version: 10,
       onCreate: (db, version) async {
         print("Creating database at version $version");
         await dropAll(db);
         await createAll(db);
       },
       // I am assuming these values will destroy and recreate the database on any version change.
-      onDowngrade: onDatabaseDowngradeDelete,
+      onDowngrade: (db, oldVersion, newVersion) async {
+        print("DOWNGRADING database at version $newVersion");
+        await dropAll(db);
+        await createAll(db);
+      },
       onUpgrade: (db, oldVersion, newVersion) async {
         print("UPGRADING database at version $newVersion");
         await dropAll(db);
@@ -55,13 +59,13 @@ class CarerDB {
 
     var batch = _db.batch();
     var upsert =
-        """INSERT INTO ${DBTables.sgvTableName} (value, date) VALUES (?, ?) 
-    ON CONFLICT(value, date) DO UPDATE SET value = ?, date = ?""";
+        """INSERT INTO ${DBTables.sgvTableName} (value, timestamp) VALUES (?, ?) 
+    ON CONFLICT(value, timestamp) DO UPDATE SET value = ?, timestamp = ?""";
 
     for (var sgv in sgvs) {
       // upsert based
-      batch.rawQuery(
-          upsert, [sgv["value"], sgv["date"], sgv["value"], sgv["date"]]);
+      batch.rawQuery(upsert,
+          [sgv["value"], sgv["timestamp"], sgv["value"], sgv["timestamp"]]);
     }
     var results = await batch.commit(continueOnError: true);
     return results.length;
@@ -71,13 +75,13 @@ class CarerDB {
     if (sgv.isEmpty) {
       return false;
     }
-    var allowedKeys = ["value", "date"];
+    var allowedKeys = ["value", "timestamp"];
     if (!sgv.keys.every((element) => allowedKeys.contains(element))) {
       return false;
     }
 
     var value = sgv["value"];
-    var date = sgv["date"];
+    var date = sgv["timestamp"];
     if (value == null || date == null) {
       return false;
     }
@@ -106,7 +110,7 @@ class CarerDB {
       FROM
         ${DBTables.sgvTableName}
       WHERE
-        date >= ? AND date < ? AND value >= ? AND value < ?
+        timestamp >= ? AND timestamp < ? AND value >= ? AND value < ?
     """;
     // update from raw query
     return Sqflite.firstIntValue(
@@ -127,9 +131,9 @@ class CarerDB {
       FROM
         ${DBTables.sgvTableName}
       WHERE
-        date >= ? AND date < ? AND value >= ? AND value < ?
+        timestamp >= ? AND timestamp < ? AND value >= ? AND value < ?
       ORDER BY 
-        date DESC, value ASC 
+        timestamp DESC, value ASC 
       LIMIT ?
     """;
     // TODO update from raw query

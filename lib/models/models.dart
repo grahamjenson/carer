@@ -59,7 +59,7 @@ class SGVs {
     var rawSGVs = sgvs.map((e) {
       return {
         "value": e.value,
-        "date": e.date.millisecondsSinceEpoch,
+        "timestamp": e.date.millisecondsSinceEpoch,
       };
     }).toList();
     return db.batchCreateOrUpdateSGVs(rawSGVs);
@@ -79,7 +79,7 @@ class SGV {
   factory SGV.fromMap(Map<String, dynamic> map) {
     return SGV(
       value: map["value"],
-      date: DateTime.fromMillisecondsSinceEpoch(map["date"]),
+      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
     );
   }
 
