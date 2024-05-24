@@ -11,22 +11,42 @@ class CarerDB {
   CarerDB(this._db);
 
   static Future<CarerDB> _createInstance() async {
-    var db = await openDatabaseAndCreateTables();
+    var db = await _openDatabaseAndCreateTables();
     return CarerDB(db);
+  }
+
+  static Future<String> getPath() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'carer.db');
+    return path;
+  }
+
+  static Future<Database> _openDatabaseAndCreateTables() async {
+    final path = await getPath();
+    print("Opening database at $path");
+    var db = await openDatabase(
+      path,
+      version: 4,
+      onCreate: (db, version) async {
+        print("Creating database at version $version");
+        await dropAll(db);
+        await createAll(db);
+      },
+      // I am assuming these values will destroy and recreate the database on any version change.
+      onDowngrade: onDatabaseDowngradeDelete,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        print("UPGRADING database at version $newVersion");
+        await dropAll(db);
+        await createAll(db);
+      },
+    );
+
+    return db;
   }
 
   /////
   // SGV
   /////
-
-  Future<Map<String, Object?>?> lastSGV() async {
-    // Order is highest date, then lowest value, then latest id
-    // This way it is Most recent, most dangeroud.
-    var sql = """
-      SELECT * FROM ${DBTables.sgvTableName} ORDER BY date DESC, value ASC LIMIT 1
-    """;
-    return (await _db.rawQuery(sql)).firstOrNull;
-  }
 
   Future<int> batchCreateOrUpdateSGVs(List<Map<String, Object>> sgvs) async {
     if (sgvs.any((sgv) => !_validateSVGMap(sgv))) {
@@ -74,86 +94,91 @@ class CarerDB {
     return true;
   }
 
-  Future<int?> countSGVs(
-      {int since = 0, int rangeLow = -1, int rangeHigh = 1000}) async {
+  Future<int?> countSGVs({
+    int after = 0,
+    before = 9999999999999999,
+    low = -1,
+    high = 1000,
+  }) async {
     var sql = """
       SELECT
         COUNT(*)
       FROM
         ${DBTables.sgvTableName}
       WHERE
-        date > ? AND value >= ? AND value <= ?
+        date >= ? AND date < ? AND value >= ? AND value < ?
     """;
+    // update from raw query
     return Sqflite.firstIntValue(
-        await _db.rawQuery(sql, [since, rangeLow, rangeHigh]));
+        await _db.rawQuery(sql, [after, before, low, high]));
   }
 
-  Future<List<Map<String, Object?>>> sgvsLastMins(int minsAgo) async {
-    // sorted by age
-    // grouped into 1 min intervals (select latest/lowest one)
-    // reference previous sgv
+  Future<List<Map<String, Object?>>> sgvs(
+      {int after = 0,
+      before = 9999999999999999,
+      low = -1,
+      high = 1000,
+      limit = 9000 // About a months worth
+      }) async {
+    // Order by most recent, then most dangerous
     var sql = """
-      SELECT * FROM ${DBTables.sgvTableName} WHERE date > ? ORDER BY date DESC
+      SELECT
+        *
+      FROM
+        ${DBTables.sgvTableName}
+      WHERE
+        date >= ? AND date < ? AND value >= ? AND value < ?
+      ORDER BY 
+        date DESC, value ASC 
+      LIMIT ?
     """;
-    return _db.rawQuery(
-        sql, [DateTime.now().millisecondsSinceEpoch - minsAgo * 60 * 1000]);
+    // TODO update from raw query
+    return _db.rawQuery(sql, [after, before, low, high, limit]);
   }
 
   ////
-  //  Utilities
+  // Testing functions
   ////
 
-  // Open the database and create the tables
-  static Future<Database> openDatabaseAndCreateTables() async {
-    final databasePath = await getDatabasesPath();
-    final path = join(databasePath, 'carer.db');
-    print("Opening database at $path");
-    var db = await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        var batch = db.batch();
+  static Future<void> dropAll(Database db) async {
+    var batch = db.batch();
 
-        batch.execute(DBTables.sgvTable);
-        batch.execute(DBTables.insulinTable);
-        batch.execute(DBTables.carbsTable);
-        batch.execute(DBTables.tempbasalTable);
-        batch.execute(DBTables.temptargetsTable);
-        batch.execute(DBTables.profileTable);
+    batch.execute("DROP TABLE IF EXISTS ${DBTables.sgvTableName}");
 
-        // Also add a key value store for state and caching calculations
-        batch.execute(KVTables.kvTable);
+    batch.execute("DROP TABLE IF EXISTS ${DBTables.insulinTableName}");
+    batch.execute("DROP TABLE IF EXISTS ${DBTables.carbsTableName}");
+    batch.execute("DROP TABLE IF EXISTS ${DBTables.tempbasalTableName}");
+    batch.execute("DROP TABLE IF EXISTS ${DBTables.temptargetsTableName}");
+    batch.execute("DROP TABLE IF EXISTS ${DBTables.profileTableName}");
 
-        await batch.commit();
-      },
-      // I am assuming these values will destroy and recreate the database on any version change.
-      onDowngrade: onDatabaseDowngradeDelete,
-      onUpgrade: onDatabaseDowngradeDelete,
-    );
-
-    return db;
-  }
-
-  Future<void> deleteAll() async {
-    var batch = _db.batch();
-
-    batch.delete(DBTables.sgvTableName);
-    batch.delete(DBTables.insulinTableName);
-    batch.delete(DBTables.carbsTableName);
-    batch.delete(DBTables.tempbasalTableName);
-    batch.delete(DBTables.temptargetsTableName);
-    batch.delete(DBTables.profileTableName);
-
-    // Delete KV table as well (settings are in different DB)
-    batch.delete(KVTables.kvTableName);
+    batch.execute("DROP TABLE IF EXISTS ${KVTables.kvTableName}");
 
     await batch.commit();
 
     return;
   }
 
-  close() async {
+  static Future<void> createAll(Database db) async {
+    var batch = db.batch();
+
+    batch.execute(DBTables.sgvTable);
+    batch.execute(DBTables.sgvIndex);
+
+    batch.execute(DBTables.insulinTable);
+    batch.execute(DBTables.carbsTable);
+    batch.execute(DBTables.tempbasalTable);
+    batch.execute(DBTables.temptargetsTable);
+    batch.execute(DBTables.profileTable);
+
+    // Also add a key value store for state and caching calculations
+    batch.execute(KVTables.kvTable);
+
+    await batch.commit();
+  }
+
+  recreate() async {
     await _db.close();
+    await deleteDatabase(await getPath());
     _instance = _createInstance();
   }
 }

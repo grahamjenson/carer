@@ -15,6 +15,10 @@ class DBTables {
     )
   ''';
 
+  static const String sgvIndex = '''
+    CREATE INDEX sgv_date_index ON $sgvTableName (date)
+  ''';
+
   static const String insulinTable = '''
     CREATE TABLE $insulinTableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

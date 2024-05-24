@@ -23,8 +23,7 @@ void main() {
     });
 
     tearDown(() async {
-      await db.deleteAll();
-      await db.close();
+      await db.recreate();
     });
 
     test('batchCreateOrUpdateSGVs', () async {
@@ -35,7 +34,9 @@ void main() {
       ]);
       expect(ret, 2);
       expect(await db.countSGVs(), 2);
-      expect((await db.lastSGV())!['value'], 2);
+      var sgvs = await db.sgvs();
+      expect(sgvs.length, 2);
+      expect(sgvs.first['value'], 2);
 
       // fetch SGVs
       ret = await db.batchCreateOrUpdateSGVs([
@@ -44,6 +45,9 @@ void main() {
       ]);
       expect(await db.countSGVs(), 2);
       expect(ret, 2);
+      sgvs = await db.sgvs();
+      expect(sgvs.length, 2);
+      expect(sgvs.first['value'], 2);
 
       ret = await db.batchCreateOrUpdateSGVs([
         {'value': 2, 'date': 2},
@@ -51,7 +55,9 @@ void main() {
       ]);
       expect(await db.countSGVs(), 3);
       // Should be ordered by date, then lowest value
-      expect((await db.lastSGV())!['value'], 1);
+      sgvs = await db.sgvs();
+      expect(sgvs.length, 3);
+      expect(sgvs.first['value'], 1);
       expect(ret, 2);
     });
 
@@ -76,6 +82,61 @@ void main() {
           expect(e, isA<ArgumentError>());
         }
       }
+    });
+
+    test("countSGVs", () async {
+      // create SGVs
+      var ret = await db.batchCreateOrUpdateSGVs([
+        {'date': 1, 'value': 4},
+        {'date': 2, 'value': 3},
+        {'date': 3, 'value': 2},
+        {'date': 4, 'value': 1},
+      ]);
+      expect(ret, 4);
+      expect(await db.countSGVs(), 4);
+      expect(await db.countSGVs(after: 2), 3); // inclusive
+      expect(await db.countSGVs(before: 4), 3); // exclusive
+      expect(await db.countSGVs(low: 2), 3); // inclusive
+      expect(await db.countSGVs(high: 4), 3); // exclusive
+
+      expect(await db.countSGVs(after: 2, before: 4, low: 2, high: 3), 1);
+    });
+
+    test("sgvs", () async {
+      // create SGVs
+      var ret = await db.batchCreateOrUpdateSGVs([
+        {'date': 1, 'value': 4},
+        {'date': 2, 'value': 3},
+        {'date': 3, 'value': 2},
+        {'date': 4, 'value': 1},
+      ]);
+      expect(ret, 4);
+
+      // fetch SGVs
+      var sgvs = await db.sgvs(after: 2); // inclusive
+      expect(sgvs.length, 3);
+      expect(sgvs[0]['value'], 1);
+      expect(sgvs[1]['value'], 2);
+      expect(sgvs[2]['value'], 3);
+
+      sgvs = await db.sgvs(before: 3); // inclusive
+      expect(sgvs.length, 2);
+      expect(sgvs[0]['value'], 3);
+      expect(sgvs[1]['value'], 4);
+
+      sgvs = await db.sgvs(low: 3); // inclusive
+      expect(sgvs.length, 2);
+      expect(sgvs[0]['value'], 3);
+      expect(sgvs[1]['value'], 4);
+
+      sgvs = await db.sgvs(high: 3); // inclusive
+      expect(sgvs.length, 2);
+      expect(sgvs[0]['value'], 1);
+      expect(sgvs[1]['value'], 2);
+
+      sgvs = await db.sgvs(limit: 1); // inclusive
+      expect(sgvs.length, 1);
+      expect(sgvs[0]['value'], 1);
     });
   });
 }

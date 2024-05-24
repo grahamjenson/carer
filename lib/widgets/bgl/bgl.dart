@@ -39,8 +39,7 @@ class _BGLState extends State<BGL> {
     if (summary.dateRetrieved == Dates.earliest) {
       return loader;
     }
-    var lastSGVs = await SGVs.lastMins(30);
-    var sgv = lastSGVs.sgvs.lastOrNull;
+    var sgv = await SGVs.lastSGV();
     if (sgv == null) {
       return loader;
     }

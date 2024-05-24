@@ -1,5 +1,5 @@
 import 'package:carer/models/constants.dart';
-import 'package:carer/sql/db.dart';
+import 'package:carer/sql/carer_db.dart';
 
 class SGVs {
   final List<SGV> sgvs;
@@ -10,11 +10,10 @@ class SGVs {
 
   static Future<SGV?> lastSGV() async {
     var db = await CarerDB.instance;
-    var rawSGV = await db.lastSGV();
+    var rawSGV = (await db.sgvs(limit: 1)).firstOrNull;
     if (rawSGV == null) {
       return null;
     }
-
     return SGV.fromMap(rawSGV);
   }
 
@@ -25,7 +24,10 @@ class SGVs {
     // sorted by age
     // grouped into 1 min intervals (select latest/lowest one)
     // reference previous sgv
-    var rawSGVs = await db.sgvsLastMins(minsAgo);
+    var rawSGVs = await db.sgvs(
+        after: DateTime.now()
+            .subtract(Duration(minutes: minsAgo))
+            .millisecondsSinceEpoch);
     List<SGV> ret = [];
     for (var rsvg in rawSGVs) {
       ret.add(SGV.fromMap(rsvg));
@@ -40,10 +42,10 @@ class SGVs {
     int startOfDayEpoch = startOfDay.millisecondsSinceEpoch;
 
     var db = await CarerDB.instance;
-    var sgvsTodayInRange = await db.countSGVs(
-        since: startOfDayEpoch, rangeLow: low, rangeHigh: high);
+    var sgvsTodayInRange =
+        await db.countSGVs(after: startOfDayEpoch, low: low, high: high);
 
-    var sgvsToday = await db.countSGVs(since: startOfDayEpoch);
+    var sgvsToday = await db.countSGVs(after: startOfDayEpoch);
 
     if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
       return 0.0;
