@@ -2,6 +2,7 @@ import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/models/treatments.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
@@ -13,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class TreatmentSpot extends FlSpot {
-  final SummaryTreatment treatment;
+  final Treatment treatment;
   TreatmentSpot(super.x, super.y, this.treatment);
 }
 
@@ -65,6 +66,9 @@ class BGLChart extends StatelessWidget {
       return FutureBuilder<Window>(
           future: futureWindow(summary, settings),
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              print("BGLChart snapshot error: ${snapshot.error}");
+            }
             if (snapshot.hasData) {
               return snapshot.data!;
             } else {
@@ -85,7 +89,7 @@ class BGLChart extends StatelessWidget {
     var bglSpotData = await bglSpots(summary, minsAgo);
     var (basalSpotData, maxBasal) = basalSpots(summary, minsAgo);
     var (lowTargets, highTargets) = targetSpots(summary, minsAgo);
-    var treatments = treatmentsSpots(summary, minsAgo);
+    var treatments = await treatmentsSpots(summary, minsAgo);
 
     var bglLineData = LineChartBarData(
       color: mainColor,
@@ -151,12 +155,12 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  List<FlSpot> treatmentsSpots(Summary summary, int minsAgo) {
+  Future<List<FlSpot>> treatmentsSpots(Summary summary, int minsAgo) async {
     List<FlSpot> spots = [];
-    var lastTreatments = summary.treatments.summarizedTreatments(minsAgo, 5);
+    var lastTreatments = await Treatment.worseSummary(minsAgo, 5);
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
-    SummaryTreatment? lastTreatment;
+    Treatment? lastTreatment;
     var diff = 0.0;
     const double change = 20;
     for (var treatment in lastTreatments) {

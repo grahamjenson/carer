@@ -37,6 +37,9 @@ class Stats extends StatelessWidget {
       return FutureBuilder<Window>(
           future: futureWindow(summary, settings),
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              print("Stats snapshot error: ${snapshot.error}");
+            }
             if (snapshot.hasData) {
               return snapshot.data!;
             } else {

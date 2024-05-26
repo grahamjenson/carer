@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/models/bolus.dart';
+import 'package:carer/models/carbs.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
@@ -66,12 +68,23 @@ class UpdateCN extends ChangeNotifier {
 
       // convert the summary to models
       List<SGV> sgvs = [];
-
       for (var sgv in summary.sgvs.sgvs) {
         sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
       }
+      int ret = await SGV.createOrUpdate(sgvs);
 
-      int ret = await SGV.createOrUpdateSGVs(sgvs);
+      List<Bolus> boluses = [];
+      for (var bolus in summary.treatments.boluses()) {
+        boluses.add(Bolus(value: bolus.insulin!, date: bolus.mills));
+      }
+      ret = await Bolus.createOrUpdate(boluses);
+
+      List<Carbs> carbs = [];
+      for (var carb in summary.treatments.carbs()) {
+        carbs.add(Carbs(value: carb.carbs!.round(), date: carb.mills));
+      }
+      ret = await Carbs.createOrUpdate(carbs);
+
       print("updateSummary ret: $ret");
 
       notifyListeners();

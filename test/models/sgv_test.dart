@@ -19,7 +19,7 @@ void main() {
     });
 
     test('lastMins', () async {
-      var sgvCount = await SGV.createOrUpdateSGVs([
+      var sgvCount = await SGV.createOrUpdate([
         SGV(value: 2, date: now.subtract(min5)),
         SGV(value: 1, date: now),
       ]);
@@ -37,7 +37,7 @@ void main() {
       var sgv = await SGV.lastSGV();
       expect(sgv, null);
 
-      var sgvCount = await SGV.createOrUpdateSGVs([
+      var sgvCount = await SGV.createOrUpdate([
         SGV(value: 2, date: now.subtract(min5)),
       ]);
       expect(sgvCount, 1);
@@ -46,7 +46,7 @@ void main() {
       expect(sgv!.value, 2);
 
       // Add more recent number
-      sgvCount = await SGV.createOrUpdateSGVs([
+      sgvCount = await SGV.createOrUpdate([
         SGV(value: 1, date: now),
       ]);
       expect(sgvCount, 1);

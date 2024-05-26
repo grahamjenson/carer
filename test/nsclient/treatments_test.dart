@@ -10,15 +10,15 @@ void main() {
     final file = File(files["treatments_basic"]!);
     final jsonString = await file.readAsString();
 
-    Treatments treatments = Treatments.fromJson(jsonString);
+    NSTreatments treatments = NSTreatments.fromJson(jsonString);
 
-    expect(treatments.treatments, isA<List<Treatment>>());
+    expect(treatments.treatments, isA<List<NSTreatment>>());
     expect(treatments.treatments.length, equals(1));
 
-    Treatment firstTreatment = treatments.treatments[0];
-    expect(firstTreatment.id, equals("65a83a1c4b474038e0900cf"));
-    expect(firstTreatment.app, equals("AAPS"));
-    expect(firstTreatment.carbs, equals(15));
+    NSTreatment firstNSTreatment = treatments.treatments[0];
+    expect(firstNSTreatment.id, equals("65a83a1c4b474038e0900cf"));
+    expect(firstNSTreatment.app, equals("AAPS"));
+    expect(firstNSTreatment.carbs, equals(15));
     // Add more assertions as needed for other properties
   });
 
@@ -26,20 +26,20 @@ void main() {
     final file = File(files["treatments"]!);
     final jsonString = await file.readAsString();
 
-    Treatments treatments = Treatments.fromJson(jsonString);
+    NSTreatments treatments = NSTreatments.fromJson(jsonString);
 
-    expect(treatments.treatments, isA<List<Treatment>>());
+    expect(treatments.treatments, isA<List<NSTreatment>>());
     expect(treatments.treatments.length, equals(552));
   });
 
-  test('treatments paring bad data will return empty Treatments object',
+  test('treatments paring bad data will return empty NSTreatments object',
       () async {
     final file = File(files["treatments_bad"]!);
     final jsonString = await file.readAsString();
 
-    Treatments treatments = Treatments.fromJson(jsonString);
+    NSTreatments treatments = NSTreatments.fromJson(jsonString);
 
-    expect(treatments.treatments, isA<List<Treatment>>());
+    expect(treatments.treatments, isA<List<NSTreatment>>());
     expect(treatments.treatments.length, equals(0));
   });
 }

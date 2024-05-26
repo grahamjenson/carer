@@ -1,6 +1,6 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
-import 'package:carer/nsclient/summary.dart';
+import 'package:carer/models/treatments.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -28,56 +28,71 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer2<SettingsCN, UpdateCN>(
-        builder: (context, settings, summaryCn, child) {
-      var history = historyContainers(settings, summaryCn);
-
-      return Window(
-        title: "History",
-        child: Expanded(
-          child: SingleChildScrollView(
-              child: Container(
-                  alignment: Alignment.center,
-                  child: DataTable(
-                      border: const TableBorder(
-                        verticalInside:
-                            BorderSide(color: mainColor, width: 0.2),
-                        horizontalInside:
-                            BorderSide(color: mainColor, width: 0.2),
-                      ),
-                      columnSpacing: 5,
-                      dividerThickness: 0.01,
-                      headingRowHeight: 12,
-                      dataRowMinHeight: 14,
-                      dataRowMaxHeight: 20,
-                      horizontalMargin: 0,
-                      columns: [
-                        DataColumn(
-                            numeric: true,
-                            label: Container(
-                                alignment: Alignment.center,
-                                child: const Text('', style: heading))),
-                        DataColumn(
-                            numeric: true,
-                            label: Container(
-                                alignment: Alignment.center,
-                                child: const Text('', style: heading))),
-                        DataColumn(
-                            numeric: true,
-                            label: Container(
-                                alignment: Alignment.center,
-                                child: const Text('', style: heading))),
-                      ],
-                      rows: history))),
-        ),
-      );
+        builder: (context, settings, updateCn, child) {
+      return FutureBuilder<Window>(
+          future: futureWindow(updateCn, settings),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              print("History snapshot error: ${snapshot.error}");
+            }
+            if (snapshot.hasData) {
+              return snapshot.data!;
+            } else {
+              return const CircularProgressIndicator();
+            }
+          });
     });
   }
 
-  List<DataRow> historyContainers(SettingsCN settings, UpdateCN summaryCn) {
-    if (summaryCn.summary.dateRetrieved == Dates.earliest) {
+  Future<Window> futureWindow(UpdateCN updateCn, SettingsCN settings) async {
+    var history = await historyContainers(settings, updateCn);
+
+    return Window(
+      title: "History",
+      child: Expanded(
+        child: SingleChildScrollView(
+            child: Container(
+                alignment: Alignment.center,
+                child: DataTable(
+                    border: const TableBorder(
+                      verticalInside: BorderSide(color: mainColor, width: 0.2),
+                      horizontalInside:
+                          BorderSide(color: mainColor, width: 0.2),
+                    ),
+                    columnSpacing: 5,
+                    dividerThickness: 0.01,
+                    headingRowHeight: 12,
+                    dataRowMinHeight: 14,
+                    dataRowMaxHeight: 20,
+                    horizontalMargin: 0,
+                    columns: [
+                      DataColumn(
+                          numeric: true,
+                          label: Container(
+                              alignment: Alignment.center,
+                              child: const Text('', style: heading))),
+                      DataColumn(
+                          numeric: true,
+                          label: Container(
+                              alignment: Alignment.center,
+                              child: const Text('', style: heading))),
+                      DataColumn(
+                          numeric: true,
+                          label: Container(
+                              alignment: Alignment.center,
+                              child: const Text('', style: heading))),
+                    ],
+                    rows: history))),
+      ),
+    );
+  }
+
+  Future<List<DataRow>> historyContainers(
+      SettingsCN settings, UpdateCN updateCn) async {
+    if (updateCn.summary.dateRetrieved == Dates.earliest) {
       return [];
     }
-    var history = summaryCn.summary.treatments.summarizedTreatments(60 * 6, 5);
+    var history = await Treatment.worseSummary(60 * 6, 5);
 
     return [for (var t in history) historyRow(t)]
         .where((row) => row != null)
@@ -85,14 +100,12 @@ class History extends StatelessWidget {
         .toList();
   }
 
-  DataRow? historyRow(ATreatment treatment) {
-    if (treatment is SummaryTreatment) {
-      return DataRow(cells: [
-        DataCell(dateAgoShort(treatment.age)),
-        DataCell(insulinSmartText(treatment)),
-        DataCell(carbsSmartText(treatment)),
-      ]);
-    }
+  DataRow? historyRow(Treatment treatment) {
+    return DataRow(cells: [
+      DataCell(dateAgoShort(treatment.age)),
+      DataCell(insulinSmartText(treatment)),
+      DataCell(carbsSmartText(treatment)),
+    ]);
 
     return null;
   }
@@ -123,7 +136,7 @@ class History extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Widget insulinSmartText(SummaryTreatment treatment) {
+  Widget insulinSmartText(Treatment treatment) {
     if (treatment.insulin == 0 || treatment.insulin == null) {
       return const SizedBox.shrink();
     }
@@ -132,7 +145,7 @@ class History extends StatelessWidget {
         styles: const [row, small]);
   }
 
-  Widget carbsSmartText(SummaryTreatment treatment) {
+  Widget carbsSmartText(Treatment treatment) {
     if (treatment.carbs == 0 || treatment.carbs == null) {
       return const SizedBox.shrink();
     }

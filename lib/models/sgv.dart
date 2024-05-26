@@ -130,14 +130,14 @@ class SGV {
     return sgvsTodayInRange / sgvsToday;
   }
 
-  static Future<int> createOrUpdateSGVs(List<SGV> sgvs) async {
+  static Future<int> createOrUpdate(List<SGV> models) async {
     var db = await CarerDB.instance;
-    var rawSGVs = sgvs.map((e) {
+    var rawModels = models.map((e) {
       return {
         "value": e.value,
         "timestamp": e.date.millisecondsSinceEpoch,
       };
     }).toList();
-    return db.batchCreateOrUpdateSGVs(rawSGVs);
+    return db.batchCreateOrUpdateSGVs(rawModels);
   }
 }

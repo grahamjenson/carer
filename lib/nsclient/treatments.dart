@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:carer/utils/errors.dart';
 
-class Treatment {
+class NSTreatment {
   String id;
   String app;
   int? carbs;
@@ -18,7 +18,7 @@ class Treatment {
   String subject;
   double? insulin;
 
-  Treatment({
+  NSTreatment({
     required this.id,
     required this.app,
     required this.carbs,
@@ -35,8 +35,8 @@ class Treatment {
     required this.insulin,
   });
 
-  factory Treatment.fromJson(Map<String, dynamic> json) {
-    return Treatment(
+  factory NSTreatment.fromJson(Map<String, dynamic> json) {
+    return NSTreatment(
       id: json['_id'],
       app: json['app'],
       carbs: json['carbs'],
@@ -55,21 +55,21 @@ class Treatment {
   }
 }
 
-class Treatments {
-  List<Treatment> treatments;
+class NSTreatments {
+  List<NSTreatment> treatments;
 
-  Treatments({required this.treatments});
+  NSTreatments({required this.treatments});
 
-  factory Treatments.fromJson(String jsonString) {
+  factory NSTreatments.fromJson(String jsonString) {
     try {
       final List<dynamic> jsonList = json.decode(jsonString);
-      List<Treatment> treatmentsList =
-          jsonList.map((json) => Treatment.fromJson(json)).toList();
+      List<NSTreatment> treatmentsList =
+          jsonList.map((json) => NSTreatment.fromJson(json)).toList();
 
-      return Treatments(treatments: treatmentsList);
+      return NSTreatments(treatments: treatmentsList);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Treatments(treatments: []);
+      return NSTreatments(treatments: []);
     }
   }
 }

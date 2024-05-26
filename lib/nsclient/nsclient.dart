@@ -23,7 +23,7 @@ Uri basalEndpoint(nsURL, token) =>
 
 // Singleton
 class NSClient {
-  Future<Entries> getEntries(String nsURL, String token) async {
+  Future<NSEntries> getEntries(String nsURL, String token) async {
     try {
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
@@ -35,7 +35,7 @@ class NSClient {
         throw Exception("Bad HTTP");
       }
 
-      return Entries.fromJson(response.body);
+      return NSEntries.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
@@ -43,7 +43,7 @@ class NSClient {
     }
   }
 
-  Future<Treatments> getTreatments(String nsURL, String token) async {
+  Future<NSTreatments> getTreatments(String nsURL, String token) async {
     try {
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
@@ -55,7 +55,7 @@ class NSClient {
         throw Exception("Bad HTTP");
       }
 
-      return Treatments.fromJson(response.body);
+      return NSTreatments.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class

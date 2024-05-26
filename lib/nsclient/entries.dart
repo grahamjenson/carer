@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:carer/utils/errors.dart';
 
-class Entry {
+class NSEntry {
   String id;
   String app;
   DateTime date;
@@ -21,7 +21,7 @@ class Entry {
   int srvCreated;
   String subject;
 
-  Entry({
+  NSEntry({
     required this.id,
     required this.app,
     required this.date,
@@ -41,8 +41,8 @@ class Entry {
     required this.subject,
   });
 
-  factory Entry.fromJson(Map<String, dynamic> json) {
-    return Entry(
+  factory NSEntry.fromJson(Map<String, dynamic> json) {
+    return NSEntry(
       id: json['_id'],
       app: json['app'],
       date: DateTime.fromMillisecondsSinceEpoch(json['date']),
@@ -64,25 +64,25 @@ class Entry {
   }
 }
 
-class Entries {
-  List<Entry> entries;
+class NSEntries {
+  List<NSEntry> entries;
 
   bool isEmpty() => entries.isEmpty;
-  Entry? firstOrNull() => entries.firstOrNull;
+  NSEntry? firstOrNull() => entries.firstOrNull;
 
-  Entries({
+  NSEntries({
     required this.entries,
   });
 
-  factory Entries.fromJson(String jsonStr) {
+  factory NSEntries.fromJson(String jsonStr) {
     try {
       final List<dynamic> jsonList = json.decode(jsonStr);
-      List<Entry> entries =
-          jsonList.map((json) => Entry.fromJson(json)).toList();
-      return Entries(entries: entries);
+      List<NSEntry> entries =
+          jsonList.map((json) => NSEntry.fromJson(json)).toList();
+      return NSEntries(entries: entries);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Entries(entries: []);
+      return NSEntries(entries: []);
     }
   }
 

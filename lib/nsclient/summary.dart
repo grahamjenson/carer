@@ -3,11 +3,9 @@ import 'dart:convert';
 import 'package:carer/models/constants.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
-import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
 class TimeValue {
   TimeOfDay time;
@@ -103,7 +101,6 @@ class SummarySGV {
 
 abstract class ATreatment {
   DateTime get date;
-  IconData get icon;
   Duration get age {
     return clock.now().difference(date);
   }
@@ -157,33 +154,6 @@ class SummaryTreatment extends ATreatment {
 
   @override
   DateTime get date => mills;
-
-  @override
-  IconData get icon {
-    if (insulin != null && carbs != null) {
-      return UniconsLine.anchor;
-    } else if (insulin != null) {
-      return UniconsLine.syringe;
-    } else {
-      return Icons.fastfood;
-    }
-  }
-
-  String get insulinStr {
-    if (insulin != null && insulin != 0) {
-      return '${toMax2dp(insulin!)}u';
-    } else {
-      return "";
-    }
-  }
-
-  String get carbStr {
-    if (carbs != null && carbs != 0) {
-      return '${toMax2dp(carbs!)}g';
-    } else {
-      return "";
-    }
-  }
 
   factory SummaryTreatment.fromJson(Map<String, dynamic> json) {
     return SummaryTreatment(
@@ -335,59 +305,12 @@ class SummaryTreatments {
     return SummaryTreatments(treatments: treatments);
   }
 
-  // return the last treatments for minutes
-  List<SummaryTreatment> lastMins(int minutes) {
-    return treatments
-        .where((treatment) => treatment.age.inMinutes < minutes)
-        .toList();
+  List<SummaryTreatment> boluses() {
+    return treatments.where((t) => t.insulin != null).toList();
   }
 
-  List<SummaryTreatment> summarizedTreatments(int minsAgo, int window) {
-    List<SummaryTreatment> spots = [];
-    var lastTreatments = lastMins(minsAgo);
-    var now = clock.now();
-    // always start the window in the same place to make sure the same treatments are grouped together
-    var startDate = now.subtract(Duration(minutes: minsAgo));
-
-    // This is not 100% efficient because it always scans at least an hour, but this is the easiest for now
-    var startWindow = DateTime(
-        startDate.year, startDate.month, startDate.day, startDate.hour, 0);
-    var endWindow = DateTime(
-        startDate.year, startDate.month, startDate.day, startDate.hour, window);
-
-    // We are going to group all treatments into 5 minute window blocks to make it more readable
-    while (endWindow.isBefore(now)) {
-      var treatments = lastTreatments.where((t) =>
-          (t.date.isAfter(startWindow) || t.date == startWindow) &&
-          t.date.isBefore(endWindow));
-
-      startWindow = endWindow;
-      endWindow = endWindow.add(Duration(minutes: window));
-
-      if (treatments.isEmpty) {
-        continue;
-      }
-
-      var insulin = treatments
-          .where((t) => t.insulin != null)
-          .map((t) => t.insulin!)
-          .fold(0.0, (a, b) => a + b);
-      var carbs = treatments
-          .where((t) => t.carbs != null)
-          .map((t) => t.carbs!)
-          .fold(0, (a, b) => a + b);
-
-      // the latest date from treatments
-      var date =
-          treatments.reduce((a, b) => a.date.isAfter(b.date) ? a : b).date;
-
-      var newSummary =
-          SummaryTreatment(insulin: insulin, carbs: carbs, mills: date);
-
-      spots.add(newSummary);
-    }
-    spots.sort((a, b) => b.date.compareTo(a.date));
-    return spots;
+  List<SummaryTreatment> carbs() {
+    return treatments.where((t) => t.carbs != null).toList();
   }
 }
 
