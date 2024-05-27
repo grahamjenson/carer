@@ -15,7 +15,7 @@ void main() {
     setUp(() async {});
 
     tearDown(() async {
-      await (await CarerDB.instance).recreate();
+      await (await CarerDB.instance).deleteAll();
     });
 
     test('lastMins', () async {

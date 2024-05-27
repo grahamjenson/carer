@@ -92,7 +92,7 @@ class History extends StatelessWidget {
     if (updateCn.summary.dateRetrieved == Dates.earliest) {
       return [];
     }
-    var history = await Treatment.worseSummary(60 * 6, 5);
+    var history = await Treatment.concatSummary(60 * 6);
 
     return [for (var t in history) historyRow(t)]
         .where((row) => row != null)
@@ -102,7 +102,7 @@ class History extends StatelessWidget {
 
   DataRow? historyRow(Treatment treatment) {
     return DataRow(cells: [
-      DataCell(dateAgoShort(treatment.age)),
+      DataCell(dateAgoShort(treatment)),
       DataCell(insulinSmartText(treatment)),
       DataCell(carbsSmartText(treatment)),
     ]);
@@ -110,7 +110,10 @@ class History extends StatelessWidget {
     return null;
   }
 
-  SmartText dateAgoShort(Duration diff) {
+  SmartText dateAgoShort(Treatment treatment) {
+    var diff = treatment.age;
+    var starNoStar = treatment.isConcated ? "ᶿ" : "";
+
     if (diff.inMinutes == 0) {
       return SmartText(texts: const ["now"], styles: const [row]);
     }
@@ -124,14 +127,14 @@ class History extends StatelessWidget {
       styles.add(small);
       texts.add((diff.inMinutes % 60).toString().padLeft(2, "0"));
       styles.add(row);
-      texts.add("m");
+      texts.add("m$starNoStar");
       styles.add(small);
       return SmartText(texts: texts, styles: styles);
     }
 
     texts.add((diff.inMinutes % 60).toString());
     styles.add(row);
-    texts.add("m");
+    texts.add("m$starNoStar");
     styles.add(small);
     return SmartText(texts: texts, styles: styles);
   }

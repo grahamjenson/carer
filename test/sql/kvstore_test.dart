@@ -19,7 +19,6 @@ void main() {
 
     tearDown(() async {
       await store.deleteAll();
-      await store.close();
     });
 
     test('insert and upsert', () async {

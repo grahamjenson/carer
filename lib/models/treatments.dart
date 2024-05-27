@@ -1,32 +1,38 @@
 // Non persisted combined model of Bolus and Carbs
-import 'package:carer/models/bolus.dart';
-import 'package:carer/models/carbs.dart';
+import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
 class Treatment {
-  DateTime mills;
+  DateTime date;
   double? insulin;
   int? carbs;
+  bool isConcated;
 
-  Treatment({
-    required this.mills,
-    this.insulin,
-    this.carbs,
-  });
+  Treatment(
+      {required this.date, this.insulin, this.carbs, this.isConcated = false});
 
-  static Future<List<Treatment>> worseSummary(int minsAgo, int window) async {
-    var boluses = (await Bolus.lastMins(minsAgo))
-        .map((e) => Treatment(mills: e.date, insulin: e.value))
-        .toList();
-    var carbs = (await Carbs.lastMins(minsAgo))
-        .map((e) => Treatment(mills: e.date, carbs: e.value))
-        .toList();
+  static Future<List<Treatment>> concatSummary(int minsAgo) async {
+    var db = await CarerDB.instance;
+    List<Treatment> treatments = [];
+    for (var e in (await db.concatedTreatments(
+        after: clock
+            .now()
+            .subtract(Duration(minutes: minsAgo))
+            .millisecondsSinceEpoch))) {
+      treatments.add(
+        Treatment(
+          date: DateTime.fromMillisecondsSinceEpoch(e["max_ts"] as int),
+          insulin: e["insulin"] as double?,
+          carbs: e["carbs"] as int?,
+          isConcated: e["count"] != 1,
+        ),
+      );
+    }
 
-    return boluses + carbs;
+    return treatments;
   }
 
-  DateTime get date => mills;
   Duration get age {
     return clock.now().difference(date);
   }

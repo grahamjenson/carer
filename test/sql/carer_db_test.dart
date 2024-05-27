@@ -16,7 +16,7 @@ void main() {
     });
 
     tearDown(() async {
-      await db.recreate();
+      await db.deleteAll();
     });
 
     test('batchCreateOrUpdateSGVs', () async {
