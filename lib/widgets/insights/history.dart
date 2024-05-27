@@ -25,6 +25,13 @@ class History extends StatelessWidget {
     fontSize: 10,
   );
 
+  static const superscript = TextStyle(
+    color: mainColor,
+    fontSize: 20,
+    fontWeight: FontWeight.w100,
+    fontFeatures: [FontFeature.superscripts()],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<SettingsCN, UpdateCN>(
@@ -106,13 +113,10 @@ class History extends StatelessWidget {
       DataCell(insulinSmartText(treatment)),
       DataCell(carbsSmartText(treatment)),
     ]);
-
-    return null;
   }
 
   SmartText dateAgoShort(Treatment treatment) {
     var diff = treatment.age;
-    var starNoStar = treatment.isConcated ? "ᶿ" : "";
 
     if (diff.inMinutes == 0) {
       return SmartText(texts: const ["now"], styles: const [row]);
@@ -127,15 +131,16 @@ class History extends StatelessWidget {
       styles.add(small);
       texts.add((diff.inMinutes % 60).toString().padLeft(2, "0"));
       styles.add(row);
-      texts.add("m$starNoStar");
+      texts.add("m");
       styles.add(small);
+
       return SmartText(texts: texts, styles: styles);
     }
-
     texts.add((diff.inMinutes % 60).toString());
     styles.add(row);
-    texts.add("m$starNoStar");
+    texts.add("m");
     styles.add(small);
+
     return SmartText(texts: texts, styles: styles);
   }
 

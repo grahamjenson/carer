@@ -14,7 +14,7 @@ class SmartText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var childrenTextSpans = <TextSpan>[
-      for (var i = 1; i < texts.length; i++)
+      for (var i = 0; i < texts.length; i++)
         TextSpan(text: texts[i], style: styles[i])
     ];
 
@@ -22,8 +22,7 @@ class SmartText extends StatelessWidget {
       textAlign: textAlign,
       overflow: TextOverflow.visible,
       softWrap: false,
-      text: TextSpan(
-          text: texts[0], style: styles[0], children: childrenTextSpans),
+      text: TextSpan(children: childrenTextSpans),
     );
   }
 }

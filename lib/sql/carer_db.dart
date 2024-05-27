@@ -25,7 +25,7 @@ class CarerDB {
     print("Opening database at $path");
     var db = await openDatabase(
       path,
-      version: 14,
+      version: 15,
       onCreate: (db, version) async {
         print("Creating database at version $version");
         await dropAll(db);

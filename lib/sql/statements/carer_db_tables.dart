@@ -99,7 +99,7 @@ const concatTreatmentsView = DBTable('concatTreatments', '''
         MAX(timestamp) as max_ts, 
         datetime(MIN(timestamp) / 1000, 'unixepoch') as min_datetime, 
         datetime(MAX(timestamp) / 1000, 'unixepoch') as max_datetime, 
-        strftime('%Y-%M-%d %H ', timestamp/1000, 'unixepoch')  ||  (Floor(strftime('%M', timestamp/1000, 'unixepoch')/5) * 5) as window 
+        strftime('%Y-%m-%d %H ', timestamp/1000, 'unixepoch')  ||  (Floor(strftime('%M', timestamp/1000, 'unixepoch')/5) * 5) as window 
       FROM treatments 
       GROUP BY window
       ORDER BY min_ts DESC

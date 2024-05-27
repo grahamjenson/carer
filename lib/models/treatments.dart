@@ -7,10 +7,9 @@ class Treatment {
   DateTime date;
   double? insulin;
   int? carbs;
-  bool isConcated;
+  int count;
 
-  Treatment(
-      {required this.date, this.insulin, this.carbs, this.isConcated = false});
+  Treatment({required this.date, this.insulin, this.carbs, this.count = 1});
 
   static Future<List<Treatment>> concatSummary(int minsAgo) async {
     var db = await CarerDB.instance;
@@ -25,13 +24,15 @@ class Treatment {
           date: DateTime.fromMillisecondsSinceEpoch(e["max_ts"] as int),
           insulin: e["insulin"] as double?,
           carbs: e["carbs"] as int?,
-          isConcated: e["count"] != 1,
+          count: e["count"] as int,
         ),
       );
     }
 
     return treatments;
   }
+
+  bool get isConcated => count > 1;
 
   Duration get age {
     return clock.now().difference(date);
