@@ -85,7 +85,7 @@ class Stats extends StatelessWidget {
               cage(summary),
               basal(summary),
               target(summary, settings.unit),
-              await fifteenMinDiff(summary, settings.unit),
+              await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
             ],
           ),
@@ -280,7 +280,7 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Future<DataRow> fifteenMinDiff(Summary summary, Unit unit) async {
+  Future<DataRow> fifteenMinDiff(Unit unit) async {
     var sgvs = await SGV.lastMins(15);
     if (sgvs.isEmpty) {
       return const DataRow(

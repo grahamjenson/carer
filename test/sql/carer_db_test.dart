@@ -131,5 +131,26 @@ void main() {
       expect(sgvs.length, 1);
       expect(sgvs[0]['value'], 1);
     });
+
+    test("svgWithDiffs", () async {
+      var ret = await db.batchCreateOrUpdateSGVs([
+        {'timestamp': 1000 * 300 * 1, 'value': 30},
+        {'timestamp': 1000 * 300 * 2, 'value': 120},
+        {'timestamp': 1000 * 300 * 3, 'value': 70},
+        {'timestamp': 1000 * 300 * 4, 'value': 100},
+      ]);
+      expect(ret, 4);
+
+      var sgvs = await db.sgvs();
+      expect(sgvs.length, 4);
+
+      var diff = await db.sgvWithDiffs(sgvs[0]["id"]! as int);
+      expect(diff, isNot(null));
+      expect(diff!["diff"], 30);
+
+      diff = await db.sgvWithDiffs(sgvs[1]["id"]! as int);
+      expect(diff, isNot(null));
+      expect(diff!["diff"], -50);
+    });
   });
 }

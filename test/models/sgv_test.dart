@@ -9,8 +9,9 @@ void main() {
   sqfliteTestInit();
 
   group('SGV', () {
-    DateTime now = DateTime(2020);
+    DateTime now = DateTime(2020, 1, 1, 12);
     Duration min5 = const Duration(minutes: 5);
+    Duration hour48 = const Duration(hours: 48);
 
     setUp(() async {});
 
@@ -52,6 +53,26 @@ void main() {
       expect(sgvCount, 1);
       sgv = await SGV.lastSGV();
       expect(sgv!.value, 1);
+    });
+
+    test("percentInRangeToday", () async {
+      var sgvCount = await SGV.createOrUpdate([
+        SGV(value: 2, date: now.subtract(hour48)),
+        SGV(value: 2, date: now.subtract(min5 + min5)),
+        SGV(value: 1, date: now.subtract(min5)),
+      ]);
+      expect(sgvCount, 3);
+      print("ASFASFSQAFASF $now");
+      await withClock(Clock.fixed(now), () async {
+        var percent = await SGV.percentInRangeToday(0, 3);
+        expect(percent, 1.0);
+        percent = await SGV.percentInRangeToday(0, 1);
+        expect(percent, 0.0);
+        percent = await SGV.percentInRangeToday(1, 2);
+        expect(percent, 0.5);
+        percent = await SGV.percentInRangeToday(2, 3);
+        expect(percent, 0.5);
+      });
     });
   });
 }

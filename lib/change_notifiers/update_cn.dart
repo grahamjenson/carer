@@ -71,21 +71,21 @@ class UpdateCN extends ChangeNotifier {
       for (var sgv in summary.sgvs.sgvs) {
         sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
       }
-      int ret = await SGV.createOrUpdate(sgvs);
+      int sgvUpdates = await SGV.createOrUpdate(sgvs);
 
       List<Bolus> boluses = [];
       for (var bolus in summary.treatments.boluses()) {
         boluses.add(Bolus(value: bolus.insulin!, date: bolus.mills));
       }
-      ret = await Bolus.createOrUpdate(boluses);
+      var bolusUpdates = await Bolus.createOrUpdate(boluses);
 
       List<Carbs> carbs = [];
       for (var carb in summary.treatments.carbs()) {
         carbs.add(Carbs(value: carb.carbs!.round(), date: carb.mills));
       }
-      ret = await Carbs.createOrUpdate(carbs);
+      var carbUpdates = await Carbs.createOrUpdate(carbs);
 
-      print("updateSummary ret: $ret");
+      print("updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates");
 
       notifyListeners();
     });

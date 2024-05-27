@@ -19,6 +19,7 @@ const dbTables = [
 const dbViews = [
   treatmentsView,
   concatTreatmentsView,
+  sgvDiffView,
 ];
 
 // Used for key values like iob...
@@ -30,6 +31,7 @@ const sgvTable = DBTable('sgvs', '''
       value INTEGER,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+      minute_timestamp INTEGER GENERATED ALWAYS AS (timestamp / 60000) VIRTUAL,
       UNIQUE(value, timestamp)
     )
   ''');
@@ -103,4 +105,32 @@ const concatTreatmentsView = DBTable('concatTreatments', '''
       FROM treatments 
       GROUP BY window
       ORDER BY min_ts DESC
+  ''');
+
+// SGV diff view table
+const sgvDiffView = DBTable('sgvDiff', '''
+    CREATE VIEW sgvDiff AS
+    SELECT 
+      safter.id as id,
+      safter.value as value, 
+      safter.timestamp timestamp, 
+      safter.datetime datetime,
+      safter.value - sbefore.value as diff,
+      ((safter.value - sbefore.value) / ((safter.minute_timestamp - sbefore.minute_timestamp) / 5)) as rate5m,
+
+      sbefore.id as id_before,
+      sbefore.value as value_before,
+      sbefore.timestamp ts_before, 
+      sbefore.datetime dt_before
+    FROM
+      sgvs sbefore JOIN sgvs safter ON sbefore.id = (
+        SELECT x.id 
+        FROM sgvs x 
+        WHERE 
+          x.id != safter.id AND 
+          x.minute_timestamp + 4 < safter.minute_timestamp 
+        ORDER BY x.timestamp desc limit 1
+      )
+    ORDER BY
+      timestamp DESC
   ''');

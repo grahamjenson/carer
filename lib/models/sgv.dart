@@ -3,17 +3,20 @@ import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
 
 class SGV {
+  final int? id;
   final int value;
   final DateTime date;
-  SGV? previousSGV;
+  int? _diffPer5MinsCache;
 
   SGV({
     required this.value,
     required this.date,
+    this.id,
   });
 
   factory SGV.fromMap(Map<String, dynamic> map) {
     return SGV(
+      id: map["id"],
       value: map["value"],
       date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
     );
@@ -27,17 +30,6 @@ class SGV {
     return unit.val(value);
   }
 
-  String diffUWithSign(Unit unit) {
-    var sgv = unit.val(diffPer5Mins);
-    var sgvStr = sgv.toStringAsFixed(1);
-    if (sgv == 0) {
-      sgvStr = "+0";
-    } else if (sgv > 0) {
-      sgvStr = "+${sgv.toStringAsFixed(1)}";
-    }
-    return sgvStr;
-  }
-
   String sgvStr(Unit unit) {
     switch (unit) {
       case Unit.mg:
@@ -47,34 +39,38 @@ class SGV {
     }
   }
 
-  int get _diff {
-    if (previousSGV == null) {
+  Future<int> get diffPer5Mins async {
+    if (_diffPer5MinsCache != null) {
+      return _diffPer5MinsCache!;
+    }
+
+    if (id == null) {
       return 0;
     }
-    return value - previousSGV!.value;
+
+    var db = await CarerDB.instance;
+    var rawSGV = await db.sgvWithDiffs(id!);
+    if (rawSGV == null) {
+      return 0;
+    }
+    var rate = rawSGV["rate5m"];
+    if (rate == null) {
+      return 0;
+    }
+
+    _diffPer5MinsCache = rawSGV["rate5m"]! as int;
+    return _diffPer5MinsCache!;
   }
 
-  // // also sanity check the last two sgvs
-  // // second most recent sgv should be within 5 minutes of most recent
-  // var last = sgvs.last;
-  // var secondLast = sgvs[sgvs.length - 2];
-
-  // if ((secondLast.age.inMinutes - last.age.inMinutes).abs() > 6) {
-  //   return null;
-  // }
-
-  int get diffMinutes {
-    if (previousSGV == null) {
-      return 5;
+  Future<String> diffUWithSign(Unit unit) async {
+    var sgv = unit.val(await diffPer5Mins);
+    var sgvStr = sgv.toStringAsFixed(1);
+    if (sgv == 0) {
+      sgvStr = "+0";
+    } else if (sgv > 0) {
+      sgvStr = "+${sgv.toStringAsFixed(1)}";
     }
-    return ((previousSGV!.age.inSeconds - age.inSeconds) / 60).round();
-  }
-
-  int get diffPer5Mins {
-    if (diffMinutes == 0) {
-      return 0; // TODO
-    }
-    return (_diff / diffMinutes * 5).round();
+    return sgvStr;
   }
 
   @override
@@ -89,7 +85,9 @@ class SGV {
     if (rawSGV == null) {
       return null;
     }
-    return SGV.fromMap(rawSGV);
+    var sgv = SGV.fromMap(rawSGV);
+
+    return sgv;
   }
 
   // return the last sgvs for minutes

@@ -25,7 +25,7 @@ class CarerDB {
     print("Opening database at $path");
     var db = await openDatabase(
       path,
-      version: 15,
+      version: 21,
       onCreate: (db, version) async {
         print("Creating database at version $version");
         await dropAll(db);
@@ -112,6 +112,21 @@ class CarerDB {
     return _db.rawQuery(sql, [after, before, low, high, limit]);
   }
 
+  Future<Map<String, Object?>?> sgvWithDiffs(int id) async {
+    // Order by most recent, then most dangerous
+    var sql = """
+      SELECT
+        *
+      FROM
+        ${sgvDiffView.name}
+      WHERE
+        id = ?
+      LIMIT 1
+    """;
+
+    var x = await _db.rawQuery(sql, [id]);
+    return x.firstOrNull;
+  }
   ////
   // BOLUS
   ////

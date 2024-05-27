@@ -80,7 +80,7 @@ class _BGLState extends State<BGL> {
                   Expanded(
                     child: FittedBox(
                       child: Text(
-                        sgv.diffUWithSign(unit),
+                        await sgv.diffUWithSign(unit),
                         style: const TextStyle(
                           color: mainColor,
                           fontWeight: FontWeight.bold,
