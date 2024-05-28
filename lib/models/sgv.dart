@@ -41,7 +41,7 @@ class SGV {
     }
   }
 
-  Future<String> diffUWithSign(Unit unit) async {
+  Future<String> rate5mWithSign(Unit unit) async {
     var diffPer5Mins = rate5m ?? 0;
     var sgv = unit.val(diffPer5Mins);
     var sgvStr = sgv.toStringAsFixed(1);

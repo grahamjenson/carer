@@ -13,7 +13,7 @@ int minTime(int min) {
 void main() {
   sqfliteTestInit();
 
-  group('CarerDB', () {
+  group('sgvs', () {
     late CarerDB db;
 
     setUp(() async {
@@ -137,6 +137,56 @@ void main() {
       sgvs = await db.sgvs(limit: 1); // inclusive
       expect(sgvs.length, 1);
       expect(sgvs[0]['value'], 1);
+    });
+
+    group("clean sgvs", () {
+      test("close sgvs", () async {
+        var ret = await db.batchCreateOrUpdateSGVs([
+          {'timestamp': minTime(0), 'value': 4},
+          {'timestamp': minTime(5), 'value': 3},
+          {'timestamp': minTime(10), 'value': 5},
+          {'timestamp': minTime(15), 'value': 1},
+          {'timestamp': minTime(16), 'value': 2},
+        ]);
+        expect(ret, 5);
+
+        var sgvs = await db.sgvs();
+        expect(sgvs.length, 5);
+        expect(sgvs[0]['value'], 2);
+        expect(sgvs[1]['value'], 1);
+        expect(sgvs[2]['value'], 5);
+
+        // Both top values should point to the same previous id
+        expect(sgvs[0]['id_before'], sgvs[2]["id"]);
+        expect(sgvs[1]['id_before'], sgvs[2]["id"]);
+
+        // Both values diffs and rate5m should be the same
+        expect(sgvs[0]['diff'], -3);
+        expect(sgvs[1]['diff'], -4);
+        expect(sgvs[0]['rate5m'], -3);
+        expect(sgvs[1]['rate5m'], -4);
+      });
+
+      test("close sgvs", () async {
+        var ret = await db.batchCreateOrUpdateSGVs([
+          {'timestamp': minTime(0), 'value': 1},
+          {'timestamp': minTime(15), 'value': 5},
+          {'timestamp': minTime(30), 'value': 20},
+        ]);
+        expect(ret, 3);
+
+        var sgvs = await db.sgvs();
+        expect(sgvs.length, 3);
+        expect(sgvs[0]['value'], 20);
+        expect(sgvs[1]['value'], 5);
+        expect(sgvs[2]['value'], 1);
+
+        // Both values diffs and rate5m should be the same
+        expect(sgvs[0]['diff'], 15);
+        expect(sgvs[1]['diff'], 4);
+        expect(sgvs[0]['rate5m'], 5);
+        expect(sgvs[1]['rate5m'], 1);
+      });
     });
   });
 }

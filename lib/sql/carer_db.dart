@@ -60,7 +60,6 @@ class CarerDB {
   }
 
   bool _validateSGVMap(Map<String, Object> sgv) {
-    print(sgv);
     if (!validateShared(sgv, ["value", "timestamp"], [int, int])) {
       return false;
     }

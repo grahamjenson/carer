@@ -62,7 +62,7 @@ void main() {
         SGV(value: 1, date: now.subtract(min5)),
       ]);
       expect(sgvCount, 3);
-      print("ASFASFSQAFASF $now");
+
       await withClock(Clock.fixed(now), () async {
         var percent = await SGV.percentInRangeToday(0, 3);
         expect(percent, 1.0);
