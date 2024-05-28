@@ -6,12 +6,13 @@ class SGV {
   final int? id;
   final int value;
   final DateTime date;
-  int? _diffPer5MinsCache;
+  int? rate5m;
 
   SGV({
     required this.value,
     required this.date,
     this.id,
+    this.rate5m,
   });
 
   factory SGV.fromMap(Map<String, dynamic> map) {
@@ -19,6 +20,7 @@ class SGV {
       id: map["id"],
       value: map["value"],
       date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
+      rate5m: map["rate5m"],
     );
   }
 
@@ -39,31 +41,9 @@ class SGV {
     }
   }
 
-  Future<int> get diffPer5Mins async {
-    if (_diffPer5MinsCache != null) {
-      return _diffPer5MinsCache!;
-    }
-
-    if (id == null) {
-      return 0;
-    }
-
-    var db = await CarerDB.instance;
-    var rawSGV = await db.sgvWithDiffs(id!);
-    if (rawSGV == null) {
-      return 0;
-    }
-    var rate = rawSGV["rate5m"];
-    if (rate == null) {
-      return 0;
-    }
-
-    _diffPer5MinsCache = rawSGV["rate5m"]! as int;
-    return _diffPer5MinsCache!;
-  }
-
   Future<String> diffUWithSign(Unit unit) async {
-    var sgv = unit.val(await diffPer5Mins);
+    var diffPer5Mins = rate5m ?? 0;
+    var sgv = unit.val(diffPer5Mins);
     var sgvStr = sgv.toStringAsFixed(1);
     if (sgv == 0) {
       sgvStr = "+0";

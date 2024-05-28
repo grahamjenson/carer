@@ -5,6 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
+int minTime(int min) {
+  if (min == 0) return 1; // has to be above 1
+  return 1000 * 60 * min;
+}
+
 void main() {
   sqfliteTestInit();
 
@@ -13,17 +18,16 @@ void main() {
 
     setUp(() async {
       db = await CarerDB.instance;
-    });
-
-    tearDown(() async {
       await db.deleteAll();
     });
+
+    tearDown(() async {});
 
     test('batchCreateOrUpdateSGVs', () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
-        {'value': 1, 'timestamp': 1},
-        {'value': 2, 'timestamp': 2},
+        {'value': 1, 'timestamp': minTime(0)},
+        {'value': 2, 'timestamp': minTime(5)},
       ]);
       expect(ret, 2);
       expect(await db.countSGVs(), 2);
@@ -33,8 +37,8 @@ void main() {
 
       // fetch SGVs
       ret = await db.batchCreateOrUpdateSGVs([
-        {'value': 1, 'timestamp': 1},
-        {'value': 2, 'timestamp': 2},
+        {'value': 1, 'timestamp': minTime(0)},
+        {'value': 2, 'timestamp': minTime(5)},
       ]);
       expect(await db.countSGVs(), 2);
       expect(ret, 2);
@@ -43,8 +47,8 @@ void main() {
       expect(sgvs.first['value'], 2);
 
       ret = await db.batchCreateOrUpdateSGVs([
-        {'value': 2, 'timestamp': 2},
-        {'value': 1, 'timestamp': 2}, // new at same date
+        {'value': 2, 'timestamp': minTime(5)},
+        {'value': 1, 'timestamp': minTime(5)}, // new at same date
       ]);
       expect(await db.countSGVs(), 3);
       // Should be ordered by date, then lowest value
@@ -58,12 +62,12 @@ void main() {
       List<Map<String, Object>> badInputs = [
         {},
         {'value': 1},
-        {'timestamp': 1},
+        {'timestamp': minTime(0)},
         {'value': 1, 'timestamp': -1},
-        {'value': -1, 'timestamp': 1},
-        {'value': 1, 'timestamp': 1, 'extra': 1},
+        {'value': -1, 'timestamp': minTime(0)},
+        {'value': 1, 'timestamp': minTime(0), 'extra': 1},
         {'value': 1, 'timestamp': '1'},
-        {'value': '1', 'timestamp': 1},
+        {'value': '1', 'timestamp': minTime(0)},
         {'value': '1', 'timestamp': '1'},
       ];
 
@@ -80,39 +84,42 @@ void main() {
     test("countSGVs", () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
-        {'timestamp': 1, 'value': 4},
-        {'timestamp': 2, 'value': 3},
-        {'timestamp': 3, 'value': 2},
-        {'timestamp': 4, 'value': 1},
+        {'timestamp': minTime(0), 'value': 4},
+        {'timestamp': minTime(5), 'value': 3},
+        {'timestamp': minTime(10), 'value': 2},
+        {'timestamp': minTime(15), 'value': 1},
       ]);
       expect(ret, 4);
       expect(await db.countSGVs(), 4);
-      expect(await db.countSGVs(after: 2), 3); // inclusive
-      expect(await db.countSGVs(before: 4), 3); // exclusive
+      expect(await db.countSGVs(after: minTime(10)), 2); // inclusive
+      expect(await db.countSGVs(before: minTime(15)), 3); // exclusive
       expect(await db.countSGVs(low: 2), 3); // inclusive
       expect(await db.countSGVs(high: 4), 3); // exclusive
 
-      expect(await db.countSGVs(after: 2, before: 4, low: 2, high: 3), 1);
+      expect(
+          await db.countSGVs(
+              after: minTime(10), before: minTime(15), low: 2, high: 3),
+          1);
     });
 
     test("sgvs", () async {
       // create SGVs
       var ret = await db.batchCreateOrUpdateSGVs([
-        {'timestamp': 1, 'value': 4},
-        {'timestamp': 2, 'value': 3},
-        {'timestamp': 3, 'value': 2},
-        {'timestamp': 4, 'value': 1},
+        {'timestamp': minTime(0), 'value': 4},
+        {'timestamp': minTime(5), 'value': 3},
+        {'timestamp': minTime(10), 'value': 2},
+        {'timestamp': minTime(15), 'value': 1},
       ]);
       expect(ret, 4);
 
       // fetch SGVs
-      var sgvs = await db.sgvs(after: 2); // inclusive
+      var sgvs = await db.sgvs(after: minTime(5)); // inclusive
       expect(sgvs.length, 3);
       expect(sgvs[0]['value'], 1);
       expect(sgvs[1]['value'], 2);
       expect(sgvs[2]['value'], 3);
 
-      sgvs = await db.sgvs(before: 3); // inclusive
+      sgvs = await db.sgvs(before: minTime(10)); // exclusive
       expect(sgvs.length, 2);
       expect(sgvs[0]['value'], 3);
       expect(sgvs[1]['value'], 4);
@@ -122,7 +129,7 @@ void main() {
       expect(sgvs[0]['value'], 3);
       expect(sgvs[1]['value'], 4);
 
-      sgvs = await db.sgvs(high: 3); // inclusive
+      sgvs = await db.sgvs(high: 3); // exclusive
       expect(sgvs.length, 2);
       expect(sgvs[0]['value'], 1);
       expect(sgvs[1]['value'], 2);
@@ -130,27 +137,6 @@ void main() {
       sgvs = await db.sgvs(limit: 1); // inclusive
       expect(sgvs.length, 1);
       expect(sgvs[0]['value'], 1);
-    });
-
-    test("svgWithDiffs", () async {
-      var ret = await db.batchCreateOrUpdateSGVs([
-        {'timestamp': 1000 * 300 * 1, 'value': 30},
-        {'timestamp': 1000 * 300 * 2, 'value': 120},
-        {'timestamp': 1000 * 300 * 3, 'value': 70},
-        {'timestamp': 1000 * 300 * 4, 'value': 100},
-      ]);
-      expect(ret, 4);
-
-      var sgvs = await db.sgvs();
-      expect(sgvs.length, 4);
-
-      var diff = await db.sgvWithDiffs(sgvs[0]["id"]! as int);
-      expect(diff, isNot(null));
-      expect(diff!["diff"], 30);
-
-      diff = await db.sgvWithDiffs(sgvs[1]["id"]! as int);
-      expect(diff, isNot(null));
-      expect(diff!["diff"], -50);
     });
   });
 }

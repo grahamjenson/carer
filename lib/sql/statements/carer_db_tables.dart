@@ -19,7 +19,7 @@ const dbTables = [
 const dbViews = [
   treatmentsView,
   concatTreatmentsView,
-  sgvDiffView,
+  sgvsCleanView,
 ];
 
 // Used for key values like iob...
@@ -107,15 +107,22 @@ const concatTreatmentsView = DBTable('concatTreatments', '''
       ORDER BY min_ts DESC
   ''');
 
-// SGV diff view table
-const sgvDiffView = DBTable('sgvDiff', '''
-    CREATE VIEW sgvDiff AS
+// SGV clean view
+// CLEAN:
+// 1. Remove SVGs that are closer than 4 minutes
+// 2. TODO
+//
+// INCLUDES:
+// 1 search for the previous SGV.
+const sgvsCleanView = DBTable('sgvsClean', '''
+    CREATE VIEW sgvsClean AS
     SELECT 
       safter.id as id,
       safter.value as value, 
       safter.timestamp timestamp, 
       safter.datetime datetime,
       safter.value - sbefore.value as diff,
+      safter.minute_timestamp - sbefore.minute_timestamp as mins_diff,
       ((safter.value - sbefore.value) / ((safter.minute_timestamp - sbefore.minute_timestamp) / 5)) as rate5m,
 
       sbefore.id as id_before,
@@ -123,13 +130,12 @@ const sgvDiffView = DBTable('sgvDiff', '''
       sbefore.timestamp ts_before, 
       sbefore.datetime dt_before
     FROM
-      sgvs sbefore JOIN sgvs safter ON sbefore.id = (
-        SELECT x.id 
+      sgvs safter LEFT JOIN  sgvs sbefore ON sbefore.id = (
+        SELECT x.id
         FROM sgvs x 
         WHERE 
-          x.id != safter.id AND 
-          x.minute_timestamp + 4 < safter.minute_timestamp 
-        ORDER BY x.timestamp desc limit 1
+          (x.minute_timestamp + 4 < safter.minute_timestamp)
+        ORDER BY timestamp DESC LIMIT 1
       )
     ORDER BY
       timestamp DESC

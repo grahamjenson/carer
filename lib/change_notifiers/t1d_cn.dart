@@ -69,7 +69,7 @@ class T1DCN extends ChangeNotifier {
 
     // Calculating Diff Range
     var (dr, drp) = diffRange(settings.alarmSettings.fastDropDelta,
-        settings.alarmSettings.fastRiseDelta, await lastSGV.diffPer5Mins);
+        settings.alarmSettings.fastRiseDelta, lastSGV.rate5m ?? 0);
 
     diffRange7 = dr;
     diffRange7Proportion = drp;
@@ -83,9 +83,9 @@ class T1DCN extends ChangeNotifier {
     List<int> diffs = [];
     var sgvs = await SGV.lastMins(minutes);
 
-    // TODO this is going to be wrong
+    // TODO double check this
     for (var sgv in sgvs) {
-      diffs.add(await sgv.diffPer5Mins);
+      diffs.add(sgv.rate5m ?? 0);
     }
 
     return diffs;

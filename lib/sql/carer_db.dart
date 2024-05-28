@@ -25,7 +25,8 @@ class CarerDB {
     print("Opening database at $path");
     var db = await openDatabase(
       path,
-      version: 21,
+      version: DateTime.now()
+          .millisecondsSinceEpoch, // TODO: replace this eventually with a version number
       onCreate: (db, version) async {
         print("Creating database at version $version");
         await dropAll(db);
@@ -59,6 +60,7 @@ class CarerDB {
   }
 
   bool _validateSGVMap(Map<String, Object> sgv) {
+    print(sgv);
     if (!validateShared(sgv, ["value", "timestamp"], [int, int])) {
       return false;
     }
@@ -80,7 +82,7 @@ class CarerDB {
       SELECT
         COUNT(*)
       FROM
-        ${sgvTable.name}
+        ${sgvsCleanView.name}
       WHERE
         timestamp >= ? AND timestamp < ? AND value >= ? AND value < ?
     """;
@@ -101,7 +103,7 @@ class CarerDB {
       SELECT
         *
       FROM
-        ${sgvTable.name}
+        ${sgvsCleanView.name}
       WHERE
         timestamp >= ? AND timestamp < ? AND value >= ? AND value < ?
       ORDER BY 
@@ -112,21 +114,6 @@ class CarerDB {
     return _db.rawQuery(sql, [after, before, low, high, limit]);
   }
 
-  Future<Map<String, Object?>?> sgvWithDiffs(int id) async {
-    // Order by most recent, then most dangerous
-    var sql = """
-      SELECT
-        *
-      FROM
-        ${sgvDiffView.name}
-      WHERE
-        id = ?
-      LIMIT 1
-    """;
-
-    var x = await _db.rawQuery(sql, [id]);
-    return x.firstOrNull;
-  }
   ////
   // BOLUS
   ////
