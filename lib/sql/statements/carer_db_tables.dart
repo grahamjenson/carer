@@ -59,16 +59,23 @@ const carbsTable = DBTable('carbs', '''
 const tempbasalTable = DBTable('tempbasal', '''
     CREATE TABLE tempbasal (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      start INTEGER,
+      datetime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      duration INTEGER,
       value REAL,
-      timestamp INTEGER
+      UNIQUE(start, value)
     )
   ''');
 
 const temptargetsTable = DBTable('temptargets', '''
     CREATE TABLE temptargets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      value REAL,
-      timestamp INTEGER
+      start INTEGER,
+      datetime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      duration INTEGER,
+      targetTop INTEGER,
+      targetBottom INTEGER,
+      UNIQUE(start, targetTop, targetBottom)
     )
   ''');
 
@@ -76,7 +83,7 @@ const profileTable = DBTable('profile', '''
     CREATE TABLE profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-      
+
       dia INTEGER,
       units TEXT,
       timezone TEXT,

@@ -24,7 +24,7 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
-    var version = 11;
+    var version = 20;
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
       version = DateTime.now().millisecondsSinceEpoch;
     }
@@ -61,7 +61,8 @@ class CarerDB {
     if (models.any((model) => !_validateSGVMap(model))) {
       throw ArgumentError("Invalid SGV map");
     }
-    return upsertQuery(_db, sgvTable.name, models, ["value", "timestamp"]);
+    return upsertQuery(_db, sgvTable.name, models, ["value", "timestamp"],
+        ["value", "timestamp"]);
   }
 
   bool _validateSGVMap(Map<String, Object> sgv) {
@@ -127,7 +128,8 @@ class CarerDB {
     if (models.any((model) => !_validateBolusMap(model))) {
       throw ArgumentError("Invalid Boplus map");
     }
-    return upsertQuery(_db, bolusTable.name, models, ["value", "timestamp"]);
+    return upsertQuery(_db, bolusTable.name, models, ["value", "timestamp"],
+        ["value", "timestamp"]);
   }
 
   bool _validateBolusMap(Map<String, Object> bolus) {
@@ -171,7 +173,8 @@ class CarerDB {
       throw ArgumentError("Invalid Carbs map");
     }
 
-    return upsertQuery(_db, carbsTable.name, models, ["value", "timestamp"]);
+    return upsertQuery(_db, carbsTable.name, models, ["value", "timestamp"],
+        ["value", "timestamp"]);
   }
 
   bool _validateCarbsMap(Map<String, Object> bolus) {
@@ -230,6 +233,66 @@ class CarerDB {
     """;
 
     return _db.rawQuery(sql, [after, before, limit]);
+  }
+
+  ////
+  // Temp Target
+  ////
+
+  Future<int> batchCreateOrUpdateTempTargets(
+      List<Map<String, Object>> models) async {
+    if (models.any((model) => !_validateTempTargetMap(model))) {
+      throw ArgumentError("Invalid Temp Target map");
+    }
+
+    return upsertQuery(
+        _db,
+        temptargetsTable.name,
+        models,
+        ["start", "duration", "targetTop", "targetBottom"],
+        ["start", "duration", "targetTop", "targetBottom"]);
+  }
+
+  bool _validateTempTargetMap(Map<String, Object> tempTarget) {
+    var keys = ["start", "duration", "targetTop", "targetBottom"];
+
+    if (!validateShared(tempTarget, keys, [int, int, int, int])) {
+      return false;
+    }
+
+    if (!validateGreaterThanZero(tempTarget, keys)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  ////
+  // Temp Basal
+  ////
+
+  Future<int> batchCreateOrUpdateTempBasals(
+      List<Map<String, Object>> models) async {
+    if (models.any((model) => !_validateTempBasalMap(model))) {
+      throw ArgumentError("Invalid Temp Basal map");
+    }
+
+    return upsertQuery(_db, temptargetsTable.name, models,
+        ["start", "duration", "value"], ["start", "duration", "value"]);
+  }
+
+  bool _validateTempBasalMap(Map<String, Object> tempTarget) {
+    var keys = ["start", "duration", "value"];
+
+    if (!validateShared(tempTarget, keys, [int, int, double])) {
+      return false;
+    }
+
+    if (!validateGreaterThanZero(tempTarget, ["start", "duration"])) {
+      return false;
+    }
+
+    return true;
   }
 
   ////
@@ -460,18 +523,22 @@ class CarerDB {
 
 /// Utils
 
-Future<int> upsertQuery(Database db, String table,
-    List<Map<String, Object>> models, List<String> keys) async {
+Future<int> upsertQuery(
+    Database db,
+    String table,
+    List<Map<String, Object>> models,
+    List<String> insertKeys,
+    List<String> updateKeys) async {
   var batch = db.batch();
 
   var upsert = """
-    INSERT INTO $table (${keys.join(", ")}) VALUES (${keys.map((e) => "?").join(", ")}) 
-    ON CONFLICT(${keys.join(", ")}) DO UPDATE SET ${keys.map((e) => "$e = ?").join(", ")}
+    INSERT INTO $table (${insertKeys.join(", ")}) VALUES (${insertKeys.map((e) => "?").join(", ")}) 
+    ON CONFLICT(${updateKeys.join(", ")}) DO UPDATE SET ${updateKeys.map((e) => "$e = ?").join(", ")}
   """;
 
   for (var model in models) {
-    var valuesList = keys.map((e) => model[e]).toList();
-    valuesList.addAll(keys.map((e) => model[e]));
+    var valuesList = insertKeys.map((e) => model[e]).toList();
+    valuesList.addAll(updateKeys.map((e) => model[e]));
 
     // upsert based
     batch.rawQuery(upsert, valuesList);

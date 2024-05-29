@@ -6,6 +6,8 @@ import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/models/tempbasal.dart';
+import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +88,27 @@ class UpdateCN extends ChangeNotifier {
       }
       var carbUpdates = await Carbs.createOrUpdate(carbs);
 
+      List<TempBasal> tempBasals = [];
+      for (var tempBasal in summary.tempBasals.tempBasals) {
+        tempBasals.add(TempBasal(
+            startDate: tempBasal.date,
+            duration: tempBasal.duration.toInt(),
+            value: tempBasal.absolute));
+      }
+
+      var tempBasalUpdates = await TempBasal.createOrUpdate(tempBasals);
+
+      List<TempTarget> tempTargets = [];
+      for (var tempTarget in summary.targets.targets) {
+        tempTargets.add(TempTarget(
+            startDate: tempTarget.date,
+            duration: tempTarget.duration,
+            targetTop: tempTarget.targetTop,
+            targetBottom: tempTarget.targetBottom));
+      }
+
+      var tempTargetUpdates = await TempTarget.createOrUpdate(tempTargets);
+
       SummaryProfile summaryProfile = summary.profile;
 
       Profile profile = Profile(
@@ -99,9 +122,10 @@ class UpdateCN extends ChangeNotifier {
         targetLow: summaryProfile.expandedTargetLow(),
         targetHigh: summaryProfile.expandedTargetHigh(),
       );
-      await Profile.createOrUpdate(profile);
+      var profileUpdate = await Profile.createOrUpdate(profile);
 
-      print("updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates");
+      print(
+          "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate");
 
       notifyListeners();
     });

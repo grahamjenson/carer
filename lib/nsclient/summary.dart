@@ -95,8 +95,6 @@ class TimeValues {
 
       expanded.add(current.value);
     }
-    print(values);
-    print(expanded);
     return expanded;
   }
 }
@@ -132,12 +130,12 @@ abstract class ATreatment {
   }
 }
 
-class TempBasal extends ATreatment {
+class SummaryTempBasal extends ATreatment {
   DateTime start;
   double duration;
   double absolute;
 
-  TempBasal({
+  SummaryTempBasal({
     required this.start,
     required this.duration,
     required this.absolute,
@@ -158,8 +156,8 @@ class TempBasal extends ATreatment {
     return dateEnd.difference(clock.now());
   }
 
-  factory TempBasal.fromJson(Map<String, dynamic> json) {
-    return TempBasal(
+  factory SummaryTempBasal.fromJson(Map<String, dynamic> json) {
+    return SummaryTempBasal(
       start: DateTime.fromMillisecondsSinceEpoch(json['start']),
       duration: json['duration'].toDouble(),
       absolute: json['absolute'].toDouble(),
@@ -190,13 +188,13 @@ class SummaryTreatment extends ATreatment {
   }
 }
 
-class TempTarget extends ATreatment {
+class SummaryTempTarget extends ATreatment {
   int targetTop;
   int targetBottom;
   int duration;
   DateTime mills;
 
-  TempTarget({
+  SummaryTempTarget({
     required this.targetTop,
     required this.targetBottom,
     required this.duration,
@@ -218,8 +216,8 @@ class TempTarget extends ATreatment {
     return dateEnd.difference(clock.now());
   }
 
-  factory TempTarget.fromJson(Map<String, dynamic> json) {
-    return TempTarget(
+  factory SummaryTempTarget.fromJson(Map<String, dynamic> json) {
+    return SummaryTempTarget(
       targetTop: json['targetTop'],
       targetBottom: json['targetBottom'],
       duration: json['duration'],
@@ -278,40 +276,58 @@ class SummarySGVs {
 }
 
 class TempBasals {
-  final List<TempBasal> tempBasals;
+  final List<SummaryTempBasal> tempBasals;
 
   const TempBasals({
     required this.tempBasals,
   });
 
   factory TempBasals.fromJson(List<dynamic> json) {
-    List<TempBasal> tempBasals =
-        json.map((tempBasalJson) => TempBasal.fromJson(tempBasalJson)).toList();
+    List<SummaryTempBasal> tempBasals = [];
+    for (var tempBasalJson in json) {
+      if (tempBasalJson['start'] == null || tempBasalJson['start'] == 0) {
+        continue;
+      }
+      if (tempBasalJson['duration'] == null || tempBasalJson['duration'] == 0) {
+        continue;
+      }
+      tempBasals.add(SummaryTempBasal.fromJson(tempBasalJson));
+    }
+
     tempBasals.sort((a, b) => a.date.compareTo(b.date));
     return TempBasals(tempBasals: tempBasals);
   }
 
-  TempBasal? atDate(DateTime date) {
+  SummaryTempBasal? atDate(DateTime date) {
     return tempBasals.lastWhereOrNull((element) =>
         date.isAfter(element.date) && date.isBefore(element.dateEnd));
   }
 }
 
-class Targets {
-  final List<TempTarget> targets;
+class SummaryTargets {
+  final List<SummaryTempTarget> targets;
 
-  const Targets({
+  const SummaryTargets({
     required this.targets,
   });
 
-  factory Targets.fromJson(List<dynamic> json) {
-    List<TempTarget> targets =
-        json.map((targetJson) => TempTarget.fromJson(targetJson)).toList();
+  factory SummaryTargets.fromJson(List<dynamic> json) {
+    List<SummaryTempTarget> targets = [];
+    for (var targetJson in json) {
+      if (targetJson['mills'] == null || targetJson['mills'] == 0) {
+        continue;
+      }
+      if (targetJson['duration'] == null || targetJson['duration'] == 0) {
+        continue;
+      }
+      targets.add(SummaryTempTarget.fromJson(targetJson));
+    }
+
     targets.sort((a, b) => a.date.compareTo(b.date));
-    return Targets(targets: targets);
+    return SummaryTargets(targets: targets);
   }
 
-  TempTarget? atDate(DateTime date) {
+  SummaryTempTarget? atDate(DateTime date) {
     return targets.lastWhereOrNull((element) =>
         date.isAfter(element.date) && date.isBefore(element.dateEnd));
   }
@@ -406,7 +422,7 @@ class Summary {
   final SummarySGVs sgvs;
   final TempBasals tempBasals;
   final SummaryTreatments treatments;
-  final Targets targets;
+  final SummaryTargets targets;
   final SummaryState state;
   final SummaryProfile profile;
   final String raw;
@@ -427,7 +443,7 @@ class Summary {
       sgvs: SummarySGVs(sgvs: []),
       tempBasals: TempBasals(tempBasals: []),
       treatments: SummaryTreatments(treatments: []),
-      targets: Targets(targets: []),
+      targets: SummaryTargets(targets: []),
       state: SummaryState(
         iob: 0,
         cob: 0,
@@ -457,7 +473,7 @@ class Summary {
         tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
         treatments:
             SummaryTreatments.fromJson(json['treatments']['treatments']),
-        targets: Targets.fromJson(json['treatments']['targets']),
+        targets: SummaryTargets.fromJson(json['treatments']['targets']),
         state: SummaryState.fromJson(json['state']),
         profile: SummaryProfile.fromJson(json['profile']),
         dateRetrievedmills: clock.now().millisecondsSinceEpoch,
@@ -476,14 +492,14 @@ class Summary {
     return clock.now().difference(dateRetrieved).inSeconds;
   }
 
-  (TimeValue?, TempBasal?) basalAtTime(DateTime date) {
+  (TimeValue?, SummaryTempBasal?) basalAtTime(DateTime date) {
     var tempBasal = tempBasals.atDate(date);
     var basal = profile.basal.atDate(date);
 
     return (basal, tempBasal);
   }
 
-  (TimeValue?, TimeValue?, TempTarget?) targetAtTime(DateTime date) {
+  (TimeValue?, TimeValue?, SummaryTempTarget?) targetAtTime(DateTime date) {
     var temptarget = targets.atDate(date);
     var profileTargetLow = profile.targetLow.atDate(date);
     var profileTargetHigh = profile.targetHigh.atDate(date);
