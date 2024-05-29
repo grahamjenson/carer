@@ -60,8 +60,11 @@ const tempbasalTable = DBTable('tempbasal', '''
     CREATE TABLE tempbasal (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       start INTEGER,
-      datetime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       duration INTEGER,
+      end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
+      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
+
       value REAL,
       UNIQUE(start, value)
     )
@@ -71,8 +74,11 @@ const temptargetsTable = DBTable('temptargets', '''
     CREATE TABLE temptargets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       start INTEGER,
-      datetime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       duration INTEGER,
+      end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
+      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
+
       targetTop INTEGER,
       targetBottom INTEGER,
       UNIQUE(start, targetTop, targetBottom)

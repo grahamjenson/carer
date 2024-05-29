@@ -4,11 +4,7 @@ import 'package:carer/sql/carer_db.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
-
-int minTime(int min) {
-  if (min == 0) return 1; // has to be above 1
-  return 1000 * 60 * min;
-}
+import 'utils.dart';
 
 void main() {
   sqfliteTestInit();

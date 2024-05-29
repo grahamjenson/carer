@@ -277,8 +277,8 @@ class CarerDB {
       throw ArgumentError("Invalid Temp Basal map");
     }
 
-    return upsertQuery(_db, temptargetsTable.name, models,
-        ["start", "duration", "value"], ["start", "duration", "value"]);
+    return upsertQuery(_db, tempbasalTable.name, models,
+        ["start", "duration", "value"], ["start", "value"]);
   }
 
   bool _validateTempBasalMap(Map<String, Object> tempTarget) {
@@ -295,6 +295,21 @@ class CarerDB {
     return true;
   }
 
+  Future<Map<String, Object?>?> tempBasalAtTime(int time) {
+    var sql = """
+      SELECT
+        *
+      FROM
+        ${tempbasalTable.name}
+      WHERE
+        start < ? AND end > ?
+      ORDER BY 
+        start DESC, id DESC
+      LIMIT 1
+    """;
+
+    return _db.rawQuery(sql, [time, time]).then((value) => value.firstOrNull);
+  }
   ////
   // Profile
   ////
@@ -528,23 +543,23 @@ Future<int> upsertQuery(
     String table,
     List<Map<String, Object>> models,
     List<String> insertKeys,
-    List<String> updateKeys) async {
+    List<String> conflictKeys) async {
   var batch = db.batch();
 
   var upsert = """
     INSERT INTO $table (${insertKeys.join(", ")}) VALUES (${insertKeys.map((e) => "?").join(", ")}) 
-    ON CONFLICT(${updateKeys.join(", ")}) DO UPDATE SET ${updateKeys.map((e) => "$e = ?").join(", ")}
+    ON CONFLICT(${conflictKeys.join(", ")}) DO UPDATE SET ${insertKeys.map((e) => "$e = ?").join(", ")}
   """;
 
   for (var model in models) {
     var valuesList = insertKeys.map((e) => model[e]).toList();
-    valuesList.addAll(updateKeys.map((e) => model[e]));
+    valuesList.addAll(insertKeys.map((e) => model[e]));
 
     // upsert based
     batch.rawQuery(upsert, valuesList);
   }
 
-  var results = await batch.commit(continueOnError: true);
+  var results = await batch.commit();
   return results.length;
 }
 
