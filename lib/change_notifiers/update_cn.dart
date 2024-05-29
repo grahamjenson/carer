@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
+import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
@@ -84,6 +85,21 @@ class UpdateCN extends ChangeNotifier {
         carbs.add(Carbs(value: carb.carbs!.round(), date: carb.mills));
       }
       var carbUpdates = await Carbs.createOrUpdate(carbs);
+
+      SummaryProfile summaryProfile = summary.profile;
+
+      Profile profile = Profile(
+        date: DateTime.now(),
+        dia: summaryProfile.dia,
+        units: summaryProfile.units,
+        timezone: summaryProfile.timezone,
+        carbratio: summaryProfile.expandedCarbratio(),
+        sens: summaryProfile.expandedSens(),
+        basal: summaryProfile.expandedBasal(),
+        targetLow: summaryProfile.expandedTargetLow(),
+        targetHigh: summaryProfile.expandedTargetHigh(),
+      );
+      await Profile.createOrUpdate(profile);
 
       print("updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates");
 

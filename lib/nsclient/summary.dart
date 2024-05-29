@@ -73,6 +73,32 @@ class TimeValues {
       (element) => element.isBefore(date),
     );
   }
+
+  List<double> expand() {
+    List<double> expanded = [];
+    var vi = 0;
+
+    for (var i = 0; i < 24; i++) {
+      var current = values[vi];
+
+      if (values.length == vi + 1) {
+        // end of values
+        expanded.add(current.value);
+        continue;
+      }
+      var next = values[vi + 1];
+      if (next.time.hour == i) {
+        expanded.add(next.value);
+        vi++;
+        continue;
+      }
+
+      expanded.add(current.value);
+    }
+    print(values);
+    print(expanded);
+    return expanded;
+  }
 }
 
 class SummarySGV {
@@ -314,7 +340,7 @@ class SummaryTreatments {
   }
 }
 
-class Profile {
+class SummaryProfile {
   final int dia;
   final TimeValues carbratio;
   final TimeValues sens;
@@ -324,7 +350,7 @@ class Profile {
   final String units;
   final String timezone;
 
-  const Profile({
+  const SummaryProfile({
     required this.dia,
     required this.carbratio,
     required this.sens,
@@ -335,7 +361,16 @@ class Profile {
     required this.timezone,
   });
 
-  factory Profile.fromJson(Map<String, dynamic> json) {
+  List<int> expandedCarbratio() =>
+      carbratio.expand().map((e) => e.round()).toList();
+  List<int> expandedSens() => sens.expand().map((e) => e.round()).toList();
+  List<double> expandedBasal() => basal.expand();
+  List<int> expandedTargetLow() =>
+      targetLow.expand().map((e) => e.round()).toList();
+  List<int> expandedTargetHigh() =>
+      targetHigh.expand().map((e) => e.round()).toList();
+
+  factory SummaryProfile.fromJson(Map<String, dynamic> json) {
     var units = json['units'];
 
     var targetLow = TimeValues.fromJson(json['target_low']);
@@ -353,7 +388,7 @@ class Profile {
       });
     }
 
-    return Profile(
+    return SummaryProfile(
       dia: json['dia'],
       carbratio: TimeValues.fromJson(json['carbratio']),
       sens: TimeValues.fromJson(json['sens']),
@@ -373,7 +408,7 @@ class Summary {
   final SummaryTreatments treatments;
   final Targets targets;
   final SummaryState state;
-  final Profile profile;
+  final SummaryProfile profile;
   final String raw;
 
   const Summary({
@@ -402,7 +437,7 @@ class Summary {
         bage: 0,
         battery: 0,
       ),
-      profile: Profile(
+      profile: SummaryProfile(
           dia: 1,
           carbratio: TimeValues(values: []),
           sens: TimeValues(values: []),
@@ -424,7 +459,7 @@ class Summary {
             SummaryTreatments.fromJson(json['treatments']['treatments']),
         targets: Targets.fromJson(json['treatments']['targets']),
         state: SummaryState.fromJson(json['state']),
-        profile: Profile.fromJson(json['profile']),
+        profile: SummaryProfile.fromJson(json['profile']),
         dateRetrievedmills: clock.now().millisecondsSinceEpoch,
       );
     } catch (e, stackTrace) {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -22,11 +24,14 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
+    var version = 11;
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      version = DateTime.now().millisecondsSinceEpoch;
+    }
     print("Opening database at $path");
     var db = await openDatabase(
       path,
-      version: DateTime.now()
-          .millisecondsSinceEpoch, // TODO: replace this eventually with a version number
+      version: version, // TODO: replace this eventually with a version number
       onCreate: (db, version) async {
         print("Creating database at version $version");
         await dropAll(db);
@@ -228,6 +233,51 @@ class CarerDB {
   }
 
   ////
+  // Profile
+  ////
+
+  Future<int> createOrUpdateProfile(Map<String, Object> model) async {
+    if (!_validateProfileMap(model)) {
+      throw ArgumentError("Invalid Profile map");
+    }
+
+    return _db.insert(profileTable.name, model,
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
+  bool _validateProfileMap(Map<String, Object> profile) {
+    var keys = ["dia", "units", "timezone"] +
+        crKeys +
+        isfKeys +
+        basalKeys +
+        targetLowKeys +
+        targetHighKeys;
+
+    if (!validateNotNull(profile, keys)) {
+      return false;
+    }
+
+    if (!validateAllowedKeys(profile, keys)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<Map<String, Object?>?> profile() async {
+    var sql = """
+      SELECT
+        *
+      FROM
+        ${profileTable.name}
+      ORDER BY 
+        timestamp DESC
+      LIMIT 1
+    """;
+
+    return (await _db.rawQuery(sql)).firstOrNull;
+  }
+  ////
   // DB Table functions
   ////
 
@@ -270,6 +320,142 @@ class CarerDB {
 
     await batch.commit();
   }
+
+  //// CONSTS
+  static const crKeys = [
+    "cr0",
+    "cr1",
+    "cr2",
+    "cr3",
+    "cr4",
+    "cr5",
+    "cr6",
+    "cr7",
+    "cr8",
+    "cr9",
+    "cr10",
+    "cr11",
+    "cr12",
+    "cr13",
+    "cr14",
+    "cr15",
+    "cr16",
+    "cr17",
+    "cr18",
+    "cr19",
+    "cr20",
+    "cr21",
+    "cr22",
+    "cr23"
+  ];
+
+  static const isfKeys = [
+    "isf0",
+    "isf1",
+    "isf2",
+    "isf3",
+    "isf4",
+    "isf5",
+    "isf6",
+    "isf7",
+    "isf8",
+    "isf9",
+    "isf10",
+    "isf11",
+    "isf12",
+    "isf13",
+    "isf14",
+    "isf15",
+    "isf16",
+    "isf17",
+    "isf18",
+    "isf19",
+    "isf20",
+    "isf21",
+    "isf22",
+    "isf23"
+  ];
+
+  static const basalKeys = [
+    "basal0",
+    "basal1",
+    "basal2",
+    "basal3",
+    "basal4",
+    "basal5",
+    "basal6",
+    "basal7",
+    "basal8",
+    "basal9",
+    "basal10",
+    "basal11",
+    "basal12",
+    "basal13",
+    "basal14",
+    "basal15",
+    "basal16",
+    "basal17",
+    "basal18",
+    "basal19",
+    "basal20",
+    "basal21",
+    "basal22",
+    "basal23"
+  ];
+
+  static const targetLowKeys = [
+    "tlow0",
+    "tlow1",
+    "tlow2",
+    "tlow3",
+    "tlow4",
+    "tlow5",
+    "tlow6",
+    "tlow7",
+    "tlow8",
+    "tlow9",
+    "tlow10",
+    "tlow11",
+    "tlow12",
+    "tlow13",
+    "tlow14",
+    "tlow15",
+    "tlow16",
+    "tlow17",
+    "tlow18",
+    "tlow19",
+    "tlow20",
+    "tlow21",
+    "tlow22",
+    "tlow23"
+  ];
+
+  static const targetHighKeys = [
+    "thigh0",
+    "thigh1",
+    "thigh2",
+    "thigh3",
+    "thigh4",
+    "thigh5",
+    "thigh6",
+    "thigh7",
+    "thigh8",
+    "thigh9",
+    "thigh10",
+    "thigh11",
+    "thigh12",
+    "thigh13",
+    "thigh14",
+    "thigh15",
+    "thigh16",
+    "thigh17",
+    "thigh18",
+    "thigh19",
+    "thigh20",
+    "thigh21",
+    "thigh22",
+    "thigh23"
+  ];
 }
 
 /// Utils
