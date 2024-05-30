@@ -26,7 +26,7 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
-    var version = 21;
+    var version = 23;
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
       version = DateTime.now().millisecondsSinceEpoch;
     }
@@ -53,50 +53,6 @@ class CarerDB {
     );
 
     return db;
-  }
-
-  ////
-  // Temp Basal
-  ////
-
-  Future<int> batchCreateOrUpdateTempBasals(
-      List<Map<String, Object>> models) async {
-    if (models.any((model) => !_validateTempBasalMap(model))) {
-      throw ArgumentError("Invalid Temp Basal map");
-    }
-
-    return upsertQuery(_db, tempbasalTable.name, models,
-        ["start", "duration", "value"], ["start", "value"]);
-  }
-
-  bool _validateTempBasalMap(Map<String, Object> tempTarget) {
-    var keys = ["start", "duration", "value"];
-
-    if (!validateShared(tempTarget, keys, [int, int, double])) {
-      return false;
-    }
-
-    if (!validateGreaterThanZero(tempTarget, ["start", "duration"])) {
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<Map<String, Object?>?> tempBasalAtTime(int time) {
-    var sql = """
-      SELECT
-        *
-      FROM
-        ${tempbasalTable.name}
-      WHERE
-        start < ? AND end > ?
-      ORDER BY 
-        start DESC, id DESC
-      LIMIT 1
-    """;
-
-    return _db.rawQuery(sql, [time, time]).then((value) => value.firstOrNull);
   }
 
   ////

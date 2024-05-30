@@ -1,4 +1,6 @@
 import 'package:carer/models/model.dart';
+import 'package:carer/models/tempbasal.dart';
+import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 
 class ProfileRepository extends ModelRepository<Profile> {
@@ -20,9 +22,12 @@ class ProfileRepository extends ModelRepository<Profile> {
     types += List.filled(targetLowKeys.length, int);
     types += List.filled(targetHighKeys.length, int);
 
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, requiredKeys, types))) {
-      throw ArgumentError("Invalid Profile Map: $map");
+    if (!validateNotNull(map, requiredKeys)) {
+      throw ArgumentError("Invalid Profile Map NULL: $map");
+    }
+
+    if (!validateType(map, requiredKeys, types)) {
+      throw ArgumentError("Invalid Profile Map TYPE: $map");
     }
 
     List<int> carbratio = crKeys.map((key) => map[key] as int).toList();
@@ -54,6 +59,7 @@ class ProfileRepository extends ModelRepository<Profile> {
       "dia": model.dia,
       "units": model.units,
       "timezone": model.timezone,
+      "timestamp": model.date.millisecondsSinceEpoch,
     };
     model.carbratio.asMap().forEach((index, value) {
       map[crKeys[index]] = value;
@@ -111,6 +117,31 @@ class Profile extends Model {
 
   factory Profile.fromMap(Map<String, Object?> map) {
     return _q.fromMap(map);
+  }
+
+  static Future<double> basalAtTime(DateTime date) async {
+    var tb = await TempBasal.atTime(date);
+    if (tb != null) {
+      return tb.value;
+    }
+    var profile = await Profile.profile();
+    if (profile == null) {
+      return 0;
+    }
+    return profile.basal[date.hour];
+  }
+
+  static Future<(int, int)> targetAtTime(DateTime date) async {
+    var tt = await TempTarget.atTime(date);
+    if (tt != null) {
+      return (tt.targetBottom, tt.targetTop);
+    }
+    var profile = await Profile.profile();
+    if (profile == null) {
+      return (0, 0);
+    }
+
+    return (profile.targetLow[date.hour], profile.targetHigh[date.hour]);
   }
 
   static Future<Profile?> profile() async {

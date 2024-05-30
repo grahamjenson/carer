@@ -492,18 +492,18 @@ class Summary {
     return clock.now().difference(dateRetrieved).inSeconds;
   }
 
-  (TimeValue?, SummaryTempBasal?) basalAtTime(DateTime date) {
-    var tempBasal = tempBasals.atDate(date);
-    var basal = profile.basal.atDate(date);
+  // (TimeValue?, SummaryTempBasal?) basalAtTime(DateTime date) {
+  //   var tempBasal = tempBasals.atDate(date);
+  //   var basal = profile.basal.atDate(date);
 
-    return (basal, tempBasal);
-  }
+  //   return (basal, tempBasal);
+  // }
 
-  (TimeValue?, TimeValue?, SummaryTempTarget?) targetAtTime(DateTime date) {
-    var temptarget = targets.atDate(date);
-    var profileTargetLow = profile.targetLow.atDate(date);
-    var profileTargetHigh = profile.targetHigh.atDate(date);
+  // (TimeValue?, TimeValue?, SummaryTempTarget?) targetAtTime(DateTime date) {
+  //   var temptarget = targets.atDate(date);
+  //   var profileTargetLow = profile.targetLow.atDate(date);
+  //   var profileTargetHigh = profile.targetHigh.atDate(date);
 
-    return (profileTargetLow, profileTargetHigh, temptarget);
-  }
+  //   return (profileTargetLow, profileTargetHigh, temptarget);
+  // }
 }

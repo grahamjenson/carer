@@ -94,7 +94,7 @@ const String profileTableName = 'profile';
 const profileTable = DBTable(profileTableName, '''
     CREATE TABLE profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      timestamp INTEGER,
 
       dia INTEGER,
       units TEXT,

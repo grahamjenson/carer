@@ -1,6 +1,7 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
+import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
@@ -83,8 +84,8 @@ class Stats extends StatelessWidget {
               cob(summary),
               power(summary),
               cage(summary),
-              basal(summary),
-              target(summary, settings.unit),
+              await basal(summary),
+              await target(summary, settings.unit),
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
             ],
@@ -150,35 +151,13 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow basal(Summary summary) {
-    var (profileBasal, tempBasal) = summary.basalAtTime(clock.now());
-    // Something is very wrong if there is no profile basal, so just checking that
-    if (profileBasal == null) {
-      return const DataRow(
-        cells: [
-          DataCell(Text("Basal", style: heading)),
-          DataCell(
-            Text("none", style: row),
-          ),
-        ],
-      );
-    }
-
-    if (tempBasal != null) {
-      return DataRow(
-        cells: [
-          const DataCell(Text("Basal*", style: heading)),
-          DataCell(
-            getBasalDescription(tempBasal.absolute, tempBasal.remaining),
-          ),
-        ],
-      );
-    }
+  Future<DataRow> basal(Summary summary) async {
+    var profileBasal = await Profile.basalAtTime(clock.now());
 
     return DataRow(
       cells: [
         const DataCell(Text("Basal", style: heading)),
-        DataCell(getBasalDescription(profileBasal.value, null)),
+        DataCell(getBasalDescription(profileBasal, null)),
       ],
     );
   }
@@ -214,39 +193,15 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  DataRow target(Summary summary, Unit unit) {
-    var (profileLowTarget, profileHighTarget, tempTarget) =
-        summary.targetAtTime(clock.now());
-    // Something is very wrong if there is no profile target, so just checking that
-    if (profileLowTarget == null || profileHighTarget == null) {
-      return const DataRow(
-        cells: [
-          DataCell(Text("Target", style: heading)),
-          DataCell(
-            Text("none", style: row),
-          ),
-        ],
-      );
-    }
-
-    if (tempTarget != null) {
-      return DataRow(
-        cells: [
-          const DataCell(Text("Target*", style: heading)),
-          DataCell(
-            targetDesciption(tempTarget.targetBottom, tempTarget.targetTop,
-                unit, tempTarget.remaining),
-          ),
-        ],
-      );
-    }
+  Future<DataRow> target(Summary summary, Unit unit) async {
+    var (profileLowTarget, profileHighTarget) =
+        await Profile.targetAtTime(clock.now());
 
     return DataRow(
       cells: [
         const DataCell(Text("Target", style: heading)),
         DataCell(
-          targetDesciption(
-              profileLowTarget.value, profileHighTarget.value, unit, null),
+          targetDesciption(profileLowTarget, profileHighTarget, unit, null),
         ),
       ],
     );

@@ -70,4 +70,16 @@ class TempTarget extends Model {
   factory TempTarget.fromMap(Map<String, dynamic> map) {
     return _q.fromMap(map);
   }
+
+  static Future<List<TempTarget>> query(
+      {int? after, int? before, int? limit}) async {
+    return _q.query(after: after, before: before, limit: limit);
+  }
+
+  static Future<TempTarget?> atTime(DateTime date) async {
+    var ms = date.millisecondsSinceEpoch;
+    return (await _q
+            .query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1))
+        .firstOrNull;
+  }
 }

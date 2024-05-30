@@ -1,6 +1,7 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
+import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/nsclient/summary.dart';
@@ -87,8 +88,8 @@ class BGLChart extends StatelessWidget {
 
     // convert the last hours of summary sgvs into flspots
     var bglSpotData = await bglSpots(summary, minsAgo);
-    var (basalSpotData, maxBasal) = basalSpots(summary, minsAgo);
-    var (lowTargets, highTargets) = targetSpots(summary, minsAgo);
+    var (basalSpotData, maxBasal) = await basalSpots(summary, minsAgo);
+    var (lowTargets, highTargets) = await targetSpots(summary, minsAgo);
     var treatments = await treatmentsSpots(summary, minsAgo);
 
     var bglLineData = LineChartBarData(
@@ -191,21 +192,18 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  (List<FlSpot>, double) basalSpots(Summary summary, int minsAgo) {
+  Future<(List<FlSpot>, double)> basalSpots(
+      Summary summary, int minsAgo) async {
     List<BasalSpot> spots = [];
     // Check the basal at every minute
     for (int i = 0; i < minsAgo; i++) {
-      var (basal, tempbasal) =
-          summary.basalAtTime(clock.now().subtract(Duration(minutes: i)));
-      if (tempbasal != null) {
-        spots.add(
-            BasalSpot(-i.toDouble(), tempbasal.absolute, tempbasal.absolute));
-      } else if (basal != null) {
-        spots.add(BasalSpot(-i.toDouble(), basal.value, basal.value));
-      }
+      var basal =
+          await Profile.basalAtTime(clock.now().subtract(Duration(minutes: i)));
+
+      spots.add(BasalSpot(-i.toDouble(), basal.toDouble(), basal.toDouble()));
     }
     if (spots.isEmpty) {
-      return (spots, 1);
+      return (spots, 1.0);
     }
     // Max basal from the list
     double maxBasal = spots
@@ -225,20 +223,16 @@ class BGLChart extends StatelessWidget {
     return (spots, maxBasal);
   }
 
-  (List<FlSpot>, List<FlSpot>) targetSpots(Summary summary, int minsAgo) {
+  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(
+      Summary summary, int minsAgo) async {
     List<FlSpot> lowTargets = [];
     List<FlSpot> highTargets = [];
     for (int i = 0; i < minsAgo; i++) {
-      var (lowTarget, highTarget, tempTarget) =
-          summary.targetAtTime(clock.now().subtract(Duration(minutes: i)));
-      if (tempTarget != null) {
-        lowTargets
-            .add(FlSpot(-i.toDouble(), tempTarget.targetBottom.toDouble()));
-        highTargets.add(FlSpot(-i.toDouble(), tempTarget.targetTop.toDouble()));
-      } else if (lowTarget != null && highTarget != null) {
-        lowTargets.add(FlSpot(-i.toDouble(), lowTarget.value));
-        highTargets.add(FlSpot(-i.toDouble(), highTarget.value));
-      }
+      var (lowTarget, highTarget) = await Profile.targetAtTime(
+          clock.now().subtract(Duration(minutes: i)));
+
+      lowTargets.add(FlSpot(-i.toDouble(), lowTarget.toDouble()));
+      highTargets.add(FlSpot(-i.toDouble(), highTarget.toDouble()));
     }
     return (lowTargets, highTargets);
   }

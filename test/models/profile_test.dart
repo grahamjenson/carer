@@ -1,0 +1,39 @@
+import 'package:carer/models/profile.dart';
+import 'package:carer/sql/carer_db.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../test_utils.dart';
+
+void main() {
+  sqfliteTestInit();
+
+  group('Profile', () {
+    DateTime now = DateTime(2020, 1, 1, 12);
+    Duration min5 = const Duration(minutes: 5);
+    Duration hour48 = const Duration(hours: 48);
+
+    setUp(() async {});
+
+    tearDown(() async {
+      await (await CarerDB.instance).deleteAll();
+    });
+
+    test("create", () async {
+      var p = Profile(
+        dia: 5,
+        timezone: "asad",
+        units: "mmol",
+        date: now,
+        carbratio: List<int>.filled(24, 1),
+        sens: List<int>.filled(24, 1),
+        basal: List<double>.filled(24, 1),
+        targetLow: List<int>.filled(24, 1),
+        targetHigh: List<int>.filled(24, 1),
+      );
+      expect(await p.save(), true);
+
+      var p1 = await Profile.profile();
+      expect(p1, isNotNull);
+    });
+  });
+}
