@@ -7,13 +7,16 @@ abstract class Model {
   DateTime get date;
   ModelRepository get repository;
 
-  // List<String> validate();
+  List<String> validate() {
+    return [];
+  }
 
   Duration get age {
     return clock.now().difference(date);
   }
 
   Future<bool> save() async {
+    // TODO update the id of the model
     return repository.save(this);
   }
 }
@@ -35,8 +38,8 @@ abstract class ModelRepository<T extends Model> {
   Map<String, Object> toSQLMap(T model);
 
   Future<List<T>> query({
-    int after = 0,
-    int before = 9999999999999999,
+    int? after,
+    int? before,
     Map<String, Object>? conditions,
     int? limit,
   }) async {
@@ -66,9 +69,7 @@ abstract class ModelRepository<T extends Model> {
   }
 
   Future<int?> count(
-      {int after = 0,
-      int before = 9999999999999999,
-      Map<String, Object>? conditions}) async {
+      {int? after, int? before, Map<String, Object>? conditions}) async {
     var cdb = await CarerDB.instance;
     var (where, whereArgs) = _buildWhereStatement(
         after: after, before: before, conditions: conditions);
@@ -79,7 +80,7 @@ abstract class ModelRepository<T extends Model> {
   }
 
   // utils
-  (String, List<Object>) _buildWhereStatement(
+  (String?, List<Object>?) _buildWhereStatement(
       {int? after, int? before, Map<String, Object>? conditions}) {
     var where = <String>[];
     var whereArgs = <Object>[];
@@ -97,6 +98,30 @@ abstract class ModelRepository<T extends Model> {
         whereArgs.add(value);
       });
     }
+    if (where.isEmpty) {
+      return (null, null);
+    }
     return (where.join(' AND '), whereArgs);
+  }
+
+  bool validateNotNull(Map<String, Object?> m, List<String> keys) {
+    for (var key in keys) {
+      if (m[key] == null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool validateType(
+      Map<String, Object?> m, List<String> keys, List<Type> types) {
+    assert(keys.length == types.length);
+
+    for (var i = 0; i < keys.length; i++) {
+      if (m[keys[i]].runtimeType != types[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 }

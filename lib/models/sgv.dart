@@ -8,13 +8,23 @@ class SGVRepository extends ModelRepository<SGV> {
       : super(sgvsCleanViewTableName, writeTableName: sgvsTableName);
 
   @override
-  SGV fromMap(Map<String, dynamic> map) {
-    return SGV(
-      id: map["id"],
-      value: map["value"],
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
-      rate5m: map["rate5m"],
-    );
+  SGV fromMap(Map<String, Object?> map) {
+    var requiredKeys = ["value", "timestamp"];
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, requiredKeys, [int, int]))) {
+      throw ArgumentError("Invalid SVG Map: $map");
+    }
+
+    {
+      return SGV(
+        id: map["id"] as int?,
+        value: map["value"] as int,
+        date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
+        rate5m: map["rate5m"] as int?,
+        diff: map["diff"] as int?,
+        idBefore: map["id_before"] as int?,
+      );
+    }
   }
 
   @override
@@ -38,15 +48,19 @@ class SGV extends Model {
   @override
   final DateTime date;
   int? rate5m;
+  int? diff;
+  int? idBefore; // previous SVGs ID
 
   SGV({
     required this.value,
     required this.date,
     this.id,
     this.rate5m,
+    this.diff,
+    this.idBefore,
   });
 
-  factory SGV.fromMap(Map<String, dynamic> map) {
+  factory SGV.fromMap(Map<String, Object?> map) {
     return _q.fromMap(map);
   }
 
@@ -81,8 +95,34 @@ class SGV extends Model {
   }
 
   // STATIC FUNCTIONS
+  static Future<int?> count(
+      {int? after, int? before, int? low, int? high}) async {
+    var conditions = <String, Object>{};
+    if (low != null) {
+      conditions["value >= ?"] = low;
+    }
+    if (high != null) {
+      conditions["value < ?"] = high;
+    }
+    return _q.count(after: after, before: before, conditions: conditions);
+  }
+
   static Future<SGV?> lastSGV() async {
     return (await _q.query(limit: 1)).firstOrNull;
+  }
+
+  static Future<List<SGV>> query(
+      {int? after, int? before, int? low, int? high, int? limit}) async {
+    var conditions = <String, Object>{};
+    if (low != null) {
+      conditions["value >= ?"] = low;
+    }
+    if (high != null) {
+      conditions["value < ?"] = high;
+    }
+
+    return _q.query(
+        after: after, before: before, conditions: conditions, limit: limit);
   }
 
   // return the last sgvs for minutes
