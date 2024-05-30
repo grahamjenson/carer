@@ -25,7 +25,8 @@ const dbViews = [
 // Used for key values like iob...
 const kvTable = DBTable(KVTables.kvTableName, KVTables.kvTable);
 
-const sgvTable = DBTable('sgvs', '''
+const String sgvsTableName = 'sgvs';
+const sgvTable = DBTable(sgvsTableName, '''
     CREATE TABLE sgvs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value INTEGER,
@@ -138,7 +139,8 @@ const concatTreatmentsView = DBTable('concatTreatments', '''
 // SGV clean view
 // CLEAN:
 // Link SVGS with the previous reading that is further than 4 minutes before.
-const sgvsCleanView = DBTable('sgvsClean', '''
+const String sgvsCleanViewTableName = 'sgvsClean';
+const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
     CREATE VIEW sgvsClean AS
     SELECT 
       safter.id as id,

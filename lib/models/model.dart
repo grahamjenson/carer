@@ -7,7 +7,7 @@ abstract class Model {
   DateTime get date;
   ModelRepository get repository;
 
-  List<String> validate();
+  // List<String> validate();
 
   Duration get age {
     return clock.now().difference(date);
@@ -20,6 +20,7 @@ abstract class Model {
 
 abstract class ModelRepository<T extends Model> {
   final String tableName;
+  final String? writeTableName;
   final String idField;
   final String timestampField;
 
@@ -27,6 +28,7 @@ abstract class ModelRepository<T extends Model> {
     this.tableName, {
     this.idField = "id",
     this.timestampField = "timestamp",
+    this.writeTableName,
   });
 
   T fromMap(Map<String, Object?> map);
@@ -41,25 +43,29 @@ abstract class ModelRepository<T extends Model> {
     var cdb = await CarerDB.instance;
     var (where, whereArgs) = _buildWhereStatement(
         after: after, before: before, conditions: conditions);
-    var res = await cdb.db
-        .query(tableName, where: where, whereArgs: whereArgs, limit: limit);
+    var res = await cdb.db.query(tableName,
+        where: where,
+        whereArgs: whereArgs,
+        limit: limit,
+        orderBy: "$timestampField DESC");
     return res.map((e) => fromMap(e)).toList();
   }
 
   Future<bool> save(T model) async {
     var cdb = await CarerDB.instance;
+    var tb = writeTableName ?? tableName;
     if (model.id == null) {
-      var ret = await cdb.db.insert(tableName, toSQLMap(model),
+      var ret = await cdb.db.insert(tb, toSQLMap(model),
           conflictAlgorithm: ConflictAlgorithm.ignore);
       return ret != 0;
     } else {
-      var ret = await cdb.db.update(tableName, toSQLMap(model),
+      var ret = await cdb.db.update(tb, toSQLMap(model),
           where: '$idField = ?', whereArgs: [model.id]);
       return ret != 0;
     }
   }
 
-  Future<int> count(
+  Future<int?> count(
       {int after = 0,
       int before = 9999999999999999,
       Map<String, Object>? conditions}) async {
@@ -69,7 +75,7 @@ abstract class ModelRepository<T extends Model> {
 
     var res = await cdb.db.query(tableName,
         columns: ['COUNT(*)'], where: where, whereArgs: whereArgs);
-    return res.first.values.first as int;
+    return res.first.values.first as int?;
   }
 
   // utils
@@ -87,7 +93,7 @@ abstract class ModelRepository<T extends Model> {
     }
     if (conditions != null) {
       conditions.forEach((key, value) {
-        where.add('$key = ?');
+        where.add('$key ');
         whereArgs.add(value);
       });
     }

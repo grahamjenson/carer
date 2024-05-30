@@ -1,10 +1,11 @@
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/model.dart';
-import 'package:carer/sql/carer_db.dart';
+import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:clock/clock.dart';
 
 class SGVRepository extends ModelRepository<SGV> {
-  const SGVRepository() : super("sgvs");
+  const SGVRepository()
+      : super(sgvsCleanViewTableName, writeTableName: sgvsTableName);
 
   @override
   SGV fromMap(Map<String, dynamic> map) {
@@ -45,12 +46,6 @@ class SGV extends Model {
     this.rate5m,
   });
 
-  @override
-  List<String> validate() {
-    // TODO: implement validate
-    throw UnimplementedError();
-  }
-
   factory SGV.fromMap(Map<String, dynamic> map) {
     return _q.fromMap(map);
   }
@@ -87,46 +82,29 @@ class SGV extends Model {
 
   // STATIC FUNCTIONS
   static Future<SGV?> lastSGV() async {
-    var db = await CarerDB.instance;
-    var rawSGV = (await db.sgvs(limit: 1)).firstOrNull;
-    if (rawSGV == null) {
-      return null;
-    }
-    var sgv = SGV.fromMap(rawSGV);
-
-    return sgv;
+    return (await _q.query(limit: 1)).firstOrNull;
   }
 
   // return the last sgvs for minutes
   static Future<List<SGV>> lastMins(int minsAgo) async {
-    var db = await CarerDB.instance;
-
-    // sorted by age
-    // grouped into 1 min intervals (select latest/lowest one)
-    // reference previous sgv
-    var rawSGVs = await db.sgvs(
+    return (await _q.query(
         after: clock
             .now()
             .subtract(Duration(minutes: minsAgo))
-            .millisecondsSinceEpoch);
-    List<SGV> ret = [];
-    for (var rsvg in rawSGVs) {
-      ret.add(SGV.fromMap(rsvg));
-    }
-
-    return ret;
+            .millisecondsSinceEpoch));
   }
 
   static Future<double> percentInRangeToday(int low, int high) async {
-    var db = await CarerDB.instance;
     DateTime now = clock.now();
     DateTime startOfDay = DateTime(now.year, now.month, now.day);
     int startOfDayEpoch = startOfDay.millisecondsSinceEpoch;
 
-    var sgvsTodayInRange =
-        await db.countSGVs(after: startOfDayEpoch, low: low, high: high);
+    var sgvsTodayInRange = await _q.count(
+      after: startOfDayEpoch,
+      conditions: {"value >= ?": low, "value < ?": high},
+    );
 
-    var sgvsToday = await db.countSGVs(after: startOfDayEpoch);
+    var sgvsToday = await _q.count(after: startOfDayEpoch);
 
     if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
       return 0.0;

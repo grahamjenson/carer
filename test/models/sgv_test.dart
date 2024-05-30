@@ -20,11 +20,8 @@ void main() {
     });
 
     test('lastMins', () async {
-      var sgvCount = await SGV.createOrUpdate([
-        SGV(value: 2, date: now.subtract(min5)),
-        SGV(value: 1, date: now),
-      ]);
-      expect(sgvCount, 2);
+      expect(await SGV(value: 2, date: now.subtract(min5)).save(), true);
+      expect(await SGV(value: 1, date: now).save(), true);
 
       await withClock(Clock.fixed(now), () async {
         var sgvs = await SGV.lastMins(1);
@@ -38,30 +35,23 @@ void main() {
       var sgv = await SGV.lastSGV();
       expect(sgv, null);
 
-      var sgvCount = await SGV.createOrUpdate([
-        SGV(value: 2, date: now.subtract(min5)),
-      ]);
-      expect(sgvCount, 1);
+      expect(await SGV(value: 2, date: now.subtract(min5)).save(), true);
 
       sgv = await SGV.lastSGV();
       expect(sgv!.value, 2);
 
       // Add more recent number
-      sgvCount = await SGV.createOrUpdate([
-        SGV(value: 1, date: now),
-      ]);
-      expect(sgvCount, 1);
+
+      expect(await SGV(value: 1, date: now).save(), true);
+
       sgv = await SGV.lastSGV();
       expect(sgv!.value, 1);
     });
 
     test("percentInRangeToday", () async {
-      var sgvCount = await SGV.createOrUpdate([
-        SGV(value: 2, date: now.subtract(hour48)),
-        SGV(value: 2, date: now.subtract(min5 + min5)),
-        SGV(value: 1, date: now.subtract(min5)),
-      ]);
-      expect(sgvCount, 3);
+      expect(await SGV(value: 2, date: now.subtract(hour48)).save(), true);
+      expect(await SGV(value: 2, date: now.subtract(min5 + min5)).save(), true);
+      expect(await SGV(value: 1, date: now.subtract(min5)).save(), true);
 
       await withClock(Clock.fixed(now), () async {
         var percent = await SGV.percentInRangeToday(0, 3);
