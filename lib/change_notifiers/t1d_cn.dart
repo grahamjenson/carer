@@ -7,14 +7,12 @@ import 'dart:async';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 
 class T1DCN extends ChangeNotifier {
   SettingsCN settings;
   UpdateCN summaryCn;
-  Summary get summary => summaryCn.summary;
 
   // Target information
   Range5 targetRange5 = Range5.mid;
@@ -39,8 +37,12 @@ class T1DCN extends ChangeNotifier {
     });
   }
 
-  void summaryAgeMissedDataError() {
-    summaryAgeInMinutes = summary.ageInSeconds() / 60;
+  void summaryAgeMissedDataError() async {
+    var lastSGV = await SGV.lastSGV();
+    if (lastSGV == null) {
+      return;
+    }
+    summaryAgeInMinutes = lastSGV.age.inSeconds / 60;
     if (summaryAgeInMinutes > 5.5) {
       oldSummary = true;
     } else {

@@ -15,7 +15,7 @@ class LogErrorPage extends StatelessWidget {
     return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summary, child) {
       var settingsString = prettyPrintJson(settings.toString());
-      var summaryString = prettyPrintJson(summary.summary.raw);
+      var summaryString = "TODO: dump the db here";
 
       return Scaffold(
         appBar: AppBar(

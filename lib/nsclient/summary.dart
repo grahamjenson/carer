@@ -4,7 +4,6 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:clock/clock.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class TimeValue {
@@ -25,26 +24,6 @@ class TimeValue {
       value: json['value'].toDouble(),
     );
   }
-
-  bool isBefore(DateTime date) {
-    // make DateTime from time
-    var dateTime =
-        DateTime(date.year, date.month, date.day, time.hour, time.minute);
-    return dateTime.isBefore(date);
-  }
-
-  // compareTo to compare two TimeValues
-  int compareTo(TimeValue other) {
-    // lexicographically ordered for hour then minute
-    return time.hour * 60 +
-        time.minute -
-        (other.time.hour * 60 + other.time.minute);
-  }
-
-  @override
-  String toString() {
-    return "TimeValue: $time, $value";
-  }
 }
 
 class TimeValues {
@@ -64,14 +43,7 @@ class TimeValues {
         json.map((valueJson) => TimeValue.fromJson(valueJson)).toList();
 
     // Sort this to make the TimeValues chronologically ordered
-    values.sort((a, b) => a.compareTo(b));
     return TimeValues(values: values);
-  }
-
-  TimeValue? atDate(DateTime date) {
-    return values.lastWhereOrNull(
-      (element) => element.isBefore(date),
-    );
   }
 
   List<double> expand() {
@@ -116,21 +88,9 @@ class SummarySGV {
       mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
     );
   }
-
-  @override
-  String toString() {
-    return "SGV: $sgv@${mills.hour}:${mills.minute}";
-  }
 }
 
-abstract class ATreatment {
-  DateTime get date;
-  Duration get age {
-    return clock.now().difference(date);
-  }
-}
-
-class SummaryTempBasal extends ATreatment {
+class SummaryTempBasal {
   DateTime start;
   double duration;
   double absolute;
@@ -141,21 +101,6 @@ class SummaryTempBasal extends ATreatment {
     required this.absolute,
   });
 
-  @override
-  DateTime get date => start;
-
-  @override
-  IconData get icon => Icons.access_time;
-
-  //return the date + duration in seconds as a DateTime
-  DateTime get dateEnd {
-    return date.add(Duration(seconds: duration.toInt()));
-  }
-
-  Duration get remaining {
-    return dateEnd.difference(clock.now());
-  }
-
   factory SummaryTempBasal.fromJson(Map<String, dynamic> json) {
     return SummaryTempBasal(
       start: DateTime.fromMillisecondsSinceEpoch(json['start']),
@@ -165,63 +110,45 @@ class SummaryTempBasal extends ATreatment {
   }
 }
 
-class SummaryTreatment extends ATreatment {
-  DateTime mills;
+class SummaryTreatment {
+  DateTime date;
   double? insulin;
   int? carbs;
 
   SummaryTreatment({
-    required this.mills,
+    required this.date,
     this.insulin,
     this.carbs,
   });
 
-  @override
-  DateTime get date => mills;
-
   factory SummaryTreatment.fromJson(Map<String, dynamic> json) {
     return SummaryTreatment(
-      mills: DateTime.fromMillisecondsSinceEpoch(json['mills']),
+      date: DateTime.fromMillisecondsSinceEpoch(json['mills']),
       insulin: json['insulin']?.toDouble(),
       carbs: json['carbs'],
     );
   }
 }
 
-class SummaryTempTarget extends ATreatment {
+class SummaryTempTarget {
   int targetTop;
   int targetBottom;
   int duration;
-  DateTime mills;
+  DateTime start;
 
   SummaryTempTarget({
     required this.targetTop,
     required this.targetBottom,
     required this.duration,
-    required this.mills,
+    required this.start,
   });
-
-  @override
-  DateTime get date => mills;
-
-  @override
-  IconData get icon => Icons.trending_flat;
-
-  //return the date + duration in seconds as a DateTime
-  DateTime get dateEnd {
-    return date.add(Duration(seconds: duration));
-  }
-
-  Duration get remaining {
-    return dateEnd.difference(clock.now());
-  }
 
   factory SummaryTempTarget.fromJson(Map<String, dynamic> json) {
     return SummaryTempTarget(
       targetTop: json['targetTop'],
       targetBottom: json['targetBottom'],
       duration: json['duration'],
-      mills: json['mills'] != null
+      start: json['mills'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['mills'])
           : Dates.earliest,
     );
@@ -294,13 +221,7 @@ class TempBasals {
       tempBasals.add(SummaryTempBasal.fromJson(tempBasalJson));
     }
 
-    tempBasals.sort((a, b) => a.date.compareTo(b.date));
     return TempBasals(tempBasals: tempBasals);
-  }
-
-  SummaryTempBasal? atDate(DateTime date) {
-    return tempBasals.lastWhereOrNull((element) =>
-        date.isAfter(element.date) && date.isBefore(element.dateEnd));
   }
 }
 
@@ -323,13 +244,7 @@ class SummaryTargets {
       targets.add(SummaryTempTarget.fromJson(targetJson));
     }
 
-    targets.sort((a, b) => a.date.compareTo(b.date));
     return SummaryTargets(targets: targets);
-  }
-
-  SummaryTempTarget? atDate(DateTime date) {
-    return targets.lastWhereOrNull((element) =>
-        date.isAfter(element.date) && date.isBefore(element.dateEnd));
   }
 }
 
@@ -491,19 +406,4 @@ class Summary {
   int ageInSeconds() {
     return clock.now().difference(dateRetrieved).inSeconds;
   }
-
-  // (TimeValue?, SummaryTempBasal?) basalAtTime(DateTime date) {
-  //   var tempBasal = tempBasals.atDate(date);
-  //   var basal = profile.basal.atDate(date);
-
-  //   return (basal, tempBasal);
-  // }
-
-  // (TimeValue?, TimeValue?, SummaryTempTarget?) targetAtTime(DateTime date) {
-  //   var temptarget = targets.atDate(date);
-  //   var profileTargetLow = profile.targetLow.atDate(date);
-  //   var profileTargetHigh = profile.targetHigh.atDate(date);
-
-  //   return (profileTargetLow, profileTargetHigh, temptarget);
-  // }
 }

@@ -1,7 +1,6 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/treatments.dart';
-import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -96,9 +95,6 @@ class History extends StatelessWidget {
 
   Future<List<DataRow>> historyContainers(
       SettingsCN settings, UpdateCN updateCn) async {
-    if (updateCn.summary.dateRetrieved == Dates.earliest) {
-      return [];
-    }
     var history = await Treatment.lastMins(60 * 6);
 
     return [for (var t in history) historyRow(t)]

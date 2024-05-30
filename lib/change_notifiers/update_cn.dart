@@ -16,7 +16,7 @@ class UpdateCN extends ChangeNotifier {
   SettingsCN settings;
 
   // When this updates lots of things will change
-  Summary summary = Summary.empty;
+  Summary _summary = Summary.empty;
   bool _summaryToBeUpdated = true;
   String _updateReason = "";
 
@@ -43,7 +43,7 @@ class UpdateCN extends ChangeNotifier {
   }
 
   checkUpdateSummary() async {
-    if (summary.ageInSeconds() > 15) {
+    if (_summary.ageInSeconds() > 15) {
       _summaryToBeUpdated = true;
       _updateReason = "Age older than 15";
     }
@@ -67,36 +67,36 @@ class UpdateCN extends ChangeNotifier {
       return Summary.empty;
     }).then((value) async {
       // Assign the raw summary value
-      summary = value;
+      _summary = value;
 
       // convert the summary to models
       List<SGV> sgvs = [];
-      for (var sgv in summary.sgvs.sgvs) {
+      for (var sgv in _summary.sgvs.sgvs) {
         sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
       }
       var saveAllSGV = sgvs.map((e) => e.save()).toList();
       int sgvUpdates = (await Future.wait(saveAllSGV)).where((b) => b).length;
 
       List<Bolus> boluses = [];
-      for (var bolus in summary.treatments.boluses()) {
-        boluses.add(Bolus(value: bolus.insulin!, date: bolus.mills));
+      for (var bolus in _summary.treatments.boluses()) {
+        boluses.add(Bolus(value: bolus.insulin!, date: bolus.date));
       }
       var saveAllBolus = boluses.map((e) => e.save()).toList();
       int bolusUpdates =
           (await Future.wait(saveAllBolus)).where((b) => b).length;
 
       List<Carbs> carbs = [];
-      for (var carb in summary.treatments.carbs()) {
-        carbs.add(Carbs(value: carb.carbs!.round(), date: carb.mills));
+      for (var carb in _summary.treatments.carbs()) {
+        carbs.add(Carbs(value: carb.carbs!.round(), date: carb.date));
       }
       var saveAllCarbs = carbs.map((e) => e.save()).toList();
       int carbUpdates =
           (await Future.wait(saveAllCarbs)).where((b) => b).length;
 
       List<TempBasal> tempBasals = [];
-      for (var tempBasal in summary.tempBasals.tempBasals) {
+      for (var tempBasal in _summary.tempBasals.tempBasals) {
         tempBasals.add(TempBasal(
-            startDate: tempBasal.date,
+            startDate: tempBasal.start,
             duration: tempBasal.duration.toInt(),
             value: tempBasal.absolute));
       }
@@ -106,9 +106,9 @@ class UpdateCN extends ChangeNotifier {
           (await Future.wait(saveAllTBs)).where((b) => b).length;
 
       List<TempTarget> tempTargets = [];
-      for (var tempTarget in summary.targets.targets) {
+      for (var tempTarget in _summary.targets.targets) {
         tempTargets.add(TempTarget(
-            startDate: tempTarget.date,
+            startDate: tempTarget.start,
             duration: tempTarget.duration,
             targetTop: tempTarget.targetTop,
             targetBottom: tempTarget.targetBottom));
@@ -118,7 +118,7 @@ class UpdateCN extends ChangeNotifier {
       int tempTargetUpdates =
           (await Future.wait(saveAllTTs)).where((b) => b).length;
 
-      SummaryProfile summaryProfile = summary.profile;
+      SummaryProfile summaryProfile = _summary.profile;
 
       Profile profile = Profile(
         date: DateTime.now(),

@@ -1,8 +1,6 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/nsclient/summary.dart';
-import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +21,7 @@ class _BGLState extends State<BGL> {
     return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
       return FutureBuilder<Widget>(
-          future: futureWindow(summaryCn.summary, settings),
+          future: futureWindow(settings),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return snapshot.data!;
@@ -34,11 +32,9 @@ class _BGLState extends State<BGL> {
     });
   }
 
-  Future<Widget> futureWindow(Summary summary, SettingsCN settings) async {
+  Future<Widget> futureWindow(SettingsCN settings) async {
     const loader = Center(child: CircularProgressIndicator());
-    if (summary.dateRetrieved == Dates.earliest) {
-      return loader;
-    }
+
     var sgv = await SGV.lastSGV();
     if (sgv == null) {
       return loader;

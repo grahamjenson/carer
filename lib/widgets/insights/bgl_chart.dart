@@ -4,7 +4,6 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
-import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -63,9 +62,9 @@ class BGLChart extends StatelessWidget {
     return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
       // Breaking down the objects
-      Summary summary = summaryCn.summary;
+
       return FutureBuilder<Window>(
-          future: futureWindow(summary, settings),
+          future: futureWindow(settings),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print("BGLChart snapshot error: ${snapshot.error}");
@@ -79,7 +78,7 @@ class BGLChart extends StatelessWidget {
     });
   }
 
-  Future<Window> futureWindow(Summary summary, SettingsCN settings) async {
+  Future<Window> futureWindow(SettingsCN settings) async {
     int minsAgo = 125;
     double maxY = settings.urgentHigh + 36;
     double minY = 0;
@@ -87,10 +86,10 @@ class BGLChart extends StatelessWidget {
     double maxX = 0; // now
 
     // convert the last hours of summary sgvs into flspots
-    var bglSpotData = await bglSpots(summary, minsAgo);
-    var (basalSpotData, maxBasal) = await basalSpots(summary, minsAgo);
-    var (lowTargets, highTargets) = await targetSpots(summary, minsAgo);
-    var treatments = await treatmentsSpots(summary, minsAgo);
+    var bglSpotData = await bglSpots(minsAgo);
+    var (basalSpotData, maxBasal) = await basalSpots(minsAgo);
+    var (lowTargets, highTargets) = await targetSpots(minsAgo);
+    var treatments = await treatmentsSpots(minsAgo);
 
     var bglLineData = LineChartBarData(
       color: mainColor,
@@ -156,7 +155,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  Future<List<FlSpot>> treatmentsSpots(Summary summary, int minsAgo) async {
+  Future<List<FlSpot>> treatmentsSpots(int minsAgo) async {
     List<FlSpot> spots = [];
     var lastTreatments = await Treatment.lastMins(minsAgo);
 
@@ -181,7 +180,7 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  Future<List<FlSpot>> bglSpots(Summary summary, int minsAgo) async {
+  Future<List<FlSpot>> bglSpots(int minsAgo) async {
     List<SGV> sgvs = await SGV.lastMins(minsAgo);
     List<FlSpot> spots = [];
     for (var i = 0; i < sgvs.length; i++) {
@@ -192,8 +191,7 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  Future<(List<FlSpot>, double)> basalSpots(
-      Summary summary, int minsAgo) async {
+  Future<(List<FlSpot>, double)> basalSpots(int minsAgo) async {
     List<BasalSpot> spots = [];
     // Check the basal at every minute
     for (int i = 0; i < minsAgo; i++) {
@@ -223,8 +221,7 @@ class BGLChart extends StatelessWidget {
     return (spots, maxBasal);
   }
 
-  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(
-      Summary summary, int minsAgo) async {
+  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(int minsAgo) async {
     List<FlSpot> lowTargets = [];
     List<FlSpot> highTargets = [];
     for (int i = 0; i < minsAgo; i++) {

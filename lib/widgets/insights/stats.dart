@@ -1,9 +1,9 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
+import 'package:carer/models/kv_data.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/nsclient/summary.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -29,14 +29,10 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const heading =
-        TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
-
     return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, summaryCn, child) {
-      var summary = summaryCn.summary;
       return FutureBuilder<Window>(
-          future: futureWindow(summary, settings),
+          future: futureWindow(settings),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print("Stats snapshot error: ${snapshot.error}");
@@ -50,7 +46,7 @@ class Stats extends StatelessWidget {
     });
   }
 
-  Future<Window> futureWindow(Summary summary, SettingsCN settings) async {
+  Future<Window> futureWindow(SettingsCN settings) async {
     return Window(
       title: "Stats",
       child: Expanded(
@@ -80,12 +76,12 @@ class Stats extends StatelessWidget {
                       SizedBox(width: 50, child: Text('stat', style: heading))),
             ],
             rows: [
-              iob(summary),
-              cob(summary),
-              power(summary),
-              cage(summary),
-              await basal(summary),
-              await target(summary, settings.unit),
+              await iob(),
+              await cob(),
+              await power(),
+              await cage(),
+              await basal(),
+              await target(settings.unit),
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
             ],
@@ -95,7 +91,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow iob(Summary summary) {
+  Future<DataRow> iob() async {
     return DataRow(
       cells: [
         const DataCell(
@@ -104,14 +100,14 @@ class Stats extends StatelessWidget {
         DataCell(
           SmartText(
               textAlign: TextAlign.center,
-              texts: ["${summary.state.iob}", "u"],
+              texts: ["${await KVData.iob()}", "u"],
               styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow cob(Summary summary) {
+  Future<DataRow> cob() async {
     return DataRow(
       cells: [
         const DataCell(
@@ -119,39 +115,40 @@ class Stats extends StatelessWidget {
         ),
         DataCell(
           SmartText(
-              texts: ["${summary.state.cob}", "g"], styles: const [row, small]),
+              texts: ["${await KVData.cob()}", "g"],
+              styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow power(Summary summary) {
+  Future<DataRow> power() async {
     return DataRow(
       cells: [
         const DataCell(Text("Power", style: heading)),
         DataCell(
           SmartText(
-              texts: ["${summary.state.battery}", "%"],
+              texts: ["${await KVData.battery()}", "%"],
               styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow cage(Summary summary) {
+  Future<DataRow> cage() async {
     return DataRow(
       cells: [
         const DataCell(Text("cage", style: heading)),
         DataCell(
           SmartText(
-              texts: ["${summary.state.cage}", "h"],
+              texts: ["${await KVData.cage()}", "h"],
               styles: const [row, small]),
         ),
       ],
     );
   }
 
-  Future<DataRow> basal(Summary summary) async {
+  Future<DataRow> basal() async {
     var profileBasal = await Profile.basalAtTime(clock.now());
 
     return DataRow(
@@ -193,7 +190,7 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Future<DataRow> target(Summary summary, Unit unit) async {
+  Future<DataRow> target(Unit unit) async {
     var (profileLowTarget, profileHighTarget) =
         await Profile.targetAtTime(clock.now());
 
