@@ -74,20 +74,24 @@ class UpdateCN extends ChangeNotifier {
       for (var sgv in summary.sgvs.sgvs) {
         sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
       }
-      var saveAll = sgvs.map((e) => e.save()).toList();
-      int sgvUpdates = (await Future.wait(saveAll)).where((b) => b).length;
+      var saveAllSGV = sgvs.map((e) => e.save()).toList();
+      int sgvUpdates = (await Future.wait(saveAllSGV)).where((b) => b).length;
 
       List<Bolus> boluses = [];
       for (var bolus in summary.treatments.boluses()) {
         boluses.add(Bolus(value: bolus.insulin!, date: bolus.mills));
       }
-      var bolusUpdates = await Bolus.createOrUpdate(boluses);
+      var saveAllBolus = boluses.map((e) => e.save()).toList();
+      int bolusUpdates =
+          (await Future.wait(saveAllBolus)).where((b) => b).length;
 
       List<Carbs> carbs = [];
       for (var carb in summary.treatments.carbs()) {
         carbs.add(Carbs(value: carb.carbs!.round(), date: carb.mills));
       }
-      var carbUpdates = await Carbs.createOrUpdate(carbs);
+      var saveAllCarbs = carbs.map((e) => e.save()).toList();
+      int carbUpdates =
+          (await Future.wait(saveAllCarbs)).where((b) => b).length;
 
       List<TempBasal> tempBasals = [];
       for (var tempBasal in summary.tempBasals.tempBasals) {
@@ -108,7 +112,9 @@ class UpdateCN extends ChangeNotifier {
             targetBottom: tempTarget.targetBottom));
       }
 
-      var tempTargetUpdates = await TempTarget.createOrUpdate(tempTargets);
+      var saveAllTTs = carbs.map((e) => e.save()).toList();
+      int tempTargetUpdates =
+          (await Future.wait(saveAllTTs)).where((b) => b).length;
 
       SummaryProfile summaryProfile = summary.profile;
 
@@ -123,7 +129,7 @@ class UpdateCN extends ChangeNotifier {
         targetLow: summaryProfile.expandedTargetLow(),
         targetHigh: summaryProfile.expandedTargetHigh(),
       );
-      var profileUpdate = await Profile.createOrUpdate(profile);
+      var profileUpdate = await profile.save();
 
       print(
           "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate");

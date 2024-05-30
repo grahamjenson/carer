@@ -54,6 +54,14 @@ abstract class ModelRepository<T extends Model> {
     return res.map((e) => fromMap(e)).toList();
   }
 
+  Future<List<T>> lastMins(int minsAgo) async {
+    return (await query(
+        after: clock
+            .now()
+            .subtract(Duration(minutes: minsAgo))
+            .millisecondsSinceEpoch));
+  }
+
   Future<bool> save(T model) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
@@ -118,6 +126,9 @@ abstract class ModelRepository<T extends Model> {
     assert(keys.length == types.length);
 
     for (var i = 0; i < keys.length; i++) {
+      if (m[keys[i]] == null) {
+        continue; // Ignore if null
+      }
       if (m[keys[i]].runtimeType != types[i]) {
         return false;
       }

@@ -37,7 +37,8 @@ const sgvTable = DBTable(sgvsTableName, '''
     )
   ''');
 
-const bolusTable = DBTable('bolus', '''
+const String bolusTableName = 'bolus';
+const bolusTable = DBTable(bolusTableName, '''
     CREATE TABLE bolus (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value REAL,
@@ -47,7 +48,8 @@ const bolusTable = DBTable('bolus', '''
     )
   ''');
 
-const carbsTable = DBTable('carbs', '''
+const String carbsTableName = 'carbs';
+const carbsTable = DBTable(carbsTableName, '''
     CREATE TABLE carbs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       value INTEGER,
@@ -57,7 +59,8 @@ const carbsTable = DBTable('carbs', '''
     )
   ''');
 
-const tempbasalTable = DBTable('tempbasal', '''
+const String tempbasalTableName = 'tempbasal';
+const tempbasalTable = DBTable(tempbasalTableName, '''
     CREATE TABLE tempbasal (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       start INTEGER,
@@ -71,7 +74,8 @@ const tempbasalTable = DBTable('tempbasal', '''
     )
   ''');
 
-const temptargetsTable = DBTable('temptargets', '''
+const String temptargetsTableName = 'temptargets';
+const temptargetsTable = DBTable(temptargetsTableName, '''
     CREATE TABLE temptargets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       start INTEGER,
@@ -86,7 +90,8 @@ const temptargetsTable = DBTable('temptargets', '''
     )
   ''');
 
-const profileTable = DBTable('profile', '''
+const String profileTableName = 'profile';
+const profileTable = DBTable(profileTableName, '''
     CREATE TABLE profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -111,7 +116,8 @@ const profileTable = DBTable('profile', '''
       )
   ''');
 
-const treatmentsView = DBTable('treatments', '''
+const String treatmentsTableName = 'treatments';
+const treatmentsView = DBTable(treatmentsTableName, '''
     CREATE VIEW treatments AS
     WITH 
     b as  (SELECT  timestamp, value as insulin FROM bolus) ,
@@ -120,7 +126,8 @@ const treatmentsView = DBTable('treatments', '''
     SELECT * from x ORDER by timestamp desc
   ''');
 
-const concatTreatmentsView = DBTable('concatTreatments', '''
+const String concatTreatmentsTableName = 'concatTreatments';
+const concatTreatmentsView = DBTable(concatTreatmentsTableName, '''
     CREATE VIEW concatTreatments AS
       SELECT
         COUNT(*) as count,

@@ -99,7 +99,7 @@ class History extends StatelessWidget {
     if (updateCn.summary.dateRetrieved == Dates.earliest) {
       return [];
     }
-    var history = await Treatment.concatSummary(60 * 6);
+    var history = await Treatment.lastMins(60 * 6);
 
     return [for (var t in history) historyRow(t)]
         .where((row) => row != null)

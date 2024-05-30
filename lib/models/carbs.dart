@@ -1,32 +1,57 @@
-import 'package:carer/sql/carer_db.dart';
+import 'package:carer/models/model.dart';
+import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/math.dart';
-import 'package:clock/clock.dart';
 
-class Carbs {
+class CarbsRepository extends ModelRepository<Carbs> {
+  const CarbsRepository() : super(carbsTableName);
+
+  @override
+  Carbs fromMap(Map<String, Object?> map) {
+    var requiredKeys = ["value", "timestamp"];
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, requiredKeys, [int, int]))) {
+      throw ArgumentError("Invalid Carbs Map: $map");
+    }
+
+    {
+      return Carbs(
+        id: map["id"] as int?,
+        value: map["value"] as int,
+        date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
+      );
+    }
+  }
+
+  @override
+  Map<String, Object> toSQLMap(Carbs model) {
+    return {
+      "value": model.value,
+      "timestamp": model.date.millisecondsSinceEpoch,
+    };
+  }
+}
+
+class Carbs extends Model {
+  static const CarbsRepository _q = CarbsRepository();
+
+  @override
+  ModelRepository get repository => _q;
+
+  @override
+  final int? id;
+
   final int value;
+  @override
   final DateTime date;
 
   Carbs({
+    this.id,
     required this.value,
     required this.date,
   });
 
-  factory Carbs.fromMap(Map<String, dynamic> map) {
-    return Carbs(
-      value: map["value"],
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
-    );
-  }
-
-  static Future<int> createOrUpdate(List<Carbs> models) async {
-    var db = await CarerDB.instance;
-    var rawModels = models.map((e) {
-      return {
-        "value": e.value,
-        "timestamp": e.date.millisecondsSinceEpoch,
-      };
-    }).toList();
-    return db.batchCreateOrUpdateCarbs(rawModels);
+  factory Carbs.fromMap(Map<String, Object?> map) {
+    return _q.fromMap(map);
   }
 
   String get str {
@@ -37,19 +62,8 @@ class Carbs {
     }
   }
 
+  // return the last sgvs for minutes
   static Future<List<Carbs>> lastMins(int minsAgo) async {
-    var db = await CarerDB.instance;
-
-    var rawModels = await db.carbs(
-        after: clock
-            .now()
-            .subtract(Duration(minutes: minsAgo))
-            .millisecondsSinceEpoch);
-    List<Carbs> ret = [];
-    for (var rModel in rawModels) {
-      ret.add(Carbs.fromMap(rModel));
-    }
-
-    return ret;
+    return (await _q.lastMins(minsAgo));
   }
 }

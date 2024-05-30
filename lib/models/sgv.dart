@@ -127,11 +127,7 @@ class SGV extends Model {
 
   // return the last sgvs for minutes
   static Future<List<SGV>> lastMins(int minsAgo) async {
-    return (await _q.query(
-        after: clock
-            .now()
-            .subtract(Duration(minutes: minsAgo))
-            .millisecondsSinceEpoch));
+    return (await _q.lastMins(minsAgo));
   }
 
   static Future<double> percentInRangeToday(int low, int high) async {

@@ -1,9 +1,58 @@
 // Non persisted combined model of Bolus and Carbs
-import 'package:carer/sql/carer_db.dart';
+import 'package:carer/models/model.dart';
+import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
-class Treatment {
+class TreatmentRepository extends ModelRepository<Treatment> {
+  const TreatmentRepository()
+      : super(concatTreatmentsTableName, timestampField: "max_ts");
+
+  @override
+  Treatment fromMap(Map<String, Object?> map) {
+    var requiredKeys = ["count", "max_ts"];
+    var allKeys = ["count", "max_ts", "carbs", "insulin"];
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, allKeys, [int, int, int, double]))) {
+      throw ArgumentError("Invalid Treatment Map: $map");
+    }
+
+    {
+      return Treatment(
+        count: map["count"] as int,
+        date: DateTime.fromMillisecondsSinceEpoch(map["max_ts"] as int),
+        carbs: map["carbs"] as int?,
+        insulin: map["insulin"] as double?,
+      );
+    }
+  }
+
+  @override
+  Map<String, Object> toSQLMap(Treatment model) {
+    Map<String, Object> map = {
+      "count": model.count,
+      "max_ts": model.date.millisecondsSinceEpoch,
+    };
+    if (model.carbs != null) {
+      map["carbs"] = model.carbs!;
+    }
+    if (model.insulin != null) {
+      map["insulin"] = model.insulin!;
+    }
+    return map;
+  }
+}
+
+class Treatment extends Model {
+  static const TreatmentRepository _q = TreatmentRepository();
+
+  @override
+  ModelRepository get repository => _q;
+
+  @override
+  get id => null; // This is a view
+
+  @override
   DateTime date;
   double? insulin;
   int? carbs;
@@ -11,29 +60,13 @@ class Treatment {
 
   Treatment({required this.date, this.insulin, this.carbs, this.count = 1});
 
-  static Future<List<Treatment>> concatSummary(int minsAgo) async {
-    var db = await CarerDB.instance;
-    List<Treatment> treatments = [];
-    for (var e in (await db.concatedTreatments(
-        after: clock
-            .now()
-            .subtract(Duration(minutes: minsAgo))
-            .millisecondsSinceEpoch))) {
-      treatments.add(
-        Treatment(
-          date: DateTime.fromMillisecondsSinceEpoch(e["max_ts"] as int),
-          insulin: e["insulin"] as double?,
-          carbs: e["carbs"] as int?,
-          count: e["count"] as int,
-        ),
-      );
-    }
-
-    return treatments;
+  static Future<List<Treatment>> lastMins(int minsAgo) async {
+    return _q.lastMins(minsAgo);
   }
 
   bool get isConcated => count > 1;
 
+  @override
   Duration get age {
     return clock.now().difference(date);
   }

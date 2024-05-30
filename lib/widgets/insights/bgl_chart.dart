@@ -157,7 +157,7 @@ class BGLChart extends StatelessWidget {
 
   Future<List<FlSpot>> treatmentsSpots(Summary summary, int minsAgo) async {
     List<FlSpot> spots = [];
-    var lastTreatments = await Treatment.concatSummary(minsAgo);
+    var lastTreatments = await Treatment.lastMins(minsAgo);
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
     Treatment? lastTreatment;
