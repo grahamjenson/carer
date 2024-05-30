@@ -11,6 +11,8 @@ class CarerDB {
   final Database _db;
   CarerDB(this._db);
 
+  Database get db => _db;
+
   static Future<CarerDB> _createInstance() async {
     var db = await _openDatabaseAndCreateTables();
     return CarerDB(db);
@@ -559,7 +561,7 @@ Future<int> upsertQuery(
     batch.rawQuery(upsert, valuesList);
   }
 
-  var results = await batch.commit();
+  var results = await batch.commit(continueOnError: true);
   return results.length;
 }
 

@@ -74,7 +74,8 @@ class UpdateCN extends ChangeNotifier {
       for (var sgv in summary.sgvs.sgvs) {
         sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
       }
-      int sgvUpdates = await SGV.createOrUpdate(sgvs);
+      var saveAll = sgvs.map((e) => e.save()).toList();
+      int sgvUpdates = (await Future.wait(saveAll)).where((b) => b).length;
 
       List<Bolus> boluses = [];
       for (var bolus in summary.treatments.boluses()) {

@@ -1,10 +1,40 @@
 import 'package:carer/models/constants.dart';
+import 'package:carer/models/model.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
 
-class SGV {
+class SGVRepository extends ModelRepository<SGV> {
+  const SGVRepository() : super("sgvs");
+
+  @override
+  SGV fromMap(Map<String, dynamic> map) {
+    return SGV(
+      id: map["id"],
+      value: map["value"],
+      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
+      rate5m: map["rate5m"],
+    );
+  }
+
+  @override
+  Map<String, Object> toSQLMap(SGV model) {
+    return {
+      "value": model.value,
+      "timestamp": model.date.millisecondsSinceEpoch,
+    };
+  }
+}
+
+class SGV extends Model {
+  static const SGVRepository _q = SGVRepository();
+
+  @override
+  ModelRepository get repository => _q;
+
+  @override
   final int? id;
   final int value;
+  @override
   final DateTime date;
   int? rate5m;
 
@@ -15,17 +45,14 @@ class SGV {
     this.rate5m,
   });
 
-  factory SGV.fromMap(Map<String, dynamic> map) {
-    return SGV(
-      id: map["id"],
-      value: map["value"],
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]),
-      rate5m: map["rate5m"],
-    );
+  @override
+  List<String> validate() {
+    // TODO: implement validate
+    throw UnimplementedError();
   }
 
-  Duration get age {
-    return clock.now().difference(date);
+  factory SGV.fromMap(Map<String, dynamic> map) {
+    return _q.fromMap(map);
   }
 
   double sgvU(Unit unit) {
@@ -106,16 +133,5 @@ class SGV {
     }
 
     return sgvsTodayInRange / sgvsToday;
-  }
-
-  static Future<int> createOrUpdate(List<SGV> models) async {
-    var db = await CarerDB.instance;
-    var rawModels = models.map((e) {
-      return {
-        "value": e.value,
-        "timestamp": e.date.millisecondsSinceEpoch,
-      };
-    }).toList();
-    return db.batchCreateOrUpdateSGVs(rawModels);
   }
 }
