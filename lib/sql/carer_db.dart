@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:path/path.dart';
@@ -20,16 +21,17 @@ class CarerDB {
 
   static Future<String> getPath() async {
     final databasePath = await getDatabasesPath();
-    final path = join(databasePath, 'carer.db');
+    var name = 'carer.db';
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      name = 'test_carer_${Random().nextInt(999999999)}.db';
+    }
+    final path = join(databasePath, name);
     return path;
   }
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
     var version = 23;
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
-      version = DateTime.now().millisecondsSinceEpoch;
-    }
     print("Opening database at $path");
     var db = await openDatabase(
       path,
