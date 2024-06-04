@@ -6,6 +6,7 @@ import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/models/state_data.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
@@ -133,8 +134,15 @@ class UpdateCN extends ChangeNotifier {
       );
       var profileUpdate = await profile.save();
 
+      var state = _summary.state;
+      var stateData = await StateData.instance;
+      await stateData.setIOB(state.iob);
+      await stateData.setCOB(state.cob.toDouble());
+      await stateData.setBattery(state.battery.toDouble());
+      await stateData.setCAge(state.cage.toDouble());
+
       print(
-          "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate");
+          "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, ${stateData.cache}");
 
       notifyListeners();
     });

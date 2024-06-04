@@ -8,7 +8,8 @@ import 'package:sqflite/sqflite.dart';
 
 class KeyValueStore {
   final Database _db;
-  final Map<String, dynamic> _kvdbCache = {};
+  final Map<String, dynamic> _cache = {};
+  Map<String, dynamic> get cache => _cache;
 
   static final Future<KeyValueStore> _instance = _createInstance();
   static Future<KeyValueStore> get instance => _instance;
@@ -19,7 +20,7 @@ class KeyValueStore {
   static Future<KeyValueStore> _createInstance() async {
     final db = await openDatabaseAndCreateTables();
     var kvdb = KeyValueStore(db);
-    await kvdb._populate();
+    await kvdb.internalPopulate();
     return kvdb;
   }
 
@@ -44,7 +45,7 @@ class KeyValueStore {
   }
 
   // populate the cache
-  Future<bool> _populate() async {
+  Future<bool> internalPopulate() async {
     var results = await _db.query(KVTables.kvTableName);
     for (var result in results) {
       if (result['k'] == null || result['v'] == null || result['t'] == null) {
@@ -57,19 +58,19 @@ class KeyValueStore {
 
       switch (type) {
         case 'Bool':
-          _kvdbCache[key] = value == '1';
+          _cache[key] = value == '1';
           break;
         case 'Int':
-          _kvdbCache[key] = int.parse(value);
+          _cache[key] = int.parse(value);
           break;
         case 'Double':
-          _kvdbCache[key] = double.parse(value);
+          _cache[key] = double.parse(value);
           break;
         case 'String':
-          _kvdbCache[key] = value;
+          _cache[key] = value;
           break;
         default:
-          _kvdbCache[key] = value;
+          _cache[key] = value;
           break;
       }
     }
@@ -77,55 +78,54 @@ class KeyValueStore {
   }
 
   int count() {
-    return _kvdbCache.length;
+    return _cache.length;
   }
 
   reloadCache() async {
-    _kvdbCache.clear();
-    await _populate();
+    _cache.clear();
+    await internalPopulate();
   }
 
   Future<int> deleteAll() async {
-    _kvdbCache.clear();
+    _cache.clear();
     int ret = await _db.delete(KVTables.kvTableName);
     return ret;
   }
 
   Future<bool> delete(String key) async {
-    _kvdbCache.remove(key);
+    _cache.remove(key);
     int ret = await _db.rawDelete(KVQueries.delete, [key]);
     return ret == 1;
   }
 
   // Getter Setters
-  Set<String> getKeys() => Set<String>.from(_kvdbCache.keys);
+  Set<String> getKeys() => Set<String>.from(_cache.keys);
 
   /// Reads a value of any type from persistent storage.
   Object? get(String key, {Object? defaultValue}) =>
-      _kvdbCache[key] ?? defaultValue;
+      _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// bool.
   bool? getBool(String key, {bool? defaultValue}) =>
-      _kvdbCache[key] ?? defaultValue;
+      _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not
   /// an int.
-  int? getInt(String key, {int? defaultValue}) =>
-      _kvdbCache[key] ?? defaultValue;
+  int? getInt(String key, {int? defaultValue}) => _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// double.
   double? getDouble(String key, {double? defaultValue}) =>
-      _kvdbCache[key] ?? defaultValue;
+      _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// String.
   String? getString(String key, {String? defaultValue}) =>
-      _kvdbCache[key] ?? defaultValue;
+      _cache[key] ?? defaultValue;
 
   /// Returns true if the persistent storage contains the given [key].
-  bool containsKey(String key) => _kvdbCache.containsKey(key);
+  bool containsKey(String key) => _cache.containsKey(key);
 
   /// Saves a boolean [value] to persistent storage in the background.
   Future<bool> setBool(String key, bool value) => _setValue('Bool', key, value);
@@ -146,7 +146,7 @@ class KeyValueStore {
   Future<bool> _setValue(String valueType, String key, Object value) async {
     ArgumentError.checkNotNull(value, 'value');
 
-    _kvdbCache[key] = value;
+    _cache[key] = value;
 
     if (valueType == 'Bool') {
       value = (value as bool) ? '1' : '0';

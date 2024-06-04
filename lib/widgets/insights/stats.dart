@@ -1,9 +1,9 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
-import 'package:carer/models/kv_data.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/models/state_data.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -47,6 +47,7 @@ class Stats extends StatelessWidget {
   }
 
   Future<Window> futureWindow(SettingsCN settings) async {
+    var stateData = await StateData.instance;
     return Window(
       title: "Stats",
       child: Expanded(
@@ -76,10 +77,10 @@ class Stats extends StatelessWidget {
                       SizedBox(width: 50, child: Text('stat', style: heading))),
             ],
             rows: [
-              await iob(),
-              await cob(),
-              await power(),
-              await cage(),
+              await iob(stateData),
+              await cob(stateData),
+              await power(stateData),
+              await cage(stateData),
               await basal(),
               await target(settings.unit),
               await fifteenMinDiff(settings.unit),
@@ -91,7 +92,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> iob() async {
+  Future<DataRow> iob(StateData stateData) async {
     return DataRow(
       cells: [
         const DataCell(
@@ -100,14 +101,14 @@ class Stats extends StatelessWidget {
         DataCell(
           SmartText(
               textAlign: TextAlign.center,
-              texts: ["${await KVData.iob()}", "u"],
+              texts: ["${stateData.iob()}", "u"],
               styles: const [row, small]),
         ),
       ],
     );
   }
 
-  Future<DataRow> cob() async {
+  Future<DataRow> cob(StateData stateData) async {
     return DataRow(
       cells: [
         const DataCell(
@@ -115,34 +116,32 @@ class Stats extends StatelessWidget {
         ),
         DataCell(
           SmartText(
-              texts: ["${await KVData.cob()}", "g"],
-              styles: const [row, small]),
+              texts: ["${stateData.cob()}", "g"], styles: const [row, small]),
         ),
       ],
     );
   }
 
-  Future<DataRow> power() async {
+  Future<DataRow> power(StateData stateData) async {
     return DataRow(
       cells: [
         const DataCell(Text("Power", style: heading)),
         DataCell(
           SmartText(
-              texts: ["${await KVData.battery()}", "%"],
+              texts: ["${stateData.battery()}", "%"],
               styles: const [row, small]),
         ),
       ],
     );
   }
 
-  Future<DataRow> cage() async {
+  Future<DataRow> cage(StateData stateData) async {
     return DataRow(
       cells: [
         const DataCell(Text("cage", style: heading)),
         DataCell(
           SmartText(
-              texts: ["${await KVData.cage()}", "h"],
-              styles: const [row, small]),
+              texts: ["${stateData.cage()}", "h"], styles: const [row, small]),
         ),
       ],
     );
