@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
@@ -16,6 +18,24 @@ class BGL extends StatefulWidget {
 }
 
 class _BGLState extends State<BGL> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        // This will trigger a rebuild of your widget every second.
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<SettingsCN, UpdateCN>(

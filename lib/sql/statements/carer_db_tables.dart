@@ -20,6 +20,9 @@ const dbViews = [
   treatmentsView,
   concatTreatmentsView,
   sgvsCleanView,
+  profileChangeTimesView,
+  profileHourView,
+  tempTargetAtTime,
 ];
 
 // Used for key values like iob...
@@ -90,11 +93,14 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
     )
   ''');
 
+// TODO this doesnt work because you could have profile1 -> profile2 -> profile1 which would mean profile 1 has multiple start stop dates
+// TODO need to find real start and stop dates for profiles to properly find real start/stop dates on them.
 const String profileTableName = 'profile';
 const profileTable = DBTable(profileTableName, '''
     CREATE TABLE profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       timestamp INTEGER,
+      datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
 
       dia INTEGER,
       units TEXT,
@@ -172,4 +178,195 @@ const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
       )
     ORDER BY
       timestamp DESC
+  ''');
+
+// Profile hour table, each profile is exploded into the values they provide each hour
+
+const String profileHourViewName = "profileHourView";
+const profileHourView = DBTable(profileHourViewName, '''
+ CREATE VIEW profileHourView AS
+with hours(hour) as (
+  values
+    (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),
+    (12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23)
+)
+select id, hour, timestamp, datetime, dia, units, timezone,
+CASE hour 
+	when 0 then cr0
+  when 1 then cr1
+  when 2 then cr2
+  when 3 then cr3
+	when 4 then cr4
+  when 5 then cr5
+  when 6 then cr6
+  when 7 then cr7
+	when 8 then cr8
+  when 9 then cr9
+  when 10 then cr10
+  when 11 then cr11
+	when 12 then cr12
+  when 13 then cr13
+  when 14 then cr14
+  when 15 then cr15
+	when 16 then cr16
+  when 17 then cr17
+  when 18 then cr18
+  when 19 then cr19
+	when 20 then cr20
+  when 21 then cr21
+  when 22 then cr22
+  when 23 then cr23
+end cr,
+CASE hour 
+	when 0 then isf0
+  when 1 then isf1
+  when 2 then isf2
+  when 3 then isf3
+	when 4 then isf4
+  when 5 then isf5
+  when 6 then isf6
+  when 7 then isf7
+	when 8 then isf8
+  when 9 then isf9
+  when 10 then isf10
+  when 11 then isf11
+	when 12 then isf12
+  when 13 then isf13
+  when 14 then isf14
+  when 15 then isf15
+	when 16 then isf16
+  when 17 then isf17
+  when 18 then isf18
+  when 19 then isf19
+	when 20 then isf20
+  when 21 then isf21
+  when 22 then isf22
+  when 23 then isf23
+end isf,
+CASE hour 
+	when 0 then basal0
+  when 1 then basal1
+  when 2 then basal2
+  when 3 then basal3
+	when 4 then basal4
+  when 5 then basal5
+  when 6 then basal6
+  when 7 then basal7
+	when 8 then basal8
+  when 9 then basal9
+  when 10 then basal10
+  when 11 then basal11
+	when 12 then basal12
+  when 13 then basal13
+  when 14 then basal14
+  when 15 then basal15
+	when 16 then basal16
+  when 17 then basal17
+  when 18 then basal18
+  when 19 then basal19
+	when 20 then basal20
+  when 21 then basal21
+  when 22 then basal22
+  when 23 then basal23
+end basal,
+CASE hour 
+	when 0 then tlow0
+  when 1 then tlow1
+  when 2 then tlow2
+  when 3 then tlow3
+	when 4 then tlow4
+  when 5 then tlow5
+  when 6 then tlow6
+  when 7 then tlow7
+	when 8 then tlow8
+  when 9 then tlow9
+  when 10 then tlow10
+  when 11 then tlow11
+	when 12 then tlow12
+  when 13 then tlow13
+  when 14 then tlow14
+  when 15 then tlow15
+	when 16 then tlow16
+  when 17 then tlow17
+  when 18 then tlow18
+  when 19 then tlow19
+	when 20 then tlow20
+  when 21 then tlow21
+  when 22 then tlow22
+  when 23 then tlow23
+end tlow,
+CASE hour 
+	when 0 then thigh0
+  when 1 then thigh1
+  when 2 then thigh2
+  when 3 then thigh3
+	when 4 then thigh4
+  when 5 then thigh5
+  when 6 then thigh6
+  when 7 then thigh7
+	when 8 then thigh8
+  when 9 then thigh9
+  when 10 then thigh10
+  when 11 then thigh11
+	when 12 then thigh12
+  when 13 then thigh13
+  when 14 then thigh14
+  when 15 then thigh15
+	when 16 then thigh16
+  when 17 then thigh17
+  when 18 then thigh18
+  when 19 then thigh19
+	when 20 then thigh20
+  when 21 then thigh21
+  when 22 then thigh22
+  when 23 then thigh23
+end thigh
+from 
+	hours join profile;
+''');
+
+// This is a list of timestamps where the profile may have changed in the last couple days.
+// TODO, expand the days for things like autotune
+const String profileChangeTimesViewName = "profileChangeTimesView";
+const profileChangeTimesView = DBTable(profileChangeTimesViewName, '''
+CREATE VIEW profileChangeTimesView AS
+    with hours(hour) as (
+      values
+        (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),
+        (12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23)
+    ),
+    days(day) as (values (0),(1),(2)),
+    start_of_hour(soh, tfhour) as (values (
+      strftime('%s', datetime(strftime('%Y-%m-%d %H:00:00', 'now'))) * 1000, strftime('%H', 'now', 'localtime'))
+    ),
+    times as (
+      select
+        soh - ((days.day*24 + hours.hour) * 60 * 60 * 1000) as timestamp,
+        datetime((soh - ((days.day*24 + hours.hour) * 60 * 60 * 1000))/1000, 'unixepoch') as datetime,
+        cast(MOD(tfhour - (days.day*24 + hours.hour) + 24*30 ,24) as int) as hour
+      from days join hours join start_of_hour
+      )
+    select * from times;
+''');
+
+// this takes all temptarget start and endtiems as that is when things change.
+const String tempTargetAtTimeNAme = "tempTargetAtTime";
+const tempTargetAtTime = DBTable(tempTargetAtTimeNAme, '''
+CREATE VIEW tempTargetAtTime AS
+    with 
+    temptargettime as (
+      select start as timestamp from temptargets union select end+1 as timestamp from temptargets
+    ),
+    temptargetchanges as (
+      select 
+			timestamp, 
+			datetime(timestamp/1000, 'unixepoch') as datetime,
+			strftime('%H', datetime(timestamp/1000, 'unixepoch'), 'localtime') as hour
+        from temptargettime
+    ),
+    alldates as (select * from temptargetchanges union select * from profileChangeTimesView),
+	current_profile as (select id from profile order by timestamp desc limit 1),
+	profile_hours as (select * from current_profile join profileHourView on current_profile.id = profileHourView.id),
+	profile_targets as (select alldates.timestamp, alldates.datetime, alldates.hour, profile_hours.tlow as profile_low, profile_hours.thigh as profile_high from alldates left join profile_hours on profile_hours.hour = alldates.hour)
+	select * from profile_targets order by timestamp desc;
   ''');

@@ -136,15 +136,27 @@ class UpdateCN extends ChangeNotifier {
 
       var state = _summary.state;
       var stateData = await StateData.instance;
-      await stateData.setIOB(state.iob);
-      await stateData.setCOB(state.cob.toDouble());
-      await stateData.setBattery(state.battery.toDouble());
-      await stateData.setCAge(state.cage.toDouble());
+      var iob = await stateData.setIOB(state.iob);
+      var cob = await stateData.setCOB(state.cob.toDouble());
+      var battery = await stateData.setBattery(state.battery.toDouble());
+      var cage = await stateData.setCAge(state.cage.toDouble());
 
       print(
-          "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, ${stateData.cache}");
+          "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, $iob, $cob, $battery, $cage");
 
-      notifyListeners();
+      if (cage ||
+          cob ||
+          iob ||
+          battery ||
+          profileUpdate ||
+          tempBasalUpdates > 0 ||
+          tempTargetUpdates > 0 ||
+          sgvUpdates > 0 ||
+          bolusUpdates > 0 ||
+          carbUpdates > 0) {
+        print("notifiying change listeners");
+        notifyListeners();
+      }
     });
   }
 }
