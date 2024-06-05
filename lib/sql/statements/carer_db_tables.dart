@@ -361,12 +361,23 @@ CREATE VIEW tempTargetAtTime AS
       select 
 			timestamp, 
 			datetime(timestamp/1000, 'unixepoch') as datetime,
-			strftime('%H', datetime(timestamp/1000, 'unixepoch'), 'localtime') as hour
+			cast(strftime('%H', datetime(timestamp/1000, 'unixepoch'), 'localtime')  as int )as hour
         from temptargettime
     ),
     alldates as (select * from temptargetchanges union select * from profileChangeTimesView),
 	current_profile as (select id from profile order by timestamp desc limit 1),
 	profile_hours as (select * from current_profile join profileHourView on current_profile.id = profileHourView.id),
-	profile_targets as (select alldates.timestamp, alldates.datetime, alldates.hour, profile_hours.tlow as profile_low, profile_hours.thigh as profile_high from alldates left join profile_hours on profile_hours.hour = alldates.hour)
-	select * from profile_targets order by timestamp desc;
+	profile_targets as (
+		select 
+			alldates.timestamp,
+			alldates.datetime, 
+			alldates.hour, 
+			profile_hours.tlow as profile_low, 
+			profile_hours.thigh as profile_high 
+		from 
+			alldates  join profile_hours on alldates.hour = profile_hours.hour
+),
+all_targets as (select timestamp, datetime, coalesce(targetBottom, profile_low) as target_low, coalesce(targetTop, profile_high)  as target_high, targetTop is not NULL as is_temp_target from  profile_targets  left join temptargets  on  profile_targets.timestamp >= temptargets.start and profile_targets.timestamp < temptargets.end)
+
+select * from all_targets order by timestamp desc;
   ''');
