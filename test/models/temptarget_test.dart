@@ -22,16 +22,16 @@ void main() {
       var tt = TempTarget(
         startDate: now.add(min5),
         duration: 60,
-        targetBottom: 100,
-        targetTop: 120,
+        targetLow: 100,
+        targetHigh: 120,
       );
       expect(await tt.save(), true);
 
       var tt1 = await TempTarget.query();
       expect(tt1.length, 1);
       expect(tt1[0].startDate, now.add(min5));
-      expect(tt1[0].targetBottom, 100);
-      expect(tt1[0].targetTop, 120);
+      expect(tt1[0].targetLow, 100);
+      expect(tt1[0].targetHigh, 120);
       expect(tt1[0].duration, 60);
     });
   });

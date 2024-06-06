@@ -111,8 +111,8 @@ class UpdateCN extends ChangeNotifier {
         tempTargets.add(TempTarget(
             startDate: tempTarget.start,
             duration: tempTarget.duration,
-            targetTop: tempTarget.targetTop,
-            targetBottom: tempTarget.targetBottom));
+            targetHigh: tempTarget.targetTop,
+            targetLow: tempTarget.targetBottom));
       }
 
       var saveAllTTs = tempTargets.map((e) => e.save()).toList();

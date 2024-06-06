@@ -19,6 +19,11 @@ abstract class Model {
     // TODO update the id of the model
     return repository.save(this);
   }
+
+  @override
+  String toString() {
+    return repository.toSQLMap(this).toString();
+  }
 }
 
 abstract class ModelRepository<T extends Model> {

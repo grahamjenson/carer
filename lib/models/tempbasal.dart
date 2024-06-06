@@ -11,7 +11,7 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
     var requiredKeys = ["start", "duration", "value"];
     if (!(validateNotNull(map, requiredKeys) &&
         validateType(map, requiredKeys, [int, int, double]))) {
-      throw ArgumentError("Invalid SVG Map: $map");
+      throw ArgumentError("Invalid TempBasal Map: $map");
     }
 
     return TempBasal(

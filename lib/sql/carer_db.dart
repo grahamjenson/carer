@@ -31,7 +31,7 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
-    var version = 2;
+    var version = 4;
     print("Opening database at $path");
     var db = await openDatabase(
       path,

@@ -134,7 +134,7 @@ class Profile extends Model {
   static Future<(int, int)> targetAtTime(DateTime date) async {
     var tt = await TempTarget.atTime(date);
     if (tt != null) {
-      return (tt.targetBottom, tt.targetTop);
+      return (tt.targetHigh, tt.targetLow);
     }
     var profile = await Profile.profile();
     if (profile == null) {

@@ -3,6 +3,7 @@ import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/models/target.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
@@ -224,13 +225,21 @@ class BGLChart extends StatelessWidget {
   Future<(List<FlSpot>, List<FlSpot>)> targetSpots(int minsAgo) async {
     List<FlSpot> lowTargets = [];
     List<FlSpot> highTargets = [];
-    for (int i = 0; i < minsAgo; i++) {
-      var (lowTarget, highTarget) = await Profile.targetAtTime(
-          clock.now().subtract(Duration(minutes: i)));
 
-      lowTargets.add(FlSpot(-i.toDouble(), lowTarget.toDouble()));
-      highTargets.add(FlSpot(-i.toDouble(), highTarget.toDouble()));
+    var after =
+        clock.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch;
+
+    var before = clock.now().millisecondsSinceEpoch;
+
+    var targets = await Target.query(before: before, after: after);
+
+    for (var t in targets) {
+      lowTargets
+          .add(FlSpot(t.age.inMinutes.toDouble(), t.targetLow.toDouble()));
+      highTargets
+          .add(FlSpot(t.age.inMinutes.toDouble(), t.targetHigh.toDouble()));
     }
+
     return (lowTargets, highTargets);
   }
 
