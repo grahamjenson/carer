@@ -73,7 +73,7 @@ const tempbasalTable = DBTable(tempbasalTableName, '''
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
 
       value REAL,
-      UNIQUE(start, value)
+      UNIQUE(start)
     )
   ''');
 
@@ -89,7 +89,7 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
 
       targetHigh INTEGER,
       targetLow INTEGER,
-      UNIQUE(start, targetHigh, targetLow)
+      UNIQUE(start)
     )
   ''');
 
@@ -365,7 +365,8 @@ profile_targets AS (
     timestampMinutes.datetime, 
     timestampMinutes.hour, 
     profile_hours.tlow AS profile_low, 
-    profile_hours.thigh AS profile_high 
+    profile_hours.thigh AS profile_high,
+    profile_hours.basal AS profile_basal
   FROM 
     timestampMinutes JOIN profile_hours ON timestampMinutes.hour = profile_hours.hour
 ),
@@ -373,11 +374,15 @@ all_targets AS (
 SELECT 
   timestamp, 
   datetime, 
-  COALESCE(targetLow, profile_low) AS targetLow, 
-  COALESCE(targetHigh, profile_high) AS targetHigh, 
-  temptargets.targetHigh is not NULL AS isTempTarget 
+  COALESCE(temptargets.targetLow, profile_low) AS targetLow, 
+  COALESCE(temptargets.targetHigh, profile_high) AS targetHigh, 
+  COALESCE(tempbasal.value, profile_basal) AS basal, 
+  temptargets.targetHigh is not NULL AS isTempTarget,
+  tempbasal.value is not NULL AS isTempBasal 
 FROM 
-  profile_targets LEFT JOIN temptargets ON profile_targets.timestamp >= temptargets.start and profile_targets.timestamp < temptargets.end  
+  profile_targets 
+  LEFT JOIN temptargets ON profile_targets.timestamp >= temptargets.start and profile_targets.timestamp < temptargets.end
+  LEFT JOIN tempbasal ON profile_targets.timestamp >= tempbasal.start and profile_targets.timestamp < tempbasal.end
 )
 
 SELECT * FROM all_targets ORDER BY timestamp desc;

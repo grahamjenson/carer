@@ -55,6 +55,11 @@ class TempBasal extends Model {
     required this.value,
   });
 
+  @override
+  List<String> uniqueValues() {
+    return ["start"];
+  }
+
   DateTime get dateEnd {
     return startDate.add(Duration(seconds: duration));
   }

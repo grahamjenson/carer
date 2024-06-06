@@ -1,7 +1,6 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
-import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/target.dart';
 import 'package:carer/models/treatments.dart';
@@ -86,10 +85,17 @@ class BGLChart extends StatelessWidget {
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now
 
+    var after = clock
+        .now()
+        .subtract(Duration(minutes: minsAgo + 1))
+        .millisecondsSinceEpoch;
+    var before = clock.now().millisecondsSinceEpoch;
+    var targets = await Target.query(before: before, after: after);
+
     // convert the last hours of summary sgvs into flspots
     var bglSpotData = await bglSpots(minsAgo);
-    var (basalSpotData, maxBasal) = await basalSpots(minsAgo);
-    var (lowTargets, highTargets) = await targetSpots(minsAgo);
+    var (basalSpotData, maxBasal) = await basalSpots(targets);
+    var (lowTargets, highTargets) = await targetSpots(targets);
     var treatments = await treatmentsSpots(minsAgo);
 
     var bglLineData = LineChartBarData(
@@ -192,15 +198,13 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  Future<(List<FlSpot>, double)> basalSpots(int minsAgo) async {
+  Future<(List<FlSpot>, double)> basalSpots(List<Target> targets) async {
     List<BasalSpot> spots = [];
     // Check the basal at every minute
-    for (int i = 0; i < minsAgo; i++) {
-      var basal =
-          await Profile.basalAtTime(clock.now().subtract(Duration(minutes: i)));
-
-      spots.add(BasalSpot(-i.toDouble(), basal.toDouble(), basal.toDouble()));
+    for (var t in targets) {
+      spots.add(BasalSpot(-t.age.inMinutes.toDouble(), t.basal, t.basal));
     }
+
     if (spots.isEmpty) {
       return (spots, 1.0);
     }
@@ -222,22 +226,15 @@ class BGLChart extends StatelessWidget {
     return (spots, maxBasal);
   }
 
-  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(int minsAgo) async {
+  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(List<Target> targets) async {
     List<FlSpot> lowTargets = [];
     List<FlSpot> highTargets = [];
 
-    var after =
-        clock.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch;
-
-    var before = clock.now().millisecondsSinceEpoch;
-
-    var targets = await Target.query(before: before, after: after);
-
     for (var t in targets) {
       lowTargets
-          .add(FlSpot(t.age.inMinutes.toDouble(), t.targetLow.toDouble()));
+          .add(FlSpot(-t.age.inMinutes.toDouble(), t.targetLow.toDouble()));
       highTargets
-          .add(FlSpot(t.age.inMinutes.toDouble(), t.targetHigh.toDouble()));
+          .add(FlSpot(-t.age.inMinutes.toDouble(), t.targetHigh.toDouble()));
     }
 
     return (lowTargets, highTargets);

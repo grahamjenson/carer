@@ -59,6 +59,11 @@ class TempTarget extends Model {
     required this.targetHigh,
   });
 
+  @override
+  List<String> uniqueValues() {
+    return ["start"];
+  }
+
   DateTime get dateEnd {
     return startDate.add(Duration(seconds: duration));
   }

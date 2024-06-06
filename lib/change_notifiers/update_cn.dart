@@ -102,7 +102,7 @@ class UpdateCN extends ChangeNotifier {
             value: tempBasal.absolute));
       }
 
-      var saveAllTBs = tempBasals.map((e) => e.save()).toList();
+      var saveAllTBs = tempBasals.map((e) => e.upsert()).toList();
       int tempBasalUpdates =
           (await Future.wait(saveAllTBs)).where((b) => b).length;
 
@@ -115,7 +115,7 @@ class UpdateCN extends ChangeNotifier {
             targetLow: tempTarget.targetBottom));
       }
 
-      var saveAllTTs = tempTargets.map((e) => e.save()).toList();
+      var saveAllTTs = tempTargets.map((e) => e.upsert()).toList();
       int tempTargetUpdates =
           (await Future.wait(saveAllTTs)).where((b) => b).length;
 

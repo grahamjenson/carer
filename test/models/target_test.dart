@@ -43,6 +43,7 @@ void main() {
 
       var targets = await Target.query(
           before: beginningOfNextHour.millisecondsSinceEpoch + 1);
+
       expect(targets.length, 73); // 3 days of targets + 1 hour ahead
       expect(targets[0].targetLow, 1);
       expect(targets[0].targetHigh, 2);

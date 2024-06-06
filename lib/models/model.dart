@@ -20,6 +20,15 @@ abstract class Model {
     return repository.save(this);
   }
 
+  Future<bool> upsert() async {
+    // TODO update the id of the model
+    return repository.upsert(this, uniqueValues());
+  }
+
+  List<String> uniqueValues() {
+    return [];
+  }
+
   @override
   String toString() {
     return repository.toSQLMap(this).toString();
@@ -79,6 +88,43 @@ abstract class ModelRepository<T extends Model> {
           where: '$idField = ?', whereArgs: [model.id]);
       return ret != 0;
     }
+  }
+
+  Future<bool> upsert(T model, List<String> uniqueValues) async {
+    var cdb = await CarerDB.instance;
+    var tb = writeTableName ?? tableName;
+
+    var map = toSQLMap(model);
+    var keys = map.keys.toList();
+    var where = uniqueValues.map((e) => '$e = ?').join(' AND ');
+    var whereArgs = uniqueValues.map((e) => map[e]).toList();
+
+    // Get current value
+    var oldModel = await cdb.db
+        .query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1);
+
+    if (oldModel.isNotEmpty) {
+      // check if there is need for any changes
+      var update = false;
+      for (var k in keys) {
+        if (oldModel.first[k] != map[k]) {
+          update = true;
+          break;
+        }
+      }
+
+      if (update) {
+        var ret = await cdb.db.update(
+          tb,
+          map,
+          where: where,
+          whereArgs: whereArgs,
+        );
+
+        return ret != 0;
+      }
+    }
+    return save(model);
   }
 
   Future<int?> count(

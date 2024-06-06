@@ -18,21 +18,45 @@ void main() {
       await (await CarerDB.instance).deleteAll();
     });
 
-    test("create", () async {
-      var tt = TempTarget(
+    test("create and update", () async {
+      var tt1 = TempTarget(
         startDate: now.add(min5),
         duration: 60,
         targetLow: 100,
         targetHigh: 120,
       );
-      expect(await tt.save(), true);
+      expect(await tt1.upsert(), true);
 
-      var tt1 = await TempTarget.query();
-      expect(tt1.length, 1);
-      expect(tt1[0].startDate, now.add(min5));
-      expect(tt1[0].targetLow, 100);
-      expect(tt1[0].targetHigh, 120);
-      expect(tt1[0].duration, 60);
+      var ttl1 = await TempTarget.query();
+      expect(ttl1.length, 1);
+      expect(ttl1[0].startDate, now.add(min5));
+      expect(ttl1[0].targetLow, 100);
+      expect(ttl1[0].targetHigh, 120);
+      expect(ttl1[0].duration, 60);
+
+      var tt2 = TempTarget(
+        startDate: now.add(min5),
+        duration: 30,
+        targetLow: 100,
+        targetHigh: 120,
+      );
+      expect(await tt2.upsert(), true);
+
+      var ttl2 = await TempTarget.query();
+      expect(ttl2.length, 1);
+      expect(ttl2[0].id, ttl1[0].id); // They should be the same
+      expect(ttl2[0].startDate, now.add(min5));
+      expect(ttl2[0].targetLow, 100);
+      expect(ttl2[0].targetHigh, 120);
+      expect(ttl2[0].duration, 30); // Duration should be the only thing updated
+
+      var tt3 = TempTarget(
+        startDate: now.add(min5),
+        duration: 30,
+        targetLow: 100,
+        targetHigh: 120,
+      );
+      expect(await tt3.upsert(), false);
     });
   });
 }

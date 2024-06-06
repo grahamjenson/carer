@@ -10,6 +10,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
+  //databaseFactory = databaseFactory.debugQuickLoggerWrapper();
+
   await SentryFlutter.init(
     (options) {
       options.dsn =
