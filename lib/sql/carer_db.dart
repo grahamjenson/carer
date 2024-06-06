@@ -23,6 +23,7 @@ class CarerDB {
     final databasePath = await getDatabasesPath();
     var name = 'carer.db';
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      // TODO make database in memory for tests
       name = 'test_carer_${Random().nextInt(999999999)}.db';
     }
     final path = join(databasePath, name);
@@ -31,7 +32,8 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
-    var version = 5;
+    // TODO hash all database table code to single value to set version for
+    var version = 6;
 
     print("Opening database at $path");
     var db = await openDatabase(

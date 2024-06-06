@@ -334,7 +334,7 @@ hours(hour) AS (
   values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23)
 ),
 days(day) AS (
-  values (-1),(0),(1),(2)
+  values (0),(1)
 ),
 start_of_minute(start_of_minute) AS (
   values (
@@ -376,7 +376,7 @@ SELECT
   datetime, 
   COALESCE(temptargets.targetLow, profile_low) AS targetLow, 
   COALESCE(temptargets.targetHigh, profile_high) AS targetHigh, 
-  COALESCE(tempbasal.value, profile_basal) AS basal, 
+  COALESCE(tempbasal.value, profile_basal) AS basal,
   temptargets.targetHigh is not NULL AS isTempTarget,
   tempbasal.value is not NULL AS isTempBasal 
 FROM 
