@@ -1,11 +1,11 @@
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 
-class TargetRepository extends ModelRepository<Target> {
-  const TargetRepository() : super(targetAtTimeViewName);
+class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
+  const ValueAtTimeRepository() : super(valuesAtTimeViewName);
 
   @override
-  Target fromMap(Map<String, Object?> map) {
+  ValueAtTime fromMap(Map<String, Object?> map) {
     var requiredKeys = [
       "timestamp",
       "targetLow",
@@ -19,7 +19,7 @@ class TargetRepository extends ModelRepository<Target> {
       throw ArgumentError("Invalid Target Map: $map");
     }
 
-    return Target(
+    return ValueAtTime(
       date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
       targetLow: map["targetLow"] as int,
       targetHigh: map["targetHigh"] as int,
@@ -30,7 +30,7 @@ class TargetRepository extends ModelRepository<Target> {
   }
 
   @override
-  Map<String, Object> toSQLMap(Target model) {
+  Map<String, Object> toSQLMap(ValueAtTime model) {
     return {
       "timestamp": model.date.millisecondsSinceEpoch,
       "targetLow": model.targetLow,
@@ -40,8 +40,8 @@ class TargetRepository extends ModelRepository<Target> {
   }
 }
 
-class Target extends Model {
-  static const TargetRepository _q = TargetRepository();
+class ValueAtTime extends Model {
+  static const ValueAtTimeRepository _q = ValueAtTimeRepository();
 
   @override
   ModelRepository get repository => _q;
@@ -58,7 +58,7 @@ class Target extends Model {
   final double basal;
   final bool isTempBasal;
 
-  Target(
+  ValueAtTime(
       {required this.date,
       required this.targetLow,
       required this.targetHigh,
@@ -66,11 +66,11 @@ class Target extends Model {
       required this.basal,
       required this.isTempBasal});
 
-  factory Target.fromMap(Map<String, dynamic> map) {
+  factory ValueAtTime.fromMap(Map<String, dynamic> map) {
     return _q.fromMap(map);
   }
 
-  static Future<List<Target>> query({
+  static Future<List<ValueAtTime>> query({
     int? after,
     int? before,
     Map<String, Object>? conditions,
@@ -81,7 +81,7 @@ class Target extends Model {
         before: before, after: after, limit: limit, conditions: conditions);
     stopwatch.stop();
 
-    print('TARGET STUFF executed in ${stopwatch.elapsed.inMilliseconds}');
+    print('ValueAtTime STUFF executed in ${stopwatch.elapsed.inMilliseconds}');
 
     return ret;
   }

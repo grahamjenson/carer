@@ -22,7 +22,7 @@ const dbViews = [
   sgvsCleanView,
   timestampMinutesView,
   profileHourView,
-  targetAtTimeView,
+  valuesAtTimeView,
 ];
 
 // Used for key values like iob...
@@ -169,6 +169,8 @@ const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
       sbefore.timestamp ts_before, 
       sbefore.datetime dt_before
     FROM
+      -- This joins the current reading with the previous reading that is more than 4 minutes before.
+      -- So that we can calculate rate of change.
       sgvs safter LEFT JOIN  sgvs sbefore ON sbefore.id = (
         SELECT x.id
         FROM sgvs x 
@@ -349,41 +351,47 @@ SELECT
   timestamp,
   datetime(timestamp / 1000, 'unixepoch') AS datetime,
   CAST(strftime('%H',datetime(timestamp / 1000, 'unixepoch'),'localtime') as INT) as hour
-FROM times;
+FROM times
+ORDER BY timestamp desc;
 ''');
 
 // this takes all temptarget start and endtiems AS that is when things change.
-const String targetAtTimeViewName = "targetAtTime";
-const targetAtTimeView = DBTable(targetAtTimeViewName, '''
-CREATE VIEW targetAtTime AS
-WITH 
+const String valuesAtTimeViewName = "valuesAtTime";
+const valuesAtTimeView = DBTable(valuesAtTimeViewName, '''
+CREATE VIEW valuesAtTime AS
+WITH
+  -- TODO get the latest profile should later get profile per time
   current_profile AS (SELECT id FROM profile ORDER BY timestamp desc limit 1),
   profile_hours AS (SELECT * FROM current_profile JOIN profileHourView ON current_profile.id = profileHourView.id),
-profile_targets AS (
-  SELECT 
-    timestampMinutes.timestamp,
-    timestampMinutes.datetime, 
-    timestampMinutes.hour, 
-    profile_hours.tlow AS profile_low, 
-    profile_hours.thigh AS profile_high,
-    profile_hours.basal AS profile_basal
-  FROM 
-    timestampMinutes JOIN profile_hours ON timestampMinutes.hour = profile_hours.hour
-),
-all_targets AS (
+  -- GET LAST 5 hours of times.
+  times_to_look AS (SELECT * from timestampMinutes limit 300),
+  profile_targets AS (
+    SELECT 
+      times_to_look.timestamp,
+      times_to_look.datetime, 
+      times_to_look.hour, 
+      profile_hours.tlow AS profile_low, 
+      profile_hours.thigh AS profile_high,
+      profile_hours.basal AS profile_basal,
+      profile_hours.isf AS profile_isf,
+      profile_hours.cr AS profile_cr
+    FROM 
+      times_to_look JOIN profile_hours ON times_to_look.hour = profile_hours.hour
+  )
 SELECT 
   timestamp, 
   datetime, 
   COALESCE(temptargets.targetLow, profile_low) AS targetLow, 
   COALESCE(temptargets.targetHigh, profile_high) AS targetHigh, 
   COALESCE(tempbasal.value, profile_basal) AS basal,
+  profile_isf as isf,
+  profile_cr as cr,
   temptargets.targetHigh is not NULL AS isTempTarget,
   tempbasal.value is not NULL AS isTempBasal 
 FROM 
   profile_targets 
   LEFT JOIN temptargets ON profile_targets.timestamp >= temptargets.start and profile_targets.timestamp < temptargets.end
   LEFT JOIN tempbasal ON profile_targets.timestamp >= tempbasal.start and profile_targets.timestamp < tempbasal.end
-)
-
-SELECT * FROM all_targets ORDER BY timestamp desc;
+ORDER BY 
+  timestamp desc;
   ''');

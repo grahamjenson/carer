@@ -141,8 +141,13 @@ class UpdateCN extends ChangeNotifier {
       var battery = await stateData.setBattery(state.battery.toDouble());
       var cage = await stateData.setCAge(state.cage.toDouble());
 
-      print(
-          "updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, $iob, $cob, $battery, $cage");
+      var badTempBasals = await TempBasal.fixData();
+      var badTempTargets = await TempTarget.fixData();
+
+      print('''
+updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, $iob, $cob, $battery, $cage
+Bad data $badTempBasals, $badTempTargets
+          ''');
 
       if (cage ||
           cob ||

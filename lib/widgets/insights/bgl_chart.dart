@@ -2,8 +2,8 @@ import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/models/target.dart';
 import 'package:carer/models/treatments.dart';
+import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -90,7 +90,7 @@ class BGLChart extends StatelessWidget {
         .subtract(Duration(minutes: minsAgo + 1))
         .millisecondsSinceEpoch;
     var before = clock.now().millisecondsSinceEpoch;
-    var targets = await Target.query(before: before, after: after);
+    var targets = await ValueAtTime.query(before: before, after: after);
 
     // convert the last hours of summary sgvs into flspots
     var bglSpotData = await bglSpots(minsAgo);
@@ -198,7 +198,7 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  Future<(List<FlSpot>, double)> basalSpots(List<Target> targets) async {
+  Future<(List<FlSpot>, double)> basalSpots(List<ValueAtTime> targets) async {
     List<BasalSpot> spots = [];
     // Check the basal at every minute
     for (var t in targets) {
@@ -226,7 +226,8 @@ class BGLChart extends StatelessWidget {
     return (spots, maxBasal);
   }
 
-  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(List<Target> targets) async {
+  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(
+      List<ValueAtTime> targets) async {
     List<FlSpot> lowTargets = [];
     List<FlSpot> highTargets = [];
 

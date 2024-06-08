@@ -1,4 +1,5 @@
 import 'package:carer/models/model.dart';
+import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:clock/clock.dart';
 
@@ -86,5 +87,10 @@ class TempTarget extends Model {
     return (await _q
             .query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1))
         .firstOrNull;
+  }
+
+  static Future<int> fixData() async {
+    var cdb = await CarerDB.instance;
+    return cdb.fixBadTempTargets();
   }
 }

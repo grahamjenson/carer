@@ -61,6 +61,28 @@ class CarerDB {
   }
 
   ////
+  // Fun queries
+  ////
+
+  Future<int> fixBadTempTargets() {
+    return _db.rawUpdate(fixBadTable(temptargetsTableName));
+  }
+
+  Future<int> fixBadTempBasals() {
+    return _db.rawUpdate(fixBadTable(tempbasalTableName));
+  }
+
+  String fixBadTable(table) {
+    // This query finds temp basals and temp targets which seem to be incorrect (for some reason)
+    // TODO limit this to a time scope, no point joining tables months ago
+    return '''
+    with badData  as (
+      select a.id as a_id, a.start as a_start, b.start as b_start from $table as a join $table as b on a.start < b.start and b.start < a.end
+    )
+    update $table set duration = (b_start - a_start)/1000 from badData where id = a_id 
+    ''';
+  }
+  ////
   // DB Table functions
   ////
 

@@ -9,6 +9,7 @@ void main() {
 
   group('Temptargets', () {
     DateTime now = DateTime(2020, 1, 1, 12);
+    Duration min1 = const Duration(minutes: 1);
     Duration min5 = const Duration(minutes: 5);
     Duration hour48 = const Duration(hours: 48);
 
@@ -57,6 +58,45 @@ void main() {
         targetHigh: 120,
       );
       expect(await tt3.upsert(), false);
+    });
+
+    test(" fix bad data", () async {
+      var tt1 = TempTarget(
+        startDate: now,
+        duration: 120,
+        targetLow: 10,
+        targetHigh: 100,
+      );
+      expect(await tt1.upsert(), true);
+
+      var tt2 = TempTarget(
+        startDate: now.add(min1),
+        duration: 120,
+        targetLow: 20,
+        targetHigh: 200,
+      );
+      expect(await tt2.upsert(), true);
+
+      var all = await TempTarget.query();
+
+      expect(all.length, 2);
+      expect(all[0].targetLow, 20);
+      expect(all[1].targetLow, 10);
+
+      expect(all[0].duration, 120);
+      expect(all[1].duration, 120); // This is the error that needs fixing
+
+      // Fix the temp targets
+      var ret = await TempTarget.fixData();
+      expect(ret, 1);
+      all = await TempTarget.query();
+
+      expect(all.length, 2);
+      expect(all[0].targetLow, 20);
+      expect(all[1].targetLow, 10);
+
+      expect(all[0].duration, 120);
+      expect(all[1].duration, 60);
     });
   });
 }
