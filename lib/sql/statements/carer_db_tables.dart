@@ -338,14 +338,15 @@ hours(hour) AS (
 days(day) AS (
   values (0),(1)
 ),
-start_of_minute(start_of_minute) AS (
+start_of_next_minute(start_of_next_minute) AS (
+  -- Calcualte the start of the next minute
   values (
-      strftime('%s',datetime(strftime('%Y-%m-%d %H:%M:00', 'now'))) * 1000
+      (strftime('%s',datetime(strftime('%Y-%m-%d %H:%M:00', 'now') )) + 60 )* 1000
     )
 ),
 times AS (
-  SELECT start_of_minute - ((days.day * 1440) + (hours.hour * 60) + minutes.minute) * 60 * 1000 AS timestamp
-  FROM days JOIN hours JOIN minutes JOIN start_of_minute
+  SELECT start_of_next_minute - ((days.day * 1440) + (hours.hour * 60) + minutes.minute) * 60 * 1000 AS timestamp
+  FROM days JOIN hours JOIN minutes JOIN start_of_next_minute
 )
 SELECT 
   timestamp,

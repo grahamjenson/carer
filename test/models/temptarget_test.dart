@@ -98,5 +98,37 @@ void main() {
       expect(all[0].duration, 120);
       expect(all[1].duration, 60);
     });
+
+    test('update duration to 0', () async {
+      var tt1 = TempTarget(
+        startDate: now.add(min5),
+        duration: 60,
+        targetLow: 100,
+        targetHigh: 120,
+      );
+      expect(await tt1.upsert(), true);
+
+      var ttl1 = await TempTarget.query();
+      expect(ttl1.length, 1);
+      expect(ttl1[0].startDate, now.add(min5));
+      expect(ttl1[0].targetLow, 100);
+      expect(ttl1[0].targetHigh, 120);
+      expect(ttl1[0].duration, 60);
+
+      var tt2 = TempTarget(
+        startDate: now.add(min5),
+        duration: 0,
+        targetLow: 100,
+        targetHigh: 120,
+      );
+      expect(await tt2.upsert(), true);
+
+      var ttl2 = await TempTarget.query();
+      expect(ttl2.length, 1);
+      expect(ttl2[0].startDate, now.add(min5));
+      expect(ttl2[0].targetLow, 100);
+      expect(ttl2[0].targetHigh, 120);
+      expect(ttl2[0].duration, 0);
+    });
   });
 }

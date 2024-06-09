@@ -212,10 +212,10 @@ class TempBasals {
   factory TempBasals.fromJson(List<dynamic> json) {
     List<SummaryTempBasal> tempBasals = [];
     for (var tempBasalJson in json) {
-      if (tempBasalJson['start'] == null || tempBasalJson['start'] == 0) {
+      if (tempBasalJson['start'] == null) {
         continue;
       }
-      if (tempBasalJson['duration'] == null || tempBasalJson['duration'] == 0) {
+      if (tempBasalJson['duration'] == null) {
         continue;
       }
       tempBasals.add(SummaryTempBasal.fromJson(tempBasalJson));
@@ -235,10 +235,10 @@ class SummaryTargets {
   factory SummaryTargets.fromJson(List<dynamic> json) {
     List<SummaryTempTarget> targets = [];
     for (var targetJson in json) {
-      if (targetJson['mills'] == null || targetJson['mills'] == 0) {
+      if (targetJson['mills'] == null) {
         continue;
       }
-      if (targetJson['duration'] == null || targetJson['duration'] == 0) {
+      if (targetJson['duration'] == null) {
         continue;
       }
       targets.add(SummaryTempTarget.fromJson(targetJson));

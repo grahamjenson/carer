@@ -141,6 +141,8 @@ class UpdateCN extends ChangeNotifier {
       var battery = await stateData.setBattery(state.battery.toDouble());
       var cage = await stateData.setCAge(state.cage.toDouble());
 
+      // summary is not trustworthy source of information
+      // TODO replace summary as the source of information
       var badTempBasals = await TempBasal.fixData();
       var badTempTargets = await TempTarget.fixData();
 
