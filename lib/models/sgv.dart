@@ -113,6 +113,7 @@ class SGV extends Model {
   }
 
   static Future<SGV?> lastSGV() async {
+    // TODO cache this for 5 mins (if becoms a problem)
     return (await _q.query(limit: 1)).firstOrNull;
   }
 

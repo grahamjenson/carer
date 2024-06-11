@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/change_notifiers/settings_cn.dart';
 
 enum Range5 { veryLow, low, mid, high, veryHigh }
@@ -66,4 +68,30 @@ double toMax2dp(num value) {
 
 int mean(List<int> l) {
   return (l.reduce((a, b) => a + b) / l.length).round();
+}
+
+class Math {
+  static double rootMeanSquaredError(
+      List<double> xValues, List<double> yValues, List<double> predictions) {
+    assert(
+        xValues.length == yValues.length &&
+            xValues.length == predictions.length,
+        'x should have the same length as y');
+
+    int count = xValues.length;
+
+    var errors = [];
+    for (int index = 0; index < count; index++) {
+      var yVal = yValues[index];
+      var prediction = predictions[index];
+      var error = prediction - yVal;
+      errors.add(pow(error, 2));
+    }
+
+    // root mean squared error = sqrt(sum of squared errors / count)
+    // https://en.wikipedia.org/wiki/Root-mean-square_deviation
+    var rmse = sqrt(errors.reduce((a, b) => a + b) / count);
+
+    return rmse;
+  }
 }

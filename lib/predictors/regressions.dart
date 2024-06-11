@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:carer/predictors/lu_decomp.dart';
 import 'package:carer/predictors/matrix.dart';
+import 'package:carer/utils/math.dart';
 
 extension ListStatistics on List<double> {
   double get average => reduce((a, b) => a + b) / length;
@@ -20,6 +21,7 @@ abstract class Regression {
   late Matrix yM;
 
   late Matrix beta;
+  late double rmse;
 
   Regression(this.xValues, this.yValues) {
     assert(
@@ -38,6 +40,8 @@ abstract class Regression {
     var (l, u) = luDecomposition(a.matrix);
     var solve = luSolve(l, u, b.column(0));
     beta = Matrix.fromColumnList(solve);
+
+    rmse = rootMeanSquaredError(xValues, yValues).$1;
   }
 
   double fnY(double y) => y;
@@ -49,24 +53,8 @@ abstract class Regression {
 
   (double, List<double>) rootMeanSquaredError(
       List<double> testXValues, List<double> testYValues) {
-    assert(testXValues.length == testYValues.length,
-        'x should have the same length as y');
-
-    int count = testXValues.length;
     var predictions = predictAll(testXValues);
-
-    var errors = [];
-    for (int index = 0; index < count; index++) {
-      var yVal = testYValues[index];
-      var prediction = predictions[index];
-      var error = prediction - yVal;
-      errors.add(pow(error, 2));
-    }
-
-    // root mean squared error = sqrt(sum of squared errors / count)
-    // https://en.wikipedia.org/wiki/Root-mean-square_deviation
-    var rmse = sqrt(errors.reduce((a, b) => a + b) / count);
-
+    var rmse = Math.rootMeanSquaredError(testXValues, testYValues, predictions);
     return (rmse, predictions);
   }
 
@@ -177,27 +165,24 @@ class ExpRegression extends Regression {
 }
 
 class BestMatchRegression {
-  late List<double> x;
-  late List<double> y;
-
   late List<Regression> models;
   late Regression selected;
 
-  BestMatchRegression(this.x, this.y) {
+  BestMatchRegression(List<double> xValues, List<double> yValues) {
     models = [
-      PolynomialRegression(x, y, 1),
-      PolynomialRegression(x, y, 2),
-      // LogRegression(x, y),  // Negative and zero numbers are out
-      // LogRegressionLogY(x, y),
-      SqrtRegression(x, y),
-      // ExpRegression(x, y),
+      PolynomialRegression(xValues, yValues, 1),
+      PolynomialRegression(xValues, yValues, 2),
+      // LogRegression(xValues, yValues),  // Negative and zero numbers are out
+      // LogRegressionLogY(xValues, yValues),
+      SqrtRegression(xValues, yValues),
+      // ExpRegression(xValues, yValues),
     ];
 
     double minErrorVariance = double.infinity;
     selected = models.first;
     for (var model in models) {
       // Check the root mean squared error fot
-      var (rootMeanSquaredError, _) = model.rootMeanSquaredError(x, y);
+      var rootMeanSquaredError = model.rmse;
 
       if (rootMeanSquaredError < minErrorVariance) {
         selected = model;
@@ -207,14 +192,11 @@ class BestMatchRegression {
   }
 
   @override
-  String toString() => 'BestMatchRegression';
+  String toString() => 'BestMatch($selected)';
 
   double predict(double x) {
     return selected.predict(x);
   }
 
-  double get rootMeanSquaredError {
-    var (rmse, _) = selected.rootMeanSquaredError(x, y);
-    return rmse;
-  }
+  double get rmse => selected.rmse;
 }

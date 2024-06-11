@@ -10,3 +10,7 @@ void sqfliteTestInit() {
 double dp4(double x) {
   return (x * 1000).round() / 1000;
 }
+
+double epoch(DateTime d) {
+  return d.millisecondsSinceEpoch.toDouble();
+}
