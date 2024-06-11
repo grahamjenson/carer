@@ -45,6 +45,7 @@ class SGV extends Model {
   @override
   final int? id;
   final int value;
+
   @override
   final DateTime date;
   int? rate5m;
@@ -63,6 +64,10 @@ class SGV extends Model {
   factory SGV.fromMap(Map<String, Object?> map) {
     return _q.fromMap(map);
   }
+
+  int get minsAgo =>
+      (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/
+      60000;
 
   double sgvU(Unit unit) {
     return unit.val(value);

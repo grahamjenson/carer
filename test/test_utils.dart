@@ -6,3 +6,7 @@ void sqfliteTestInit() {
   // Set global factory
   databaseFactory = databaseFactoryFfi;
 }
+
+double dp4(double x) {
+  return (x * 1000).round() / 1000;
+}

@@ -4,6 +4,7 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
+import 'package:carer/predictors/regressions.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -48,6 +49,15 @@ class Stats extends StatelessWidget {
 
   Future<Window> futureWindow(SettingsCN settings) async {
     var stateData = await StateData.instance;
+
+    var sgvs = await SGV.lastMins(20);
+    var x = sgvs.map((s) => s.minsAgo * 1.0).toList();
+    var y = sgvs.map((s) => s.value * 1.0).toList();
+    var br = BestMatchRegression(x, y);
+    var (rmse, _) = br.selected.rootMeanSquaredError(x, y);
+    var ma = sgvs.first.minsAgo;
+    var preds = br.selected.predictAll([ma - 5, ma - 10, ma - 15, ma - 20]);
+
     return Window(
       title: "Stats",
       child: Expanded(
@@ -85,10 +95,40 @@ class Stats extends StatelessWidget {
               await target(settings.unit),
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
+              await model(br, rmse),
+              await predictions(preds, settings.unit),
             ],
           ),
         )),
       ),
+    );
+  }
+
+  Future<DataRow> model(BestMatchRegression br, double rmse) async {
+    return DataRow(
+      cells: [
+        const DataCell(Text("Model", style: heading)),
+        DataCell(
+          Text("${br.selected}($rmse)", style: small),
+        ),
+      ],
+    );
+  }
+
+  Future<DataRow> predictions(List<double> preds, Unit unit) async {
+    return DataRow(
+      cells: [
+        const DataCell(Text("Preds", style: heading)),
+        DataCell(
+          SmartText(texts: [
+            "${preds.map(
+              (e) => unit.str(e),
+            )}"
+          ], styles: const [
+            small,
+          ]),
+        ),
+      ],
     );
   }
 

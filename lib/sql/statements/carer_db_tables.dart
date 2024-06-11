@@ -161,6 +161,7 @@ const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
       safter.timestamp timestamp, 
       safter.datetime datetime,
       safter.value - sbefore.value AS diff,
+      
       safter.minute_timestamp - sbefore.minute_timestamp AS mins_diff,
       ((safter.value - sbefore.value) / ((safter.minute_timestamp - sbefore.minute_timestamp) / 5)) AS rate5m,
 

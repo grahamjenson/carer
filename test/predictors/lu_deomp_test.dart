@@ -1,6 +1,8 @@
 import 'package:carer/predictors/lu_decomp.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../test_utils.dart';
+
 void main() {
   // example from
   group('LU Decomposistion', () {
@@ -36,7 +38,7 @@ void main() {
       var solve = luSolve(l, u, Y);
 
       // Some very small numbers at the bottom so need rounding to 4dp
-      solve = solve.map((e) => double.parse(e.toStringAsFixed(4))).toList();
+      solve = solve.map(dp4).toList();
       expect(solve, [3, -2.5, 7]);
     });
   });
