@@ -11,9 +11,53 @@ extension ListStatistics on List<double> {
   }
 }
 
+class Solution {
+  late List<double> x;
+  late Matrix expandedX;
+  late List<double> y;
+  late List<double> yValuesProcessed;
+  late Matrix beta;
+  late String type;
+  late double Function(double) fixY;
+
+  Solution({
+    required this.x,
+    required this.y,
+    required this.expandedX,
+    required this.yValuesProcessed,
+    required this.beta,
+    required this.type,
+    required this.fixY,
+  });
+
+  double get rootMeanSquaredError {
+    int count = x.length;
+    var errors = [];
+    for (int index = 0; index < count; index++) {
+      var xVal = x[index];
+      var yVal = y[index];
+      var prediction = predict(xVal);
+      var error = yVal - prediction;
+
+      errors.add(pow(error, 2));
+    }
+
+    // root mean squared error = sqrt(sum of squared errors / count)
+    // https://en.wikipedia.org/wiki/Root-mean-square_deviation
+    return sqrt(errors.reduce((a, b) => a + b) / count);
+  }
+
+  double predict(double xValue) {
+    double result = (expandedX * beta)[0][0];
+    return fixY(result);
+  }
+}
+
 abstract class Regression {
   late Matrix x = Matrix.zero(1, 1);
+
   late Matrix y = Matrix.zero(1, 1);
+
   late Matrix beta = Matrix.zero(1, 1);
 
   bool logY = false;
@@ -21,25 +65,7 @@ abstract class Regression {
   @override
   String toString() => 'Regression';
 
-  double get errorVariance {
-    List<double> xValues = x.column(0);
-    List<double> yValues =
-        logY ? y.column(0).map((v) => exp(v)).toList() : y.column(0);
-    int count = xValues.length;
-
-    print('$this errors:');
-    for (int index = 0; index < count; index++) {
-      print(
-          'f(${xValues[index]}) = ${yValues[index]}, predicted: ${predict(xValues[index])}');
-    }
-
-    return (List.generate(count,
-                (index) => pow(yValues[index] - predict(xValues[index]), 2))
-            .reduce((a, b) => a + b) /
-        (2 * count));
-  }
-
-  void train(List<double> xValues, List<double> yValues) {
+  Solution train(List<double> xValues, List<double> yValues) {
     assert(
         xValues.length == yValues.length, 'x should have the same length as y');
 
@@ -49,30 +75,39 @@ abstract class Regression {
         logY ? yValues.map((v) => log(v)).toList() : yValues;
     y = Matrix.fromColumnList(yValuesProcessed);
 
-    Matrix newX = enhanced(x);
     Matrix ones = Matrix.fromColumnList(List.filled(x.rowCount, 1));
-    Matrix onedNewX = ones.appendColumns(newX);
+    ones.appendColumns(expanded(x));
 
-    Matrix a = onedNewX.transpose * onedNewX;
-    Matrix b = onedNewX.transpose * y;
+    Matrix a = ones.transpose * ones;
+    Matrix b = ones.transpose * y;
 
     var (l, u) = luDecomposition(a.matrix);
     var solve = luSolve(l, u, b.column(0));
     beta = Matrix.fromColumnList(solve);
+
+    if (logY) {
+      return Solution(
+        x: xValues,
+        y: yValues,
+        expandedX: ones,
+        yValuesProcessed: yValuesProcessed,
+        beta: beta,
+        type: toString(),
+        fixY: (double y) => exp(y),
+      );
+    }
+    return Solution(
+      x: xValues,
+      y: yValues,
+      yValuesProcessed: yValuesProcessed,
+      expandedX: ones,
+      beta: beta,
+      type: toString(),
+      fixY: (double y) => y,
+    );
   }
 
-  @override
-  double predict(double xValue) {
-    Matrix xm = Matrix.fromColumnList([xValue]);
-    Matrix newX = enhanced(xm);
-    Matrix ones = Matrix.fromColumnList(List.filled(newX.rowCount, 1));
-    Matrix onedNewX = ones.appendColumns(newX);
-
-    double result = (onedNewX * beta)[0][0];
-    return logY ? exp(result) : result;
-  }
-
-  Matrix enhanced(Matrix x) {
+  Matrix expanded(Matrix x) {
     return x;
   }
 }
@@ -86,7 +121,7 @@ class PolynomialRegression extends Regression {
   String toString() => 'Polynomial($degree)';
 
   @override
-  Matrix enhanced(Matrix x) {
+  Matrix expanded(Matrix x) {
     if (degree <= 1) return x;
 
     Matrix newX = x;
@@ -103,26 +138,21 @@ class PolynomialRegression extends Regression {
 }
 
 class LogRegression extends Regression {
-  final bool replaceX;
-
-  LogRegression({required this.replaceX, required bool logY}) {
+  LogRegression({required bool logY}) {
     this.logY = logY;
   }
 
   @override
-  String toString() => 'Log${replaceX ? 'ReplaceX' : ''}${logY ? 'LogY' : ''}';
+  String toString() => 'Log${logY ? 'LogY' : ''}';
 
   @override
-  Matrix enhanced(Matrix x) {
+  Matrix expanded(Matrix x) {
     Matrix newX = x;
 
     Matrix logX =
         Matrix.fromColumnList(newX.column(0).map((v) => log(v)).toList());
-    if (replaceX) {
-      newX = logX;
-    } else {
-      newX = newX.appendColumns(logX);
-    }
+
+    newX = newX.appendColumns(logX);
 
     return newX;
   }
@@ -133,7 +163,7 @@ class SqrtRegression extends Regression {
   String toString() => 'Sqrt';
 
   @override
-  Matrix enhanced(Matrix x) {
+  Matrix expanded(Matrix x) {
     Matrix newX = x;
 
     Matrix sqrtX =
@@ -155,14 +185,14 @@ class ExpRegression extends Regression {
 
 class BestMatchRegression {
   final List<Regression> models;
-  int selected = 0;
+  Solution? selected;
 
   BestMatchRegression()
       : models = [
           PolynomialRegression(1),
           PolynomialRegression(2),
-          LogRegression(replaceX: false, logY: false),
-          LogRegression(replaceX: false, logY: true),
+          LogRegression(logY: false),
+          LogRegression(logY: true),
           SqrtRegression(),
           ExpRegression()
         ];
@@ -170,30 +200,39 @@ class BestMatchRegression {
   @override
   String toString() => 'BestMatchRegression';
 
-  void train(List<double> x, List<double> y) {
+  Solution train(List<double> x, List<double> y) {
+    List<Solution> solutions = [];
     for (Regression regression in models) {
-      regression.train(x, y);
+      solutions.add(regression.train(x, y));
     }
 
     double minErrorVariance = double.infinity;
-    for (int i = 0; i < models.length; i++) {
-      double errorVariance = models[i].errorVariance;
-      print('${models[i]} regression, error variance: $errorVariance');
+    selected = solutions.first;
+    for (var sol in solutions) {
+      double rootMeanSquaredError = sol.rootMeanSquaredError;
+      print('$sol regression, error variance: $rootMeanSquaredError');
 
-      if (errorVariance < minErrorVariance) {
-        selected = i;
-        minErrorVariance = errorVariance;
+      if (rootMeanSquaredError < minErrorVariance) {
+        selected = sol;
+        minErrorVariance = rootMeanSquaredError;
       }
     }
 
-    print('Best matched model: ${models[selected]}');
+    print('Best matched model: $selected');
+    return selected!;
   }
 
   double predict(double x) {
-    return models[selected].predict(x);
+    if (selected == null) {
+      throw Exception('Model not trained');
+    }
+    return selected!.predict(x);
   }
 
-  double get errorVariance {
-    return models[selected].errorVariance;
+  double get rootMeanSquaredError {
+    if (selected == null) {
+      throw Exception('Model not trained');
+    }
+    return selected!.rootMeanSquaredError;
   }
 }

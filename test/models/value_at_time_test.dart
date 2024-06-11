@@ -13,6 +13,8 @@ void main() {
     // TODO this will be flaky
     DateTime now =
         DateTime.now(); // cant stub out sqlite date (uses system datetime)
+    DateTime nowMinPlus1 =
+        DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
     DateTime nowMin =
         DateTime(now.year, now.month, now.day, now.hour, now.minute);
     DateTime now1Min =
@@ -44,14 +46,18 @@ void main() {
       var targets = await ValueAtTime.query();
 
       expect(targets.length, 300); // 5 hours
+
       valueAssertion(targets[0],
-          targetLow: 1, targetHigh: 2, isTempTarget: false, date: nowMin);
+          targetLow: 1, targetHigh: 2, isTempTarget: false, date: nowMinPlus1);
 
       valueAssertion(targets[1],
+          targetLow: 1, targetHigh: 2, isTempTarget: false, date: nowMin);
+
+      valueAssertion(targets[2],
           targetLow: 1, targetHigh: 2, isTempTarget: false, date: now1Min);
 
       var s = await TempTarget(
-              startDate: now.subtract(const Duration(seconds: 30)),
+              startDate: now.subtract(const Duration(seconds: 50)),
               duration: 300,
               targetHigh: 10,
               targetLow: 5)
@@ -63,12 +69,15 @@ void main() {
 
       print("${targets[0]} ${targets[1]}");
 
-      // beginning will be 1 hour ahead
       valueAssertion(targets[0],
+          targetLow: 5, targetHigh: 10, isTempTarget: true, date: nowMinPlus1);
+
+      // beginning will be 1 hour ahead
+      valueAssertion(targets[1],
           targetLow: 5, targetHigh: 10, isTempTarget: true, date: nowMin);
 
       // 3 days of profile targets + 1 temp target
-      valueAssertion(targets[1],
+      valueAssertion(targets[2],
           targetLow: 1, targetHigh: 2, isTempTarget: false, date: now1Min);
     });
   });
