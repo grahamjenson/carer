@@ -74,6 +74,10 @@ class NSEntries {
     required this.entries,
   });
 
+  factory NSEntries.empty() {
+    return NSEntries(entries: []);
+  }
+
   factory NSEntries.fromJson(String jsonStr) {
     try {
       final List<dynamic> jsonList = json.decode(jsonStr);

@@ -6,8 +6,8 @@ import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:http/http.dart' as http;
 
-Uri entryEndpoint(nsURL, token) =>
-    Uri.parse('$nsURL/api/v1/entries.json?token=$token');
+Uri entryEndpoint(nsURL, token, int count) =>
+    Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
 Uri treatmentsEndpoint(nsURL, token) =>
     Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
 
@@ -23,12 +23,12 @@ Uri basalEndpoint(nsURL, token) =>
 
 // Singleton
 class NSClient {
-  Future<NSEntries> getEntries(String nsURL, String token) async {
+  Future<NSEntries> getEntries(String nsURL, String token, int count) async {
     try {
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
       }
-      final response = await http.get(entryEndpoint(nsURL, token));
+      final response = await http.get(entryEndpoint(nsURL, token, count));
 
       if (response.statusCode != 200) {
         log("NON 200 responce code ${response.statusCode}");
