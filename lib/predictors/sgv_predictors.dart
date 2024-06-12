@@ -1,38 +1,38 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/regressions.dart';
 import 'package:carer/utils/math.dart';
+import 'package:clock/clock.dart';
 
 abstract class Predictor {
-  const Predictor();
+  Predictor();
+
+  // set this to get the cadence of sgv predictinos correct
+  DateTime _lastReadingDate = DateTime.now();
+
+  // Get all the expencive calls done here, and can be repedtly called when new data arrives
+  Future<void> init();
 
   // Returns the predicted value at mins
-  Future<SGV?> predictAt(double timestamp);
+  SGV? predictAt(double timestamp);
+
+  DateTime get lastReadingDate => _lastReadingDate;
 
   // Returns all predicted values until mins
-  Future<List<SGV>> predictRange(List<double> timestamp) async {
-    List<Future<SGV?>> predictionFutures = [];
-    for (var ts in timestamp) {
-      predictionFutures.add(predictAt(ts));
-    }
-
+  List<SGV> predictRange(List<double> timestamp) {
     List<SGV> predictions = [];
-    for (var pf in predictionFutures) {
-      var p = await pf;
-      if (p == null) continue;
-      predictions.add(p);
+    for (var ts in timestamp) {
+      var p = predictAt(ts);
+      if (p != null) {
+        predictions.add(p);
+      }
     }
     return predictions;
   }
 
-  Future<List<SGV>> predictNextHour() async {
-    var lastSGV = await SGV.lastSGV();
-
-    if (lastSGV == null) {
-      return [];
-    }
+  List<SGV> predictNextHour() {
     var times = List.generate(
         12,
-        (i) => lastSGV.date
+        (i) => lastReadingDate
             .add(Duration(minutes: (i + 1) * 5))
             .millisecondsSinceEpoch
             .toDouble());
@@ -41,7 +41,7 @@ abstract class Predictor {
   }
 
   Future<double> rmse(List<double> futureX, List<double> futureY) async {
-    var sgvs = await predictRange(futureX);
+    var sgvs = predictRange(futureX);
     var predictions = sgvs.map((s) => s.value * 1.0).toList();
     return Math.rootMeanSquaredError(futureX, futureY, predictions);
   }
@@ -49,37 +49,49 @@ abstract class Predictor {
 
 // This predictor just returns the value of the current
 class FlatPredictor extends Predictor {
-  const FlatPredictor();
+  FlatPredictor();
+  SGV? lastSGV;
 
   @override
-  Future<SGV?> predictAt(double timestamp) async {
-    var lastSGV = await SGV.lastSGV();
+  Future<void> init() async {
+    lastSGV = await SGV.lastSGV();
+    if (lastSGV != null) _lastReadingDate = lastSGV!.date;
+  }
+
+  @override
+  SGV? predictAt(double timestamp) {
     if (lastSGV == null) {
       return null;
     }
 
     return SGV(
-        value: lastSGV.value,
+        value: lastSGV!.value,
         date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
   }
 }
 
 class GradientPredictor extends Predictor {
-  const GradientPredictor();
+  GradientPredictor();
+  SGV? lastSGV;
 
   @override
-  Future<SGV?> predictAt(double timestamp) async {
-    var lastSGV = await SGV.lastSGV();
-    if (lastSGV == null || lastSGV.rate5m == null) {
+  Future<void> init() async {
+    lastSGV = await SGV.lastSGV();
+    if (lastSGV != null) _lastReadingDate = lastSGV!.date;
+  }
+
+  @override
+  SGV? predictAt(double timestamp) {
+    if (lastSGV == null || lastSGV!.rate5m == null) {
       return null;
     }
 
     // Using the lastSGV and rate5m to rearrage to formula y = ax + c
     // x is timestamp, y is the predicted value, c = -ax1 + y1
-    double x1 = lastSGV.date.millisecondsSinceEpoch.toDouble();
-    double y1 = lastSGV.value.toDouble();
+    double x1 = lastSGV!.date.millisecondsSinceEpoch.toDouble();
+    double y1 = lastSGV!.value.toDouble();
     double slope =
-        lastSGV.rate5m!.toDouble() / (5 * 60 * 1000); // rate5m is in mg/dL/min
+        lastSGV!.rate5m!.toDouble() / (5 * 60 * 1000); // rate5m is in mg/dL/min
 
     // Calculate c using the formula c = -ax1 + y1
     double c = -slope * x1 + y1;
@@ -92,24 +104,45 @@ class GradientPredictor extends Predictor {
 }
 
 abstract class RegressionPredictor extends Predictor {
-  BestMatchRegression createRegression(List<double> x, List<double> y);
+  Regression createRegression(List<double> x, List<double> y);
+  final int pastReadings;
+  final double mimnutesFromEpochToLastWeek =
+      clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch /
+          60000;
 
-  double fnX(num x) => x / 60000.0;
-  int fnRX(double x) => (x * 60000.0).toInt();
+  RegressionPredictor({this.pastReadings = 5});
+
+  Regression? regression;
+  // When processing very large numbers, by squaring and cubing this can cause lots of issues
+  // These functions drop x from milliseconds since epoch to
+  double fnX(num x) =>
+      (x / 60000.0).round().toDouble() - mimnutesFromEpochToLastWeek;
+  int fnRX(double x) =>
+      (x * 60000.0).toInt() + mimnutesFromEpochToLastWeek.toInt();
+
+  List<SGV> sgvs = [];
 
   @override
-  Future<SGV?> predictAt(double timestamp) async {
-    // Very ineffienct
-    var sgvs = await SGV.query(limit: 5);
-    if (sgvs.length < 2) {
-      return null;
+  Future<void> init() async {
+    sgvs = await SGV.query(limit: pastReadings);
+    if (sgvs.isEmpty) {
+      return;
     }
+    _lastReadingDate = sgvs.first.date;
 
     var x = sgvs.map((s) => fnX(s.date.millisecondsSinceEpoch)).toList();
     var y = sgvs.map((s) => s.value * 1.0).toList();
-    var r = createRegression(x, y);
-    print(r);
-    var pred = r.predict(fnX(timestamp));
+    print("$x, $y");
+    regression = createRegression(x, y);
+  }
+
+  @override
+  SGV? predictAt(double timestamp) {
+    if (regression == null) {
+      return null;
+    }
+    // Very ineffienct
+    var pred = regression!.predict(fnX(timestamp));
     int limitedValue = pred.toInt().clamp(20, 500);
     return SGV(
         value: limitedValue,
@@ -121,7 +154,7 @@ class BestRegressionPredictor extends RegressionPredictor {
   BestRegressionPredictor();
 
   @override
-  BestMatchRegression createRegression(List<double> x, List<double> y) {
+  Regression createRegression(List<double> x, List<double> y) {
     return BestMatchRegression(x, y);
   }
 

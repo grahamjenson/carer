@@ -62,14 +62,53 @@ void main() {
   });
 
   group("BestMatchRegression", () {
-    test("degree 1 matrices and predictions", () {
-      // example from https://people.stfx.ca/bliengme/exceltips/Regression%20Analysis%20using%20Matrix%20Algebra.htm
-      List<double> x = [1, 2, 3, 4, 5, 6];
-      List<double> y = [0.5, 2.0, 7.5, 17.0, 30.5, 48];
-      var pr = BestMatchRegression(x, y);
-      for (var m in pr.models) {
-        print("$m ${m.rootMeanSquaredError(x, y)}");
-      }
+    test("selectes the correct model per dataset", () {
+      // y = 10x + 1
+      List<double> linearx = [1, 2, 3, 4, 5, 6];
+      List<double> lineary = [11, 21, 31, 41, 51, 61];
+      expect(BestMatchRegression(linearx, lineary).selected.toString(),
+          'Polynomial(1)');
+
+      // y = 3x^2 + 2x + 1
+      List<double> poly2x = [1, 2, 3, 4, 5, 6];
+      List<double> poly2y = [6, 17, 34, 57, 86, 121];
+      expect(BestMatchRegression(poly2x, poly2y).selected.toString(),
+          'Polynomial(2)');
+
+      // y = log(x) * 20
+      List<double> logx = [1, 2, 3, 4, 5, 6];
+      List<double> logy = [0, 6.02, 9.54, 12.04, 13.98, 15.56];
+      expect(BestMatchRegression(logx, logy).selected.toString(), 'Log');
+
+      // y = sqrt(x) * 20 + 3
+      List<double> sqrtx = [1, 2, 3, 4, 5, 6];
+      List<double> sqrty = [
+        23,
+        31.28427125,
+        37.64101615,
+        43,
+        47.72135955,
+        51.98979486
+      ];
+      expect(BestMatchRegression(sqrtx, sqrty).selected.toString(), 'Sqrt');
+
+      // y = exp(x) * 20 + 3
+      List<double> expx = [1, 2, 3, 4, 5, 6];
+      List<double> expy = [
+        57.36563657,
+        150.781122,
+        404.7107385,
+        1094.963001,
+        2971.263182,
+        8071.57587
+      ];
+      expect(BestMatchRegression(expx, expy).selected.toString(), 'Exp');
+
+      // y = 2^x * 20 + 3
+      List<double> loglogx = [1, 2, 3, 4, 5, 6];
+      List<double> loglogy = [43, 83, 163, 323, 643, 1283];
+      expect(
+          BestMatchRegression(loglogx, loglogy).selected.toString(), 'LogLog');
     });
   });
 }

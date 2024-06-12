@@ -1,4 +1,5 @@
 import 'package:carer/models/sgv.dart';
+import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,8 +34,9 @@ void main() {
     });
 
     test("FlatPredictor", () async {
-      FlatPredictor pr = const FlatPredictor();
-      var sgvs = await pr.predictNextHour();
+      FlatPredictor pr = FlatPredictor();
+      await pr.init();
+      var sgvs = pr.predictNextHour();
       expect(sgvs.length, 12);
 
       var firstSGV = sgvs[0];
@@ -55,8 +57,9 @@ void main() {
     });
 
     test("GradientPredictor", () async {
-      GradientPredictor pr = const GradientPredictor();
-      var sgvs = await pr.predictNextHour();
+      GradientPredictor pr = GradientPredictor();
+      await pr.init();
+      var sgvs = pr.predictNextHour();
       expect(sgvs.length, 12);
 
       var firstSGV = sgvs[0];
@@ -77,7 +80,9 @@ void main() {
 
     test("BestRegressionPredictor", () async {
       BestRegressionPredictor pr = BestRegressionPredictor();
-      var sgvs = await pr.predictNextHour();
+      await pr.init();
+
+      var sgvs = pr.predictNextHour();
       expect(sgvs.length, 12);
 
       var firstSGV = sgvs[0];
@@ -87,7 +92,6 @@ void main() {
       expect(secondSGV.value, 120);
       expect(secondSGV.date, min10fromNow);
 
-      // This should use the linear regression (polyNomial(degree 1)) and track the gradient down.
       var rmse =
           await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [140, 140]);
       expect(rmse.toInt(), 15);
@@ -95,6 +99,10 @@ void main() {
       rmse =
           await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
 
+      BestMatchRegression b = pr.regression! as BestMatchRegression;
+
+      // This should use the linear regression (polyNomial(degree 1)) and track the gradient down.
+      expect(b.selected.toString(), 'Polynomial(1)');
       print("$pr RMSE: $rmse $sgvs");
       expect(rmse.toInt(), 0);
     });

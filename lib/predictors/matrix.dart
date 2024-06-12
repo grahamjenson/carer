@@ -42,6 +42,20 @@ class Matrix {
     return m;
   }
 
+  bool valid() {
+    for (var list in matrix) {
+      for (var element in list) {
+        if (!element.isFinite) {
+          return false;
+        }
+        if (element.isNaN) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   @override
   String toString() {
     String matrixToString =
