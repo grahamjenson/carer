@@ -4,7 +4,6 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
-import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -51,12 +50,10 @@ class Stats extends StatelessWidget {
   Future<Window> futureWindow(SettingsCN settings) async {
     var stateData = await StateData.instance;
 
-    BestRegressionPredictor bestMatchPrediction = BestRegressionPredictor();
+    LinearRegressionPredictor bestMatchPrediction = LinearRegressionPredictor();
     await bestMatchPrediction.init();
-    BestMatchRegression r =
-        bestMatchPrediction.regression! as BestMatchRegression;
 
-    var rmse = r.rmse;
+    var rmse = bestMatchPrediction.regression!.rmse;
     var preds = bestMatchPrediction.predictNextHour();
 
     return Window(
@@ -96,7 +93,7 @@ class Stats extends StatelessWidget {
               await target(settings.unit),
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
-              await model(r, rmse),
+              await model(rmse),
               await predictions(preds, settings.unit),
             ],
           ),
@@ -105,12 +102,12 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> model(BestMatchRegression br, double rmse) async {
+  Future<DataRow> model(double rmse) async {
     return DataRow(
       cells: [
         const DataCell(Text("Model", style: heading)),
         DataCell(
-          Text("${br.selected}($rmse)", style: small),
+          Text("Linear(${toMax2dp(rmse)})", style: small),
         ),
       ],
     );

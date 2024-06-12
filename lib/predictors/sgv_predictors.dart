@@ -54,7 +54,7 @@ abstract class RegressionPredictor extends Predictor {
       clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch /
           60000;
 
-  RegressionPredictor({this.pastReadings = 5});
+  RegressionPredictor({this.pastReadings = 3});
 
   Regression? regression;
   // When processing very large numbers, by squaring and cubing this can cause lots of issues
@@ -94,14 +94,14 @@ abstract class RegressionPredictor extends Predictor {
   }
 }
 
-class BestRegressionPredictor extends RegressionPredictor {
-  BestRegressionPredictor();
+class LinearRegressionPredictor extends RegressionPredictor {
+  LinearRegressionPredictor();
 
   @override
   Regression createRegression(List<double> x, List<double> y) {
-    return BestMatchRegression(x, y);
+    return LinearRegression(x, y);
   }
 
   @override
-  String toString() => 'BestRegression';
+  String toString() => 'LinearRegression';
 }
