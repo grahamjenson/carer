@@ -236,6 +236,22 @@ class GradientRegression extends Regression {
   double get rmse => _rmse;
 }
 
+class LinearRegression extends PolynomialRegression {
+  LinearRegression(List<double> xValues, List<double> yValues)
+      : super(xValues, yValues, 1);
+
+  @override
+  String toString() => 'Linear';
+}
+
+class QuadraticRegression extends PolynomialRegression {
+  QuadraticRegression(List<double> xValues, List<double> yValues)
+      : super(xValues, yValues, 2);
+
+  @override
+  String toString() => 'Quadratic';
+}
+
 class BestMatchRegression extends Regression {
   late List<Regression> models;
   late Regression selected;
@@ -244,8 +260,8 @@ class BestMatchRegression extends Regression {
     models = [
       FlatRegression(xValues, yValues),
       GradientRegression(xValues, yValues),
-      PolynomialRegression(xValues, yValues, 1),
-      PolynomialRegression(xValues, yValues, 2),
+      LinearRegression(xValues, yValues),
+      QuadraticRegression(xValues, yValues),
       LogRegression(xValues, yValues), // Negative and zero numbers are out
       LogRegressionLogY(xValues, yValues),
       SqrtRegression(xValues, yValues),

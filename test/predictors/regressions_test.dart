@@ -77,8 +77,8 @@ void main() {
       // y = 3x^2 + 2x + 1
       List<double> poly2x = [1, 2, 3, 4, 5, 6];
       List<double> poly2y = [6, 17, 34, 57, 86, 121];
-      expect(BestMatchRegression(poly2x, poly2y).selected.toString(),
-          'Polynomial(2)');
+      expect(
+          BestMatchRegression(poly2x, poly2y).selected.toString(), 'Quadratic');
 
       // y = log(x) * 20
       List<double> logx = [1, 2, 3, 4, 5, 6];
