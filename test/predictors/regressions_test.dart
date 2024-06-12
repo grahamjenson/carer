@@ -63,11 +63,16 @@ void main() {
 
   group("BestMatchRegression", () {
     test("selectes the correct model per dataset", () {
+      List<double> flatx = [1, 2, 3, 4, 5, 6];
+      List<double> flaty = [11, 11, 11, 11, 11, 11];
+      expect(
+          BestMatchRegression(flatx, flaty).selected.toString(), 'Flat(11.0)');
+
       // y = 10x + 1
       List<double> linearx = [1, 2, 3, 4, 5, 6];
       List<double> lineary = [11, 21, 31, 41, 51, 61];
       expect(BestMatchRegression(linearx, lineary).selected.toString(),
-          'Polynomial(1)');
+          startsWith("Gradient"));
 
       // y = 3x^2 + 2x + 1
       List<double> poly2x = [1, 2, 3, 4, 5, 6];

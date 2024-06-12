@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:carer/predictors/lu_decomp.dart';
 import 'package:carer/predictors/matrix.dart';
 import 'package:carer/utils/math.dart';
 
@@ -15,12 +14,18 @@ extension ListStatistics on List<double> {
 abstract class Regression {
   double predict(double xValue);
 
-  List<double> predictAll(List<double> xVals);
+  List<double> predictAll(List<double> xVals) {
+    return xVals.map(predict).toList();
+  }
 
   double get rmse;
 
   (double, List<double>) rootMeanSquaredError(
-      List<double> testXValues, List<double> testYValues);
+      List<double> testXValues, List<double> testYValues) {
+    var predictions = predictAll(testXValues);
+    var rmse = Math.rootMeanSquaredError(testXValues, testYValues, predictions);
+    return (rmse, predictions);
+  }
 }
 
 abstract class MatrixRegression extends Regression {
@@ -66,14 +71,6 @@ abstract class MatrixRegression extends Regression {
   String toString() => 'Regression';
 
   @override
-  (double, List<double>) rootMeanSquaredError(
-      List<double> testXValues, List<double> testYValues) {
-    var predictions = predictAll(testXValues);
-    var rmse = Math.rootMeanSquaredError(testXValues, testYValues, predictions);
-    return (rmse, predictions);
-  }
-
-  @override
   double predict(double xValue) {
     Matrix m = Matrix.fromColumnList([1]);
     m.appendColumns(expandX(Matrix.fromColumnList([xValue])));
@@ -84,11 +81,6 @@ abstract class MatrixRegression extends Regression {
 
     var resultMatrix = (m * beta);
     return fnYReverse(resultMatrix[0][0]);
-  }
-
-  @override
-  List<double> predictAll(List<double> xVals) {
-    return xVals.map(predict).toList();
   }
 }
 
@@ -189,12 +181,64 @@ class ExpRegression extends MatrixRegression {
   }
 }
 
+class FlatRegression extends Regression {
+  late double value;
+  double _rmse = 0;
+
+  FlatRegression(List<double> xValues, List<double> yValues) {
+    value = yValues.first;
+    _rmse = rootMeanSquaredError(xValues, yValues).$1;
+  }
+
+  @override
+  String toString() => 'Flat($value)';
+
+  @override
+  double predict(double x) {
+    return value;
+  }
+
+  @override
+  double get rmse => _rmse;
+}
+
+class GradientRegression extends Regression {
+  late double slope;
+  late double c;
+  late double _rmse;
+
+  GradientRegression(List<double> x, List<double> y) {
+    //y = ax + c
+    // x is timestamp, y is the predicted value, c = -ax1 + y1
+
+    slope = (y[1] - y[0]) / (x[1] - x[0]);
+
+    // Calculate c using the formula c = -ax1 + y1
+    c = -slope * x[0] + y[0];
+
+    _rmse = rootMeanSquaredError(x, y).$1;
+  }
+
+  @override
+  String toString() => 'Gradient(${slope}x + $c)';
+
+  @override
+  double predict(double x) {
+    return slope * x + c;
+  }
+
+  @override
+  double get rmse => _rmse;
+}
+
 class BestMatchRegression extends Regression {
   late List<Regression> models;
   late Regression selected;
 
   BestMatchRegression(List<double> xValues, List<double> yValues) {
     models = [
+      FlatRegression(xValues, yValues),
+      GradientRegression(xValues, yValues),
       PolynomialRegression(xValues, yValues, 1),
       PolynomialRegression(xValues, yValues, 2),
       LogRegression(xValues, yValues), // Negative and zero numbers are out

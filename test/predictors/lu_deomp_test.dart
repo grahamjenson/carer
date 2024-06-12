@@ -1,4 +1,4 @@
-import 'package:carer/predictors/lu_decomp.dart';
+import 'package:carer/predictors/matrix.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';

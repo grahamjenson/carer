@@ -18,7 +18,7 @@ class UpdateCN extends ChangeNotifier {
   SettingsCN settings;
 
   // When this updates lots of things will change
-  final Summary _summary = Summary.empty;
+  Summary _summary = Summary.empty;
   bool _summaryToBeUpdated = true;
   bool _entriesToBeUpdated = true;
 
@@ -55,7 +55,7 @@ class UpdateCN extends ChangeNotifier {
   checkUpdateSummary() async {
     if (_summary.ageInSeconds() > 15) {
       _summaryToBeUpdated = true;
-      _updateReason = "Age older than 15";
+      _updateReason = "Age older than 15 ${_summary.ageInSeconds()}s";
     }
     var lastSGV = await SGV.lastSGV();
     if (lastSGV != null) {
@@ -71,7 +71,7 @@ class UpdateCN extends ChangeNotifier {
 
   updateSummary() async {
     var (nsURL, nsToken) = settings.nightscoutURLAndToken;
-    var summary = await NSClient().getSummary(nsURL, nsToken).catchError((e) {
+    _summary = await NSClient().getSummary(nsURL, nsToken).catchError((e) {
       log("GETTING SUMMARY ERROR: $e, $nsURL");
       _summaryToBeUpdated = true;
       return Summary.empty;
@@ -79,28 +79,28 @@ class UpdateCN extends ChangeNotifier {
 
     // convert the summary to models
     List<SGV> sgvs = [];
-    for (var sgv in summary.sgvs.sgvs) {
+    for (var sgv in _summary.sgvs.sgvs) {
       sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
     }
     var saveAllSGV = sgvs.map((e) => e.save()).toList();
     int sgvUpdates = (await Future.wait(saveAllSGV)).where((b) => b).length;
 
     List<Bolus> boluses = [];
-    for (var bolus in summary.treatments.boluses()) {
+    for (var bolus in _summary.treatments.boluses()) {
       boluses.add(Bolus(value: bolus.insulin!, date: bolus.date));
     }
     var saveAllBolus = boluses.map((e) => e.save()).toList();
     int bolusUpdates = (await Future.wait(saveAllBolus)).where((b) => b).length;
 
     List<Carbs> carbs = [];
-    for (var carb in summary.treatments.carbs()) {
+    for (var carb in _summary.treatments.carbs()) {
       carbs.add(Carbs(value: carb.carbs!.round(), date: carb.date));
     }
     var saveAllCarbs = carbs.map((e) => e.save()).toList();
     int carbUpdates = (await Future.wait(saveAllCarbs)).where((b) => b).length;
 
     List<TempBasal> tempBasals = [];
-    for (var tempBasal in summary.tempBasals.tempBasals) {
+    for (var tempBasal in _summary.tempBasals.tempBasals) {
       tempBasals.add(TempBasal(
           startDate: tempBasal.start,
           duration: tempBasal.duration.toInt(),
@@ -112,7 +112,7 @@ class UpdateCN extends ChangeNotifier {
         (await Future.wait(saveAllTBs)).where((b) => b).length;
 
     List<TempTarget> tempTargets = [];
-    for (var tempTarget in summary.targets.targets) {
+    for (var tempTarget in _summary.targets.targets) {
       tempTargets.add(TempTarget(
           startDate: tempTarget.start,
           duration: tempTarget.duration,
@@ -124,7 +124,7 @@ class UpdateCN extends ChangeNotifier {
     int tempTargetUpdates =
         (await Future.wait(saveAllTTs)).where((b) => b).length;
 
-    SummaryProfile summaryProfile = summary.profile;
+    SummaryProfile summaryProfile = _summary.profile;
 
     Profile profile = Profile(
       date: DateTime.now(),
@@ -139,7 +139,7 @@ class UpdateCN extends ChangeNotifier {
     );
     var profileUpdate = await profile.save();
 
-    var state = summary.state;
+    var state = _summary.state;
     var stateData = await StateData.instance;
     var iob = await stateData.setIOB(state.iob);
     var cob = await stateData.setCOB(state.cob.toDouble());
@@ -176,7 +176,7 @@ Bad data $badTempBasals, $badTempTargets
     var entries =
         await NSClient().getEntries(nsURL, nsToken, 12 * 48).catchError((e) {
       log("GETTING ENTRIES ERROR: $e, $nsURL");
-      _summaryToBeUpdated = true;
+
       return NSEntries.empty();
     });
 

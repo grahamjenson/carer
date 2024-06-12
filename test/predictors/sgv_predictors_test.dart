@@ -33,51 +33,6 @@ void main() {
       await (await CarerDB.instance).deleteAll();
     });
 
-    test("FlatPredictor", () async {
-      FlatPredictor pr = FlatPredictor();
-      await pr.init();
-      var sgvs = pr.predictNextHour();
-      expect(sgvs.length, 12);
-
-      var firstSGV = sgvs[0];
-      var secondSGV = sgvs[1];
-      expect(firstSGV.value, 140);
-      expect(firstSGV.date, min5fromNow);
-      expect(secondSGV.value, 140);
-      expect(secondSGV.date, min10fromNow);
-
-      var rmse =
-          await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [140, 140]);
-      expect(rmse.toInt(), 0);
-
-      rmse =
-          await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
-      // diff is 10 + 20 / 2 = 15 (ish)
-      expect(rmse.toInt(), 15);
-    });
-
-    test("GradientPredictor", () async {
-      GradientPredictor pr = GradientPredictor();
-      await pr.init();
-      var sgvs = pr.predictNextHour();
-      expect(sgvs.length, 12);
-
-      var firstSGV = sgvs[0];
-      var secondSGV = sgvs[1];
-      expect(firstSGV.value, 130);
-      expect(firstSGV.date, min5fromNow);
-      expect(secondSGV.value, 120);
-      expect(secondSGV.date, min10fromNow);
-
-      var rmse =
-          await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [140, 140]);
-      expect(rmse.toInt(), 15);
-
-      rmse =
-          await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
-      expect(rmse.toInt(), 0);
-    });
-
     test("BestRegressionPredictor", () async {
       BestRegressionPredictor pr = BestRegressionPredictor();
       await pr.init();
@@ -102,7 +57,7 @@ void main() {
       BestMatchRegression b = pr.regression! as BestMatchRegression;
 
       // This should use the linear regression (polyNomial(degree 1)) and track the gradient down.
-      expect(b.selected.toString(), 'Polynomial(1)');
+      expect(b.selected.toString(), startsWith("Gradient"));
       print("$pr RMSE: $rmse $sgvs");
       expect(rmse.toInt(), 0);
     });

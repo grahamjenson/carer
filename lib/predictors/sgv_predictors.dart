@@ -47,62 +47,6 @@ abstract class Predictor {
   }
 }
 
-// This predictor just returns the value of the current
-class FlatPredictor extends Predictor {
-  FlatPredictor();
-  SGV? lastSGV;
-
-  @override
-  Future<void> init() async {
-    lastSGV = await SGV.lastSGV();
-    if (lastSGV != null) _lastReadingDate = lastSGV!.date;
-  }
-
-  @override
-  SGV? predictAt(double timestamp) {
-    if (lastSGV == null) {
-      return null;
-    }
-
-    return SGV(
-        value: lastSGV!.value,
-        date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
-  }
-}
-
-class GradientPredictor extends Predictor {
-  GradientPredictor();
-  SGV? lastSGV;
-
-  @override
-  Future<void> init() async {
-    lastSGV = await SGV.lastSGV();
-    if (lastSGV != null) _lastReadingDate = lastSGV!.date;
-  }
-
-  @override
-  SGV? predictAt(double timestamp) {
-    if (lastSGV == null || lastSGV!.rate5m == null) {
-      return null;
-    }
-
-    // Using the lastSGV and rate5m to rearrage to formula y = ax + c
-    // x is timestamp, y is the predicted value, c = -ax1 + y1
-    double x1 = lastSGV!.date.millisecondsSinceEpoch.toDouble();
-    double y1 = lastSGV!.value.toDouble();
-    double slope =
-        lastSGV!.rate5m!.toDouble() / (5 * 60 * 1000); // rate5m is in mg/dL/min
-
-    // Calculate c using the formula c = -ax1 + y1
-    double c = -slope * x1 + y1;
-
-    DateTime newXDate = DateTime.fromMillisecondsSinceEpoch(timestamp.toInt());
-    int newYValue = (slope * timestamp + c).toInt();
-    int limitedValue = newYValue.clamp(20, 500);
-    return SGV(value: limitedValue, date: newXDate);
-  }
-}
-
 abstract class RegressionPredictor extends Predictor {
   Regression createRegression(List<double> x, List<double> y);
   final int pastReadings;
