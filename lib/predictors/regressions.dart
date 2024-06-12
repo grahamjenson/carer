@@ -3,6 +3,11 @@ import 'dart:math';
 import 'package:carer/predictors/matrix.dart';
 import 'package:carer/utils/math.dart';
 
+//  Converted From NightGuard codebase
+//  Maybe from https://github.com/dfelber/SwiftRegressionExperiments
+//  Created by Dominik Felber on 15.05.16.
+//  Copyright © 2016 Dominik Felber. All rights reserved.
+
 extension ListStatistics on List<double> {
   double get average => reduce((a, b) => a + b) / length;
   double get standardDeviation {

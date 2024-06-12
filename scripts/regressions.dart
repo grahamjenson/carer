@@ -10,7 +10,8 @@ void main() async {
   var nsURL = env["NS_URL"]!;
   var nsToken = env["TOKEN"]!;
 
-  var entries = await NSClient().getEntries(nsURL, nsToken, 12 * 48);
+  var entries = await NSClient().getEntries(nsURL, nsToken, 12 * 24 * 14);
+  print(entries.entries.length);
 
   final double mimnutesFromEpochToLastWeek =
       clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch /
@@ -31,7 +32,32 @@ void main() async {
     sgvs.add(entry.sgv!.toDouble());
   }
 
-  var trainingReadings = 5;
-  var b = BestMatchRegression(times.take(trainingReadings).toList(),
-      sgvs.take(trainingReadings).toList());
+  // Variables
+  // training readings
+  // check real values
+
+  printTest(times, sgvs);
+}
+
+bool printTest(List<double> times, List<double> sgvs) {
+  for (var readings = 2; readings < 7; readings++) {
+    for (var start = 30; start < 300; start++) {
+      var end = start + readings;
+      var trainingTimes = times.sublist(start, end).toList();
+      var trainingSgvs = sgvs.sublist(start, end).toList();
+
+      var testingTimes = times.sublist(end, end + 12).toList();
+      var testingSgvs = sgvs.sublist(end, end + 12).toList();
+
+      var b = BestMatchRegression(trainingTimes, trainingSgvs);
+
+      for (var m in b.models) {
+        var trainingDataRMSE = m.rmse;
+        var (rmse, _) = m.rootMeanSquaredError(testingTimes, testingSgvs);
+        print("${m.toString()} $rmse $trainingDataRMSE");
+      }
+      print("--------");
+    }
+  }
+  return true;
 }

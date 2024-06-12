@@ -252,7 +252,6 @@ class BestMatchRegression extends Regression {
       // Check the root mean squared error fot
       var rootMeanSquaredError = model.rmse;
 
-      print("$model RMSE: $rootMeanSquaredError");
       if (rootMeanSquaredError.isNaN) {
         continue;
       }
