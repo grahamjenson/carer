@@ -44,5 +44,7 @@ app.*.map.json
 
 launch.json
 test.json
+data.json
+data.csv
 macosData
 coverage/

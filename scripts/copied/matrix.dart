@@ -40,6 +40,9 @@ class Matrix {
   }
 
   bool valid() {
+    if (matrix.isEmpty) {
+      return false;
+    }
     for (var list in matrix) {
       for (var element in list) {
         if (!element.isFinite) {

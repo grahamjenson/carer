@@ -12,9 +12,10 @@ extension ListStatistics on List<double> {
 
 abstract class Regression {
   double predict(double xValue);
-
+  int min = 20;
+  int max = 400;
   List<double> predictAll(List<double> xVals) {
-    return xVals.map(predict).toList();
+    return xVals.map(predict).map((e) => e.clamp(min, max).toDouble()).toList();
   }
 
   double get rmse;
@@ -253,13 +254,11 @@ class BestMatchRegression extends Regression {
   BestMatchRegression(List<double> xValues, List<double> yValues) {
     models = [
       FlatRegression(xValues, yValues),
-      GradientRegression(xValues, yValues),
       LinearRegression(xValues, yValues),
       QuadraticRegression(xValues, yValues),
       LogRegression(xValues, yValues), // Negative and zero numbers are out
       LogRegressionLogY(xValues, yValues),
       SqrtRegression(xValues, yValues),
-      ExpRegression(xValues, yValues),
     ];
 
     double minErrorVariance = double.infinity;
