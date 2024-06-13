@@ -77,9 +77,9 @@ class CarerDB {
     // TODO limit this to a time scope, no point joining tables months ago
     return '''
     with badData  as (
-      select a.id as a_id, a.start as a_start, b.start as b_start from $table as a join $table as b on a.start < b.start and b.start < a.end
+      select a.id as a_id, (b.start -a.start)/1000 as nd from $table as a join $table as b on a.start < b.start and b.start < a.end order by nd desc
     )
-    update $table set duration = (b_start - a_start)/1000 from badData where id = a_id 
+    update $table set duration = nd from badData where id = a_id 
     ''';
   }
   ////

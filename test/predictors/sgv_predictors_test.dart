@@ -1,5 +1,4 @@
 import 'package:carer/models/sgv.dart';
-import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,8 +32,8 @@ void main() {
       await (await CarerDB.instance).deleteAll();
     });
 
-    test("BestRegressionPredictor", () async {
-      BestRegressionPredictor pr = BestRegressionPredictor();
+    test("LinearRegressionPredictor", () async {
+      LinearRegressionPredictor pr = LinearRegressionPredictor();
       await pr.init();
 
       var sgvs = pr.predictNextHour();
@@ -53,11 +52,6 @@ void main() {
 
       rmse =
           await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
-
-      BestMatchRegression b = pr.regression! as BestMatchRegression;
-
-      // This should use the linear regression (polyNomial(degree 1)) and track the gradient down.
-      expect(b.selected.toString(), startsWith("Gradient"));
       print("$pr RMSE: $rmse $sgvs");
       expect(rmse.toInt(), 0);
     });

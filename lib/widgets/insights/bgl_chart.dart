@@ -67,7 +67,8 @@ class BGLChart extends StatelessWidget {
           future: futureWindow(settings),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              print("BGLChart snapshot error: ${snapshot.error}");
+              print("BGLChart snapshot error");
+              return const CircularProgressIndicator();
             }
             if (snapshot.hasData) {
               return snapshot.data!;

@@ -47,6 +47,9 @@ class TimeValues {
   }
 
   List<double> expand() {
+    if (values.isEmpty) {
+      return [];
+    }
     List<double> expanded = [];
     var vi = 0;
 
@@ -156,13 +159,13 @@ class SummaryTempTarget {
 }
 
 class SummaryState {
-  final double iob;
-  final int cob;
-  final double bwp;
-  final int cage;
-  final int iage;
-  final int bage;
-  final int battery;
+  final double? iob;
+  final int? cob;
+  final double? bwp;
+  final int? cage;
+  final int? iage;
+  final int? bage;
+  final int? battery;
 
   const SummaryState({
     required this.iob,
@@ -176,9 +179,9 @@ class SummaryState {
 
   factory SummaryState.fromJson(Map<String, dynamic> json) {
     return SummaryState(
-      iob: json['iob'].toDouble(),
+      iob: (json['iob'] ?? 0).toDouble(),
       cob: json['cob'],
-      bwp: json['bwp'].toDouble(),
+      bwp: (json['bwp'] ?? 0).toDouble(),
       cage: json['cage'],
       iage: json['iage'],
       bage: json['bage'],

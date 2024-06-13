@@ -32,14 +32,14 @@ class NSClient {
 
       if (response.statusCode != 200) {
         log("NON 200 responce code ${response.statusCode}");
-        throw Exception("Bad HTTP");
+        return NSEntries.empty();
       }
 
       return NSEntries.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
-      return Future.error(e);
+      return NSEntries.empty();
     }
   }
 
@@ -73,13 +73,13 @@ class NSClient {
       log("FETCHED ${ep.toString()}");
       if (response.statusCode != 200) {
         print("NON 200 responce code ${response.statusCode}");
-        throw Exception("Bad HTTP");
+        return Summary.empty;
       }
       return Summary.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
-      return Future.error(e);
+      return Summary.empty;
     }
   }
 }

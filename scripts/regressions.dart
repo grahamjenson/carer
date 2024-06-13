@@ -10,8 +10,9 @@ void main() async {
   var nsURL = env["NS_URL"]!;
   var nsToken = env["TOKEN"]!;
 
-  var entries = await NSClient().getEntries(nsURL, nsToken, 12 * 24 * 14);
+  var entries = await NSClient().getEntries(nsURL, nsToken, 1000);
   print(entries.entries.length);
+  print(entries.entries);
 
   final double mimnutesFromEpochToLastWeek =
       clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch /
@@ -50,7 +51,7 @@ bool printTest(List<double> times, List<double> sgvs) {
   };
   for (var readings = 2; readings <= 7; readings++) {
     rmesess[readings] ??= {};
-    for (var start = 30; start <= 576; start++) {
+    for (var start = 0; start <= 576; start++) {
       var end = start + readings;
       var trainingTimes = times.sublist(start, end).toList();
       var trainingSgvs = sgvs.sublist(start, end).toList();
@@ -65,7 +66,8 @@ bool printTest(List<double> times, List<double> sgvs) {
         var shouldHaveBeenSelected = b.models.first;
         double minErrorVariance = double.infinity;
         for (var m in b.models) {
-          var trainingDataRMSE = m.rmse;
+          var (trainingDataRMSE, _) =
+              m.rootMeanSquaredError(trainingTimes, trainingSgvs);
           var (rmse, _) = m.rootMeanSquaredError(testingTimes, testingSgvs);
 
           if (rmse <= minErrorVariance) {

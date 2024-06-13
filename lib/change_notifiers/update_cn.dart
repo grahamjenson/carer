@@ -77,6 +77,11 @@ class UpdateCN extends ChangeNotifier {
       return Summary.empty;
     });
 
+    if (_summary == Summary.empty) {
+      print("Summary is empty, not updating.");
+      _summaryToBeUpdated = true;
+      return;
+    }
     // convert the summary to models
     List<SGV> sgvs = [];
     for (var sgv in _summary.sgvs.sgvs) {
@@ -141,10 +146,19 @@ class UpdateCN extends ChangeNotifier {
 
     var state = _summary.state;
     var stateData = await StateData.instance;
-    var iob = await stateData.setIOB(state.iob);
-    var cob = await stateData.setCOB(state.cob.toDouble());
-    var battery = await stateData.setBattery(state.battery.toDouble());
-    var cage = await stateData.setCAge(state.cage.toDouble());
+    bool iob = false, cob = false, battery = false, cage = false;
+    if (state.iob != null) {
+      iob = await stateData.setIOB(state.iob!.toDouble());
+    }
+    if (state.cob != null) {
+      cob = await stateData.setCOB(state.cob!.toDouble());
+    }
+    if (state.battery != null) {
+      battery = await stateData.setBattery(state.battery!.toDouble());
+    }
+    if (state.cage != null) {
+      cage = await stateData.setCAge(state.cage!.toDouble());
+    }
 
     // summary is not trustworthy source of information
     // TODO replace summary as the source of information
