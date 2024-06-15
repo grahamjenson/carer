@@ -1,4 +1,5 @@
 import 'package:carer/sql/carer_db.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -15,14 +16,15 @@ abstract class Model {
     return clock.now().difference(date);
   }
 
-  Future<bool> save() async {
+  Future<bool> save() {
     // TODO update the id of the model
-    return repository.save(this);
+    return futureProfile("$runtimeType save", repository.save(this));
   }
 
-  Future<bool> upsert() async {
+  Future<bool> upsert() {
     // TODO update the id of the model
-    return repository.upsert(this, uniqueValues());
+    return futureProfile(
+        "$runtimeType upsert", repository.upsert(this, uniqueValues()));
   }
 
   List<String> uniqueValues() {
@@ -60,11 +62,13 @@ abstract class ModelRepository<T extends Model> {
     var cdb = await CarerDB.instance;
     var (where, whereArgs) = _buildWhereStatement(
         after: after, before: before, conditions: conditions);
-    var res = await cdb.db.query(tableName,
-        where: where,
-        whereArgs: whereArgs,
-        limit: limit,
-        orderBy: "$timestampField DESC");
+    var res = await futureProfile(
+        "$runtimeType q",
+        cdb.db.query(tableName,
+            where: where,
+            whereArgs: whereArgs,
+            limit: limit,
+            orderBy: "$timestampField DESC"));
     return res.map((e) => fromMap(e)).toList();
   }
 

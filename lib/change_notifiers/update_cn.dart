@@ -12,6 +12,7 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
+import 'package:carer/sql/carer_db.dart';
 import 'package:flutter/material.dart';
 
 class UpdateCN extends ChangeNotifier {
@@ -201,8 +202,16 @@ Bad data $badTempBasals, $badTempTargets
       }
       sgvs.add(SGV(value: entry.sgv!, date: entry.date));
     }
-    var saveAllSGV = sgvs.map((e) => e.save()).toList();
-    int sgvUpdates = (await Future.wait(saveAllSGV)).where((b) => b).length;
-    print("ENTRIEEESSSSS UPDATES $sgvUpdates");
+    var cdb = await CarerDB.instance;
+
+    var total = 0;
+    for (var e in sgvs) {
+      var saveSGV = await e.save();
+      if (saveSGV) {
+        total++;
+      }
+    }
+
+    print("ENTRIEEESSSSS UPDATES $total");
   }
 }

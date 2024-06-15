@@ -331,23 +331,13 @@ const String timestampMinutesViewName = "timestampMinutes";
 const timestampMinutesView = DBTable(timestampMinutesViewName, '''
 CREATE VIEW timestampMinutes AS
 WITH minutes(minute) AS (
-  values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28),(29),(30),(31),(32),(33),(34),(35),(36),(37),(38),(39),(40),(41),(42),(43),(44),(45),(46),(47),(48),(49),(50),(51),(52),(53),(54),(55),(56),(57),(58),(59)
-),
-hours(hour) AS (
-  values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23)
-),
-days(day) AS (
-  values (0),(1)
-),
-start_of_next_minute(start_of_next_minute) AS (
-  -- Calcualte the start of the next minute
-  values (
-      (strftime('%s',datetime(strftime('%Y-%m-%d %H:%M:00', 'now') )) + 60 )* 1000
-    )
+  values (-1), (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28),(29),(30),(31),(32),(33),(34),(35),(36),(37),(38),(39),(40),(41),(42),(43),(44),(45),(46),(47),(48),(49),(50),(51),(52),(53),(54),(55),(56),(57),(58),(59),
+  (60),(61),(62),(63),(64),(65),(66),(67),(68),(69),(70),(71),(72),(73),(74),(75),(76),(77),(78),(79),(80),(81),(82),(83),(84),(85),(86),(87),(88),(89),(90),(91),(92),(93),(94),(95),(96),(97),(98),(99),(100),(101),(102),(103),(104),(105),(106),(107),(108),(109),(110),(111),(112),(113),(114),(115),(116),(117),(118),(119),
+  (120), (121)
 ),
 times AS (
-  SELECT start_of_next_minute - ((days.day * 1440) + (hours.hour * 60) + minutes.minute) * 60 * 1000 AS timestamp
-  FROM days JOIN hours JOIN minutes JOIN start_of_next_minute
+  SELECT (strftime('%s',datetime(strftime('%Y-%m-%d %H:%M:00', 'now') )) - 60 * minute ) * 1000 AS timestamp
+  FROM minutes
 )
 SELECT 
   timestamp,
@@ -365,35 +355,35 @@ WITH
   -- TODO get the latest profile should later get profile per time
   current_profile AS (SELECT id FROM profile ORDER BY timestamp desc limit 1),
   profile_hours AS (SELECT * FROM current_profile JOIN profileHourView ON current_profile.id = profileHourView.id),
-  -- GET LAST 5 hours of times.
-  times_to_look AS (SELECT * from timestampMinutes limit 300),
   profile_targets AS (
     SELECT 
-      times_to_look.timestamp,
-      times_to_look.datetime, 
-      times_to_look.hour, 
+      timestampMinutes.timestamp,
+      timestampMinutes.datetime, 
+      timestampMinutes.hour, 
       profile_hours.tlow AS profile_low, 
       profile_hours.thigh AS profile_high,
       profile_hours.basal AS profile_basal,
       profile_hours.isf AS profile_isf,
       profile_hours.cr AS profile_cr
     FROM 
-      times_to_look JOIN profile_hours ON times_to_look.hour = profile_hours.hour
-  )
+      timestampMinutes JOIN profile_hours ON timestampMinutes.hour = profile_hours.hour
+  ),
+ltempbasal as (select * from tempbasal where datetime(end/1000, 'unixepoch')  > datetime('now', '-2 hours')),
+ltemptargets as (select * from temptargets where datetime(end/1000, 'unixepoch')  > datetime('now', '-2 hours'))
 SELECT 
   timestamp, 
   datetime, 
-  COALESCE(temptargets.targetLow, profile_low) AS targetLow, 
-  COALESCE(temptargets.targetHigh, profile_high) AS targetHigh, 
-  COALESCE(tempbasal.value, profile_basal) AS basal,
+  COALESCE(ltemptargets.targetLow, profile_low) AS targetLow, 
+  COALESCE(ltemptargets.targetHigh, profile_high) AS targetHigh, 
+  COALESCE(ltempbasal.value, profile_basal) AS basal,
   profile_isf as isf,
   profile_cr as cr,
-  temptargets.targetHigh is not NULL AS isTempTarget,
-  tempbasal.value is not NULL AS isTempBasal 
+  ltemptargets.targetHigh is not NULL AS isTempTarget,
+  ltempbasal.value is not NULL AS isTempBasal 
 FROM 
   profile_targets 
-  LEFT JOIN temptargets ON profile_targets.timestamp >= temptargets.start and profile_targets.timestamp < temptargets.end
-  LEFT JOIN tempbasal ON profile_targets.timestamp >= tempbasal.start and profile_targets.timestamp < tempbasal.end
+  LEFT JOIN ltemptargets ON profile_targets.timestamp >= ltemptargets.start and profile_targets.timestamp < ltemptargets.end
+  LEFT JOIN ltempbasal ON profile_targets.timestamp >= ltempbasal.start and profile_targets.timestamp < ltempbasal.end
 ORDER BY 
   timestamp desc;
   ''');

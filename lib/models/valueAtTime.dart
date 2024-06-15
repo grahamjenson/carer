@@ -75,14 +75,8 @@ class ValueAtTime extends Model {
     int? before,
     Map<String, Object>? conditions,
     int? limit,
-  }) async {
-    Stopwatch stopwatch = Stopwatch()..start();
-    var ret = await _q.query(
+  }) {
+    return _q.query(
         before: before, after: after, limit: limit, conditions: conditions);
-    stopwatch.stop();
-
-    print('ValueAtTime STUFF executed in ${stopwatch.elapsed.inMilliseconds}');
-
-    return ret;
   }
 }

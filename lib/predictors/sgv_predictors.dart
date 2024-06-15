@@ -54,8 +54,8 @@ abstract class RegressionPredictor extends Predictor {
       clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch /
           60000;
 
-  // Based on some hacky stats, 4 readings in the past seems best
-  RegressionPredictor({this.pastReadings = 4});
+  // Based on some hacky stats, 5 readings in the past seems best
+  RegressionPredictor({this.pastReadings = 5});
 
   Regression? regression;
   // When processing very large numbers, by squaring and cubing this can cause lots of issues
