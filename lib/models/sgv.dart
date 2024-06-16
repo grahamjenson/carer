@@ -113,12 +113,21 @@ class SGV extends Model {
   }
 
   static Future<SGV?> lastSGV() async {
-    // TODO cache this for 5 mins (if becoms a problem)
-    return (await _q.query(limit: 1)).firstOrNull;
+    if (lastSGVcache != null) {
+      return lastSGVcache;
+    }
+    var ret = (await _q.query(limit: 1, name: "lastSGV")).firstOrNull;
+    lastSGVcache = ret;
+    return ret;
   }
 
   static Future<List<SGV>> query(
-      {int? after, int? before, int? low, int? high, int? limit}) async {
+      {int? after,
+      int? before,
+      int? low,
+      int? high,
+      int? limit,
+      String? name}) async {
     var conditions = <String, Object>{};
     if (low != null) {
       conditions["value >= ?"] = low;
@@ -128,12 +137,24 @@ class SGV extends Model {
     }
 
     return _q.query(
-        after: after, before: before, conditions: conditions, limit: limit);
+        after: after,
+        before: before,
+        conditions: conditions,
+        limit: limit,
+        name: name);
   }
 
-  // return the last sgvs for minutes
+  // return the last sgvs for minutes'
+  static Map<int, List<SGV>> lastMinsCache = {};
+  static SGV? lastSGVcache;
+
   static Future<List<SGV>> lastMins(int minsAgo) async {
-    return (await _q.lastMins(minsAgo));
+    if (lastMinsCache[minsAgo] != null) {
+      return lastMinsCache[minsAgo]!;
+    }
+    var ret = (await _q.lastMins(minsAgo));
+    lastMinsCache[minsAgo] = ret;
+    return ret;
   }
 
   static Future<double> percentInRangeToday(int low, int high) async {
@@ -153,5 +174,16 @@ class SGV extends Model {
     }
 
     return sgvsTodayInRange / sgvsToday;
+  }
+
+  // overside save to cache lastMins and lastSGV values
+  @override
+  Future<bool> save() async {
+    var ret = await super.save();
+    if (ret) {
+      lastMinsCache = {};
+      lastSGVcache = null;
+    }
+    return ret;
   }
 }

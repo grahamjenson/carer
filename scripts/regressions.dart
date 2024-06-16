@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import "copied/regressions.dart";
+import "implregressions.dart";
 
 void main() async {
   // data.json is a tide pool dump of JSON data
@@ -39,12 +39,9 @@ void main() async {
 
 bool printTest(List<double> times, List<double> sgvs) {
   Map<int, Map<int, Map<String, List<Map<String, double>>>>> rmesess = {
-    2: {},
-    3: {},
-    4: {},
-    5: {},
-    6: {},
-    7: {},
+    -18: {},
+    0: {},
+    18: {},
   };
 
   // Number of tests
@@ -53,9 +50,11 @@ bool printTest(List<double> times, List<double> sgvs) {
   // Using this system and understanding the error variance what are the safe guarged we should place
   // four days
   var numOfTests = 12 * 24 * 14;
+  var readings = 5;
+  for (var lowHighDiff in [(-18, 18), (0, 0), (18, -18)]) {
+    var (lowDiff, highDiff) = lowHighDiff;
 
-  for (var readings = 5; readings <= 5; readings++) {
-    rmesess[readings] ??= {};
+    rmesess[lowDiff] ??= {};
     // Jump further by 5 each time
     for (var start = 0; start < numOfTests * 6; start += 6) {
       var end = start + readings;
@@ -76,7 +75,7 @@ bool printTest(List<double> times, List<double> sgvs) {
         var b = BestMatchRegression(
             trainingTimes.reversed.toList(), trainingSgvs.reversed.toList());
 
-        rmesess[readings]![testReadings] ??= {};
+        rmesess[lowDiff]![testReadings] ??= {};
 
         var shouldHaveBeenSelected = b.models.first;
         double minErrorVariance = double.infinity;
@@ -103,8 +102,8 @@ bool printTest(List<double> times, List<double> sgvs) {
           var isGoingToBeHigh = testSVG > 180;
           var isGoingToBeNormal = !isGoingToBeLow && !isGoingToBeHigh;
 
-          var predictedLow = preds.last < 72 - 18;
-          var predictedHigh = preds.last > 180 + 18;
+          var predictedLow = preds.last < 72 + lowDiff;
+          var predictedHigh = preds.last > 180 + highDiff;
           var predictedNormal = !predictedLow && !predictedHigh;
 
           // Work Out Predicted Low/High Proabability to be True
@@ -113,7 +112,7 @@ bool printTest(List<double> times, List<double> sgvs) {
             minErrorVariance = rmse;
             shouldHaveBeenSelected = m;
           }
-          rmesess[readings]![testReadings]![modelName] ??= [];
+          rmesess[lowDiff]![testReadings]![modelName] ??= [];
 
           //simple implementations of smart snooze and predictive low
 
@@ -128,7 +127,18 @@ bool printTest(List<double> times, List<double> sgvs) {
               predictedHigh,
               predictedNormal);
 
-          var (predictSnooze, willSnooze) = smartSnooze(
+          var (predictSnoozeLow, willSnoozeLow) = smartSnoozeLow(
+              isLow,
+              isHigh,
+              isNormal,
+              isGoingToBeLow,
+              isGoingToBeHigh,
+              isGoingToBeNormal,
+              predictedLow,
+              predictedHigh,
+              predictedNormal);
+
+          var (predictSnoozeHigh, willSnoozeHigh) = smartSnoozeHigh(
               isLow,
               isHigh,
               isNormal,
@@ -143,11 +153,14 @@ bool printTest(List<double> times, List<double> sgvs) {
           var predictAlarmFP = predictAlarm && !willAlarm;
           var predictAlarmFN = !predictAlarm && willAlarm;
 
-          var predictSnoozeGood = predictSnooze && willSnooze;
-          var predictSnoozeFP = predictSnooze && !willSnooze;
-          var predictSnoozeFN = !predictSnooze && willSnooze;
+          var predictSnoozeLowGood = predictSnoozeLow && willSnoozeLow;
+          var predictSnoozeLowFP = predictSnoozeLow && !willSnoozeLow;
+          var predictSnoozeLowFN = !predictSnoozeLow && willSnoozeLow;
+          var predictSnoozeHighGood = predictSnoozeHigh && willSnoozeHigh;
+          var predictSnoozeHighFP = predictSnoozeHigh && !willSnoozeHigh;
+          var predictSnoozeHighFN = !predictSnoozeHigh && willSnoozeHigh;
 
-          rmesess[readings]![testReadings]![modelName]!.add({
+          rmesess[lowDiff]![testReadings]![modelName]!.add({
             'trmse': trainingDataRMSE,
             'rmse': rmse,
             "selected": b.selected == m ? 1 : 0,
@@ -155,14 +168,17 @@ bool printTest(List<double> times, List<double> sgvs) {
             "predictAlarmGood": predictAlarmGood ? 1 : 0,
             "predictAlarmFP": predictAlarmFP ? 1 : 0,
             "predictAlarmFN": predictAlarmFN ? 1 : 0,
-            "predictSnoozeGood": predictSnoozeGood ? 1 : 0,
-            "predictSnoozeFP": predictSnoozeFP ? 1 : 0,
-            "predictSnoozeFN": predictSnoozeFN ? 1 : 0,
+            "predictSnoozeLowGood": predictSnoozeLowGood ? 1 : 0,
+            "predictSnoozeLowFP": predictSnoozeLowFP ? 1 : 0,
+            "predictSnoozeLowFN": predictSnoozeLowFN ? 1 : 0,
+            "predictSnoozeHighGood": predictSnoozeHighGood ? 1 : 0,
+            "predictSnoozeHighFP": predictSnoozeHighFP ? 1 : 0,
+            "predictSnoozeHighFN": predictSnoozeHighFN ? 1 : 0,
           });
 
           //print("${m.toString()} $rmse $trainingDataRMSE");
         }
-        rmesess[readings]![testReadings]![
+        rmesess[lowDiff]![testReadings]![
                 shouldHaveBeenSelected.runtimeType.toString()]!
             .last['lowest'] = 1.0;
         //
@@ -170,7 +186,7 @@ bool printTest(List<double> times, List<double> sgvs) {
     }
   }
 
-  Map<String, List<List<double>>> bestTrainingSet = {};
+  //Map<String, List<List<double>>> bestTrainingSet = {};
   Map<String, List<double>> bestFuture = {};
   rmesess.forEach((readings, readingsValue) {
     readingsValue.forEach((testReadings, testReadingsValue) {
@@ -183,9 +199,13 @@ bool printTest(List<double> times, List<double> sgvs) {
         int totalpredictAlarmGood = 0;
         int totalpredictAlarmFP = 0;
         int totalpredictAlarmFN = 0;
-        int totalpredictSnoozeGood = 0;
-        int totalpredictSnoozeFP = 0;
-        int totalpredictSnoozeFN = 0;
+        int totalpredictSnoozeLowGood = 0;
+        int totalpredictSnoozeLowFP = 0;
+        int totalpredictSnoozeLowFN = 0;
+
+        int totalpredictSnoozeHighGood = 0;
+        int totalpredictSnoozeHighFP = 0;
+        int totalpredictSnoozeHighFN = 0;
 
         var n = 0;
         for (var lv in l) {
@@ -202,9 +222,13 @@ bool printTest(List<double> times, List<double> sgvs) {
           totalpredictAlarmFP += lv['predictAlarmFP']!.toInt();
           totalpredictAlarmFN += lv['predictAlarmFN']!.toInt();
 
-          totalpredictSnoozeGood += lv['predictSnoozeGood']!.toInt();
-          totalpredictSnoozeFP += lv['predictSnoozeFP']!.toInt();
-          totalpredictSnoozeFN += lv['predictSnoozeFN']!.toInt();
+          totalpredictSnoozeLowGood += lv['predictSnoozeLowGood']!.toInt();
+          totalpredictSnoozeLowFP += lv['predictSnoozeLowFP']!.toInt();
+          totalpredictSnoozeLowFN += lv['predictSnoozeLowFN']!.toInt();
+
+          totalpredictSnoozeHighGood += lv['predictSnoozeHighGood']!.toInt();
+          totalpredictSnoozeHighFP += lv['predictSnoozeHighFP']!.toInt();
+          totalpredictSnoozeHighFN += lv['predictSnoozeHighFN']!.toInt();
 
           if (rmse.isNaN ||
               trmse.isNaN ||
@@ -226,24 +250,34 @@ bool printTest(List<double> times, List<double> sgvs) {
 
         var modelNameFR = "$modelName($readings)";
 
-        bestTrainingSet[modelName] ??= [[], [], [], [], [], []];
-        bestTrainingSet[modelName]![readings - 2].add(rmse);
+        // bestTrainingSet[modelName] ??= [[], [], [], [], [], []];
+        // bestTrainingSet[modelName]![readings - 2].add(rmse);
 
         bestFuture[modelNameFR] ??= List.filled(12, 0);
         bestFuture[modelNameFR]![testReadings - 1] = rmse;
 
         var fractionAlarmCorrect =
             ((n - totalpredictAlarmFP - totalpredictAlarmFN) * 100.0) / n;
-        var fractionSnoozeCorrect =
-            ((n - totalpredictSnoozeFP - totalpredictSnoozeFN) * 100.0) / n;
+        var fractionSnoozeLowCorrect =
+            ((n - totalpredictSnoozeLowFP - totalpredictSnoozeLowFN) * 100.0) /
+                n;
+
+        var fractionSnoozeHighCorrect =
+            ((n - totalpredictSnoozeHighFP - totalpredictSnoozeHighFN) *
+                    100.0) /
+                n;
 
         var annoyingAlarms = (totalpredictAlarmFP * 100.0) / n;
-        var dangerousSnoozes = (totalpredictSnoozeFP * 100.0) / n;
+        var missedAlarms = (totalpredictAlarmFN * 100.0) / n;
+        var dangerousLowSnoozes = (totalpredictSnoozeLowFP * 100.0) / n;
+        var missedLowSnoozes = (totalpredictSnoozeLowFN * 100.0) / n;
+        var dangerousHighSnoozes = (totalpredictSnoozeHighFP * 100.0) / n;
+        var missedHighSnoozes = (totalpredictSnoozeHighFN * 100.0) / n;
 
         //print(
         //    "$model,$readings,$testReadings,$n,${dp4(trmse)},${dp4(rmse)},$totalSelected,$totalLowest, ${dp4(fractionAlarmCorrect)}, ${dp4(fractionSnoozeCorrect)}, ${dp4(annoyingAlarms)}, ${dp4(dangerousSnoozes)}");
         print(
-            "$model,$readings,$testReadings, $n, ${dp4(fractionAlarmCorrect)}, ${dp4(fractionSnoozeCorrect)}, ${dp4(annoyingAlarms)}, ${dp4(dangerousSnoozes)}");
+            "$model,$readings,$testReadings, $n, ${dp4(fractionAlarmCorrect)}, ${dp4(annoyingAlarms)}, ${dp4(missedAlarms)}, ${dp4(fractionSnoozeLowCorrect)}, ${dp4(dangerousLowSnoozes)},  ${dp4(missedLowSnoozes)}, ${dp4(fractionSnoozeHighCorrect)}, ${dp4(dangerousHighSnoozes)}, ${dp4(missedHighSnoozes)}");
       });
     });
   });
@@ -342,7 +376,7 @@ double median(List<double> nums) {
   return (predictedAalrm, shouldAlarm);
 }
 
-(bool, bool) smartSnooze(
+(bool, bool) smartSnoozeLow(
     bool isLow,
     isHigh,
     isNormal,
@@ -360,11 +394,40 @@ double median(List<double> nums) {
   var predictSnooze = false;
   var shouldSnooze = false;
 
-  if ((isLow || isHigh) && predictedNormal) {
+  if ((isLow) && predictedNormal) {
     predictSnooze = true;
   }
 
-  if ((isLow || isHigh) && isGoingToBeNormal) {
+  if ((isLow) && isGoingToBeNormal) {
+    shouldSnooze = true;
+  }
+
+  return (predictSnooze, shouldSnooze);
+}
+
+(bool, bool) smartSnoozeHigh(
+    bool isLow,
+    isHigh,
+    isNormal,
+    isGoingToBeLow,
+    isGoingToBeHigh,
+    isGoingToBeNormal,
+    predictedLow,
+    predictedHigh,
+    predictedNormal) {
+  // It will only be alarming if it is already low or high
+  if (isNormal) {
+    return (false, false);
+  }
+
+  var predictSnooze = false;
+  var shouldSnooze = false;
+
+  if ((isHigh) && predictedNormal) {
+    predictSnooze = true;
+  }
+
+  if ((isHigh) && isGoingToBeNormal) {
     shouldSnooze = true;
   }
 

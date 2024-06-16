@@ -58,12 +58,13 @@ abstract class ModelRepository<T extends Model> {
     int? before,
     Map<String, Object>? conditions,
     int? limit,
+    String? name, // Optional for debugging
   }) async {
     var cdb = await CarerDB.instance;
     var (where, whereArgs) = _buildWhereStatement(
         after: after, before: before, conditions: conditions);
     var res = await futureProfile(
-        "$runtimeType q",
+        "$runtimeType ${name ?? "q"}",
         cdb.db.query(tableName,
             where: where,
             whereArgs: whereArgs,
@@ -74,6 +75,7 @@ abstract class ModelRepository<T extends Model> {
 
   Future<List<T>> lastMins(int minsAgo) async {
     return (await query(
+        name: "lastMins",
         after: clock
             .now()
             .subtract(Duration(minutes: minsAgo))

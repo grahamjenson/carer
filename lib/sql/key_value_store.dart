@@ -156,7 +156,10 @@ class KeyValueStore {
 
   Future<bool> _setValue(String valueType, String key, Object value) async {
     ArgumentError.checkNotNull(value, 'value');
-
+    var oldValue = _cache[key];
+    if (oldValue == value) {
+      return false;
+    }
     _cache[key] = value;
 
     if (valueType == 'Bool') {

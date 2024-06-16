@@ -69,7 +69,7 @@ abstract class RegressionPredictor extends Predictor {
 
   @override
   Future<void> init() async {
-    sgvs = await SGV.query(limit: pastReadings);
+    sgvs = await SGV.query(limit: pastReadings, name: "RegressionPredictor");
     if (sgvs.isEmpty) {
       return;
     }

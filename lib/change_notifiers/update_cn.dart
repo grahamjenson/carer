@@ -12,7 +12,6 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:flutter/material.dart';
 
 class UpdateCN extends ChangeNotifier {
@@ -84,51 +83,43 @@ class UpdateCN extends ChangeNotifier {
       return;
     }
     // convert the summary to models
-    List<SGV> sgvs = [];
+    int sgvUpdates = 0;
     for (var sgv in _summary.sgvs.sgvs) {
-      sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
-    }
-    var saveAllSGV = sgvs.map((e) => e.save()).toList();
-    int sgvUpdates = (await Future.wait(saveAllSGV)).where((b) => b).length;
+      var svgModel = SGV(value: sgv.sgv, date: sgv.mills);
 
-    List<Bolus> boluses = [];
+      sgvUpdates += (await svgModel.save()) ? 1 : 0;
+    }
+
+    int bolusUpdates = 0;
     for (var bolus in _summary.treatments.boluses()) {
-      boluses.add(Bolus(value: bolus.insulin!, date: bolus.date));
+      var bolusModel = Bolus(value: bolus.insulin!, date: bolus.date);
+      sgvUpdates += (await bolusModel.save()) ? 1 : 0;
     }
-    var saveAllBolus = boluses.map((e) => e.save()).toList();
-    int bolusUpdates = (await Future.wait(saveAllBolus)).where((b) => b).length;
 
-    List<Carbs> carbs = [];
+    int carbUpdates = 0;
     for (var carb in _summary.treatments.carbs()) {
-      carbs.add(Carbs(value: carb.carbs!.round(), date: carb.date));
+      var carbModel = Carbs(value: carb.carbs!.round(), date: carb.date);
+      carbUpdates += (await carbModel.save()) ? 1 : 0;
     }
-    var saveAllCarbs = carbs.map((e) => e.save()).toList();
-    int carbUpdates = (await Future.wait(saveAllCarbs)).where((b) => b).length;
 
-    List<TempBasal> tempBasals = [];
+    int tempBasalUpdates = 0;
     for (var tempBasal in _summary.tempBasals.tempBasals) {
-      tempBasals.add(TempBasal(
+      var tbModel = TempBasal(
           startDate: tempBasal.start,
           duration: tempBasal.duration.toInt(),
-          value: tempBasal.absolute));
+          value: tempBasal.absolute);
+      tempBasalUpdates += (await tbModel.upsert()) ? 1 : 0;
     }
 
-    var saveAllTBs = tempBasals.map((e) => e.upsert()).toList();
-    int tempBasalUpdates =
-        (await Future.wait(saveAllTBs)).where((b) => b).length;
-
-    List<TempTarget> tempTargets = [];
+    int tempTargetUpdates = 0;
     for (var tempTarget in _summary.targets.targets) {
-      tempTargets.add(TempTarget(
+      var ttModel = TempTarget(
           startDate: tempTarget.start,
           duration: tempTarget.duration,
           targetHigh: tempTarget.targetTop,
-          targetLow: tempTarget.targetBottom));
+          targetLow: tempTarget.targetBottom);
+      tempTargetUpdates += (await ttModel.upsert()) ? 1 : 0;
     }
-
-    var saveAllTTs = tempTargets.map((e) => e.upsert()).toList();
-    int tempTargetUpdates =
-        (await Future.wait(saveAllTTs)).where((b) => b).length;
 
     SummaryProfile summaryProfile = _summary.profile;
 
@@ -195,19 +186,17 @@ Bad data $badTempBasals, $badTempTargets
       return NSEntries.empty();
     });
 
-    List<SGV> sgvs = [];
+    List<bool> sgvs = [];
     for (var entry in entries.entries) {
       if (entry.sgv == null) {
         continue;
       }
-      sgvs.add(SGV(value: entry.sgv!, date: entry.date));
+      sgvs.add(await SGV(value: entry.sgv!, date: entry.date).save());
     }
-    var cdb = await CarerDB.instance;
 
     var total = 0;
     for (var e in sgvs) {
-      var saveSGV = await e.save();
-      if (saveSGV) {
+      if (e) {
         total++;
       }
     }
