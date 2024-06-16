@@ -49,51 +49,52 @@ bool printTest(List<double> times, List<double> sgvs) {
   // When high and linear predicts going down, does it go down and just miss?
   // Using this system and understanding the error variance what are the safe guarged we should place
   // four days
-  var numOfTests = 12 * 24 * 14;
+  var numOfTests = 12 * 24 * 80;
   var readings = 5;
-  for (var lowHighDiff in [(-18, 18), (0, 0), (18, -18)]) {
-    var (lowDiff, highDiff) = lowHighDiff;
 
-    rmesess[lowDiff] ??= {};
-    // Jump further by 5 each time
-    for (var start = 0; start < numOfTests * 6; start += 6) {
-      var end = start + readings;
-      var trainingTimes = times.sublist(start, end).toList();
-      var trainingSgvs = sgvs.sublist(start, end).toList();
-      //print("TRAIN $trainingTimes $trainingSgvs");
+  for (var start = 0; start < numOfTests; start++) {
+// Jump further by 5 each time
+    var end = start + readings;
+    var trainingTimes = times.sublist(start, end).toList();
+    var trainingSgvs = sgvs.sublist(start, end).toList();
+    //print("TRAIN $trainingTimes $trainingSgvs");
 
-      for (var testReadings = 1; testReadings <= 12; testReadings++) {
-        var testingTimes =
-            times.sublist(end + testReadings - 1, end + testReadings).toList();
-        var testingSgvs =
-            sgvs.sublist(end + testReadings - 1, end + testReadings).toList();
+    for (var testReadings = 1; testReadings <= 12; testReadings++) {
+      var testingTimes =
+          times.sublist(end + testReadings - 1, end + testReadings).toList();
+      var testingSgvs =
+          sgvs.sublist(end + testReadings - 1, end + testReadings).toList();
 
-        assert(testingSgvs.length == 1);
-        var testSVG = testingSgvs.first;
+      assert(testingSgvs.length == 1);
+      var testSVG = testingSgvs.first;
 
-        //print("TEST $testingTimes $testingSgvs");
-        var b = BestMatchRegression(
-            trainingTimes.reversed.toList(), trainingSgvs.reversed.toList());
+      //print("TEST $testingTimes $testingSgvs");
+      var b = BestMatchRegression(
+          trainingTimes.reversed.toList(), trainingSgvs.reversed.toList());
 
-        rmesess[lowDiff]![testReadings] ??= {};
+      var shouldHaveBeenSelected = b.models.first;
+      double minErrorVariance = double.infinity;
+      for (var m in b.models) {
+        var modelName = m.runtimeType.toString();
+        var (trainingDataRMSE, _) =
+            m.rootMeanSquaredError(trainingTimes, trainingSgvs);
 
-        var shouldHaveBeenSelected = b.models.first;
-        double minErrorVariance = double.infinity;
-        for (var m in b.models) {
-          var modelName = m.runtimeType.toString();
-          var (trainingDataRMSE, _) =
-              m.rootMeanSquaredError(trainingTimes, trainingSgvs);
-
-          var (rmse, preds) = m.rootMeanSquaredError(testingTimes, testingSgvs);
-          var high = 0;
-          var low = 0;
-          for (var i = 0; i < testingSgvs.length; i++) {
-            if (testingSgvs[i] > preds[i]) {
-              high++;
-            } else {
-              low++;
-            }
+        var (rmse, preds) = m.rootMeanSquaredError(testingTimes, testingSgvs);
+        var high = 0;
+        var low = 0;
+        for (var i = 0; i < testingSgvs.length; i++) {
+          if (testingSgvs[i] > preds[i]) {
+            high++;
+          } else {
+            low++;
           }
+        }
+
+        for (var lowHighDiff in [(-18, 18), (0, 0), (18, -18)]) {
+          var (lowDiff, highDiff) = lowHighDiff;
+
+          rmesess[lowDiff] ??= {};
+          rmesess[lowDiff]![testReadings] ??= {};
 
           var isLow = trainingSgvs.last < 72;
           var isHigh = trainingSgvs.last > 180;
@@ -174,13 +175,14 @@ bool printTest(List<double> times, List<double> sgvs) {
             "predictSnoozeHighGood": predictSnoozeHighGood ? 1 : 0,
             "predictSnoozeHighFP": predictSnoozeHighFP ? 1 : 0,
             "predictSnoozeHighFN": predictSnoozeHighFN ? 1 : 0,
+            "isLow": isLow ? 1 : 0,
+            "isHigh": isHigh ? 1 : 0,
+            "isNormal": isNormal ? 1 : 0,
           });
 
           //print("${m.toString()} $rmse $trainingDataRMSE");
         }
-        rmesess[lowDiff]![testReadings]![
-                shouldHaveBeenSelected.runtimeType.toString()]!
-            .last['lowest'] = 1.0;
+
         //
       }
     }
@@ -207,6 +209,10 @@ bool printTest(List<double> times, List<double> sgvs) {
         int totalpredictSnoozeHighFP = 0;
         int totalpredictSnoozeHighFN = 0;
 
+        int totalLow = 0;
+        int totalHigh = 0;
+        int totalNormal = 0;
+
         var n = 0;
         for (var lv in l) {
           if (lv['rmse'] == null || lv['trmse'] == null) {
@@ -218,6 +224,7 @@ bool printTest(List<double> times, List<double> sgvs) {
 
           totalSelected += lv['selected']!.toInt();
           totalLowest += lv['lowest']!.toInt();
+
           totalpredictAlarmGood += lv['predictAlarmGood']!.toInt();
           totalpredictAlarmFP += lv['predictAlarmFP']!.toInt();
           totalpredictAlarmFN += lv['predictAlarmFN']!.toInt();
@@ -229,6 +236,10 @@ bool printTest(List<double> times, List<double> sgvs) {
           totalpredictSnoozeHighGood += lv['predictSnoozeHighGood']!.toInt();
           totalpredictSnoozeHighFP += lv['predictSnoozeHighFP']!.toInt();
           totalpredictSnoozeHighFN += lv['predictSnoozeHighFN']!.toInt();
+
+          totalLow += lv['isLow']!.toInt();
+          totalHigh += lv['isHigh']!.toInt();
+          totalNormal += lv['isNormal']!.toInt();
 
           if (rmse.isNaN ||
               trmse.isNaN ||
@@ -267,12 +278,13 @@ bool printTest(List<double> times, List<double> sgvs) {
                     100.0) /
                 n;
 
-        var annoyingAlarms = (totalpredictAlarmFP * 100.0) / n;
-        var missedAlarms = (totalpredictAlarmFN * 100.0) / n;
-        var dangerousLowSnoozes = (totalpredictSnoozeLowFP * 100.0) / n;
-        var missedLowSnoozes = (totalpredictSnoozeLowFN * 100.0) / n;
-        var dangerousHighSnoozes = (totalpredictSnoozeHighFP * 100.0) / n;
-        var missedHighSnoozes = (totalpredictSnoozeHighFN * 100.0) / n;
+        var annoyingAlarms = (totalpredictAlarmFP * 100.0) / totalNormal;
+        var missedAlarms = (totalpredictAlarmFN * 100.0) / totalNormal;
+        var dangerousLowSnoozes = (totalpredictSnoozeLowFP * 100.0) / totalLow;
+        var missedLowSnoozes = (totalpredictSnoozeLowFN * 100.0) / totalLow;
+        var dangerousHighSnoozes =
+            (totalpredictSnoozeHighFP * 100.0) / totalHigh;
+        var missedHighSnoozes = (totalpredictSnoozeHighFN * 100.0) / totalHigh;
 
         //print(
         //    "$model,$readings,$testReadings,$n,${dp4(trmse)},${dp4(rmse)},$totalSelected,$totalLowest, ${dp4(fractionAlarmCorrect)}, ${dp4(fractionSnoozeCorrect)}, ${dp4(annoyingAlarms)}, ${dp4(dangerousSnoozes)}");
