@@ -253,7 +253,7 @@ class BestMatchRegression extends Regression {
 
   BestMatchRegression(List<double> xValues, List<double> yValues) {
     models = [
-      //FlatRegression(xValues, yValues),
+      // FlatRegression(xValues, yValues),
       LinearRegression(xValues, yValues),
       // QuadraticRegression(xValues, yValues),
       // LogRegression(xValues, yValues), // Negative and zero numbers are out
