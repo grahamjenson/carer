@@ -32,8 +32,8 @@ void main() {
       await (await CarerDB.instance).deleteAll();
     });
 
-    test("LinearRegressionPredictor", () async {
-      LinearRegressionPredictor pr = LinearRegressionPredictor();
+    test("Linear2Predictor", () async {
+      Linear2Predictor pr = Linear2Predictor();
       await pr.init();
 
       var sgvs = pr.predictNextHour();

@@ -50,10 +50,18 @@ class Stats extends StatelessWidget {
   Future<Window> futureWindow(SettingsCN settings) async {
     var stateData = await StateData.instance;
 
-    LinearRegressionPredictor bestMatchPrediction = LinearRegressionPredictor();
-    await bestMatchPrediction.init();
+    Linear2Predictor linear2predictor = Linear2Predictor();
+    await linear2predictor.init();
 
-    var preds = bestMatchPrediction.predictNextHour();
+    Linear7Predictor linear7predictor = Linear7Predictor();
+    await linear7predictor.init();
+
+    Quadratic3Predictor quadratic3predictor = Quadratic3Predictor();
+    await quadratic3predictor.init();
+
+    var linear2preds = linear2predictor.predictNextHour();
+    var linear7preds = linear7predictor.predictNextHour();
+    var quadratic3preds = quadratic3predictor.predictNextHour();
 
     return Window(
       title: "Stats",
@@ -92,7 +100,9 @@ class Stats extends StatelessWidget {
               await target(settings.unit),
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
-              await predictions(preds, settings.unit),
+              await predictions("Linear2", linear2preds, settings.unit),
+              await predictions("Linear7", linear7preds, settings.unit),
+              await predictions("Quad3", quadratic3preds, settings.unit),
             ],
           ),
         )),
@@ -111,10 +121,10 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> predictions(List<SGV> preds, Unit unit) async {
+  Future<DataRow> predictions(String name, List<SGV> preds, Unit unit) async {
     return DataRow(
       cells: [
-        const DataCell(Text("Preds", style: heading)),
+        DataCell(Text(name, style: heading)),
         DataCell(
           SmartText(texts: [
             "${preds.map(

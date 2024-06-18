@@ -83,6 +83,9 @@ bool printTest(List<double> times, List<double> sgvs) {
 
         double minErrorVariance = double.infinity;
         for (var m in b.models) {
+          if (readings == 2 && m is QuadraticRegression) {
+            continue;
+          }
           var modelName = m.runtimeType.toString();
 
           var (trainingDataRMSE, _) =
@@ -200,6 +203,10 @@ bool printTest(List<double> times, List<double> sgvs) {
     "smartLowFPRatioList": {},
     "smartLowFPList": {},
     "smartLowTPList": {},
+    "predictAlarmFNList": {},
+    "predictAlarmTNList": {},
+    "smartLowFNList": {},
+    "smartLowTNList": {},
   };
 
   rmesess.forEach((readings, readingsValue) {
@@ -215,10 +222,15 @@ bool printTest(List<double> times, List<double> sgvs) {
         orth["predictAlarmFPRatioList"]![modelNameFR] ??= [];
         orth["predictAlarmFPList"]![modelNameFR] ??= [];
         orth["predictAlarmTPList"]![modelNameFR] ??= [];
+        orth["predictAlarmFNList"]![modelNameFR] ??= [];
+        orth["predictAlarmTNList"]![modelNameFR] ??= [];
+
         orth["smartLowTPRatioList"]![modelNameFR] ??= [];
         orth["smartLowFPRatioList"]![modelNameFR] ??= [];
         orth["smartLowFPList"]![modelNameFR] ??= [];
         orth["smartLowTPList"]![modelNameFR] ??= [];
+        orth["smartLowFNList"]![modelNameFR] ??= [];
+        orth["smartLowTNList"]![modelNameFR] ??= [];
 
         var rmseList = orth["rmse"]![modelNameFR]!;
         var trmseList = orth["trmse"]![modelNameFR]!;
@@ -234,6 +246,11 @@ bool printTest(List<double> times, List<double> sgvs) {
         var smartLowFPRatioList = orth["smartLowFPRatioList"]![modelNameFR]!;
         var smartLowFPList = orth["smartLowFPList"]![modelNameFR]!;
         var smartLowTPList = orth["smartLowTPList"]![modelNameFR]!;
+
+        var predictAlarmFNList = orth["predictAlarmFNList"]![modelNameFR]!;
+        var predictAlarmTNList = orth["predictAlarmTNList"]![modelNameFR]!;
+        var smartLowFNList = orth["smartLowFNList"]![modelNameFR]!;
+        var smartLowTNList = orth["smartLowTNList"]![modelNameFR]!;
 
         // calculate the average RMSE for each model
         List<double> totalTRMSE = [];
@@ -349,11 +366,15 @@ bool printTest(List<double> times, List<double> sgvs) {
         predictAlarmFPRatioList.add(alarmFPRatio);
         predictAlarmFPList.add(totalAlarmFP.toDouble());
         predictAlarmTPList.add(totalAlarmTP.toDouble());
+        predictAlarmFNList.add(totalAlarmFN.toDouble());
+        predictAlarmTNList.add(totalAlarmTN.toDouble());
 
         smartLowTPRatioList.add(snoozeTPRatio);
         smartLowFPRatioList.add(snoozeFPRatio);
         smartLowFPList.add(totalSnoozeLowFP.toDouble());
         smartLowTPList.add(totalSnoozeLowTP.toDouble());
+        smartLowFNList.add(totalSnoozeLowFN.toDouble());
+        smartLowTNList.add(totalSnoozeLowTN.toDouble());
 
         //print(
         //    "$model,$readings,$futureReading,$n,${dp4(trmse)},${dp4(rmse)},$totalSelected,$totalLowest, ${dp4(accuracyAlarmCorrect)}, ${dp4(accuracySnoozeCorrect)}, ${dp4(annoyingAlarms)}, ${dp4(dangerousSnoozes)}");
@@ -379,11 +400,11 @@ bool printTest(List<double> times, List<double> sgvs) {
     newM[newModelName]!.add(median(nums));
   }
   orth["trmse"] = newM;
-  for (var chart in orth.keys) {
+  for (var chart in (orth.keys.toList()..sort()).toList()) {
     print("");
     print("");
     print("$chart,1,2,3,4,5,6");
-    for (var model in orth[chart]!.keys) {
+    for (var model in (orth[chart]!.keys.toList()..sort()).toList()) {
       var values = orth[chart]![model]!;
       print("$model,${values.join(",")}");
     }
