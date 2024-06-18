@@ -51,7 +51,7 @@ bool printTest(List<double> times, List<double> sgvs) {
   // four days
   var numOfTests = 12 * 24 * 80;
   var jump = 1;
-  numOfTests = 100;
+
   print("Number of Runs: ${numOfTests / jump}");
 
   for (var start = 10; start < numOfTests * jump; start += jump) {
@@ -59,7 +59,7 @@ bool printTest(List<double> times, List<double> sgvs) {
       var end = start + readings;
       var trainingTimes = times.sublist(start, end).toList();
       var trainingSgvs = sgvs.sublist(start, end).toList();
-      //print("TRAIN $trainingTimes $trainingSgvs");
+      var minTime = ((trainingTimes)..sort()).first - 20;
 
       for (var testReadings = 1; testReadings <= 6; testReadings++) {
         var testingTimes =
@@ -67,11 +67,11 @@ bool printTest(List<double> times, List<double> sgvs) {
         var testingSgvs =
             sgvs.sublist(end + testReadings - 1, end + testReadings).toList();
 
-        var minTime = ((trainingTimes + testingTimes)..sort()).first;
-
         // Big numbers cause overflows in flutter, need to reduce mins ago time
-        trainingTimes = trainingTimes.map((e) => e - minTime).toList();
-        testingTimes = testingTimes.map((e) => e - minTime).toList();
+
+        var nrmtrainingTimes = trainingTimes.map((e) => e - minTime).toList();
+        var nrmtestingTimes = testingTimes.map((e) => e - minTime).toList();
+
         // We are only testing the value at the position, not the average value (we can do that later)
         assert(testingSgvs.length == 1);
 
@@ -79,16 +79,17 @@ bool printTest(List<double> times, List<double> sgvs) {
         var testSVG = testingSgvs.first;
 
         var b = BestMatchRegression(
-            trainingTimes.reversed.toList(), trainingSgvs.reversed.toList());
+            nrmtrainingTimes.reversed.toList(), trainingSgvs.reversed.toList());
 
         double minErrorVariance = double.infinity;
         for (var m in b.models) {
           var modelName = m.runtimeType.toString();
 
           var (trainingDataRMSE, _) =
-              m.rootMeanSquaredError(trainingTimes, trainingSgvs);
+              m.rootMeanSquaredError(nrmtrainingTimes, trainingSgvs);
 
-          var (rmse, preds) = m.rootMeanSquaredError(testingTimes, testingSgvs);
+          var (rmse, preds) =
+              m.rootMeanSquaredError(nrmtestingTimes, testingSgvs);
 
           rmesess[readings] ??= {};
           rmesess[readings]![testReadings] ??= {};
@@ -194,9 +195,11 @@ bool printTest(List<double> times, List<double> sgvs) {
     "predictAlarmTPRatioList": {},
     "predictAlarmFPRatioList": {},
     "predictAlarmFPList": {},
+    "predictAlarmTPList": {},
     "smartLowTPRatioList": {},
     "smartLowFPRatioList": {},
     "smartLowFPList": {},
+    "smartLowTPList": {},
   };
 
   rmesess.forEach((readings, readingsValue) {
@@ -211,9 +214,11 @@ bool printTest(List<double> times, List<double> sgvs) {
         orth["predictAlarmTPRatioList"]![modelNameFR] ??= [];
         orth["predictAlarmFPRatioList"]![modelNameFR] ??= [];
         orth["predictAlarmFPList"]![modelNameFR] ??= [];
+        orth["predictAlarmTPList"]![modelNameFR] ??= [];
         orth["smartLowTPRatioList"]![modelNameFR] ??= [];
         orth["smartLowFPRatioList"]![modelNameFR] ??= [];
         orth["smartLowFPList"]![modelNameFR] ??= [];
+        orth["smartLowTPList"]![modelNameFR] ??= [];
 
         var rmseList = orth["rmse"]![modelNameFR]!;
         var trmseList = orth["trmse"]![modelNameFR]!;
@@ -223,10 +228,12 @@ bool printTest(List<double> times, List<double> sgvs) {
         var predictAlarmFPRatioList =
             orth["predictAlarmFPRatioList"]![modelNameFR]!;
         var predictAlarmFPList = orth["predictAlarmFPList"]![modelNameFR]!;
+        var predictAlarmTPList = orth["predictAlarmTPList"]![modelNameFR]!;
 
         var smartLowTPRatioList = orth["smartLowTPRatioList"]![modelNameFR]!;
         var smartLowFPRatioList = orth["smartLowFPRatioList"]![modelNameFR]!;
         var smartLowFPList = orth["smartLowFPList"]![modelNameFR]!;
+        var smartLowTPList = orth["smartLowTPList"]![modelNameFR]!;
 
         // calculate the average RMSE for each model
         List<double> totalTRMSE = [];
@@ -334,18 +341,19 @@ bool printTest(List<double> times, List<double> sgvs) {
         var missedHighSnoozes = (totalSnoozeHighFN * 100.0) / totalSnoozeHighN;
 
         var rmse = median(totalRMSE);
-        var trmse = median(totalTRMSE);
 
         rmseList.add(rmse);
-        trmseList.add(trmse);
+        trmseList.addAll(totalTRMSE);
 
         predictAlarmTPRatioList.add(alarmTPRatio);
         predictAlarmFPRatioList.add(alarmFPRatio);
         predictAlarmFPList.add(totalAlarmFP.toDouble());
+        predictAlarmTPList.add(totalAlarmTP.toDouble());
 
         smartLowTPRatioList.add(snoozeTPRatio);
         smartLowFPRatioList.add(snoozeFPRatio);
         smartLowFPList.add(totalSnoozeLowFP.toDouble());
+        smartLowTPList.add(totalSnoozeLowTP.toDouble());
 
         //print(
         //    "$model,$readings,$futureReading,$n,${dp4(trmse)},${dp4(rmse)},$totalSelected,$totalLowest, ${dp4(accuracyAlarmCorrect)}, ${dp4(accuracySnoozeCorrect)}, ${dp4(annoyingAlarms)}, ${dp4(dangerousSnoozes)}");
@@ -362,6 +370,15 @@ bool printTest(List<double> times, List<double> sgvs) {
     });
   });
 
+  // fix trmse
+  Map<String, List<double>> newM = {};
+  for (var mm in orth["trmse"]!.keys.toList()) {
+    var nums = orth["trmse"]![mm]!;
+    var newModelName = mm.substring(0, mm.length - 3);
+    newM[newModelName] ??= [];
+    newM[newModelName]!.add(median(nums));
+  }
+  orth["trmse"] = newM;
   for (var chart in orth.keys) {
     print("");
     print("");
