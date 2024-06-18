@@ -26,6 +26,8 @@ abstract class Regression {
     var rmse = Math.rootMeanSquaredError(testXValues, testYValues, predictions);
     return (rmse, predictions);
   }
+
+  String get nameWithTD => toString();
 }
 
 abstract class MatrixRegression extends Regression {
@@ -69,6 +71,9 @@ abstract class MatrixRegression extends Regression {
 
   @override
   String toString() => 'Regression';
+
+  @override
+  String get nameWithTD => "$this(${xValues.length})";
 
   @override
   double predict(double xValue) {
@@ -253,12 +258,13 @@ class BestMatchRegression extends Regression {
 
   BestMatchRegression(List<double> xValues, List<double> yValues) {
     models = [
-      // FlatRegression(xValues, yValues),
+      FlatRegression(xValues, yValues),
       LinearRegression(xValues, yValues),
-      // QuadraticRegression(xValues, yValues),
-      // LogRegression(xValues, yValues), // Negative and zero numbers are out
-      // LogRegressionLogY(xValues, yValues),
-      // SqrtRegression(xValues, yValues),
+      QuadraticRegression(xValues, yValues),
+      LogRegression(xValues, yValues), // Negative and zero numbers are out
+      LogRegressionLogY(xValues, yValues),
+      SqrtRegression(xValues, yValues),
+      //ExpRegression(xValues, yValues),
     ];
 
     double minErrorVariance = double.infinity;
