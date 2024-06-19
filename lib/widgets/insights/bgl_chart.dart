@@ -67,7 +67,7 @@ class BGLChart extends StatelessWidget {
           future: futureWindow(settings),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              print("BGLChart snapshot error");
+              print("BGLChart snapshot error $context: ${snapshot.error}");
               return const CircularProgressIndicator();
             }
             if (snapshot.hasData) {
@@ -91,6 +91,7 @@ class BGLChart extends StatelessWidget {
         .subtract(Duration(minutes: minsAgo + 1))
         .millisecondsSinceEpoch;
     var before = clock.now().millisecondsSinceEpoch;
+
     var targets = await ValueAtTime.query(before: before, after: after);
 
     // convert the last hours of summary sgvs into flspots

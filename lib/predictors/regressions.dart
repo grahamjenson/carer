@@ -177,13 +177,14 @@ class ExpRegression extends MatrixRegression {
 
   @override
   Matrix expandX(Matrix x) {
-    Matrix expX =
-        Matrix.fromColumnList(x.column(0).map((v) => exp(v)).toList());
-
-    x.appendColumns(expX);
-
     return x;
   }
+
+  @override
+  double fnY(double y) => log(y);
+
+  @override
+  double fnYReverse(double y) => exp(y);
 }
 
 class FlatRegression extends Regression {

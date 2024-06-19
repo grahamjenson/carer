@@ -52,7 +52,7 @@ bool printTest(List<double> times, List<double> sgvs) {
   var numOfTests = 12 * 24 * 80;
   var jump = 1;
 
-  print("Number of Runs: ${numOfTests / jump}");
+  print("Number of Runs: $numOfTests");
 
   for (var start = 10; start < numOfTests * jump; start += jump) {
     for (var readings = 2; readings < 8; readings++) {
@@ -401,6 +401,14 @@ bool printTest(List<double> times, List<double> sgvs) {
   }
   orth["trmse"] = newM;
   for (var chart in (orth.keys.toList()..sort()).toList()) {
+    if ([
+      "predictAlarmTPRatioList",
+      "predictAlarmFPRatioList",
+      "smartLowTPRatioList",
+      "smartLowFPRatioList"
+    ].contains(chart)) {
+      continue;
+    }
     print("");
     print("");
     print("$chart,1,2,3,4,5,6");
@@ -470,7 +478,7 @@ double median(List<double> nums) {
     predictedHigh,
     predictedNormal) {
   // It would already be alarming if low or high
-  if (!isNormal) {
+  if (!(isNormal || isHigh)) {
     return (false, false);
   }
 

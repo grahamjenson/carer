@@ -177,13 +177,14 @@ class ExpRegression extends MatrixRegression {
 
   @override
   Matrix expandX(Matrix x) {
-    Matrix expX =
-        Matrix.fromColumnList(x.column(0).map((v) => exp(v)).toList());
-
-    x.appendColumns(expX);
-
     return x;
   }
+
+  @override
+  double fnY(double y) => log(y);
+
+  @override
+  double fnYReverse(double y) => exp(y);
 }
 
 class FlatRegression extends Regression {
@@ -261,9 +262,9 @@ class BestMatchRegression extends Regression {
       // FlatRegression(xValues, yValues),
       LinearRegression(xValues, yValues),
       QuadraticRegression(xValues, yValues),
-      // LogRegression(xValues, yValues), // Negative and zero numbers are out
-      // LogRegressionLogY(xValues, yValues),
-      // SqrtRegression(xValues, yValues),
+      LogRegression(xValues, yValues), // Negative and zero numbers are out
+      LogRegressionLogY(xValues, yValues),
+      SqrtRegression(xValues, yValues),
       ExpRegression(xValues, yValues),
     ];
 

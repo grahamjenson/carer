@@ -53,15 +53,11 @@ class Stats extends StatelessWidget {
     Linear2Predictor linear2predictor = Linear2Predictor();
     await linear2predictor.init();
 
-    Linear7Predictor linear7predictor = Linear7Predictor();
-    await linear7predictor.init();
-
-    Quadratic3Predictor quadratic3predictor = Quadratic3Predictor();
-    await quadratic3predictor.init();
+    Exp2Predictor exp2predictor = Exp2Predictor();
+    await exp2predictor.init();
 
     var linear2preds = linear2predictor.predictNextHour();
-    var linear7preds = linear7predictor.predictNextHour();
-    var quadratic3preds = quadratic3predictor.predictNextHour();
+    var exp2preds = exp2predictor.predictNextHour();
 
     return Window(
       title: "Stats",
@@ -101,8 +97,7 @@ class Stats extends StatelessWidget {
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
               await predictions("Linear2", linear2preds, settings.unit),
-              await predictions("Linear7", linear7preds, settings.unit),
-              await predictions("Quad3", quadratic3preds, settings.unit),
+              await predictions("Exp2", exp2preds, settings.unit),
             ],
           ),
         )),

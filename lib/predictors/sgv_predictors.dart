@@ -144,3 +144,18 @@ class Quadratic3Predictor extends RegressionPredictor {
   @override
   String toString() => 'LinearRegression';
 }
+
+class Exp2Predictor extends RegressionPredictor {
+  Exp2Predictor() : super();
+
+  @override
+  int get pastReadings => 2;
+
+  @override
+  Regression createRegression(List<double> x, List<double> y) {
+    return ExpRegression(x, y);
+  }
+
+  @override
+  String toString() => 'LinearRegression';
+}
