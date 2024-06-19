@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:carer/models/constants.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/errors.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
 class TimeValue {
@@ -336,7 +335,6 @@ class SummaryProfile {
 }
 
 class Summary {
-  final int dateRetrievedmills;
   final SummarySGVs sgvs;
   final TempBasals tempBasals;
   final SummaryTreatments treatments;
@@ -353,34 +351,7 @@ class Summary {
     required this.targets,
     required this.state,
     required this.profile,
-    required this.dateRetrievedmills,
   });
-
-  static const Summary empty = Summary(
-      raw: "",
-      sgvs: SummarySGVs(sgvs: []),
-      tempBasals: TempBasals(tempBasals: []),
-      treatments: SummaryTreatments(treatments: []),
-      targets: SummaryTargets(targets: []),
-      state: SummaryState(
-        iob: 0,
-        cob: 0,
-        bwp: 0,
-        cage: 0,
-        iage: 0,
-        bage: 0,
-        battery: 0,
-      ),
-      profile: SummaryProfile(
-          dia: 1,
-          carbratio: TimeValues(values: []),
-          sens: TimeValues(values: []),
-          basal: TimeValues(values: []),
-          targetLow: TimeValues(values: []),
-          targetHigh: TimeValues(values: []),
-          units: "",
-          timezone: ""),
-      dateRetrievedmills: 0);
 
   factory Summary.fromJson(String jsonString) {
     try {
@@ -394,19 +365,10 @@ class Summary {
         targets: SummaryTargets.fromJson(json['treatments']['targets']),
         state: SummaryState.fromJson(json['state']),
         profile: SummaryProfile.fromJson(json['profile']),
-        dateRetrievedmills: clock.now().millisecondsSinceEpoch,
       );
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      return Summary.empty;
+      throw ArgumentError("Invalid Summary JSON: $jsonString");
     }
-  }
-
-  DateTime get dateRetrieved {
-    return DateTime.fromMillisecondsSinceEpoch(dateRetrievedmills);
-  }
-
-  int ageInSeconds() {
-    return clock.now().difference(dateRetrieved).inSeconds;
   }
 }

@@ -1,10 +1,12 @@
 import 'package:carer/change_notifiers/settings/debug_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/sql/carer_db.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:unicons/unicons.dart';
 
 class DebugSettingsWidget extends AbstractSettingsSection {
@@ -44,7 +46,21 @@ class DebugSettingsWidget extends AbstractSettingsSection {
         title: const Text('Debug'),
         tiles: [
           SettingsTile.navigation(
-            title: const Text("Log Error"),
+            title: const Text("Share DB"),
+            descriptionInlineIos: true,
+            leading: const Icon(UniconsLine.bug),
+            onPressed: (context) async {
+              var path = await CarerDB.getPath();
+              print("Sharing DB at $path");
+              final result = await Share.shareXFiles([XFile(path)], text: 'DB');
+
+              if (result.status == ShareResultStatus.success) {
+                print('Thank you for sharing the DB');
+              }
+            },
+          ),
+          SettingsTile.navigation(
+            title: const Text("Error Log"),
             descriptionInlineIos: true,
             leading: const Icon(UniconsLine.bug),
             onPressed: (context) {

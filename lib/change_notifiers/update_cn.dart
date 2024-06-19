@@ -12,13 +12,20 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
 class UpdateCN extends ChangeNotifier {
   SettingsCN settings;
 
   // When this updates lots of things will change
-  Summary _summary = Summary.empty;
+  int summaryLastUpdatedMS = 0;
+  int summaryAgeInSeconds() {
+    var dateRetrieved =
+        DateTime.fromMillisecondsSinceEpoch(summaryLastUpdatedMS);
+    return clock.now().difference(dateRetrieved).inSeconds;
+  }
+
   bool _summaryToBeUpdated = true;
   bool _entriesToBeUpdated = true;
 
@@ -53,9 +60,9 @@ class UpdateCN extends ChangeNotifier {
   }
 
   checkUpdateSummary() async {
-    if (_summary.ageInSeconds() > 15) {
+    if (summaryAgeInSeconds() > 15) {
       _summaryToBeUpdated = true;
-      _updateReason = "Age older than 15 ${_summary.ageInSeconds()}s";
+      _updateReason = "Age older than 15 ${summaryAgeInSeconds()}s";
     }
     var lastSGV = await SGV.lastSGV();
     if (lastSGV != null) {
@@ -71,39 +78,42 @@ class UpdateCN extends ChangeNotifier {
 
   updateSummary() async {
     var (nsURL, nsToken) = settings.nightscoutURLAndToken;
-    _summary = await NSClient().getSummary(nsURL, nsToken).catchError((e) {
+    Summary? summary =
+        await NSClient().getSummary(nsURL, nsToken).catchError((e) {
       log("GETTING SUMMARY ERROR: $e, $nsURL");
       _summaryToBeUpdated = true;
-      return Summary.empty;
+      return null;
     });
 
-    if (_summary == Summary.empty) {
+    if (summary == null) {
       print("Summary is empty, not updating.");
       _summaryToBeUpdated = true;
       return;
     }
+    summaryLastUpdatedMS = clock.now().millisecondsSinceEpoch;
+
     // convert the summary to models
     int sgvUpdates = 0;
-    for (var sgv in _summary.sgvs.sgvs) {
+    for (var sgv in summary.sgvs.sgvs) {
       var svgModel = SGV(value: sgv.sgv, date: sgv.mills);
 
       sgvUpdates += (await svgModel.save()) ? 1 : 0;
     }
 
     int bolusUpdates = 0;
-    for (var bolus in _summary.treatments.boluses()) {
+    for (var bolus in summary.treatments.boluses()) {
       var bolusModel = Bolus(value: bolus.insulin!, date: bolus.date);
       sgvUpdates += (await bolusModel.save()) ? 1 : 0;
     }
 
     int carbUpdates = 0;
-    for (var carb in _summary.treatments.carbs()) {
+    for (var carb in summary.treatments.carbs()) {
       var carbModel = Carbs(value: carb.carbs!.round(), date: carb.date);
       carbUpdates += (await carbModel.save()) ? 1 : 0;
     }
 
     int tempBasalUpdates = 0;
-    for (var tempBasal in _summary.tempBasals.tempBasals) {
+    for (var tempBasal in summary.tempBasals.tempBasals) {
       var tbModel = TempBasal(
           startDate: tempBasal.start,
           duration: tempBasal.duration.toInt(),
@@ -112,7 +122,7 @@ class UpdateCN extends ChangeNotifier {
     }
 
     int tempTargetUpdates = 0;
-    for (var tempTarget in _summary.targets.targets) {
+    for (var tempTarget in summary.targets.targets) {
       var ttModel = TempTarget(
           startDate: tempTarget.start,
           duration: tempTarget.duration,
@@ -121,7 +131,7 @@ class UpdateCN extends ChangeNotifier {
       tempTargetUpdates += (await ttModel.upsert()) ? 1 : 0;
     }
 
-    SummaryProfile summaryProfile = _summary.profile;
+    SummaryProfile summaryProfile = summary.profile;
 
     Profile profile = Profile(
       date: DateTime.now(),
@@ -136,7 +146,7 @@ class UpdateCN extends ChangeNotifier {
     );
     var profileUpdate = await profile.save();
 
-    var state = _summary.state;
+    var state = summary.state;
     var stateData = await StateData.instance;
     bool iob = false, cob = false, battery = false, cage = false;
     if (state.iob != null) {

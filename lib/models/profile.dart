@@ -147,6 +147,11 @@ class Profile extends Model {
   static Future<Profile?> profile() async {
     return (await _q.query(limit: 1)).firstOrNull;
   }
+
+  static Future<int?> count(
+      {int? after, int? before, Map<String, Object>? conditions}) async {
+    return _q.count(after: after, before: before, conditions: conditions);
+  }
 }
 
 const crKeys = [

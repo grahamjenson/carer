@@ -1,7 +1,6 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/sql/key_value_store.dart';
-import 'package:clock/clock.dart';
 
 enum DebugSettingNames {
   debug,
@@ -15,16 +14,16 @@ enum DebugSummary {
   normal,
   high;
 
-  Summary summary(SettingsCN settings) {
+  Summary? summary(SettingsCN settings) {
     switch (this) {
       case DebugSummary.off:
-        return Summary.empty;
+        return null;
       case DebugSummary.normal:
-        return normalSummary(settings);
+        return null;
       case DebugSummary.low:
-        return lowSummary(settings);
+        return null;
       case DebugSummary.high:
-        return highSummary(settings);
+        return null;
     }
   }
 }
@@ -62,82 +61,4 @@ class DebugSettings {
 
     settings.notify();
   }
-}
-
-var counter = 0;
-
-Summary highSummary(SettingsCN settings) {
-  var start = settings.targetHigh - 6;
-  var end = 15 * 18;
-  counter += 6;
-  if (counter > end || counter < start) {
-    counter = start;
-  }
-
-  return Summary(
-      raw: "",
-      sgvs: SummarySGVs(sgvs: [
-        SummarySGV(
-            sgv: counter ~/ 1.1,
-            mills: clock.now()..subtract(const Duration(minutes: 10))),
-        SummarySGV(
-            sgv: counter,
-            mills: clock.now()..subtract(const Duration(minutes: 4))),
-      ]),
-      tempBasals: Summary.empty.tempBasals,
-      treatments: Summary.empty.treatments,
-      targets: Summary.empty.targets,
-      state: Summary.empty.state,
-      profile: Summary.empty.profile,
-      dateRetrievedmills: 10);
-}
-
-Summary lowSummary(SettingsCN settings) {
-  var start = settings.urgentLow - 18;
-  var end = settings.targetLow + 18;
-  counter -= 6;
-  if (counter > end || counter < start) {
-    counter = end;
-  }
-
-  return Summary(
-      raw: "",
-      sgvs: SummarySGVs(sgvs: [
-        SummarySGV(
-            sgv: counter ~/ 0.7,
-            mills: clock.now()..subtract(const Duration(minutes: 30))),
-        SummarySGV(sgv: counter, mills: clock.now()),
-      ]),
-      tempBasals: Summary.empty.tempBasals,
-      treatments: Summary.empty.treatments,
-      targets: Summary.empty.targets,
-      state: Summary.empty.state,
-      profile: Summary.empty.profile,
-      dateRetrievedmills: 10);
-}
-
-Summary normalSummary(SettingsCN settings) {
-  var start = settings.targetLow - 18;
-  var end = settings.targetHigh + 18;
-  counter += 6;
-  if (counter > end || counter < start) {
-    counter = start;
-  }
-
-  return Summary(
-      raw: "",
-      sgvs: SummarySGVs(sgvs: [
-        SummarySGV(
-            sgv: counter ~/ 1.1,
-            mills: clock.now()..subtract(const Duration(minutes: 8))),
-        SummarySGV(
-            sgv: counter,
-            mills: clock.now()..subtract(const Duration(minutes: 4))),
-      ]),
-      tempBasals: Summary.empty.tempBasals,
-      treatments: Summary.empty.treatments,
-      targets: Summary.empty.targets,
-      state: Summary.empty.state,
-      profile: Summary.empty.profile,
-      dateRetrievedmills: 10);
 }

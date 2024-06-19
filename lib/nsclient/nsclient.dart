@@ -63,7 +63,7 @@ class NSClient {
     }
   }
 
-  Future<Summary> getSummary(String nsURL, String token) async {
+  Future<Summary?> getSummary(String nsURL, String token) async {
     try {
       if (nsURL == "" || token == "") {
         throw Exception("No URL");
@@ -73,13 +73,13 @@ class NSClient {
       log("FETCHED ${ep.toString()}");
       if (response.statusCode != 200) {
         print("NON 200 responce code ${response.statusCode}");
-        return Summary.empty;
+        return null;
       }
       return Summary.fromJson(response.body);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
       // TODO rewrite to friendly error class
-      return Summary.empty;
+      return null;
     }
   }
 }
