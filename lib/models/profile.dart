@@ -22,14 +22,6 @@ class ProfileRepository extends ModelRepository<Profile> {
     types += List.filled(targetLowKeys.length, int);
     types += List.filled(targetHighKeys.length, int);
 
-    if (!validateNotNull(map, requiredKeys)) {
-      throw ArgumentError("Invalid Profile Map NULL: $map");
-    }
-
-    if (!validateType(map, requiredKeys, types)) {
-      throw ArgumentError("Invalid Profile Map TYPE: $map");
-    }
-
     List<int> carbratio = crKeys.map((key) => map[key] as int).toList();
     List<int> sens = isfKeys.map((key) => map[key] as int).toList();
     List<double> basal = basalKeys.map((key) => map[key] as double).toList();

@@ -8,10 +8,6 @@ abstract class Model {
   DateTime get date;
   ModelRepository get repository;
 
-  List<String> validate() {
-    return [];
-  }
-
   Duration get age {
     return clock.now().difference(date);
   }
@@ -34,6 +30,10 @@ abstract class Model {
   @override
   String toString() {
     return repository.toSQLMap(this).toString();
+  }
+
+  List<String> validate() {
+    return [];
   }
 }
 

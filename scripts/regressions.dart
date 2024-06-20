@@ -82,107 +82,25 @@ bool printTest(List<double> times, List<double> sgvs) {
             nrmtrainingTimes.reversed.toList(), trainingSgvs.reversed.toList());
 
         double minErrorVariance = double.infinity;
+        addToThing(
+            "Selected",
+            b.selected,
+            rmesess,
+            nrmtrainingTimes,
+            trainingSgvs,
+            nrmtestingTimes,
+            testingSgvs,
+            testSVG,
+            readings,
+            testReadings);
+
         for (var m in b.models) {
           if (readings == 2 && m is QuadraticRegression) {
             continue;
           }
           var modelName = m.runtimeType.toString();
-
-          var (trainingDataRMSE, _) =
-              m.rootMeanSquaredError(nrmtrainingTimes, trainingSgvs);
-
-          var (rmse, preds) =
-              m.rootMeanSquaredError(nrmtestingTimes, testingSgvs);
-
-          rmesess[readings] ??= {};
-          rmesess[readings]![testReadings] ??= {};
-          rmesess[readings]![testReadings]![modelName] ??= [];
-
-          // Calculate the ranges
-          var isLow = trainingSgvs.last < 72;
-          var isHigh = trainingSgvs.last > 180;
-          var isNormal = !isLow && !isHigh;
-          var isGoingToBeLow = testSVG < 72;
-          var isGoingToBeHigh = testSVG > 180;
-          var isGoingToBeNormal = !isGoingToBeLow && !isGoingToBeHigh;
-
-          var predictedLow = preds.last < 72;
-          var predictedHigh = preds.last > 180;
-          var predictedNormal = !predictedLow && !predictedHigh;
-
-          // simple implementations of smart snooze and predictive low
-          var (predictAlarm, willAlarm) = predictiveAlarm(
-              isLow,
-              isHigh,
-              isNormal,
-              isGoingToBeLow,
-              isGoingToBeHigh,
-              isGoingToBeNormal,
-              predictedLow,
-              predictedHigh,
-              predictedNormal);
-
-          var (predictSnoozeLow, willSnoozeLow) = smartSnoozeLow(
-              isLow,
-              isHigh,
-              isNormal,
-              isGoingToBeLow,
-              isGoingToBeHigh,
-              isGoingToBeNormal,
-              predictedLow,
-              predictedHigh,
-              predictedNormal);
-
-          var (predictSnoozeHigh, willSnoozeHigh) = smartSnoozeHigh(
-              isLow,
-              isHigh,
-              isNormal,
-              isGoingToBeLow,
-              isGoingToBeHigh,
-              isGoingToBeNormal,
-              predictedLow,
-              predictedHigh,
-              predictedNormal);
-
-          var predictAlarmTP = isNormal && predictAlarm && willAlarm;
-          var predictAlarmFP = isNormal && predictAlarm && !willAlarm;
-          var predictAlarmFN = isNormal && !predictAlarm && willAlarm;
-          var predictAlarmTN = isNormal && !predictAlarm && !willAlarm;
-
-          var predictSnoozeLowTP = isLow && predictSnoozeLow && willSnoozeLow;
-          var predictSnoozeLowFP = isLow && predictSnoozeLow && !willSnoozeLow;
-          var predictSnoozeLowFN = isLow && !predictSnoozeLow && willSnoozeLow;
-          var predictSnoozeLowTN = isLow && !predictSnoozeLow && !willSnoozeLow;
-
-          var predictSnoozeHighTP =
-              isHigh && predictSnoozeHigh && willSnoozeHigh;
-          var predictSnoozeHighFP =
-              isHigh && predictSnoozeHigh && !willSnoozeHigh;
-          var predictSnoozeHighFN =
-              isHigh && !predictSnoozeHigh && willSnoozeHigh;
-          var predictSnoozeHighTN =
-              isHigh && !predictSnoozeHigh && !willSnoozeHigh;
-
-          rmesess[readings]![testReadings]![modelName]!.add({
-            'trmse': trainingDataRMSE,
-            'rmse': rmse,
-            "lowest": 0,
-            "predictAlarmTP": predictAlarmTP ? 1 : 0,
-            "predictAlarmFP": predictAlarmFP ? 1 : 0,
-            "predictAlarmFN": predictAlarmFN ? 1 : 0,
-            "predictAlarmTN": predictAlarmTN ? 1 : 0,
-            "predictSnoozeLowTP": predictSnoozeLowTP ? 1 : 0,
-            "predictSnoozeLowFP": predictSnoozeLowFP ? 1 : 0,
-            "predictSnoozeLowFN": predictSnoozeLowFN ? 1 : 0,
-            "predictSnoozeLowTN": predictSnoozeLowTN ? 1 : 0,
-            "predictSnoozeHighTP": predictSnoozeHighTP ? 1 : 0,
-            "predictSnoozeHighFP": predictSnoozeHighFP ? 1 : 0,
-            "predictSnoozeHighFN": predictSnoozeHighFN ? 1 : 0,
-            "predictSnoozeHighTN": predictSnoozeHighTN ? 1 : 0,
-            "isLow": isLow ? 1 : 0,
-            "isHigh": isHigh ? 1 : 0,
-            "isNormal": isNormal ? 1 : 0,
-          });
+          addToThing(modelName, m, rmesess, nrmtrainingTimes, trainingSgvs,
+              nrmtestingTimes, testingSgvs, testSVG, readings, testReadings);
 
           //print("${m.toString()} $rmse $trainingDataRMSE");
         }
@@ -556,4 +474,107 @@ double median(List<double> nums) {
 void prettyPrintMap(Map map) {
   var prettyString = const JsonEncoder.withIndent('  ').convert(map);
   print(prettyString);
+}
+
+void addToThing(
+    String modelName,
+    Regression m,
+    Map<int, Map<int, Map<String, List<Map<String, double>>>>> rmesess,
+    List<double> nrmtrainingTimes,
+    List<double> trainingSgvs,
+    List<double> nrmtestingTimes,
+    List<double> testingSgvs,
+    double testSVG,
+    int readings,
+    int testReadings) {
+  var (trainingDataRMSE, _) =
+      m.rootMeanSquaredError(nrmtrainingTimes, trainingSgvs);
+
+  var (rmse, preds) = m.rootMeanSquaredError(nrmtestingTimes, testingSgvs);
+
+  rmesess[readings] ??= {};
+  rmesess[readings]![testReadings] ??= {};
+  rmesess[readings]![testReadings]![modelName] ??= [];
+
+  // Calculate the ranges
+  var isLow = trainingSgvs.last < 72;
+  var isHigh = trainingSgvs.last > 180;
+  var isNormal = !isLow && !isHigh;
+  var isGoingToBeLow = testSVG < 72;
+  var isGoingToBeHigh = testSVG > 180;
+  var isGoingToBeNormal = !isGoingToBeLow && !isGoingToBeHigh;
+
+  var predictedLow = preds.last < 72;
+  var predictedHigh = preds.last > 180;
+  var predictedNormal = !predictedLow && !predictedHigh;
+
+  // simple implementations of smart snooze and predictive low
+  var (predictAlarm, willAlarm) = predictiveAlarm(
+      isLow,
+      isHigh,
+      isNormal,
+      isGoingToBeLow,
+      isGoingToBeHigh,
+      isGoingToBeNormal,
+      predictedLow,
+      predictedHigh,
+      predictedNormal);
+
+  var (predictSnoozeLow, willSnoozeLow) = smartSnoozeLow(
+      isLow,
+      isHigh,
+      isNormal,
+      isGoingToBeLow,
+      isGoingToBeHigh,
+      isGoingToBeNormal,
+      predictedLow,
+      predictedHigh,
+      predictedNormal);
+
+  var (predictSnoozeHigh, willSnoozeHigh) = smartSnoozeHigh(
+      isLow,
+      isHigh,
+      isNormal,
+      isGoingToBeLow,
+      isGoingToBeHigh,
+      isGoingToBeNormal,
+      predictedLow,
+      predictedHigh,
+      predictedNormal);
+
+  var predictAlarmTP = isNormal && predictAlarm && willAlarm;
+  var predictAlarmFP = isNormal && predictAlarm && !willAlarm;
+  var predictAlarmFN = isNormal && !predictAlarm && willAlarm;
+  var predictAlarmTN = isNormal && !predictAlarm && !willAlarm;
+
+  var predictSnoozeLowTP = isLow && predictSnoozeLow && willSnoozeLow;
+  var predictSnoozeLowFP = isLow && predictSnoozeLow && !willSnoozeLow;
+  var predictSnoozeLowFN = isLow && !predictSnoozeLow && willSnoozeLow;
+  var predictSnoozeLowTN = isLow && !predictSnoozeLow && !willSnoozeLow;
+
+  var predictSnoozeHighTP = isHigh && predictSnoozeHigh && willSnoozeHigh;
+  var predictSnoozeHighFP = isHigh && predictSnoozeHigh && !willSnoozeHigh;
+  var predictSnoozeHighFN = isHigh && !predictSnoozeHigh && willSnoozeHigh;
+  var predictSnoozeHighTN = isHigh && !predictSnoozeHigh && !willSnoozeHigh;
+
+  rmesess[readings]![testReadings]![modelName]!.add({
+    'trmse': trainingDataRMSE,
+    'rmse': rmse,
+    "lowest": 0,
+    "predictAlarmTP": predictAlarmTP ? 1 : 0,
+    "predictAlarmFP": predictAlarmFP ? 1 : 0,
+    "predictAlarmFN": predictAlarmFN ? 1 : 0,
+    "predictAlarmTN": predictAlarmTN ? 1 : 0,
+    "predictSnoozeLowTP": predictSnoozeLowTP ? 1 : 0,
+    "predictSnoozeLowFP": predictSnoozeLowFP ? 1 : 0,
+    "predictSnoozeLowFN": predictSnoozeLowFN ? 1 : 0,
+    "predictSnoozeLowTN": predictSnoozeLowTN ? 1 : 0,
+    "predictSnoozeHighTP": predictSnoozeHighTP ? 1 : 0,
+    "predictSnoozeHighFP": predictSnoozeHighFP ? 1 : 0,
+    "predictSnoozeHighFN": predictSnoozeHighFN ? 1 : 0,
+    "predictSnoozeHighTN": predictSnoozeHighTN ? 1 : 0,
+    "isLow": isLow ? 1 : 0,
+    "isHigh": isHigh ? 1 : 0,
+    "isNormal": isNormal ? 1 : 0,
+  });
 }
