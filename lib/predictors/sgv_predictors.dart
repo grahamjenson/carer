@@ -13,7 +13,7 @@ abstract class Predictor {
   Future<void> init();
 
   // Returns the predicted value at mins
-  SGV? predictAt(double timestamp);
+  SGV predictAt(double timestamp);
 
   DateTime get lastReadingDate => _lastReadingDate;
 
@@ -22,9 +22,7 @@ abstract class Predictor {
     List<SGV> predictions = [];
     for (var ts in timestamp) {
       var p = predictAt(ts);
-      if (p != null) {
-        predictions.add(p);
-      }
+      predictions.add(p);
     }
     return predictions;
   }
@@ -38,6 +36,24 @@ abstract class Predictor {
             .toDouble());
 
     return predictRange(times);
+  }
+
+  SGV predictNext() {
+    var time = lastReadingDate
+        .add(const Duration(minutes: 5))
+        .millisecondsSinceEpoch
+        .toDouble();
+
+    return predictAt(time);
+  }
+
+  SGV predictMin(int mins) {
+    var time = lastReadingDate
+        .add(Duration(minutes: mins))
+        .millisecondsSinceEpoch
+        .toDouble();
+
+    return predictAt(time);
   }
 
   Future<double> rmse(List<double> futureX, List<double> futureY) async {
@@ -59,7 +75,7 @@ abstract class RegressionPredictor extends Predictor {
   // Based on some hacky stats, 5 readings in the past seems best
   RegressionPredictor();
 
-  Regression? regression;
+  late Regression regression;
   // When processing very large numbers, by squaring and cubing this can cause lots of issues
   // These functions drop x from milliseconds since epoch to
   double fnX(num x) =>
@@ -73,7 +89,6 @@ abstract class RegressionPredictor extends Predictor {
   Future<void> init() async {
     sgvs = await SGV.lastMins(40);
     sgvs = sgvs.sublist(0, pastReadings);
-    print("SGVs: $sgvs ${sgvs.length}");
 
     if (sgvs.isEmpty) {
       return;
@@ -82,17 +97,12 @@ abstract class RegressionPredictor extends Predictor {
 
     var x = sgvs.map((s) => fnX(s.date.millisecondsSinceEpoch)).toList();
     var y = sgvs.map((s) => s.value * 1.0).toList();
-    print("$x, $y");
     regression = createRegression(x, y);
   }
 
   @override
-  SGV? predictAt(double timestamp) {
-    if (regression == null) {
-      return null;
-    }
-    // Very ineffienct
-    var pred = regression!.predict(fnX(timestamp));
+  SGV predictAt(double timestamp) {
+    var pred = regression.predict(fnX(timestamp));
     int limitedValue = pred.toInt().clamp(20, 500);
     return SGV(
         value: limitedValue,

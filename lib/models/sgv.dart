@@ -176,6 +176,30 @@ class SGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
+  static Future<double> percentInRangeYesterday(int low, int high) async {
+    DateTime now = clock.now();
+    DateTime startOfDay = DateTime(now.year, now.month, now.day);
+    int startOfDayEpoch = startOfDay.millisecondsSinceEpoch;
+
+    DateTime startOfYesterday = DateTime(now.year, now.month, now.day - 1);
+    int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
+
+    var sgvsTodayInRange = await _q.count(
+      after: startOfYesterdayEpoch,
+      before: startOfDayEpoch,
+      conditions: {"value >= ?": low, "value < ?": high},
+    );
+
+    var sgvsToday =
+        await _q.count(after: startOfYesterdayEpoch, before: startOfDayEpoch);
+
+    if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
+      return 0.0;
+    }
+
+    return sgvsTodayInRange / sgvsToday;
+  }
+
   // overside save to cache lastMins and lastSGV values
   @override
   Future<bool> save() async {

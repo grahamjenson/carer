@@ -8,7 +8,6 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
-
 (Range5, double) targetRange(SettingsCN settings, int sgv) {
   var low = settings.targetLow.toDouble();
   var high = settings.targetHigh.toDouble();

@@ -2,7 +2,16 @@ import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/utils/math.dart';
+
+Future<Range5> atPredictedTime(int mins, SettingsCN settings) async {
+  Exp2Predictor exp2predictor = Exp2Predictor();
+  await exp2predictor.init();
+  var sgvAtTime = exp2predictor.predictMin(mins);
+  var (range, _) = targetRange(settings, sgvAtTime.value.toInt());
+  return range;
+}
 
 abstract class Alarm {
   final SettingsCN settings;
@@ -33,21 +42,8 @@ class PredictiveLowAlarm extends Alarm {
 
   @override
   Future<bool> trigger() async {
-    var lastSGV = await SGV.lastSGV();
-    if (lastSGV == null) {
-      return false;
-    }
-    var diffs = await t1d.diffPer5Minute(15);
-    if (diffs.isEmpty) {
-      return false;
-    }
-
-    var meanDiff = mean(diffs);
-    var meanDiffPerMinute = meanDiff / 5;
-    var predictedDiff = meanDiffPerMinute * alarmSettings.lowPredictionMinutes;
-    var predictedSGV = (lastSGV.value + predictedDiff).round();
-
-    var (range, _) = targetRange(settings, predictedSGV);
+    var range =
+        await atPredictedTime(alarmSettings.lowPredictionMinutes, settings);
     return range == Range5.veryLow || range == Range5.low;
   }
 
@@ -109,12 +105,9 @@ class LowAlarm extends Alarm {
 
   @override
   Future<bool> smartSnooze() async {
-    var diffs = await t1d.diffPer5Minute(10);
-    if (diffs.isEmpty) {
-      return false;
-    }
+    var range = await atPredictedTime(10, settings);
 
-    return diffs.last > 0;
+    return range == Range5.mid;
   }
 }
 
@@ -150,12 +143,8 @@ class HighAlarm extends Alarm {
 
   @override
   Future<bool> smartSnooze() async {
-    var diffs = await t1d.diffPer5Minute(10);
-    if (diffs.isEmpty) {
-      return false;
-    }
-
-    return diffs.last < 0;
+    var range = await atPredictedTime(10, settings);
+    return range == Range5.mid;
   }
 }
 

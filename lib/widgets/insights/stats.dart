@@ -50,13 +50,9 @@ class Stats extends StatelessWidget {
   Future<Window> futureWindow(SettingsCN settings) async {
     var stateData = await StateData.instance;
 
-    Linear2Predictor linear2predictor = Linear2Predictor();
-    await linear2predictor.init();
-
     Exp2Predictor exp2predictor = Exp2Predictor();
     await exp2predictor.init();
 
-    var linear2preds = linear2predictor.predictNextHour();
     var exp2preds = exp2predictor.predictNextHour();
 
     return Window(
@@ -96,7 +92,7 @@ class Stats extends StatelessWidget {
               await target(settings.unit),
               await fifteenMinDiff(settings.unit),
               await todaysInRange(settings.targetLow, settings.targetHigh),
-              await predictions("Linear2", linear2preds, settings.unit),
+              await yesterdayInRange(settings.targetLow, settings.targetHigh),
               await predictions("Exp2", exp2preds, settings.unit),
             ],
           ),
@@ -305,6 +301,21 @@ class Stats extends StatelessWidget {
     return DataRow(
       cells: [
         const DataCell(Text("TIR", style: heading)),
+        DataCell(
+          SmartText(texts: [percent, "%"], styles: const [row, small]),
+        ),
+      ],
+    );
+  }
+
+  Future<DataRow> yesterdayInRange(int low, int high) async {
+    var percent = (await SGV.percentInRangeYesterday(low, high) * 100.0)
+        .toStringAsFixed(0);
+    // get mills at start of day
+
+    return DataRow(
+      cells: [
+        const DataCell(Text("YIR", style: heading)),
         DataCell(
           SmartText(texts: [percent, "%"], styles: const [row, small]),
         ),
