@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 class NightscoutSettingsWidget extends AbstractSettingsSection {
   NightscoutSettingsWidget({super.key});
@@ -12,33 +12,32 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsCN>(builder: (context, settings, child) {
-      var maxWidth =
-          min(650, max(0, MediaQuery.of(context).size.width - 200)).toDouble();
-      return SettingsSection(
-        title: const Text('Nightscout'),
-        tiles: [
-          SettingsTile.navigation(
-            title: const Text('URL'),
-            value: Container(
-              alignment: Alignment.centerRight,
-              width: maxWidth,
-              child: Text(
-                settings.nightscoutURL,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            leading: const Icon(Icons.language),
-            onPressed: (context) async {
-              final url = await openTextDialog(context, "Nightscout URL",
-                  hint: "URL", value: settings.nightscoutURL);
-              if (url == null || url.isEmpty) return;
-              settings.nightscoutURL = url;
-            },
+    var maxWidth =
+        min(650, max(0, MediaQuery.of(context).size.width - 200)).toDouble();
+    return SettingsSection(
+      title: const Text('Nightscout'),
+      tiles: [
+        SettingsTile.navigation(
+          title: const Text('URL'),
+          value: Container(
+            alignment: Alignment.centerRight,
+            width: maxWidth,
+            child: Watch((context) => Text(
+                  SettingNames.nightscoutUrl.signal.value ?? "Not Set",
+                  overflow: TextOverflow.ellipsis,
+                )),
           ),
-        ],
-      );
-    });
+          leading: const Icon(Icons.language),
+          onPressed: (context) async {
+            var value = SettingNames.unit.signal.value;
+            final url = await openTextDialog(context, "Nightscout URL",
+                hint: "URL", value: value);
+            if (url == null || url.isEmpty) return;
+            SettingNames.nightscoutUrl.signal.value = url;
+          },
+        ),
+      ],
+    );
   }
 
   Future<String?> openTextDialog(BuildContext context, String title,

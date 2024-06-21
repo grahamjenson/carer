@@ -6,14 +6,39 @@ import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/change_notifiers/settings/ui_settings.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:signals/signals_flutter.dart';
 
 enum SettingNames {
   // NS Settings
   nightscoutUrl,
 
   // Unit for BGL
-  unit,
+  unit;
+}
+
+Map<SettingNames, Signal> settingsSignals = {
+  SettingNames.nightscoutUrl: Signal<String?>(null),
+  SettingNames.unit: Signal<Unit?>(null),
+};
+
+var nightscoutURLAndToken = computed(() {
+  var nightscoutURL = SettingNames.nightscoutUrl.signal.value;
+  if (nightscoutURL.isNotEmpty) {
+    var uri = Uri.parse(nightscoutURL);
+    var token = uri.queryParameters["token"];
+    token ??= '';
+    var base = '${uri.scheme}://${uri.host}';
+    return (base.toString(), token);
+  }
+
+  return ('', '');
+});
+
+extension SettingNamesExtension on SettingNames {
+  Signal get signal {
+    return settingsSignals[this]!;
+  }
 }
 
 class SettingsCN extends ChangeNotifier {
@@ -26,6 +51,17 @@ class SettingsCN extends ChangeNotifier {
   Future<void> populate() async {
     // Get instance to the KVStore
     prefs = await KeyValueStore.instance;
+    SettingNames.nightscoutUrl.signal.value =
+        prefs.getString(SettingNames.nightscoutUrl.name);
+    SettingNames.unit.signal.value =
+        UnitExtension.fromBool(prefs.getBool(SettingNames.unit.name));
+
+    // Sets the DataBase to the value when set
+    effect(() => prefs.setString(SettingNames.nightscoutUrl.name,
+        SettingNames.nightscoutUrl.signal.value));
+
+    effect(() => prefs.setBool(
+        SettingNames.unit.name, SettingNames.unit.signal.value.toBool()));
 
     uiSettings = UISettings(prefs: prefs, settings: this);
 
@@ -53,36 +89,7 @@ class SettingsCN extends ChangeNotifier {
 
   // NIGHT SCOUT URL
 
-  (String, String) get nightscoutURLAndToken {
-    if (nightscoutURL.isNotEmpty) {
-      var uri = Uri.parse(nightscoutURL);
-      var token = uri.queryParameters["token"];
-      token ??= '';
-      var base = '${uri.scheme}://${uri.host}';
-      return (base.toString(), token);
-    }
-
-    return ('', '');
-  }
-
   void notify() {
-    notifyListeners();
-  }
-
-  String get nightscoutURL =>
-      prefs.getString(SettingNames.nightscoutUrl.name) ?? '';
-
-  set nightscoutURL(String value) {
-    prefs.setString(SettingNames.nightscoutUrl.name, value);
-    notifyListeners();
-  }
-
-  // UNIT
-  Unit get unit =>
-      UnitExtension.fromBool(prefs.getBool(SettingNames.unit.name));
-
-  set unit(Unit value) {
-    prefs.setBool(SettingNames.unit.name, value.toBool());
     notifyListeners();
   }
 

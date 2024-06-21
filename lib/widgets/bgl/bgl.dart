@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
@@ -59,7 +60,7 @@ class _BGLState extends State<BGL> {
     if (sgv == null) {
       return loader;
     }
-    var unit = settings.unit;
+    var unit = UnitExtension.fromBool(true);
 
     return AspectRatio(
         aspectRatio: 1.5,

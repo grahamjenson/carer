@@ -12,6 +12,7 @@ import 'package:carer/widgets/smarttext.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 class Stats extends StatelessWidget {
   const Stats({super.key});
@@ -30,8 +31,10 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("oisdhfiudshf");
     return Consumer2<SettingsCN, UpdateCN>(
-        builder: (context, settings, summaryCn, child) {
+        builder: (context, settings, _, child) {
+      print("124124124");
       return FutureBuilder<Window>(
           future: futureWindow(settings),
           builder: (context, snapshot) {
@@ -53,7 +56,23 @@ class Stats extends StatelessWidget {
     Exp2Predictor exp2predictor = Exp2Predictor();
     await exp2predictor.init();
 
+    var profileBasal = await Profile.basalAtTime(clock.now());
+
+    var (profileLowTarget, profileHighTarget) =
+        await Profile.targetAtTime(clock.now());
+
+    var sgvs = await SGV.lastMins(15);
+
     var exp2preds = exp2predictor.predictNextHour();
+    var ypercent = (await SGV.percentInRangeYesterday(
+                settings.targetLow, settings.targetHigh) *
+            100.0)
+        .toStringAsFixed(0);
+
+    var tpercent = (await SGV.percentInRangeToday(
+                settings.targetLow, settings.targetHigh) *
+            100.0)
+        .toStringAsFixed(0);
 
     return Window(
       title: "Stats",
@@ -61,47 +80,50 @@ class Stats extends StatelessWidget {
         child: SingleChildScrollView(
             child: Container(
           alignment: Alignment.center,
-          child: DataTable(
-            border: const TableBorder(
-              verticalInside: BorderSide(color: mainColor),
-            ),
-            columnSpacing: 10,
-            dividerThickness: 0.01,
-            headingRowHeight: 0,
-            dataRowMinHeight: 14,
-            dataRowMaxHeight: 20,
-            horizontalMargin: 0,
-            columns: const [
-              DataColumn(
-                numeric: true,
-                label: SizedBox(
-                  width: 50,
-                  child: Text('name', style: heading),
-                ),
+          child: Watch((_) {
+            return DataTable(
+              border: const TableBorder(
+                verticalInside: BorderSide(color: mainColor),
               ),
-              DataColumn(
-                  label:
-                      SizedBox(width: 50, child: Text('stat', style: heading))),
-            ],
-            rows: [
-              await iob(stateData),
-              await cob(stateData),
-              await power(stateData),
-              await cage(stateData),
-              await basal(),
-              await target(settings.unit),
-              await fifteenMinDiff(settings.unit),
-              await todaysInRange(settings.targetLow, settings.targetHigh),
-              await yesterdayInRange(settings.targetLow, settings.targetHigh),
-              await predictions("Exp2", exp2preds, settings.unit),
-            ],
-          ),
+              columnSpacing: 10,
+              dividerThickness: 0.01,
+              headingRowHeight: 0,
+              dataRowMinHeight: 14,
+              dataRowMaxHeight: 20,
+              horizontalMargin: 0,
+              columns: const [
+                DataColumn(
+                  numeric: true,
+                  label: SizedBox(
+                    width: 50,
+                    child: Text('name', style: heading),
+                  ),
+                ),
+                DataColumn(
+                    label: SizedBox(
+                        width: 50, child: Text('stat', style: heading))),
+              ],
+              rows: [
+                iob(stateData),
+                cob(stateData),
+                power(stateData),
+                cage(stateData),
+                basal(profileBasal),
+                target(SettingNames.unit.signal.value, profileLowTarget,
+                    profileHighTarget),
+                fifteenMinDiff(SettingNames.unit.signal.value, sgvs),
+                todaysInRange(tpercent),
+                yesterdayInRange(ypercent),
+                predictions("Exp2", exp2preds, SettingNames.unit.signal.value),
+              ],
+            );
+          }),
         )),
       ),
     );
   }
 
-  Future<DataRow> model(double rmse) async {
+  DataRow model(double rmse) {
     return DataRow(
       cells: [
         const DataCell(Text("Model", style: heading)),
@@ -112,7 +134,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> predictions(String name, List<SGV> preds, Unit unit) async {
+  DataRow predictions(String name, List<SGV> preds, Unit unit) {
     return DataRow(
       cells: [
         DataCell(Text(name, style: heading)),
@@ -129,7 +151,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> iob(StateData stateData) async {
+  DataRow iob(StateData stateData) {
     return DataRow(
       cells: [
         const DataCell(
@@ -145,7 +167,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> cob(StateData stateData) async {
+  DataRow cob(StateData stateData) {
     return DataRow(
       cells: [
         const DataCell(
@@ -159,7 +181,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> power(StateData stateData) async {
+  DataRow power(StateData stateData) {
     return DataRow(
       cells: [
         const DataCell(Text("Power", style: heading)),
@@ -172,7 +194,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> cage(StateData stateData) async {
+  DataRow cage(StateData stateData) {
     return DataRow(
       cells: [
         const DataCell(Text("cage", style: heading)),
@@ -184,9 +206,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> basal() async {
-    var profileBasal = await Profile.basalAtTime(clock.now());
-
+  DataRow basal(profileBasal) {
     return DataRow(
       cells: [
         const DataCell(Text("Basal", style: heading)),
@@ -226,10 +246,7 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Future<DataRow> target(Unit unit) async {
-    var (profileLowTarget, profileHighTarget) =
-        await Profile.targetAtTime(clock.now());
-
+  DataRow target(Unit unit, int profileLowTarget, profileHighTarget) {
     return DataRow(
       cells: [
         const DataCell(Text("Target", style: heading)),
@@ -268,8 +285,7 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Future<DataRow> fifteenMinDiff(Unit unit) async {
-    var sgvs = await SGV.lastMins(15);
+  DataRow fifteenMinDiff(Unit unit, List<SGV> sgvs) {
     if (sgvs.isEmpty) {
       return const DataRow(
         cells: [
@@ -293,9 +309,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> todaysInRange(int low, int high) async {
-    var percent =
-        (await SGV.percentInRangeToday(low, high) * 100.0).toStringAsFixed(0);
+  DataRow todaysInRange(String percent) {
     // get mills at start of day
 
     return DataRow(
@@ -308,9 +322,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  Future<DataRow> yesterdayInRange(int low, int high) async {
-    var percent = (await SGV.percentInRangeYesterday(low, high) * 100.0)
-        .toStringAsFixed(0);
+  DataRow yesterdayInRange(String percent) {
     // get mills at start of day
 
     return DataRow(

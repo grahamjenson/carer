@@ -12,6 +12,7 @@ import 'package:clock/clock.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 class TreatmentSpot extends FlSpot {
   final Treatment treatment;
@@ -81,10 +82,6 @@ class BGLChart extends StatelessWidget {
 
   Future<Window> futureWindow(SettingsCN settings) async {
     int minsAgo = 125;
-    double maxY = settings.urgentHigh + 36;
-    double minY = 0;
-    double minX = -1 * minsAgo.toDouble(); // mins ago
-    double maxX = 0; // now
 
     var after = clock
         .now()
@@ -107,7 +104,49 @@ class BGLChart extends StatelessWidget {
       dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
     );
 
-    var lineChartData = LineChartData(
+    return Window(
+      title: "Chart",
+      child: Expanded(
+          child: Padding(
+              padding: const EdgeInsets.only(
+                right: 10,
+                top: 5,
+              ),
+              child: Watch((context) {
+                return LineChart(
+                  buildlineChartData(
+                      settings,
+                      minsAgo,
+                      maxBasal,
+                      bglSpotData,
+                      basalSpotData,
+                      lowTargets,
+                      highTargets,
+                      treatments,
+                      bglLineData),
+                  duration: Duration.zero,
+                );
+              }))),
+    );
+  }
+
+  buildlineChartData(
+    SettingsCN settings,
+    int minsAgo,
+    double maxBasal,
+    List<FlSpot> bglSpotData,
+    List<FlSpot> basalSpotData,
+    List<FlSpot> lowTargets,
+    List<FlSpot> highTargets,
+    List<FlSpot> treatments,
+    LineChartBarData bglLineData,
+  ) {
+    double maxY = settings.urgentHigh + 36;
+    double minY = 0;
+    double minX = -1 * minsAgo.toDouble(); // mins ago
+    double maxX = 0; // now
+
+    LineChartData(
       rangeAnnotations: rangeAnnotations(settings),
       gridData: gridData(),
       titlesData: titleData(settings, maxBasal),
@@ -142,25 +181,11 @@ class BGLChart extends StatelessWidget {
           dotData: const FlDotData(show: false),
         ),
       ],
-      lineTouchData: lineTouchData(settings),
+      lineTouchData: lineTouchData(SettingNames.unit.signal.value),
       betweenBarsData: [
         BetweenBarsData(
             fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
       ],
-    );
-
-    return Window(
-      title: "Chart",
-      child: Expanded(
-          child: Padding(
-              padding: const EdgeInsets.only(
-                right: 10,
-                top: 5,
-              ),
-              child: LineChart(
-                lineChartData,
-                duration: Duration.zero,
-              ))),
     );
   }
 
@@ -243,7 +268,7 @@ class BGLChart extends StatelessWidget {
     return (lowTargets, highTargets);
   }
 
-  LineTouchData lineTouchData(SettingsCN settings) {
+  LineTouchData lineTouchData(Unit unit) {
     return LineTouchData(
       enabled: true,
       touchTooltipData: LineTouchTooltipData(
@@ -264,8 +289,7 @@ class BGLChart extends StatelessWidget {
               );
               return TouchedSpotIndicatorData(
                 line,
-                FlDotData(
-                    show: true, getDotPainter: bglHighlightPainter(settings)),
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit)),
               );
             }
 
@@ -276,8 +300,7 @@ class BGLChart extends StatelessWidget {
               );
               return TouchedSpotIndicatorData(
                 line,
-                FlDotData(
-                    show: true, getDotPainter: bglHighlightPainter(settings)),
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit)),
               );
             }
 
@@ -419,8 +442,10 @@ class BGLChart extends StatelessWidget {
             value.toInt() == settings.urgentLow ||
             value.toInt() == settings.targetHigh ||
             value.toInt() == settings.targetLow) {
-          return Text(settings.unit.str(value),
-              style: style, textAlign: TextAlign.right);
+          return Watch((context) {
+            return Text(SettingNames.unit.signal.value.str(value),
+                style: style, textAlign: TextAlign.right);
+          });
         }
         return const SizedBox();
       },
@@ -441,7 +466,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  GetDotPainterCallback bglHighlightPainter(SettingsCN settings) {
+  GetDotPainterCallback bglHighlightPainter(Unit unit) {
     return (
       FlSpot spot,
       double xPercentage,
@@ -451,7 +476,7 @@ class BGLChart extends StatelessWidget {
     }) {
       if (spot is BGLSpot) {
         return FlTextPainterPainter(
-          spot.sgv.sgvStr(settings.unit),
+          spot.sgv.sgvStr(unit),
           strokeColor: Colors.black,
           size: 12,
           color: mainColor,
