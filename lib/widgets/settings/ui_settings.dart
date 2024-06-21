@@ -1,23 +1,22 @@
 import 'package:carer/change_notifiers/settings/ui_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 class UISettingsWidget extends AbstractSettingsSection {
   const UISettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsCN>(builder: (context, settings, child) {
+    return Watch((context) {
       return SettingsSection(
         title: const Text('UI'),
         tiles: [
           SettingsTile.switchTile(
             title: const Text('Keep Screen Active'),
-            initialValue: settings.screenActive,
+            initialValue: UISettings.screenActive.signal.value,
             onToggle: (value) async {
-              settings.screenActive = value;
+              UISettings.screenActive.value = value;
             },
           ),
           SettingsTile(
@@ -30,10 +29,10 @@ class UISettingsWidget extends AbstractSettingsSection {
                         child: SizedBox(width: 130, child: Text(e.viewName)),
                       ))
                   .toList(),
-              value: settings.uiSettings.uiLayoutVertical,
+              value: UISettings.uiLayoutVertical.value,
               onChanged: (value) {
                 if (value == null) return;
-                settings.uiSettings.uiLayoutVertical = value;
+                UISettings.uiLayoutVertical.value = value;
               },
             ),
           ),
@@ -46,10 +45,10 @@ class UISettingsWidget extends AbstractSettingsSection {
                         child: SizedBox(width: 130, child: Text(e.viewName)),
                       ))
                   .toList(),
-              value: settings.uiSettings.uiLayoutHorizontal,
+              value: UISettings.uiLayoutHorizontal.value,
               onChanged: (value) {
                 if (value == null) return;
-                settings.uiSettings.uiLayoutHorizontal = value;
+                UISettings.uiLayoutHorizontal.value = value;
               },
             ),
           ),
@@ -62,10 +61,10 @@ class UISettingsWidget extends AbstractSettingsSection {
                         child: SizedBox(width: 130, child: Text(e.viewName)),
                       ))
                   .toList(),
-              value: settings.uiSettings.uiTheme,
+              value: UISettings.uiTheme.value,
               onChanged: (value) {
                 if (value == null) return;
-                settings.uiSettings.uiTheme = value;
+                UISettings.uiTheme.value = value;
               },
             ),
           ),

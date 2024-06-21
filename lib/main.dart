@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   //databaseFactory = databaseFactory.debugQuickLoggerWrapper();
@@ -32,10 +31,8 @@ void runCarer() async {
 
   // Load the settings from Shared Preferences before starting
   var settings = SettingsCN();
-  await settings.populate();
 
-  // Make sure screen wont fall asleep if set
-  WakelockPlus.toggle(enable: settings.screenActive);
+  await settings.populate();
 
   final summary = UpdateCN(settings: settings);
   final t1d = T1DCN(settings: settings, summaryCn: summary);

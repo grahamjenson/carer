@@ -9,21 +9,22 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:signals/signals_flutter.dart';
 
-enum SettingNames {
+Map<Settings, Signal> settingsSignals = {};
+
+enum Settings {
   // NS Settings
   nightscoutUrl,
 
   // Unit for BGL
   unit;
+
+  Signal get signal {
+    return settingsSignals[this]!;
+  }
 }
 
-Map<SettingNames, Signal> settingsSignals = {
-  SettingNames.nightscoutUrl: Signal<String?>(null),
-  SettingNames.unit: Signal<Unit?>(null),
-};
-
 var nightscoutURLAndToken = computed(() {
-  var nightscoutURL = SettingNames.nightscoutUrl.signal.value;
+  var nightscoutURL = Settings.nightscoutUrl.signal.value;
   if (nightscoutURL.isNotEmpty) {
     var uri = Uri.parse(nightscoutURL);
     var token = uri.queryParameters["token"];
@@ -35,35 +36,32 @@ var nightscoutURLAndToken = computed(() {
   return ('', '');
 });
 
-extension SettingNamesExtension on SettingNames {
-  Signal get signal {
-    return settingsSignals[this]!;
-  }
-}
-
 class SettingsCN extends ChangeNotifier {
   late KeyValueStore prefs;
   late DebugSettings debugSettings;
   late TargetSettings targetSettings;
-  late UISettings uiSettings;
+  late UISettingsCN uiSettings;
   late AlarmSettings alarmSettings;
 
   Future<void> populate() async {
     // Get instance to the KVStore
     prefs = await KeyValueStore.instance;
-    SettingNames.nightscoutUrl.signal.value =
-        prefs.getString(SettingNames.nightscoutUrl.name);
-    SettingNames.unit.signal.value =
-        UnitExtension.fromBool(prefs.getBool(SettingNames.unit.name));
 
-    // Sets the DataBase to the value when set
-    effect(() => prefs.setString(SettingNames.nightscoutUrl.name,
-        SettingNames.nightscoutUrl.signal.value));
+    settingsSignals = {
+      Settings.nightscoutUrl:
+          Signal<String?>(prefs.getString(Settings.nightscoutUrl.name)),
+      Settings.unit:
+          Signal<Unit>(Unit.fromBool(prefs.getBool(Settings.unit.name))),
+    };
+
+    // On Signal change update the KVStore
+    effect(() => prefs.setString(
+        Settings.nightscoutUrl.name, Settings.nightscoutUrl.signal.value));
 
     effect(() => prefs.setBool(
-        SettingNames.unit.name, SettingNames.unit.signal.value.toBool()));
+        Settings.unit.name, (Settings.unit.signal.value as Unit).toBool()));
 
-    uiSettings = UISettings(prefs: prefs, settings: this);
+    uiSettings = UISettingsCN(prefs: prefs, settings: this);
 
     targetSettings = TargetSettings(prefs: prefs, settings: this);
 
@@ -76,7 +74,7 @@ class SettingsCN extends ChangeNotifier {
   String toString() {
     var string = "{\n";
     for (var key in prefs.getKeys()) {
-      if (key == SettingNames.nightscoutUrl.name) {
+      if (key == Settings.nightscoutUrl.name) {
         string += "\"$key\": \"[Filtered]\",\n";
         continue;
       }
@@ -92,10 +90,6 @@ class SettingsCN extends ChangeNotifier {
   void notify() {
     notifyListeners();
   }
-
-  // UI
-  bool get screenActive => uiSettings.screenActive;
-  set screenActive(bool value) => uiSettings.screenActive = value;
 
   // targets
   int get targetHigh => targetSettings.targetHigh;

@@ -82,7 +82,7 @@ class SGV extends Model {
     }
   }
 
-  Future<String> rate5mWithSign(Unit unit) async {
+  String rate5mWithSign(Unit unit) {
     var diffPer5Mins = rate5m ?? 0;
     var sgv = unit.val(diffPer5Mins);
     var sgvStr = sgv.toStringAsFixed(1);

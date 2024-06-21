@@ -39,7 +39,7 @@ class UpdateCN extends ChangeNotifier {
     // If settings update grab latest summary
     effect(() {
       // Check signal to register
-      var _ = SettingNames.nightscoutUrl.signal.value;
+      var _ = Settings.nightscoutUrl.signal.value;
       _summaryToBeUpdated = true;
       _updateReason = "Added Listener";
     });

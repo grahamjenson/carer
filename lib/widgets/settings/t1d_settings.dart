@@ -14,7 +14,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
   Widget build(BuildContext context) {
     return Consumer<SettingsCN>(builder: (context, settings, child) {
       return Watch((context) {
-        var unit = SettingNames.unit.signal.value;
+        var unit = Settings.unit.signal.value as Unit;
         var high = settings.targetHigh.toDouble();
         var low = settings.targetLow.toDouble();
         var highStr = unit.str(high);
@@ -45,8 +45,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
               trailing: Text(unit.name),
               initialValue: unit.toBool(),
               onToggle: (value) async {
-                var unitP = UnitExtension.fromBool(value);
-                SettingNames.unit.signal.value = unitP;
+                var unitP = Unit.fromBool(value);
+                Settings.unit.signal.value = unitP;
               },
             ),
             SettingsTile(

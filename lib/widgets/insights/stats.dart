@@ -31,10 +31,8 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("oisdhfiudshf");
     return Consumer2<SettingsCN, UpdateCN>(
         builder: (context, settings, _, child) {
-      print("124124124");
       return FutureBuilder<Window>(
           future: futureWindow(settings),
           builder: (context, snapshot) {
@@ -109,12 +107,12 @@ class Stats extends StatelessWidget {
                 power(stateData),
                 cage(stateData),
                 basal(profileBasal),
-                target(SettingNames.unit.signal.value, profileLowTarget,
+                target(Settings.unit.signal.value, profileLowTarget,
                     profileHighTarget),
-                fifteenMinDiff(SettingNames.unit.signal.value, sgvs),
+                fifteenMinDiff(Settings.unit.signal.value, sgvs),
                 todaysInRange(tpercent),
                 yesterdayInRange(ypercent),
-                predictions("Exp2", exp2preds, SettingNames.unit.signal.value),
+                predictions("Exp2", exp2preds, Settings.unit.signal.value),
               ],
             );
           }),

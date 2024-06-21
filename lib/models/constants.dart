@@ -1,15 +1,8 @@
 const MGtoMMOL = 18.018;
 
-enum Unit { mmol, mg }
-
-extension UnitExtension on Unit {
-  static Unit fromBool(bool? b) {
-    if (b == false) {
-      return Unit.mg;
-    } else {
-      return Unit.mmol; // default on null
-    }
-  }
+enum Unit {
+  mmol,
+  mg;
 
   bool toBool() {
     switch (this) {
@@ -50,6 +43,14 @@ extension UnitExtension on Unit {
         return value.toDouble().toStringAsFixed(0);
       default:
         return value.toDouble().toStringAsFixed(0);
+    }
+  }
+
+  static Unit fromBool(bool? b) {
+    if (b == false) {
+      return Unit.mg;
+    } else {
+      return Unit.mmol; // default on null
     }
   }
 }

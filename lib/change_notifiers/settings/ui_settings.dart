@@ -2,14 +2,29 @@ import 'dart:async';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-enum UISettingsNames {
+enum UISettings {
   screenActive,
   uiLayoutVertical,
   uiLayoutHorizontal,
-  uiTheme
+  uiTheme;
+
+  Signal get signal {
+    return settingsUISignals[this]!;
+  }
+
+  set value(dynamic value) {
+    settingsUISignals[this]!.value = value;
+  }
+
+  get value {
+    return settingsUISignals[this]!.value;
+  }
 }
+
+Map<UISettings, Signal> settingsUISignals = {};
 
 enum UITheme {
   // NS Settings
@@ -30,64 +45,75 @@ enum UILayout {
   const UILayout(this.viewName);
 }
 
-class UISettings {
+class UISettingsCN {
   KeyValueStore prefs;
   SettingsCN settings;
 
-  UISettings({required this.prefs, required this.settings}) {
+  UISettingsCN({required this.prefs, required this.settings}) {
     // Sometimes the app "forgets" that it is meant to keep the screen active
-    Timer.periodic(const Duration(seconds: 30),
-        (Timer t) => WakelockPlus.toggle(enable: screenActive));
-  }
 
-  // Screen Active
-  bool get screenActive =>
-      prefs.getBool(UISettingsNames.screenActive.name, defaultValue: true)!;
-  set screenActive(bool value) {
-    prefs.setBool(UISettingsNames.screenActive.name, value);
-    WakelockPlus.toggle(enable: value);
-    settings.notify();
+    // Assign the value of the settings from the KVStore
+    var screenActive =
+        prefs.getBool(UISettings.screenActive.name, defaultValue: true)!;
+
+    settingsUISignals = {
+      UISettings.screenActive: Signal<bool>(screenActive),
+      UISettings.uiLayoutVertical: Signal<UILayout>(_uiLayoutVertical),
+      UISettings.uiLayoutHorizontal: Signal<UILayout>(_uiLayoutHorizontal),
+      UISettings.uiTheme: Signal<UITheme>(_uiTheme),
+    };
+
+    // On Signal change update the KVStore
+    effect(() {
+      var value = UISettings.screenActive.signal.value;
+      prefs.setBool(UISettings.screenActive.name, value);
+      WakelockPlus.toggle(enable: value);
+    });
+
+    effect(() {
+      prefs.setString(
+          UISettings.uiLayoutVertical.name, UISettings.uiLayoutVertical.name);
+    });
+
+    effect(() {
+      prefs.setString(UISettings.uiLayoutHorizontal.name,
+          (UISettings.uiLayoutHorizontal.signal.value as UILayout).name);
+    });
+
+    effect(() {
+      var value = UISettings.uiTheme.signal.value as UITheme;
+      prefs.setString(UISettings.uiTheme.name, value.name);
+    });
+
+    Timer.periodic(
+        const Duration(seconds: 15),
+        (Timer t) =>
+            WakelockPlus.toggle(enable: UISettings.screenActive.signal.value));
   }
 
   // UI Layout Vertical
-  UILayout get uiLayoutVertical {
-    var layout = prefs.getString(UISettingsNames.uiLayoutVertical.name,
+  UILayout get _uiLayoutVertical {
+    var layout = prefs.getString(UISettings.uiLayoutVertical.name,
         defaultValue: UILayout.showBGL.name);
 
     return UILayout.values
         .firstWhere((e) => e.name == layout, orElse: () => UILayout.showBGL);
-  }
-
-  set uiLayoutVertical(UILayout value) {
-    prefs.setString(UISettingsNames.uiLayoutVertical.name, value.name);
-    settings.notify();
   }
 
   // UI Layout Horizontal
-  UILayout get uiLayoutHorizontal {
-    var layout = prefs.getString(UISettingsNames.uiLayoutHorizontal.name,
+  UILayout get _uiLayoutHorizontal {
+    var layout = prefs.getString(UISettings.uiLayoutHorizontal.name,
         defaultValue: UILayout.showBGL.name);
 
     return UILayout.values
         .firstWhere((e) => e.name == layout, orElse: () => UILayout.showBGL);
   }
 
-  set uiLayoutHorizontal(UILayout value) {
-    prefs.setString(UISettingsNames.uiLayoutHorizontal.name, value.name);
-    settings.notify();
-  }
-
   // UI Theme
-  UITheme get uiTheme {
-    var uiThemePref = prefs.getString(UISettingsNames.uiTheme.name);
+  UITheme get _uiTheme {
+    var uiThemePref = prefs.getString(UISettings.uiTheme.name);
 
     return UITheme.values
         .firstWhere((e) => e.name == uiThemePref, orElse: () => UITheme.normal);
-  }
-
-  set uiTheme(UITheme value) {
-    prefs.setString(UISettingsNames.uiTheme.name, value.name);
-
-    settings.notify();
   }
 }

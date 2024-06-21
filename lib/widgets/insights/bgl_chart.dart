@@ -130,7 +130,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  buildlineChartData(
+  LineChartData buildlineChartData(
     SettingsCN settings,
     int minsAgo,
     double maxBasal,
@@ -146,7 +146,7 @@ class BGLChart extends StatelessWidget {
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now
 
-    LineChartData(
+    return LineChartData(
       rangeAnnotations: rangeAnnotations(settings),
       gridData: gridData(),
       titlesData: titleData(settings, maxBasal),
@@ -181,7 +181,7 @@ class BGLChart extends StatelessWidget {
           dotData: const FlDotData(show: false),
         ),
       ],
-      lineTouchData: lineTouchData(SettingNames.unit.signal.value),
+      lineTouchData: lineTouchData(Settings.unit.signal.value),
       betweenBarsData: [
         BetweenBarsData(
             fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
@@ -443,7 +443,7 @@ class BGLChart extends StatelessWidget {
             value.toInt() == settings.targetHigh ||
             value.toInt() == settings.targetLow) {
           return Watch((context) {
-            return Text(SettingNames.unit.signal.value.str(value),
+            return Text(Settings.unit.signal.value.str(value),
                 style: style, textAlign: TextAlign.right);
           });
         }

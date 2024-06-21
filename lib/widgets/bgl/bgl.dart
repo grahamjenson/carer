@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
-import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 //copied from https://xdrip.readthedocs.io/en/latest/use/mainUI/#trend-arrow
 
@@ -60,7 +60,6 @@ class _BGLState extends State<BGL> {
     if (sgv == null) {
       return loader;
     }
-    var unit = UnitExtension.fromBool(true);
 
     return AspectRatio(
         aspectRatio: 1.5,
@@ -81,11 +80,14 @@ class _BGLState extends State<BGL> {
               widthFactor: 1,
               heightFactor: 1,
               child: FittedBox(
-                child: Text(sgv.sgvStr(unit),
-                    style: const TextStyle(
-                      color: mainColor,
-                      fontWeight: FontWeight.bold,
-                    )),
+                child: Watch((_) {
+                  var unit = Settings.unit.signal.value;
+                  return Text(sgv.sgvStr(unit),
+                      style: const TextStyle(
+                        color: mainColor,
+                        fontWeight: FontWeight.bold,
+                      ));
+                }),
               ),
             ),
             Align(
@@ -96,13 +98,16 @@ class _BGLState extends State<BGL> {
                 child: Row(children: [
                   Expanded(
                     child: FittedBox(
-                      child: Text(
-                        await sgv.rate5mWithSign(unit),
-                        style: const TextStyle(
-                          color: mainColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Watch((_) {
+                        var unit = Settings.unit.signal.value;
+                        return Text(
+                          sgv.rate5mWithSign(unit),
+                          style: const TextStyle(
+                            color: mainColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }),
                     ),
                   ),
                   const Flexible(
