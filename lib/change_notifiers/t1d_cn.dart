@@ -53,7 +53,7 @@ class T1DCN extends ChangeNotifier {
 
   Future<List<Range5>> targetRange5ForMins(int minutes) async {
     return (await SGV.lastMins(minutes)).map((e) {
-      var (t, _) = targetRange(settings, e.value);
+      var (t, _) = targetRange(e.value);
       return t;
     }).toList();
   }
@@ -65,7 +65,7 @@ class T1DCN extends ChangeNotifier {
     }
 
     // Calculating Target Range
-    var (tr, trp) = targetRange(settings, lastSGV.value);
+    var (tr, trp) = targetRange(lastSGV.value);
     targetRange5 = tr;
     targetRange5Proportion = trp;
 

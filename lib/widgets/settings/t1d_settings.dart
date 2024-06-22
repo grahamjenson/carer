@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/models/constants.dart';
 import 'package:flutter/material.dart';
@@ -14,14 +15,14 @@ class T1DSettingsWidget extends AbstractSettingsSection {
   Widget build(BuildContext context) {
     return Consumer<SettingsCN>(builder: (context, settings, child) {
       return Watch((context) {
-        var unit = Settings.unit.signal.value as Unit;
-        var high = settings.targetHigh.toDouble();
-        var low = settings.targetLow.toDouble();
+        var unit = Settings.unit.value as Unit;
+        var high = TargetSettings.targetHigh.value.toDouble();
+        var low = TargetSettings.targetLow.value.toDouble();
         var highStr = unit.str(high);
         var lowStr = unit.str(low);
 
-        var uhigh = settings.urgentHigh.toDouble();
-        var ulow = settings.urgentLow.toDouble();
+        var uhigh = TargetSettings.urgentHigh.value.toDouble();
+        var ulow = TargetSettings.urgentLow.value.toDouble();
         var uhighStr = unit.str(uhigh);
         var ulowStr = unit.str(ulow);
 
@@ -46,7 +47,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
               initialValue: unit.toBool(),
               onToggle: (value) async {
                 var unitP = Unit.fromBool(value);
-                Settings.unit.signal.value = unitP;
+                Settings.unit.value = unitP;
               },
             ),
             SettingsTile(
@@ -57,8 +58,10 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                     child: InkWell(
                         child: Text(lowStr, textAlign: TextAlign.end),
                         onTap: () {
-                          settings.targetLow = max(minRange,
-                                  settings.targetLow.toDouble() - diff)
+                          TargetSettings.targetLow.value = max(
+                                  minRange,
+                                  TargetSettings.targetLow.peek.toDouble() -
+                                      diff)
                               .toInt();
                         })),
                 Expanded(
@@ -74,8 +77,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                           onChanged: (RangeValues vals) {
                             var newLow = vals.start.toInt();
                             var newHigh = vals.end.toInt();
-                            settings.targetLow = newLow;
-                            settings.targetHigh = newHigh;
+                            TargetSettings.targetLow.value = newLow;
+                            TargetSettings.targetHigh.value = newHigh;
                           },
                         ))),
                 Expanded(
@@ -86,9 +89,11 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                         textAlign: TextAlign.start,
                       ),
                       onTap: () {
-                        settings.targetHigh =
-                            min(maxRange, settings.targetHigh.toDouble() + diff)
-                                .toInt();
+                        TargetSettings.targetHigh.value = min(
+                                maxRange,
+                                TargetSettings.targetHigh.peek.toDouble() +
+                                    diff)
+                            .toInt();
                       }),
                 ),
               ]),
@@ -101,8 +106,10 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                     child: InkWell(
                         child: Text(ulowStr, textAlign: TextAlign.end),
                         onTap: () {
-                          settings.urgentLow = max(minRange,
-                                  settings.urgentLow.toDouble() - diff)
+                          TargetSettings.urgentLow.value = max(
+                                  minRange,
+                                  TargetSettings.urgentLow.peek.toDouble() -
+                                      diff)
                               .toInt();
                         })),
                 Expanded(
@@ -116,8 +123,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                           min: minRange,
                           max: maxRange,
                           onChanged: (RangeValues vals) {
-                            settings.urgentLow = vals.start.toInt();
-                            settings.urgentHigh = vals.end.toInt();
+                            TargetSettings.urgentLow.value = vals.start.toInt();
+                            TargetSettings.urgentHigh.value = vals.end.toInt();
                           },
                         ))),
                 Expanded(
@@ -125,9 +132,9 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                     child: Text(uhighStr, textAlign: TextAlign.start),
                     onTap: () {
-                      settings.urgentHigh =
-                          min(maxRange, settings.urgentHigh.toDouble() + diff)
-                              .toInt();
+                      TargetSettings.urgentHigh.value = min(maxRange,
+                              TargetSettings.urgentHigh.peek.toDouble() + diff)
+                          .toInt();
                     },
                   ),
                 ),

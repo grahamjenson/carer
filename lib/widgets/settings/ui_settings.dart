@@ -14,7 +14,7 @@ class UISettingsWidget extends AbstractSettingsSection {
         tiles: [
           SettingsTile.switchTile(
             title: const Text('Keep Screen Active'),
-            initialValue: UISettings.screenActive.signal.value,
+            initialValue: UISettings.screenActive.value,
             onToggle: (value) async {
               UISettings.screenActive.value = value;
             },

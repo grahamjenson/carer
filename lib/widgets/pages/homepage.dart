@@ -24,8 +24,8 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             child: Watch((context) => getLayout(
                 context,
-                UISettings.uiLayoutVertical.signal.value,
-                UISettings.uiLayoutHorizontal.signal.value)),
+                UISettings.uiLayoutVertical.value,
+                UISettings.uiLayoutHorizontal.value)),
           ),
           const Positioned(
             top: 10, // Adjust these values as needed

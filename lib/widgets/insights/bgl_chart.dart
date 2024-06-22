@@ -1,3 +1,4 @@
+import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
@@ -141,15 +142,15 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> treatments,
     LineChartBarData bglLineData,
   ) {
-    double maxY = settings.urgentHigh + 36;
+    double maxY = TargetSettings.urgentHigh.value + 36;
     double minY = 0;
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now
 
     return LineChartData(
-      rangeAnnotations: rangeAnnotations(settings),
+      rangeAnnotations: rangeAnnotations(),
       gridData: gridData(),
-      titlesData: titleData(settings, maxBasal),
+      titlesData: titleData(maxBasal),
       borderData: borderData(),
       maxX: maxX,
       minX: minX,
@@ -181,7 +182,7 @@ class BGLChart extends StatelessWidget {
           dotData: const FlDotData(show: false),
         ),
       ],
-      lineTouchData: lineTouchData(Settings.unit.signal.value),
+      lineTouchData: lineTouchData(Settings.unit.value),
       betweenBarsData: [
         BetweenBarsData(
             fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
@@ -318,7 +319,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlTitlesData titleData(SettingsCN settings, double maxBasal) {
+  FlTitlesData titleData(double maxBasal) {
     return FlTitlesData(
       show: true,
       rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal)),
@@ -328,7 +329,7 @@ class BGLChart extends StatelessWidget {
       bottomTitles: AxisTitles(
         sideTitles: bottomTitleWidgets(),
       ),
-      leftTitles: AxisTitles(sideTitles: leftTitleWidgets(settings)),
+      leftTitles: AxisTitles(sideTitles: leftTitleWidgets()),
     );
   }
 
@@ -353,17 +354,17 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  RangeAnnotations rangeAnnotations(SettingsCN settings) {
+  RangeAnnotations rangeAnnotations() {
     return RangeAnnotations(
       horizontalRangeAnnotations: [
         HorizontalRangeAnnotation(
-          y1: settings.urgentHigh.toDouble(),
-          y2: settings.urgentLow.toDouble(),
+          y1: TargetSettings.urgentHigh.value.toDouble(),
+          y2: TargetSettings.urgentLow.value.toDouble(),
           color: mainColor.withAlpha(35),
         ),
         HorizontalRangeAnnotation(
-          y1: settings.targetHigh.toDouble(),
-          y2: settings.targetLow.toDouble(),
+          y1: TargetSettings.targetHigh.value.toDouble(),
+          y2: TargetSettings.targetLow.value.toDouble(),
           color: mainColor.withAlpha(35),
         ),
       ],
@@ -426,7 +427,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  SideTitles leftTitleWidgets(SettingsCN settings) {
+  SideTitles leftTitleWidgets() {
     return SideTitles(
       showTitles: true,
       interval: 1,
@@ -438,12 +439,12 @@ class BGLChart extends StatelessWidget {
             color: mainColor,
             height: 0.5);
 
-        if (value.toInt() == settings.urgentHigh ||
-            value.toInt() == settings.urgentLow ||
-            value.toInt() == settings.targetHigh ||
-            value.toInt() == settings.targetLow) {
+        if (value.toInt() == TargetSettings.urgentHigh.value ||
+            value.toInt() == TargetSettings.urgentLow.value ||
+            value.toInt() == TargetSettings.targetHigh.value ||
+            value.toInt() == TargetSettings.targetLow.value) {
           return Watch((context) {
-            return Text(Settings.unit.signal.value.str(value),
+            return Text(Settings.unit.value.str(value),
                 style: style, textAlign: TextAlign.right);
           });
         }

@@ -9,7 +9,7 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:signals/signals_flutter.dart';
 
-Map<Settings, Signal> settingsSignals = {};
+Map<Settings, Signal> _settingsSignals = {};
 
 enum Settings {
   // NS Settings
@@ -18,13 +18,21 @@ enum Settings {
   // Unit for BGL
   unit;
 
-  Signal get signal {
-    return settingsSignals[this]!;
+  Signal get _signal {
+    return _settingsSignals[this]!;
+  }
+
+  set value(dynamic value) {
+    _settingsSignals[this]!.value = value;
+  }
+
+  get value {
+    return _settingsSignals[this]!.value;
   }
 }
 
 var nightscoutURLAndToken = computed(() {
-  var nightscoutURL = Settings.nightscoutUrl.signal.value;
+  var nightscoutURL = Settings.nightscoutUrl._signal.value;
   if (nightscoutURL.isNotEmpty) {
     var uri = Uri.parse(nightscoutURL);
     var token = uri.queryParameters["token"];
@@ -39,7 +47,7 @@ var nightscoutURLAndToken = computed(() {
 class SettingsCN extends ChangeNotifier {
   late KeyValueStore prefs;
   late DebugSettings debugSettings;
-  late TargetSettings targetSettings;
+  late TargetSettingsCN targetSettings;
   late UISettingsCN uiSettings;
   late AlarmSettings alarmSettings;
 
@@ -47,7 +55,7 @@ class SettingsCN extends ChangeNotifier {
     // Get instance to the KVStore
     prefs = await KeyValueStore.instance;
 
-    settingsSignals = {
+    _settingsSignals = {
       Settings.nightscoutUrl:
           Signal<String?>(prefs.getString(Settings.nightscoutUrl.name)),
       Settings.unit:
@@ -56,14 +64,14 @@ class SettingsCN extends ChangeNotifier {
 
     // On Signal change update the KVStore
     effect(() => prefs.setString(
-        Settings.nightscoutUrl.name, Settings.nightscoutUrl.signal.value));
+        Settings.nightscoutUrl.name, Settings.nightscoutUrl._signal.value));
 
     effect(() => prefs.setBool(
-        Settings.unit.name, (Settings.unit.signal.value as Unit).toBool()));
+        Settings.unit.name, (Settings.unit._signal.value as Unit).toBool()));
 
     uiSettings = UISettingsCN(prefs: prefs, settings: this);
 
-    targetSettings = TargetSettings(prefs: prefs, settings: this);
+    targetSettings = TargetSettingsCN(prefs: prefs, settings: this);
 
     alarmSettings = AlarmSettings(prefs: prefs, settings: this);
 
@@ -90,17 +98,6 @@ class SettingsCN extends ChangeNotifier {
   void notify() {
     notifyListeners();
   }
-
-  // targets
-  int get targetHigh => targetSettings.targetHigh;
-  int get targetLow => targetSettings.targetLow;
-  int get urgentHigh => targetSettings.urgentHigh;
-  int get urgentLow => targetSettings.urgentLow;
-
-  set targetHigh(int value) => targetSettings.targetHigh = value;
-  set targetLow(int value) => targetSettings.targetLow = value;
-  set urgentHigh(int value) => targetSettings.urgentHigh = value;
-  set urgentLow(int value) => targetSettings.urgentLow = value;
 
   // debug
   bool get debug => debugSettings.debug;

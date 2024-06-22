@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/change_notifiers/settings/target_settings.dart';
 
 enum Range5 { veryLow, low, mid, high, veryHigh }
 
@@ -8,11 +8,11 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
-(Range5, double) targetRange(SettingsCN settings, int sgv) {
-  var low = settings.targetLow.toDouble();
-  var high = settings.targetHigh.toDouble();
-  var veryHigh = settings.urgentHigh.toDouble();
-  var veryLow = settings.urgentLow.toDouble();
+(Range5, double) targetRange(int sgv) {
+  var low = TargetSettings.targetLow.value.toDouble();
+  var high = TargetSettings.targetHigh.value.toDouble();
+  var veryHigh = TargetSettings.urgentHigh.value.toDouble();
+  var veryLow = TargetSettings.urgentLow.value.toDouble();
 
   return range5(veryLow, low, high, veryHigh, sgv.toDouble());
 }

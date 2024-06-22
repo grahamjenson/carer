@@ -1,7 +1,25 @@
+import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:clock/clock.dart';
+import 'package:signals/signals_flutter.dart';
+
+FutureSignal<double> todaysPercentage = computedAsync(() {
+  print("updating Future Signal todaysPercentage");
+  return SGV
+      .percentInRangeToday(
+          TargetSettings.targetLow.value, TargetSettings.targetHigh.value)
+      .then((value) => value * 100.0);
+});
+
+FutureSignal<double> yesterdaysPercentage = computedAsync(() {
+  print("updating Future Signal yesterdaysPercentage");
+  return SGV
+      .percentInRangeYesterday(
+          TargetSettings.targetLow.value, TargetSettings.targetHigh.value)
+      .then((value) => value * 100.0);
+});
 
 class SGVRepository extends ModelRepository<SGV> {
   const SGVRepository()

@@ -31,10 +31,9 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<SettingsCN, UpdateCN>(
-        builder: (context, settings, _, child) {
+    return Consumer<UpdateCN>(builder: (context, _, child) {
       return FutureBuilder<Window>(
-          future: futureWindow(settings),
+          future: futureWindow(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print("Stats snapshot error: ${snapshot.error}");
@@ -48,7 +47,7 @@ class Stats extends StatelessWidget {
     });
   }
 
-  Future<Window> futureWindow(SettingsCN settings) async {
+  Future<Window> futureWindow() async {
     var stateData = await StateData.instance;
 
     Exp2Predictor exp2predictor = Exp2Predictor();
@@ -62,15 +61,6 @@ class Stats extends StatelessWidget {
     var sgvs = await SGV.lastMins(15);
 
     var exp2preds = exp2predictor.predictNextHour();
-    var ypercent = (await SGV.percentInRangeYesterday(
-                settings.targetLow, settings.targetHigh) *
-            100.0)
-        .toStringAsFixed(0);
-
-    var tpercent = (await SGV.percentInRangeToday(
-                settings.targetLow, settings.targetHigh) *
-            100.0)
-        .toStringAsFixed(0);
 
     return Window(
       title: "Stats",
@@ -107,12 +97,12 @@ class Stats extends StatelessWidget {
                 power(stateData),
                 cage(stateData),
                 basal(profileBasal),
-                target(Settings.unit.signal.value, profileLowTarget,
-                    profileHighTarget),
-                fifteenMinDiff(Settings.unit.signal.value, sgvs),
-                todaysInRange(tpercent),
-                yesterdayInRange(ypercent),
-                predictions("Exp2", exp2preds, Settings.unit.signal.value),
+                target(
+                    Settings.unit.value, profileLowTarget, profileHighTarget),
+                fifteenMinDiff(Settings.unit.value, sgvs),
+                todaysInRange(),
+                yesterdayInRange(),
+                predictions("Exp2", exp2preds, Settings.unit.value),
               ],
             );
           }),
@@ -307,27 +297,36 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow todaysInRange(String percent) {
-    // get mills at start of day
-
+  DataRow todaysInRange() {
+    var percent = 0;
+    if (todaysPercentage.value.value != null) {
+      percent = todaysPercentage.value.value!.toInt();
+    }
     return DataRow(
       cells: [
         const DataCell(Text("TIR", style: heading)),
         DataCell(
-          SmartText(texts: [percent, "%"], styles: const [row, small]),
+          SmartText(
+              texts: [percent.toStringAsFixed(0), "%"],
+              styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow yesterdayInRange(String percent) {
-    // get mills at start of day
+  DataRow yesterdayInRange() {
+    var percent = 0;
+    if (yesterdaysPercentage.value.value != null) {
+      percent = yesterdaysPercentage.value.value!.toInt();
+    }
 
     return DataRow(
       cells: [
         const DataCell(Text("YIR", style: heading)),
         DataCell(
-          SmartText(texts: [percent, "%"], styles: const [row, small]),
+          SmartText(
+              texts: [percent.toStringAsFixed(0), "%"],
+              styles: const [row, small]),
         ),
       ],
     );

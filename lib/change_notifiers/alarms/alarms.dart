@@ -9,7 +9,7 @@ Future<Range5> atPredictedTime(int mins, SettingsCN settings) async {
   Exp2Predictor exp2predictor = Exp2Predictor();
   await exp2predictor.init();
   var sgvAtTime = exp2predictor.predictMin(mins);
-  var (range, _) = targetRange(settings, sgvAtTime.value.toInt());
+  var (range, _) = targetRange(sgvAtTime.value.toInt());
   return range;
 }
 

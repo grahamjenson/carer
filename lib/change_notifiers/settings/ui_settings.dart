@@ -11,20 +11,20 @@ enum UISettings {
   uiLayoutHorizontal,
   uiTheme;
 
-  Signal get signal {
-    return settingsUISignals[this]!;
+  Signal get _signal {
+    return _settingsSignals[this]!;
   }
 
   set value(dynamic value) {
-    settingsUISignals[this]!.value = value;
+    _settingsSignals[this]!.value = value;
   }
 
   get value {
-    return settingsUISignals[this]!.value;
+    return _settingsSignals[this]!.value;
   }
 }
 
-Map<UISettings, Signal> settingsUISignals = {};
+Map<UISettings, Signal> _settingsSignals = {};
 
 enum UITheme {
   // NS Settings
@@ -56,7 +56,7 @@ class UISettingsCN {
     var screenActive =
         prefs.getBool(UISettings.screenActive.name, defaultValue: true)!;
 
-    settingsUISignals = {
+    _settingsSignals = {
       UISettings.screenActive: Signal<bool>(screenActive),
       UISettings.uiLayoutVertical: Signal<UILayout>(_uiLayoutVertical),
       UISettings.uiLayoutHorizontal: Signal<UILayout>(_uiLayoutHorizontal),
@@ -65,7 +65,7 @@ class UISettingsCN {
 
     // On Signal change update the KVStore
     effect(() {
-      var value = UISettings.screenActive.signal.value;
+      var value = UISettings.screenActive._signal.value;
       prefs.setBool(UISettings.screenActive.name, value);
       WakelockPlus.toggle(enable: value);
     });
@@ -77,18 +77,18 @@ class UISettingsCN {
 
     effect(() {
       prefs.setString(UISettings.uiLayoutHorizontal.name,
-          (UISettings.uiLayoutHorizontal.signal.value as UILayout).name);
+          (UISettings.uiLayoutHorizontal._signal.value as UILayout).name);
     });
 
     effect(() {
-      var value = UISettings.uiTheme.signal.value as UITheme;
+      var value = UISettings.uiTheme._signal.value as UITheme;
       prefs.setString(UISettings.uiTheme.name, value.name);
     });
 
     Timer.periodic(
         const Duration(seconds: 15),
         (Timer t) =>
-            WakelockPlus.toggle(enable: UISettings.screenActive.signal.value));
+            WakelockPlus.toggle(enable: UISettings.screenActive._signal.value));
   }
 
   // UI Layout Vertical
