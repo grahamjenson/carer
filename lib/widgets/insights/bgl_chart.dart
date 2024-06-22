@@ -61,12 +61,11 @@ class BGLChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<SettingsCN, UpdateCN>(
-        builder: (context, settings, summaryCn, child) {
+    return Consumer<UpdateCN>(builder: (context, summaryCn, child) {
       // Breaking down the objects
 
       return FutureBuilder<Window>(
-          future: futureWindow(settings),
+          future: futureWindow(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print("BGLChart snapshot error $context: ${snapshot.error}");
@@ -81,7 +80,7 @@ class BGLChart extends StatelessWidget {
     });
   }
 
-  Future<Window> futureWindow(SettingsCN settings) async {
+  Future<Window> futureWindow() async {
     int minsAgo = 125;
 
     var after = clock
@@ -116,7 +115,6 @@ class BGLChart extends StatelessWidget {
               child: Watch((context) {
                 return LineChart(
                   buildlineChartData(
-                      settings,
                       minsAgo,
                       maxBasal,
                       bglSpotData,
@@ -132,7 +130,6 @@ class BGLChart extends StatelessWidget {
   }
 
   LineChartData buildlineChartData(
-    SettingsCN settings,
     int minsAgo,
     double maxBasal,
     List<FlSpot> bglSpotData,

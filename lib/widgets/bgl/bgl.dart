@@ -39,10 +39,9 @@ class _BGLState extends State<BGL> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<SettingsCN, UpdateCN>(
-        builder: (context, settings, summaryCn, child) {
+    return Consumer<UpdateCN>(builder: (context, summaryCn, child) {
       return FutureBuilder<Widget>(
-          future: futureWindow(settings),
+          future: futureWindow(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return snapshot.data!;
@@ -53,7 +52,7 @@ class _BGLState extends State<BGL> {
     });
   }
 
-  Future<Widget> futureWindow(SettingsCN settings) async {
+  Future<Widget> futureWindow() async {
     const loader = Center(child: CircularProgressIndicator());
 
     var sgv = await SGV.lastSGV();

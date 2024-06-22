@@ -188,6 +188,10 @@ Bad data $badTempBasals, $badTempTargets
       print("notifiying change listeners");
       notifyListeners();
     }
+
+    if (sgvUpdates > 0) {
+      SGV.sgvWriteSignal.value = clock.now().millisecondsSinceEpoch;
+    }
   }
 
   void updateEntries() async {
@@ -212,6 +216,11 @@ Bad data $badTempBasals, $badTempTargets
       if (e) {
         total++;
       }
+    }
+
+    if (total > 0) {
+      // updates stuff
+      SGV.sgvWriteSignal.value = clock.now().millisecondsSinceEpoch;
     }
 
     print("ENTRIEEESSSSS UPDATES $total");

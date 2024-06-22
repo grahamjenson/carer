@@ -7,6 +7,7 @@ import 'package:signals/signals_flutter.dart';
 
 FutureSignal<double> todaysPercentage = computedAsync(() {
   print("updating Future Signal todaysPercentage");
+  var _ = SGV.sgvWriteSignal.value; // force update on save
   return SGV
       .percentInRangeToday(
           TargetSettings.targetLow.value, TargetSettings.targetHigh.value)
@@ -15,6 +16,7 @@ FutureSignal<double> todaysPercentage = computedAsync(() {
 
 FutureSignal<double> yesterdaysPercentage = computedAsync(() {
   print("updating Future Signal yesterdaysPercentage");
+  var _ = SGV.sgvWriteSignal.value; // force update on save
   return SGV
       .percentInRangeYesterday(
           TargetSettings.targetLow.value, TargetSettings.targetHigh.value)
@@ -56,6 +58,7 @@ class SGVRepository extends ModelRepository<SGV> {
 
 class SGV extends Model {
   static const SGVRepository _q = SGVRepository();
+  static Signal<int> sgvWriteSignal = Signal(0);
 
   @override
   ModelRepository get repository => _q;
@@ -186,7 +189,6 @@ class SGV extends Model {
     );
 
     var sgvsToday = await _q.count(after: startOfDayEpoch);
-
     if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
       return 0.0;
     }
@@ -226,6 +228,7 @@ class SGV extends Model {
       lastMinsCache = {};
       lastSGVcache = null;
     }
+
     return ret;
   }
 }
