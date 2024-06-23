@@ -1,8 +1,11 @@
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:signals/signals_flutter.dart';
 
-enum AlarmSettingsNames {
+enum AlarmSettings {
   disableAlarms,
+  testAlarmPlaying,
+  alarmAsset,
 
   urgentLowAlarm,
   lowAlarm,
@@ -27,8 +30,69 @@ enum AlarmSettingsNames {
 
   volumeOveride,
   volumeOverrideValue,
-  volumeProgressionSeconds,
+  volumeProgressionSeconds;
+
+  Signal get _signal {
+    return _settingsSignals[this]!;
+  }
+
+  set value(dynamic value) {
+    switch (this) {
+      case AlarmSettings.lowMinutes ||
+            AlarmSettings.highMinutes ||
+            AlarmSettings.lowPredictionMinutes ||
+            AlarmSettings.fastDropAlarmMinutes ||
+            AlarmSettings.fastRiseAlarmMinutes:
+        var validValues = [0, 5, 10, 15, 20, 30, 45, 60];
+        if (!validValues.contains(value)) {
+          return;
+        }
+        break;
+      case AlarmSettings.noDataAlarmMinutes:
+        var validValues = [-1, 10, 20, 30];
+        if (!validValues.contains(value)) {
+          return;
+        }
+        break;
+      case AlarmSettings.volumeOverrideValue:
+        if (value < 0) {
+          value = 0;
+        } else if (value > 100) {
+          value = 100;
+        }
+        break;
+      case AlarmSettings.volumeProgressionSeconds:
+        var validValues = [-1, 10, 20, 30, 60, 120];
+        if (!validValues.contains(value)) {
+          return;
+        }
+        break;
+      case AlarmSettings.fastDropDelta:
+        if (value > 8) {
+          value = 8;
+        }
+        break;
+      case AlarmSettings.fastRiseDelta:
+        if (value < -8) {
+          value = -8;
+        }
+        break;
+      default:
+        break;
+    }
+    _settingsSignals[this]!.value = value;
+  }
+
+  get value {
+    return _settingsSignals[this]!.value;
+  }
+
+  dynamic get peek {
+    return _settingsSignals[this]!.peek();
+  }
 }
+
+Map<AlarmSettings, Signal> _settingsSignals = {};
 
 enum AlarmSounds { nightguard, letsgo, hybridas }
 
@@ -60,265 +124,168 @@ extension AlarmSoundsExtension on AlarmSounds {
   }
 }
 
-class AlarmSettings {
+class AlarmSettingsCN {
   KeyValueStore prefs;
   SettingsCN settings;
 
   // ephemeral properters
-  bool _testAlarmPlaying = false;
-  AlarmSettings({required this.prefs, required this.settings});
 
-  bool get disableAlarms => prefs.getBool(AlarmSettingsNames.disableAlarms.name,
-      defaultValue: false)!;
+  AlarmSettingsCN({required this.prefs, required this.settings}) {
+    _settingsSignals = {
+      AlarmSettings.disableAlarms: Signal<bool>(_disableAlarms),
+      AlarmSettings.urgentLowAlarm: Signal<bool>(_urgentLowAlarm),
+      AlarmSettings.lowAlarm: Signal<bool>(_lowAlarm),
+      AlarmSettings.lowMinutes: Signal<int>(_lowMinutes),
+      AlarmSettings.highAlarm: Signal<bool>(_highAlarm),
+      AlarmSettings.highMinutes: Signal<int>(_highMinutes),
+      AlarmSettings.urgentHighAlarm: Signal<bool>(_urgentHighAlarm),
+      AlarmSettings.fastDropAlarm: Signal<bool>(_fastDropAlarm),
+      AlarmSettings.fastDropAlarmMinutes: Signal<int>(_fastDropAlarmMinutes),
+      AlarmSettings.fastDropDelta: Signal<int>(_fastDropDelta),
+      AlarmSettings.fastRiseAlarm: Signal<bool>(_fastRiseAlarm),
+      AlarmSettings.fastRiseAlarmMinutes: Signal<int>(_fastRiseAlarmMinutes),
+      AlarmSettings.fastRiseDelta: Signal<int>(_fastRiseDelta),
+      AlarmSettings.noDataAlarmMinutes: Signal<int>(_noDataAlarmMinutes),
+      AlarmSettings.lowPredictionAlarm: Signal<bool>(_lowPredictionAlarm),
+      AlarmSettings.lowPredictionMinutes: Signal<int>(_lowPredictionMinutes),
+      AlarmSettings.smartSnooze: Signal<bool>(_smartSnooze),
+      AlarmSettings.volumeOveride: Signal<bool>(_volumeOveride),
+      AlarmSettings.volumeOverrideValue: Signal<int>(_volumeOverrideValue),
+      AlarmSettings.volumeProgressionSeconds:
+          Signal<int>(_volumeProgressionSeconds),
+      AlarmSettings.testAlarmPlaying: Signal<bool>(false),
+      AlarmSettings.alarmAsset: Signal<AlarmSounds>(_alarmAsset),
+    };
 
-  set disableAlarms(bool value) {
-    prefs.setBool(AlarmSettingsNames.disableAlarms.name, value);
-    settings.notify();
+    effect(() => prefs.setBool(
+        AlarmSettings.disableAlarms.name, AlarmSettings.disableAlarms.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.urgentLowAlarm.name, AlarmSettings.urgentLowAlarm.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.lowAlarm.name, AlarmSettings.lowAlarm.value));
+
+    effect(() => prefs.setInt(
+        AlarmSettings.lowMinutes.name, AlarmSettings.lowMinutes.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.highAlarm.name, AlarmSettings.highAlarm.value));
+
+    effect(() => prefs.setInt(
+        AlarmSettings.highMinutes.name, AlarmSettings.highMinutes.value));
+
+    effect(() => prefs.setBool(AlarmSettings.urgentHighAlarm.name,
+        AlarmSettings.urgentHighAlarm.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.fastDropAlarm.name, AlarmSettings.fastDropAlarm.value));
+
+    effect(() => prefs.setInt(AlarmSettings.fastDropAlarmMinutes.name,
+        AlarmSettings.fastDropAlarmMinutes.value));
+
+    effect(() => prefs.setInt(
+        AlarmSettings.fastDropDelta.name, AlarmSettings.fastDropDelta.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.fastRiseAlarm.name, AlarmSettings.fastRiseAlarm.value));
+
+    effect(() => prefs.setInt(AlarmSettings.fastRiseAlarmMinutes.name,
+        AlarmSettings.fastRiseAlarmMinutes.value));
+
+    effect(() => prefs.setInt(
+        AlarmSettings.fastRiseDelta.name, AlarmSettings.fastRiseDelta.value));
+
+    effect(() => prefs.setInt(AlarmSettings.noDataAlarmMinutes.name,
+        AlarmSettings.noDataAlarmMinutes.value));
+
+    effect(() => prefs.setBool(AlarmSettings.lowPredictionAlarm.name,
+        AlarmSettings.lowPredictionAlarm.value));
+
+    effect(() => prefs.setInt(AlarmSettings.lowPredictionMinutes.name,
+        AlarmSettings.lowPredictionMinutes.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.smartSnooze.name, AlarmSettings.smartSnooze.value));
+
+    effect(() => prefs.setBool(
+        AlarmSettings.volumeOveride.name, AlarmSettings.volumeOveride.value));
+
+    effect(() => prefs.setInt(AlarmSettings.volumeOverrideValue.name,
+        AlarmSettings.volumeOverrideValue.value));
+
+    effect(() => prefs.setInt(AlarmSettings.volumeProgressionSeconds.name,
+        AlarmSettings.volumeProgressionSeconds.value));
+
+    effect(() {
+      var value = (AlarmSettings.alarmAsset.value as AlarmSounds).name;
+      prefs.setString(AlarmSettings.alarmAsset.name, value);
+    });
   }
 
-  ////
-  // Boundary Alarms
-  ////
+  bool get _disableAlarms =>
+      prefs.getBool(AlarmSettings.disableAlarms.name, defaultValue: false)!;
 
-  // urgentLowAlarm
-  bool get urgentLowAlarm => prefs
-      .getBool(AlarmSettingsNames.urgentLowAlarm.name, defaultValue: false)!;
-  set urgentLowAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.urgentLowAlarm.name, value);
-    settings.notify();
-  }
+  bool get _urgentLowAlarm =>
+      prefs.getBool(AlarmSettings.urgentLowAlarm.name, defaultValue: false)!;
 
-  bool get lowAlarm =>
-      prefs.getBool(AlarmSettingsNames.lowAlarm.name, defaultValue: false)!;
-  set lowAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.lowAlarm.name, value);
-    settings.notify();
-  }
+  bool get _lowAlarm =>
+      prefs.getBool(AlarmSettings.lowAlarm.name, defaultValue: false)!;
 
-  // highAlarm
-  bool get highAlarm =>
-      prefs.getBool(AlarmSettingsNames.highAlarm.name, defaultValue: false)!;
-  set highAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.highAlarm.name, value);
+  bool get _highAlarm =>
+      prefs.getBool(AlarmSettings.highAlarm.name, defaultValue: false)!;
 
-    settings.notify();
-  }
+  int get _lowMinutes =>
+      prefs.getInt(AlarmSettings.lowMinutes.name, defaultValue: 30)!;
 
-  int get lowMinutes =>
-      prefs.getInt(AlarmSettingsNames.lowMinutes.name, defaultValue: 30)!;
-  set lowMinutes(int value) {
-    var validValues = [0, 5, 10, 15, 20, 30, 45, 60];
-    if (!validValues.contains(value)) {
-      return;
-    }
+  int get _highMinutes =>
+      prefs.getInt(AlarmSettings.highMinutes.name, defaultValue: 30)!;
 
-    prefs.setInt(AlarmSettingsNames.lowMinutes.name, value);
+  bool get _urgentHighAlarm =>
+      prefs.getBool(AlarmSettings.urgentHighAlarm.name, defaultValue: false)!;
 
-    settings.notify();
-  }
+  bool get _lowPredictionAlarm => prefs
+      .getBool(AlarmSettings.lowPredictionAlarm.name, defaultValue: false)!;
 
-  int get highMinutes =>
-      prefs.getInt(AlarmSettingsNames.highMinutes.name, defaultValue: 30)!;
-  set highMinutes(int value) {
-    var validValues = [0, 5, 10, 15, 20, 30, 45, 60];
-    if (!validValues.contains(value)) {
-      return;
-    }
+  int get _lowPredictionMinutes =>
+      prefs.getInt(AlarmSettings.lowPredictionMinutes.name, defaultValue: 30)!;
 
-    prefs.setInt(AlarmSettingsNames.highMinutes.name, value);
+  bool get _fastDropAlarm =>
+      prefs.getBool(AlarmSettings.fastDropAlarm.name, defaultValue: false)!;
 
-    settings.notify();
-  }
+  int get _fastDropAlarmMinutes =>
+      prefs.getInt(AlarmSettings.fastDropAlarmMinutes.name, defaultValue: 30)!;
 
-  // urgentHighAlarm
-  bool get urgentHighAlarm => prefs
-      .getBool(AlarmSettingsNames.urgentHighAlarm.name, defaultValue: false)!;
-  set urgentHighAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.urgentHighAlarm.name, value);
-    settings.notify();
-  }
+  int get _fastDropDelta =>
+      prefs.getInt(AlarmSettings.fastDropDelta.name, defaultValue: -20)!;
 
-  ////
-  // Prediction alarms
-  ////
+  bool get _fastRiseAlarm =>
+      prefs.getBool(AlarmSettings.fastRiseAlarm.name, defaultValue: false)!;
 
-  bool get lowPredictionAlarm =>
-      prefs.getBool(AlarmSettingsNames.lowPredictionAlarm.name,
-          defaultValue: false)!;
-  set lowPredictionAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.lowPredictionAlarm.name, value);
+  int get _fastRiseAlarmMinutes =>
+      prefs.getInt(AlarmSettings.fastRiseAlarmMinutes.name, defaultValue: 30)!;
 
-    settings.notify();
-  }
+  int get _fastRiseDelta =>
+      prefs.getInt(AlarmSettings.fastRiseDelta.name, defaultValue: 20)!;
 
-  int get lowPredictionMinutes => prefs
-      .getInt(AlarmSettingsNames.lowPredictionMinutes.name, defaultValue: 30)!;
-  set lowPredictionMinutes(int value) {
-    var validValues = [5, 10, 15, 20, 30];
-    if (!validValues.contains(value)) {
-      return;
-    }
+  int get _noDataAlarmMinutes =>
+      prefs.getInt(AlarmSettings.noDataAlarmMinutes.name, defaultValue: 30)!;
 
-    prefs.setInt(AlarmSettingsNames.lowPredictionMinutes.name, value);
+  bool get _smartSnooze =>
+      prefs.getBool(AlarmSettings.smartSnooze.name, defaultValue: false)!;
 
-    settings.notify();
-  }
+  bool get _volumeOveride =>
+      prefs.getBool(AlarmSettings.volumeOveride.name, defaultValue: false)!;
 
-  ////
-  // Diff Alarms
-  ////
+  int get _volumeOverrideValue =>
+      prefs.getInt(AlarmSettings.volumeOverrideValue.name, defaultValue: 50)!;
 
-  // fasrDrop
-  bool get fastDropAlarm => prefs.getBool(AlarmSettingsNames.fastDropAlarm.name,
-      defaultValue: false)!;
-  set fastDropAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.fastDropAlarm.name, value);
-    settings.notify();
-  }
+  int get _volumeProgressionSeconds => prefs
+      .getInt(AlarmSettings.volumeProgressionSeconds.name, defaultValue: 10)!;
 
-  int get fastDropAlarmMinutes => prefs
-      .getInt(AlarmSettingsNames.fastDropAlarmMinutes.name, defaultValue: 30)!;
-  set fastDropAlarmMinutes(int value) {
-    var validValues = [5, 10, 15, 20, 30];
-    if (!validValues.contains(value)) {
-      return;
-    }
-
-    prefs.setInt(AlarmSettingsNames.fastDropAlarmMinutes.name, value);
-
-    settings.notify();
-  }
-
-  int get fastDropDelta =>
-      prefs.getInt(AlarmSettingsNames.fastDropDelta.name, defaultValue: -20)!;
-  set fastDropDelta(int value) {
-    if (value > -8) {
-      value = -8;
-    }
-    prefs.setInt(AlarmSettingsNames.fastDropDelta.name, value);
-
-    settings.notify();
-  }
-
-  // fastRise
-  bool get fastRiseAlarm => prefs.getBool(AlarmSettingsNames.fastRiseAlarm.name,
-      defaultValue: false)!;
-  set fastRiseAlarm(bool value) {
-    prefs.setBool(AlarmSettingsNames.fastRiseAlarm.name, value);
-
-    settings.notify();
-  }
-
-  int get fastRiseAlarmMinutes => prefs
-      .getInt(AlarmSettingsNames.fastRiseAlarmMinutes.name, defaultValue: 30)!;
-  set fastRiseAlarmMinutes(int value) {
-    var validValues = [5, 10, 15, 20, 30];
-    if (!validValues.contains(value)) {
-      return;
-    }
-
-    prefs.setInt(AlarmSettingsNames.fastRiseAlarmMinutes.name, value);
-    settings.notify();
-  }
-
-  int get fastRiseDelta =>
-      prefs.getInt(AlarmSettingsNames.fastRiseDelta.name, defaultValue: 20)!;
-  set fastRiseDelta(int value) {
-    if (value < 8) {
-      value = 8;
-    }
-    prefs.setInt(AlarmSettingsNames.fastRiseDelta.name, value);
-
-    settings.notify();
-  }
-
-  ////
-  // Data Alarms
-  ////
-
-  // noDataAlarmMinutes
-  int get noDataAlarmMinutes => prefs
-      .getInt(AlarmSettingsNames.noDataAlarmMinutes.name, defaultValue: 30)!;
-  set noDataAlarmMinutes(int value) {
-    var validValues = [-1, 10, 20, 30];
-    if (!validValues.contains(value)) {
-      return;
-    }
-
-    prefs.setInt(AlarmSettingsNames.noDataAlarmMinutes.name, value);
-    settings.notify();
-  }
-
-  ////
-  /// Smart Alarms
-  ////
-
-  bool get smartSnooze =>
-      prefs.getBool(AlarmSettingsNames.smartSnooze.name, defaultValue: false)!;
-  set smartSnooze(bool value) {
-    prefs.setBool(AlarmSettingsNames.smartSnooze.name, value);
-
-    settings.notify();
-  }
-
-  ////
-  /// Volume
-  ////
-  ///
-
-  bool get volumeOveride => prefs.getBool(AlarmSettingsNames.volumeOveride.name,
-      defaultValue: false)!;
-  set volumeOveride(bool value) {
-    prefs.setBool(AlarmSettingsNames.volumeOveride.name, value);
-
-    settings.notify();
-  }
-
-  int get volumeOverrideValue => prefs
-      .getInt(AlarmSettingsNames.volumeOverrideValue.name, defaultValue: 50)!;
-  set volumeOverrideValue(int value) {
-    prefs.setInt(AlarmSettingsNames.volumeOverrideValue.name, value);
-    if (value < 0) {
-      value = 0;
-    } else if (value > 100) {
-      value = 100;
-    }
-
-    settings.notify();
-  }
-
-  int get volumeProgressionSeconds =>
-      prefs.getInt(AlarmSettingsNames.volumeProgressionSeconds.name,
-          defaultValue: 10)!;
-  set volumeProgressionSeconds(int value) {
-    var validValues = [-1, 10, 20, 30, 60, 120];
-    if (!validValues.contains(value)) {
-      return;
-    }
-
-    prefs.setInt(AlarmSettingsNames.volumeProgressionSeconds.name, value);
-
-    settings.notify();
-  }
-
-  AlarmSounds get alarmAsset {
+  AlarmSounds get _alarmAsset {
     var asset = prefs.getString('alarmAsset', defaultValue: 'Nightguard');
     return AlarmSounds.values.firstWhere((e) => e.name == asset,
         orElse: () => AlarmSounds.nightguard);
-  }
-
-  set alarmAsset(AlarmSounds value) {
-    prefs.setString('alarmAsset', value.name);
-    settings.notify();
-  }
-
-  // ephermeral
-  bool get testAlarmPlaying => _testAlarmPlaying;
-  set testAlarmPlaying(bool value) {
-    if (value == _testAlarmPlaying) {
-      return;
-    }
-    _testAlarmPlaying = value;
-    settings.notify();
   }
 }

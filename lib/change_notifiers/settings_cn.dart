@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/settings/debug_settings.dart';
 import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/change_notifiers/settings/ui_settings.dart';
 import 'package:carer/models/constants.dart';
@@ -46,10 +45,9 @@ var nightscoutURLAndToken = computed(() {
 
 class SettingsCN extends ChangeNotifier {
   late KeyValueStore prefs;
-  late DebugSettings debugSettings;
   late TargetSettingsCN targetSettings;
   late UISettingsCN uiSettings;
-  late AlarmSettings alarmSettings;
+  late AlarmSettingsCN alarmSettings;
 
   Future<void> populate() async {
     // Get instance to the KVStore
@@ -73,9 +71,7 @@ class SettingsCN extends ChangeNotifier {
 
     targetSettings = TargetSettingsCN(prefs: prefs, settings: this);
 
-    alarmSettings = AlarmSettings(prefs: prefs, settings: this);
-
-    debugSettings = DebugSettings(prefs: prefs, settings: this);
+    alarmSettings = AlarmSettingsCN(prefs: prefs, settings: this);
   }
 
   @override
@@ -92,17 +88,4 @@ class SettingsCN extends ChangeNotifier {
     string += "\n}";
     return string;
   }
-
-  // NIGHT SCOUT URL
-
-  void notify() {
-    notifyListeners();
-  }
-
-  // debug
-  bool get debug => debugSettings.debug;
-  set debug(bool value) => debugSettings.debug = value;
-
-  DebugSummary get debugSummary => debugSettings.debugSummary;
-  set debugSummary(DebugSummary value) => debugSettings.debugSummary = value;
 }

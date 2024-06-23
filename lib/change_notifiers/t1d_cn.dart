@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
@@ -70,8 +71,8 @@ class T1DCN extends ChangeNotifier {
     targetRange5Proportion = trp;
 
     // Calculating Diff Range
-    var (dr, drp) = diffRange(settings.alarmSettings.fastDropDelta,
-        settings.alarmSettings.fastRiseDelta, lastSGV.rate5m ?? 0);
+    var (dr, drp) = diffRange(AlarmSettings.fastDropDelta.value,
+        AlarmSettings.fastRiseDelta.value, lastSGV.rate5m ?? 0);
 
     diffRange7 = dr;
     diffRange7Proportion = drp;

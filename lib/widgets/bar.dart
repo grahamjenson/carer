@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:carer/change_notifiers/alarms_cn.dart';
+import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -24,7 +25,7 @@ class Bar extends StatelessWidget {
         ),
         getSettingsButton(context),
       ];
-      if (!settings.alarmSettings.disableAlarms) {
+      if (!AlarmSettings.disableAlarms.value) {
         tiles = [
           getSleepButton(context, alarms),
           getActiveAlarms(context, alarms),
