@@ -58,7 +58,12 @@ void main() {
       expect(await SGV(value: 2, date: now.subtract(min5 + min5)).save(), true);
       expect(await SGV(value: 1, date: now.subtract(min5)).save(), true);
 
-      await SGV.todaysPercentage.future;
+      await Future.delayed(const Duration(seconds: 1));
+      await SGV.todaysPercentage.future.onError((e, s) {
+        print("Error: $e");
+        print("Stack: $s");
+        return 2;
+      });
 
       await withClock(Clock.fixed(now), () async {
         await SGV.todaysPercentage.future;

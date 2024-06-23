@@ -71,8 +71,8 @@ class UISettingsCN {
     });
 
     effect(() {
-      prefs.setString(
-          UISettings.uiLayoutVertical.name, UISettings.uiLayoutVertical.name);
+      prefs.setString(UISettings.uiLayoutVertical.name,
+          (UISettings.uiLayoutVertical._signal.value as UILayout).name);
     });
 
     effect(() {
