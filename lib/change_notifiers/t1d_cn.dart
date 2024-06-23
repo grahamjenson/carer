@@ -38,8 +38,8 @@ class T1DCN extends ChangeNotifier {
     });
   }
 
-  void summaryAgeMissedDataError() async {
-    var lastSGV = await SGV.lastSGV();
+  void summaryAgeMissedDataError() {
+    var lastSGV = SGV.lastSGV.value.value;
     if (lastSGV == null) {
       return;
     }
@@ -59,12 +59,11 @@ class T1DCN extends ChangeNotifier {
     }).toList();
   }
 
-  void checkSummary() async {
-    var lastSGV = await SGV.lastSGV();
+  void checkSummary() {
+    var lastSGV = SGV.lastSGV.value.value;
     if (lastSGV == null) {
       return;
     }
-
     // Calculating Target Range
     var (tr, trp) = targetRange(lastSGV.value);
     targetRange5 = tr;

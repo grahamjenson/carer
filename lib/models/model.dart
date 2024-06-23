@@ -96,6 +96,23 @@ abstract class ModelRepository<T extends Model> {
     }
   }
 
+  Future<int> saveAll(List<T> models) async {
+    var cdb = await CarerDB.instance;
+    var tb = writeTableName ?? tableName;
+    var batch = cdb.db.batch();
+    for (var model in models) {
+      if (model.id == null) {
+        batch.insert(tb, toSQLMap(model),
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+      } else {
+        batch.update(tb, toSQLMap(model),
+            where: '$idField = ?', whereArgs: [model.id]);
+      }
+    }
+    var ret = await futureProfile("${T.runtimeType} saveAll", batch.commit());
+    return ret.where((v) => v != null && v != 0).length;
+  }
+
   Future<bool> upsert(T model, List<String> uniqueValues) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;

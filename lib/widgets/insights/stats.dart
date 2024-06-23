@@ -299,8 +299,8 @@ class Stats extends StatelessWidget {
 
   DataRow todaysInRange() {
     var percent = 0;
-    if (todaysPercentage.value.value != null) {
-      percent = todaysPercentage.value.value!.toInt();
+    if (SGV.todaysPercentage.value.value != null) {
+      percent = SGV.todaysPercentage.value.value!.toInt();
     }
     return DataRow(
       cells: [
@@ -316,8 +316,8 @@ class Stats extends StatelessWidget {
 
   DataRow yesterdayInRange() {
     var percent = 0;
-    if (yesterdaysPercentage.value.value != null) {
-      percent = yesterdaysPercentage.value.value!.toInt();
+    if (SGV.yesterdaysPercentage.value.value != null) {
+      percent = SGV.yesterdaysPercentage.value.value!.toInt();
     }
 
     return DataRow(

@@ -263,11 +263,10 @@ class NoDataAlarm extends Alarm {
     if (AlarmSettings.noDataAlarmMinutes.value == -1) {
       return false;
     }
-    var lastSGV = await SGV.lastSGV();
+    var lastSGV = SGV.lastSGV.value.value;
     if (lastSGV == null) {
       return false;
     }
-
     return lastSGV.age.inMinutes > alarmMinutes();
   }
 

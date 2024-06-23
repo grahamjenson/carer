@@ -62,20 +62,24 @@ class UpdateCN extends ChangeNotifier {
     }
   }
 
-  checkUpdateSummary() async {
+  checkUpdateSummary() {
     if (summaryAgeInSeconds() > 15) {
       _summaryToBeUpdated = true;
       _updateReason = "Age older than 15 ${summaryAgeInSeconds()}s";
     }
-    var lastSGV = await SGV.lastSGV();
-    if (lastSGV != null) {
-      var sgvage = lastSGV.age.inSeconds;
+    var lastSGV = SGV.lastSGV.value.value;
+    if (lastSGV == null) {
+      _summaryToBeUpdated = true;
+      _updateReason = "Last SGV is null";
+      return;
+    }
 
-      // Check more frequently when the SGV is about to expire
-      if (sgvage > 305 && sgvage < 320) {
-        _summaryToBeUpdated = true;
-        _updateReason = "Last SGV older than 300";
-      }
+    var sgvage = lastSGV.age.inSeconds;
+
+    // Check more frequently when the SGV is about to expire
+    if (sgvage > 305 && sgvage < 320) {
+      _summaryToBeUpdated = true;
+      _updateReason = "Last SGV older than 300";
     }
   }
 
@@ -96,12 +100,11 @@ class UpdateCN extends ChangeNotifier {
     summaryLastUpdatedMS = clock.now().millisecondsSinceEpoch;
 
     // convert the summary to models
-    int sgvUpdates = 0;
+    List<SGV> models = [];
     for (var sgv in summary.sgvs.sgvs) {
-      var svgModel = SGV(value: sgv.sgv, date: sgv.mills);
-
-      sgvUpdates += (await svgModel.save()) ? 1 : 0;
+      models.add(SGV(value: sgv.sgv, date: sgv.mills));
     }
+    var sgvUpdates = await SGV.saveAll(models);
 
     int bolusUpdates = 0;
     for (var bolus in summary.treatments.boluses()) {
@@ -188,10 +191,6 @@ Bad data $badTempBasals, $badTempTargets
       print("notifiying change listeners");
       notifyListeners();
     }
-
-    if (sgvUpdates > 0) {
-      SGV.sgvWriteSignal.value = clock.now().millisecondsSinceEpoch;
-    }
   }
 
   void updateEntries() async {
@@ -203,25 +202,15 @@ Bad data $badTempBasals, $badTempTargets
       return NSEntries.empty();
     });
 
-    List<bool> sgvs = [];
+    List<SGV> sgvs = [];
     for (var entry in entries.entries) {
       if (entry.sgv == null) {
         continue;
       }
-      sgvs.add(await SGV(value: entry.sgv!, date: entry.date).save());
+      sgvs.add(SGV(value: entry.sgv!, date: entry.date));
     }
 
-    var total = 0;
-    for (var e in sgvs) {
-      if (e) {
-        total++;
-      }
-    }
-
-    if (total > 0) {
-      // updates stuff
-      SGV.sgvWriteSignal.value = clock.now().millisecondsSinceEpoch;
-    }
+    var total = await SGV.saveAll(sgvs);
 
     print("ENTRIEEESSSSS UPDATES $total");
   }

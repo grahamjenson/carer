@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
-import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 
 //copied from https://xdrip.readthedocs.io/en/latest/use/mainUI/#trend-arrow
@@ -39,84 +37,72 @@ class _BGLState extends State<BGL> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UpdateCN>(builder: (context, summaryCn, child) {
-      return FutureBuilder<Widget>(
-          future: futureWindow(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return snapshot.data!;
-            } else {
-              return const CircularProgressIndicator();
-            }
-          });
-    });
-  }
+    return Watch((context) {
+      const loader = Center(child: CircularProgressIndicator());
 
-  Future<Widget> futureWindow() async {
-    const loader = Center(child: CircularProgressIndicator());
+      var sgv = SGV.lastSGV.value.value;
+      if (sgv == null) {
+        return loader;
+      }
 
-    var sgv = await SGV.lastSGV();
-    if (sgv == null) {
-      return loader;
-    }
-
-    return AspectRatio(
-        aspectRatio: 1.5,
-        child: Stack(
-          children: [
-            Align(
-              alignment: const Alignment(0, -0.9),
-              child: FractionallySizedBox(
-                widthFactor: 1,
-                heightFactor: 0.2,
-                child: FittedBox(
-                  alignment: const Alignment(0, 0),
-                  child: timeAgoText(sgv),
+      return AspectRatio(
+          aspectRatio: 1.5,
+          child: Stack(
+            children: [
+              Align(
+                alignment: const Alignment(0, -0.9),
+                child: FractionallySizedBox(
+                  widthFactor: 1,
+                  heightFactor: 0.2,
+                  child: FittedBox(
+                    alignment: const Alignment(0, 0),
+                    child: timeAgoText(sgv),
+                  ),
                 ),
               ),
-            ),
-            FractionallySizedBox(
-              widthFactor: 1,
-              heightFactor: 1,
-              child: FittedBox(
-                child: Watch((_) {
-                  var unit = Settings.unit.value;
-                  return Text(sgv.sgvStr(unit),
-                      style: const TextStyle(
-                        color: mainColor,
-                        fontWeight: FontWeight.bold,
-                      ));
-                }),
+              FractionallySizedBox(
+                widthFactor: 1,
+                heightFactor: 1,
+                child: FittedBox(
+                  child: Watch((_) {
+                    var unit = Settings.unit.value;
+                    return Text(sgv.sgvStr(unit),
+                        style: const TextStyle(
+                          color: mainColor,
+                          fontWeight: FontWeight.bold,
+                        ));
+                  }),
+                ),
               ),
-            ),
-            Align(
-              alignment: const Alignment(0.4, 0.85),
-              child: FractionallySizedBox(
-                widthFactor: .5,
-                heightFactor: 0.2,
-                child: Row(children: [
-                  Expanded(
-                    child: FittedBox(
-                      child: Watch((_) {
-                        var unit = Settings.unit.value;
-                        return Text(
-                          sgv.rate5mWithSign(unit),
-                          style: const TextStyle(
-                            color: mainColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }),
+              Align(
+                alignment: const Alignment(0.4, 0.85),
+                child: FractionallySizedBox(
+                  widthFactor: .5,
+                  heightFactor: 0.2,
+                  child: Row(children: [
+                    Expanded(
+                      child: FittedBox(
+                        child: Watch((_) {
+                          var unit = Settings.unit.value;
+                          return Text(
+                            sgv.rate5mWithSign(unit),
+                            style: const TextStyle(
+                              color: mainColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }),
+                      ),
                     ),
-                  ),
-                  const Flexible(
-                      child: FractionallySizedBox(
-                          heightFactor: 1, child: MagArrow())),
-                ]),
+                    const Flexible(
+                        child: FractionallySizedBox(
+                            heightFactor: 1, child: MagArrow())),
+                  ]),
+                ),
               ),
-            ),
-          ],
-        ));
+            ],
+          ));
+    });
   }
 
   Widget timeAgoText(SGV delta) {
