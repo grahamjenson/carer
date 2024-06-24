@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:carer/change_notifiers/alarms/alarms.dart';
-import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/t1d_cn.dart';
+import 'package:carer/signals/alarms/alarms.dart';
+import 'package:carer/signals/settings/alarm_settings.dart';
+import 'package:carer/signals/t1d_cn.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';

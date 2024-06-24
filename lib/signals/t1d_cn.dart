@@ -4,9 +4,9 @@
 
 import 'dart:async';
 
-import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/signals/settings/alarm_settings.dart';
+import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 

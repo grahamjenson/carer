@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
@@ -12,6 +11,7 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
+import 'package:carer/signals/settings_cn.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';

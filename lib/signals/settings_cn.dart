@@ -1,7 +1,7 @@
-import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/settings/target_settings.dart';
-import 'package:carer/change_notifiers/settings/ui_settings.dart';
 import 'package:carer/models/constants.dart';
+import 'package:carer/signals/settings/alarm_settings.dart';
+import 'package:carer/signals/settings/target_settings.dart';
+import 'package:carer/signals/settings/ui_settings.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals_flutter.dart';
 

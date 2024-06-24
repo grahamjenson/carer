@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/signals/settings_cn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:signals/signals_flutter.dart';

@@ -1,4 +1,4 @@
-import 'package:carer/change_notifiers/settings_cn.dart';
+import 'package:carer/signals/settings_cn.dart';
 import 'package:carer/utils/json.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';

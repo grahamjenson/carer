@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:carer/change_notifiers/alarms_cn.dart';
-import 'package:carer/change_notifiers/settings/ui_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
-import 'package:carer/change_notifiers/t1d_cn.dart';
-import 'package:carer/change_notifiers/update_cn.dart';
+import 'package:carer/signals/alarms_cn.dart';
+import 'package:carer/signals/settings/ui_settings.dart';
+import 'package:carer/signals/settings_cn.dart';
+import 'package:carer/signals/t1d_cn.dart';
+import 'package:carer/signals/update_cn.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';

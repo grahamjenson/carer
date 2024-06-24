@@ -1,10 +1,10 @@
-import 'package:carer/change_notifiers/settings_cn.dart';
-import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
+import 'package:carer/signals/settings_cn.dart';
+import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';

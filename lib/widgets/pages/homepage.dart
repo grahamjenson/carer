@@ -1,4 +1,4 @@
-import 'package:carer/change_notifiers/settings/ui_settings.dart';
+import 'package:carer/signals/settings/ui_settings.dart';
 import 'package:carer/widgets/bar.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/current_time.dart';

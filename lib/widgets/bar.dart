@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:carer/change_notifiers/alarms_cn.dart';
-import 'package:carer/change_notifiers/settings/alarm_settings.dart';
+import 'package:carer/signals/alarms_cn.dart';
+import 'package:carer/signals/settings/alarm_settings.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/pages/settingspage.dart';

@@ -1,10 +1,10 @@
-import 'package:carer/change_notifiers/settings/target_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
-import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
+import 'package:carer/signals/settings/target_settings.dart';
+import 'package:carer/signals/settings_cn.dart';
+import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
