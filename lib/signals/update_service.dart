@@ -13,10 +13,9 @@ import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/signals/settings.dart';
 import 'package:clock/clock.dart';
-import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
-class UpdateCN extends ChangeNotifier {
+class UpdateService {
   // When this updates lots of things will change
   int summaryLastUpdatedMS = 0;
   int summaryAgeInSeconds() {
@@ -30,7 +29,7 @@ class UpdateCN extends ChangeNotifier {
 
   String _updateReason = "";
 
-  UpdateCN() {
+  UpdateService() {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => update());
     update();
 
@@ -175,20 +174,6 @@ class UpdateCN extends ChangeNotifier {
 updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, $iob, $cob, $battery, $cage
 Bad data $badTempBasals, $badTempTargets
           ''');
-
-    if (cage ||
-        cob ||
-        iob ||
-        battery ||
-        profileUpdate ||
-        tempBasalUpdates > 0 ||
-        tempTargetUpdates > 0 ||
-        sgvUpdates > 0 ||
-        bolusUpdates > 0 ||
-        carbUpdates > 0) {
-      print("notifiying change listeners");
-      notifyListeners();
-    }
   }
 
   void updateEntries() async {
@@ -210,6 +195,6 @@ Bad data $badTempBasals, $badTempTargets
 
     var total = await SGV.saveAll(sgvs);
 
-    print("ENTRIEEESSSSS UPDATES $total");
+    print("updateEntries $total");
   }
 }

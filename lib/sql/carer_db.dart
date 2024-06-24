@@ -33,7 +33,7 @@ class CarerDB {
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
     // TODO hash all database table code to single value to set version for
-    var version = 18;
+    var version = 22;
 
     print("Opening database at $path");
     var db = await openDatabase(

@@ -36,11 +36,11 @@ abstract class Regression {
 class NoopRegression extends Regression {
   @override
   double predict(double xValue) {
-    return double.nan;
+    return 0.0;
   }
 
   @override
-  double get rmse => double.nan;
+  double get rmse => 1.0;
 }
 
 abstract class MatrixRegression extends Regression {

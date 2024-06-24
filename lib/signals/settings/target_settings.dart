@@ -24,6 +24,12 @@ class TargetSettings {
 
   TargetSettings._();
 
+  allValues() {
+    for (var signal in _signals.values) {
+      var _ = signal.value;
+    }
+  }
+
   int get targetHigh => _signals[_TNames.targetHigh]!.value;
   int get targetHighPeek => _signals[_TNames.targetHigh]!.peek();
   set targetHigh(int value) {

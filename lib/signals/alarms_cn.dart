@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/signals/alarms/alarms.dart';
 import 'package:carer/signals/settings/alarm_settings.dart';
-import 'package:carer/signals/t1d_cn.dart';
+import 'package:carer/signals/settings/target_settings.dart';
+import 'package:carer/signals/t1d_settings.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ import 'package:signals/signals_flutter.dart';
 const se = SetEquality();
 
 class AlarmsCN extends ChangeNotifier {
-  T1DCN t1d;
+  T1DSettings t1d;
   String get alarmFile {
     return (AlarmSettings().alarmAsset).asset;
   }
@@ -87,14 +88,15 @@ class AlarmsCN extends ChangeNotifier {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
 
     effect(() {
-      var sigs = AlarmSettings().allValues();
-      print("Changed Alarm value rechecking alarms");
-      checkAlarms();
-      stopTestAlarm();
-    });
-
-    t1d.addListener(() {
-      checkAlarms();
+      try {
+        var sigs = AlarmSettings().allValues();
+        var tigs = TargetSettings().allValues();
+        print("Changed Alarm value rechecking alarms");
+        checkAlarms();
+        stopTestAlarm();
+      } catch (e) {
+        print("Error in AlarmsCN effect: $e");
+      }
     });
   }
 

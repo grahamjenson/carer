@@ -108,6 +108,11 @@ abstract class RegressionPredictor extends Predictor {
   @override
   SGV predictAt(double timestamp) {
     var pred = regression.predict(fnX(timestamp));
+    if (pred.isNaN || pred.isInfinite) {
+      return SGV(
+          value: 0,
+          date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
+    }
     int limitedValue = pred.toInt().clamp(20, 500);
     return SGV(
         value: limitedValue,

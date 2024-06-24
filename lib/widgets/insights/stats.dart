@@ -4,14 +4,12 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/signals/settings.dart';
-import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 
 class Stats extends StatelessWidget {
@@ -31,83 +29,88 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UpdateCN>(builder: (context, _, child) {
-      return FutureBuilder<Window>(
-          future: futureWindow(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              print("Stats snapshot error: ${snapshot.error}");
-            }
-            if (snapshot.hasData) {
-              return snapshot.data!;
-            } else {
-              return const CircularProgressIndicator();
-            }
-          });
-    });
+    return FutureBuilder<Widget>(
+        future: futureWindow(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print("Stats snapshot error: ${snapshot.error}");
+          }
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
   }
 
-  Future<Window> futureWindow() async {
+  Future<Widget> futureWindow() async {
     var stateData = await StateData.instance;
-
-    Exp2Predictor exp2predictor = Exp2Predictor();
-    await exp2predictor.init();
-
     var profileBasal = await Profile.basalAtTime(clock.now());
-
     var (profileLowTarget, profileHighTarget) =
         await Profile.targetAtTime(clock.now());
 
-    var sgvs = SGV.last3Hours().value!;
+    return Watch((context) {
+      try {
+        Exp2Predictor exp2predictor = Exp2Predictor();
+        exp2predictor.init();
 
-    var exp2preds = exp2predictor.predictNextHour();
+        var sgvs = SGV.last3Hours().value!;
 
-    return Window(
-      title: "Stats",
-      child: Expanded(
-        child: SingleChildScrollView(
-            child: Container(
-          alignment: Alignment.center,
-          child: Watch((_) {
-            return DataTable(
-              border: const TableBorder(
-                verticalInside: BorderSide(color: mainColor),
-              ),
-              columnSpacing: 10,
-              dividerThickness: 0.01,
-              headingRowHeight: 0,
-              dataRowMinHeight: 14,
-              dataRowMaxHeight: 20,
-              horizontalMargin: 0,
-              columns: const [
-                DataColumn(
-                  numeric: true,
-                  label: SizedBox(
-                    width: 50,
-                    child: Text('name', style: heading),
+        var exp2preds = exp2predictor.predictNextHour();
+
+        return Window(
+          title: "Stats",
+          child: Expanded(
+            child: SingleChildScrollView(
+                child: Container(
+              alignment: Alignment.center,
+              child: Watch((_) {
+                return DataTable(
+                  border: const TableBorder(
+                    verticalInside: BorderSide(color: mainColor),
                   ),
-                ),
-                DataColumn(
-                    label: SizedBox(
-                        width: 50, child: Text('stat', style: heading))),
-              ],
-              rows: [
-                iob(stateData),
-                cob(stateData),
-                power(stateData),
-                cage(stateData),
-                basal(profileBasal),
-                target(Settings().unit, profileLowTarget, profileHighTarget),
-                fifteenMinDiff(Settings().unit, sgvs),
-                todaysInRange(),
-                yesterdayInRange(),
-                predictions("Exp2", exp2preds, Settings().unit),
-              ],
-            );
-          }),
-        )),
-      ),
-    );
+                  columnSpacing: 10,
+                  dividerThickness: 0.01,
+                  headingRowHeight: 0,
+                  dataRowMinHeight: 14,
+                  dataRowMaxHeight: 20,
+                  horizontalMargin: 0,
+                  columns: const [
+                    DataColumn(
+                      numeric: true,
+                      label: SizedBox(
+                        width: 50,
+                        child: Text('name', style: heading),
+                      ),
+                    ),
+                    DataColumn(
+                        label: SizedBox(
+                            width: 50, child: Text('stat', style: heading))),
+                  ],
+                  rows: [
+                    iob(stateData),
+                    cob(stateData),
+                    power(stateData),
+                    cage(stateData),
+                    basal(profileBasal),
+                    target(
+                        Settings().unit, profileLowTarget, profileHighTarget),
+                    fifteenMinDiff(Settings().unit, sgvs),
+                    todaysInRange(),
+                    yesterdayInRange(),
+                    predictions("Exp2", exp2preds, Settings().unit),
+                  ],
+                );
+              }),
+            )),
+          ),
+        );
+      } catch (e, s) {
+        print("Error in Stats: $e");
+        print("Stack in Stats: $s");
+        return const SizedBox();
+      }
+    });
   }
 
   DataRow model(double rmse) {
@@ -273,8 +276,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow fifteenMinDiff(Unit unit, List<SGV> bigsgvs) {
-    var sgvs = bigsgvs.sublist(0, 3);
-    if (sgvs.isEmpty) {
+    if (bigsgvs.length < 3) {
       return const DataRow(
         cells: [
           DataCell(Text("15m Δ", style: heading)),
@@ -284,6 +286,7 @@ class Stats extends StatelessWidget {
         ],
       );
     }
+    var sgvs = bigsgvs.sublist(0, 3);
     var diff = sgvs.last.value - sgvs.first.value;
     return DataRow(
       cells: [
@@ -298,9 +301,9 @@ class Stats extends StatelessWidget {
   }
 
   DataRow todaysInRange() {
-    var percent = 0;
-    if (SGV.todaysPercentage.value.value != null) {
-      percent = SGV.todaysPercentage.value.value!.toInt();
+    var percent = SGV.todaysPercentage().value;
+    if (percent == null || percent.isNaN || percent.isInfinite) {
+      percent = 0.0;
     }
     return DataRow(
       cells: [
@@ -315,9 +318,9 @@ class Stats extends StatelessWidget {
   }
 
   DataRow yesterdayInRange() {
-    var percent = 0;
-    if (SGV.yesterdaysPercentage.value.value != null) {
-      percent = SGV.yesterdaysPercentage.value.value!.toInt();
+    var percent = SGV.yesterdaysPercentage().value;
+    if (percent == null || percent.isNaN || percent.isInfinite) {
+      percent = 0.0;
     }
 
     return DataRow(

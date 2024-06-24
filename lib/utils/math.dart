@@ -8,13 +8,13 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
-(Range5, double) targetRange(int sgv) {
+(Range5, double) targetRange(num sgv) {
   var low = TargetSettings().targetLow.toDouble();
   var high = TargetSettings().targetHigh.toDouble();
   var veryHigh = TargetSettings().urgentHigh.toDouble();
   var veryLow = TargetSettings().urgentLow.toDouble();
 
-  return range5(veryLow, low, high, veryHigh, sgv.toDouble());
+  return range5(veryLow, low, high, veryHigh, sgv);
 }
 
 (Range7, double) diffRange(int fastDrop, int fastRise, int diff) {
@@ -24,7 +24,7 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 }
 
 (Range5, double) range5(
-    double veryLow, double low, double high, double veryHigh, double value) {
+    double veryLow, double low, double high, double veryHigh, num value) {
   if (value < veryLow) {
     return (Range5.veryLow, (veryLow - value).abs().toDouble());
   } else if (value < low) {
@@ -39,7 +39,7 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 }
 
 (Range7, double) range7(double veryVeryLow, double veryLow, double low,
-    double high, double veryHigh, double veryVeryHigh, double value) {
+    double high, double veryHigh, double veryVeryHigh, num value) {
   if (value < veryVeryLow) {
     return (Range7.veryVeryLow, (veryVeryLow - value).abs().toDouble());
   } else if (value < veryLow) {

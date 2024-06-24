@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:carer/signals/alarms_cn.dart';
 import 'package:carer/signals/settings.dart';
 import 'package:carer/signals/settings/ui_settings.dart';
-import 'package:carer/signals/t1d_cn.dart';
-import 'package:carer/signals/update_cn.dart';
+import 'package:carer/signals/t1d_settings.dart';
+import 'package:carer/signals/update_service.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -40,15 +40,13 @@ void runCarer() async {
   Timer.periodic(const Duration(seconds: 15),
       (Timer t) => WakelockPlus.toggle(enable: UISettings().screenActive));
 
-  final summary = UpdateCN();
-  final t1d = T1DCN(summaryCn: summary);
+  UpdateService();
+  final t1d = T1DSettings();
   final alarms = AlarmsCN(t1d: t1d);
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => summary),
       ChangeNotifierProvider(create: (context) => alarms),
-      ChangeNotifierProvider(create: (context) => t1d),
     ],
     child: const MyApp(),
   ));

@@ -6,13 +6,10 @@ import 'dart:async';
 
 import 'package:carer/models/sgv.dart';
 import 'package:carer/signals/settings/alarm_settings.dart';
-import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/math.dart';
-import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
-class T1DCN extends ChangeNotifier {
-  UpdateCN summaryCn;
-
+class T1DSettings {
   // Target information
   Range5 targetRange5 = Range5.mid;
   double targetRange5Proportion = 0.0;
@@ -26,14 +23,10 @@ class T1DCN extends ChangeNotifier {
   bool oldSummary = false;
   double summaryAgeInMinutes = 0;
 
-  T1DCN({required this.summaryCn}) {
+  T1DSettings() {
     // Every 60 seconds check if the summary is too old or has errors
     Timer.periodic(
         const Duration(seconds: 60), (Timer t) => summaryAgeMissedDataError());
-
-    summaryCn.addListener(() {
-      checkSummary();
-    });
   }
 
   void summaryAgeMissedDataError() {
@@ -47,7 +40,6 @@ class T1DCN extends ChangeNotifier {
     } else {
       oldSummary = false;
     }
-    notifyListeners();
   }
 
   List<Range5> targetRange5ForMins(int minsAgo) {
@@ -59,23 +51,27 @@ class T1DCN extends ChangeNotifier {
   }
 
   void checkSummary() {
-    var lastSGV = SGV.lastSGV.value.value;
-    if (lastSGV == null) {
-      return;
-    }
-    // Calculating Target Range
-    var (tr, trp) = targetRange(lastSGV.value);
-    targetRange5 = tr;
-    targetRange5Proportion = trp;
+    effect(() {
+      try {
+        var lastSGV = SGV.lastSGV.value.value;
+        if (lastSGV == null) {
+          return;
+        }
+        // Calculating Target Range
+        var (tr, trp) = targetRange(lastSGV.value);
+        targetRange5 = tr;
+        targetRange5Proportion = trp;
 
-    // Calculating Diff Range
-    var (dr, drp) = diffRange(AlarmSettings().fastDropDelta,
-        AlarmSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
+        // Calculating Diff Range
+        var (dr, drp) = diffRange(AlarmSettings().fastDropDelta,
+            AlarmSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
 
-    diffRange7 = dr;
-    diffRange7Proportion = drp;
-
-    notifyListeners();
+        diffRange7 = dr;
+        diffRange7Proportion = drp;
+      } catch (e) {
+        print("Error in checkSummary: $e");
+      }
+    });
   }
 
   //// Mungingx

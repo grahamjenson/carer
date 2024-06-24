@@ -202,15 +202,21 @@ class SGV extends Model {
     }
   }, initialValue: 0.0, debugLabel: 'todaysPercentage');
 
-  static FutureSignal<double?> yesterdaysPercentage = computedAsync(() {
+  static FutureSignal<double?> yesterdaysPercentage = computedAsync(() async {
     print("updating Future Signal yesterdaysPercentage Signal");
     var _ = _q.writeSignal.value; // force update on save
-    return _percentInRangeYesterday(
-            TargetSettings().targetLow, TargetSettings().targetHigh)
-        .then((value) => value * 100.0);
+    try {
+      var value = await _percentInRangeYesterday(
+          TargetSettings().targetLow, TargetSettings().targetHigh);
+      return value * 100.0;
+    } catch (e, s) {
+      print("Error yesterdaysPercentage: $e");
+      print("Stack yesterdaysPercentage: $s");
+      return 0.0;
+    }
   }, initialValue: 0.0, debugLabel: 'yesterdaysPercentage');
 
-  static FutureSignal<SGV?> lastSGV = computedAsync(() {
+  static FutureSignal<SGV?> lastSGV = computedAsync(() async {
     print("updating LastSGV Signal");
     var _ = _q.writeSignal.value; // force update on save
 
@@ -219,7 +225,7 @@ class SGV extends Model {
         .then((value) => value.firstOrNull);
   }, debugLabel: 'LastSGV');
 
-  static FutureSignal<List<SGV>> last3Hours = computedAsync(() {
+  static FutureSignal<List<SGV>> last3Hours = computedAsync(() async {
     print("updating last2Hours Signal");
     var _ = _q.writeSignal.value; // force update on save
 

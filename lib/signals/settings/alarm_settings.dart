@@ -114,7 +114,7 @@ class AlarmSettings {
 
   bool get fastDropAlarm => _signals[_AlarmNames.fastDropAlarm]!.value as bool;
   bool get fastDropAlarmPeek =>
-      _signals[_AlarmNames.fastDropAlarm]!.peek as bool;
+      _signals[_AlarmNames.fastDropAlarm]!.peek() as bool;
 
   set fastDropAlarm(bool value) =>
       _signals[_AlarmNames.fastDropAlarm]!.value = value;
@@ -125,14 +125,15 @@ class AlarmSettings {
       _signals[_AlarmNames.fastDropAlarmMinutes]! as Signal<int>, value);
 
   int get fastDropDelta => _signals[_AlarmNames.fastDropDelta]!.value as int;
-  int get fastDropDeltaPeek => _signals[_AlarmNames.fastDropDelta]!.peek as int;
+  int get fastDropDeltaPeek =>
+      _signals[_AlarmNames.fastDropDelta]!.peek() as int;
 
   set fastDropDelta(int value) => fastDropDeltaSet(
       _signals[_AlarmNames.fastDropDelta]! as Signal<int>, value);
 
   bool get fastRiseAlarm => _signals[_AlarmNames.fastRiseAlarm]!.value as bool;
   bool get fastRiseAlarmPeek =>
-      _signals[_AlarmNames.fastRiseAlarm]!.peek as bool;
+      _signals[_AlarmNames.fastRiseAlarm]!.peek() as bool;
   set fastRiseAlarm(bool value) =>
       _signals[_AlarmNames.fastRiseAlarm]!.value = value;
 
@@ -142,7 +143,8 @@ class AlarmSettings {
       _signals[_AlarmNames.fastRiseAlarmMinutes]! as Signal<int>, value);
 
   int get fastRiseDelta => _signals[_AlarmNames.fastRiseDelta]!.value as int;
-  int get fastRiseDeltaPeek => _signals[_AlarmNames.fastRiseDelta]!.peek as int;
+  int get fastRiseDeltaPeek =>
+      _signals[_AlarmNames.fastRiseDelta]!.peek() as int;
 
   set fastRiseDelta(int value) => fastRiseDeltaSet(
       _signals[_AlarmNames.fastRiseDelta]! as Signal<int>, value);
@@ -163,7 +165,7 @@ class AlarmSettings {
   int get volumeOverrideValue =>
       _signals[_AlarmNames.volumeOverrideValue]!.value as int;
   int get volumeOverrideValuePeek =>
-      _signals[_AlarmNames.volumeOverrideValue]!.peek as int;
+      _signals[_AlarmNames.volumeOverrideValue]!.peek() as int;
 
   set volumeOverrideValue(int value) => volumeOverrideValueSet(
       _signals[_AlarmNames.volumeOverrideValue]! as Signal<int>, value);

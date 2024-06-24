@@ -2,7 +2,7 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/signals/settings/alarm_settings.dart';
-import 'package:carer/signals/t1d_cn.dart';
+import 'package:carer/signals/t1d_settings.dart';
 import 'package:carer/utils/math.dart';
 
 Future<Range5> atPredictedTime(int mins) async {
@@ -13,12 +13,12 @@ Future<Range5> atPredictedTime(int mins) async {
     return Range5.mid;
   }
   var sgvAtTime = exp2predictor.predictMin(mins);
-  var (range, _) = targetRange(sgvAtTime.value.toInt());
+  var (range, _) = targetRange(sgvAtTime.value);
   return range;
 }
 
 abstract class Alarm {
-  final T1DCN t1d;
+  final T1DSettings t1d;
 
   const Alarm({required this.t1d});
 

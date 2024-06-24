@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/signals/t1d_cn.dart';
+import 'package:carer/signals/t1d_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MagArrow extends StatefulWidget {
   const MagArrow({super.key});
@@ -42,59 +41,58 @@ class _MagArrowState extends State<MagArrow> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<T1DCN>(builder: (context, t1dCn, child) {
-      var mag = findMagnitude(t1dCn);
-      int? value = mag;
-      if (mag == null) {
-        value = mag;
-      } else if (mag == 0) {
-        value = 0;
-        diff = 0;
-        limit = 1;
-      } else if (mag > 0) {
-        value = diff;
-        limit = mag.abs() + 1;
-      } else if (mag < 0) {
-        value = -diff;
-        limit = mag.abs() + 1;
-      }
-
-      return AspectRatio(
-        aspectRatio: 0.3,
-        child: CustomPaint(
-          painter: MyPainter(value),
-        ),
-      );
-    });
-  }
-
-  int? findMagnitude(T1DCN t1d) {
-    var mag = 0;
-    switch (t1d.diffRange7) {
-      case Range7.veryVeryLow:
-        mag = -3;
-        break;
-      case Range7.veryLow:
-        mag = -2;
-        break;
-      case Range7.low:
-        mag = -1;
-        break;
-      case Range7.mid:
-        mag = 0;
-        break;
-      case Range7.high:
-        mag = 1;
-        break;
-      case Range7.veryHigh:
-        mag = 2;
-        break;
-      case Range7.veryVeryHigh:
-        mag = 3;
-        break;
+    var mag = findMagnitude();
+    int? value = mag;
+    if (mag == null) {
+      value = mag;
+    } else if (mag == 0) {
+      value = 0;
+      diff = 0;
+      limit = 1;
+    } else if (mag > 0) {
+      value = diff;
+      limit = mag.abs() + 1;
+    } else if (mag < 0) {
+      value = -diff;
+      limit = mag.abs() + 1;
     }
-    return mag;
+
+    return AspectRatio(
+      aspectRatio: 0.3,
+      child: CustomPaint(
+        painter: MyPainter(value),
+      ),
+    );
   }
+}
+
+int? findMagnitude() {
+  var diffRange7 = T1DSettings().diffRange7;
+  var mag = 0;
+  switch (diffRange7) {
+    case Range7.veryVeryLow:
+      mag = -3;
+      break;
+    case Range7.veryLow:
+      mag = -2;
+      break;
+    case Range7.low:
+      mag = -1;
+      break;
+    case Range7.mid:
+      mag = 0;
+      break;
+    case Range7.high:
+      mag = 1;
+      break;
+    case Range7.veryHigh:
+      mag = 2;
+      break;
+    case Range7.veryVeryHigh:
+      mag = 3;
+      break;
+  }
+  return mag;
 }
 
 class MyPainter extends CustomPainter {
