@@ -30,11 +30,11 @@ void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load the settings from Shared Preferences before starting
-  var settings = SettingsCN();
-  await settings.populate();
+  var settings = Settings();
+  await settings.setupDBPropagation();
 
-  final summary = UpdateCN(settings: settings);
-  final t1d = T1DCN(settings: settings, summaryCn: summary);
+  final summary = UpdateCN();
+  final t1d = T1DCN(summaryCn: summary);
   final alarms = AlarmsCN(t1d: t1d);
 
   runApp(MultiProvider(
@@ -43,13 +43,12 @@ void runCarer() async {
       ChangeNotifierProvider(create: (context) => alarms),
       ChangeNotifierProvider(create: (context) => t1d),
     ],
-    child: MyApp(settings: settings),
+    child: const MyApp(),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  final SettingsCN settings;
-  const MyApp({super.key, required this.settings});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override

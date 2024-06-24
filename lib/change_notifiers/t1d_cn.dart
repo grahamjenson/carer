@@ -5,14 +5,12 @@
 import 'dart:async';
 
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 
 class T1DCN extends ChangeNotifier {
-  SettingsCN settings;
   UpdateCN summaryCn;
 
   // Target information
@@ -28,7 +26,7 @@ class T1DCN extends ChangeNotifier {
   bool oldSummary = false;
   double summaryAgeInMinutes = 0;
 
-  T1DCN({required this.settings, required this.summaryCn}) {
+  T1DCN({required this.summaryCn}) {
     // Every 60 seconds check if the summary is too old or has errors
     Timer.periodic(
         const Duration(seconds: 60), (Timer t) => summaryAgeMissedDataError());

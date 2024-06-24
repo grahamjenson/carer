@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/change_notifiers/settings/ui_settings.dart';
@@ -7,89 +5,66 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals_flutter.dart';
 
-Map<Settings, Signal> _settingsSignals = {};
-
-enum Settings {
-  // NS Settings
+enum SNames {
   nightscoutUrl,
-
-  // Unit for BGL
-  unit;
-
-  Signal get _signal {
-    return _settingsSignals[this]!;
-  }
-
-  set value(dynamic value) {
-    _settingsSignals[this]!.value = value;
-  }
-
-  get value {
-    return _settingsSignals[this]!.value;
-  }
+  unit,
 }
 
-var nightscoutURLAndToken = computed(() {
-  var nightscoutURL = Settings.nightscoutUrl._signal.value;
-  if (nightscoutURL.isNotEmpty) {
-    var uri = Uri.parse(nightscoutURL);
-    var token = uri.queryParameters["token"];
-    token ??= '';
-    var base = '${uri.scheme}://${uri.host}';
-    return (base.toString(), token);
-  }
+class Settings {
+  static final Settings _singleton = Settings._();
+  factory Settings() => _singleton;
 
-  return ('', '');
-});
+  Map<SNames, Signal> _signals = {};
+  late final Computed<(String, String)> _nightscoutURLAndTokenSignal;
 
-class SettingsCN {
-  late KeyValueStore prefs;
-  late TargetSettingsCN targetSettings;
-  late UISettingsCN uiSettings;
-  late AlarmSettingsCN alarmSettings;
-
-  Future<void> populate() async {
-    // Get instance to the KVStore
-    prefs = await KeyValueStore.instance;
-
-    _settingsSignals = {
-      Settings.nightscoutUrl:
-          Signal<String?>(prefs.getString(Settings.nightscoutUrl.name)),
-      Settings.unit:
-          Signal<Unit>(Unit.fromBool(prefs.getBool(Settings.unit.name))),
+  Settings._() {
+    _signals = {
+      SNames.nightscoutUrl: Signal<String?>(null),
+      SNames.unit: Signal<Unit>(Unit.mg),
     };
 
-    // On Signal change update the KVStore
-    effect(() {
-      if (Settings.nightscoutUrl.value == null) {
-        return;
+    _nightscoutURLAndTokenSignal = computed(() {
+      if (nightscoutURL == null || nightscoutURL!.isEmpty) {
+        return ('', '');
       }
-      prefs.setString(
-          Settings.nightscoutUrl.name, Settings.nightscoutUrl.value);
+
+      var uri = Uri.parse(nightscoutURL!);
+      var token = uri.queryParameters["token"];
+      token ??= '';
+      var base = '${uri.scheme}://${uri.host}';
+      return (base.toString(), token);
     });
-
-    effect(() => prefs.setBool(
-        Settings.unit.name, (Settings.unit.value as Unit).toBool()));
-
-    uiSettings = UISettingsCN(prefs: prefs, settings: this);
-
-    targetSettings = TargetSettingsCN(prefs: prefs, settings: this);
-
-    alarmSettings = AlarmSettingsCN(prefs: prefs, settings: this);
   }
 
-  @override
-  String toString() {
-    var string = "{\n";
-    for (var key in prefs.getKeys()) {
-      if (key == Settings.nightscoutUrl.name) {
-        string += "\"$key\": \"[Filtered]\",\n";
-        continue;
+  String? get nightscoutURL => _signals[SNames.nightscoutUrl]!.value as String?;
+  set nightscoutURL(String? value) =>
+      _signals[SNames.nightscoutUrl]!.value = value;
+
+  Unit get unit => _signals[SNames.unit]!.value as Unit;
+  set unit(Unit value) => _signals[SNames.unit]!.value = value;
+
+  (String, String) get nightscoutURLAndToken =>
+      _nightscoutURLAndTokenSignal.value;
+
+  setupDBPropagation() async {
+    var prefs = await KeyValueStore.instance;
+    nightscoutURL = prefs.getString(SNames.nightscoutUrl.name);
+    unit = Unit.fromBool(prefs.getBool(SNames.unit.name, defaultValue: true)!);
+
+    effect(() {
+      if (nightscoutURL == null) {
+        return;
       }
-      string += "\"$key\": \"${prefs.get(key)}\",\n";
-    }
-    string += "\"end\": true\n";
-    string += "\n}";
-    return string;
+      prefs.setString(SNames.nightscoutUrl.name, nightscoutURL!);
+    });
+
+    effect(() => prefs.setBool(SNames.unit.name, unit.toBool()));
+
+    // Legacy
+    var uiSettings = UISettingsCN(prefs: prefs);
+
+    var targetSettings = TargetSettingsCN(prefs: prefs);
+
+    var alarmSettings = AlarmSettingsCN(prefs: prefs);
   }
 }

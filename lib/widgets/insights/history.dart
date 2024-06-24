@@ -1,12 +1,9 @@
-import 'package:carer/change_notifiers/settings_cn.dart';
-import 'package:carer/change_notifiers/update_cn.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class History extends StatelessWidget {
   const History({super.key});
@@ -33,25 +30,22 @@ class History extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<SettingsCN, UpdateCN>(
-        builder: (context, settings, updateCn, child) {
-      return FutureBuilder<Window>(
-          future: futureWindow(updateCn, settings),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              print("History snapshot error: ${snapshot.error}");
-            }
-            if (snapshot.hasData) {
-              return snapshot.data!;
-            } else {
-              return const CircularProgressIndicator();
-            }
-          });
-    });
+    return FutureBuilder<Window>(
+        future: futureWindow(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print("History snapshot error: ${snapshot.error}");
+          }
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
   }
 
-  Future<Window> futureWindow(UpdateCN updateCn, SettingsCN settings) async {
-    var history = await historyContainers(settings, updateCn);
+  Future<Window> futureWindow() async {
+    var history = await historyContainers();
 
     return Window(
       title: "History",
@@ -93,8 +87,7 @@ class History extends StatelessWidget {
     );
   }
 
-  Future<List<DataRow>> historyContainers(
-      SettingsCN settings, UpdateCN updateCn) async {
+  Future<List<DataRow>> historyContainers() async {
     var history = await Treatment.lastMins(60 * 6);
 
     return [for (var t in history) historyRow(t)]

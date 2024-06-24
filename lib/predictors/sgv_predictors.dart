@@ -7,7 +7,7 @@ abstract class Predictor {
   Predictor();
 
   // set this to get the cadence of sgv predictinos correct
-  DateTime _lastReadingDate = DateTime.now();
+  final DateTime _lastReadingDate = DateTime.now();
 
   // Get all the expencive calls done here, and can be repedtly called when new data arrives
   Future<void> init();
@@ -88,12 +88,19 @@ abstract class RegressionPredictor extends Predictor {
   @override
   Future<void> init() async {
     sgvs = await SGV.lastMins(40);
+    if (sgvs.length < pastReadings) {
+      regression = NoopRegression();
+      return;
+    }
     sgvs = sgvs.sublist(0, pastReadings);
 
     if (sgvs.isEmpty) {
+      regression = NoopRegression();
       return;
     }
-    _lastReadingDate = sgvs.first.date;
+
+    @override
+    final lastReadingDate = sgvs.first.date;
 
     var x = sgvs.map((s) => fnX(s.date.millisecondsSinceEpoch)).toList();
     var y = sgvs.map((s) => s.value * 1.0).toList();

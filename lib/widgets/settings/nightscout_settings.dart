@@ -23,17 +23,16 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
             alignment: Alignment.centerRight,
             width: maxWidth,
             child: Watch((context) => Text(
-                  Settings.nightscoutUrl.value ?? "Not Set",
+                  Settings().nightscoutURL ?? "Not Set",
                   overflow: TextOverflow.ellipsis,
                 )),
           ),
           leading: const Icon(Icons.language),
           onPressed: (context) async {
-            var value = Settings.unit.value;
             final url = await openTextDialog(context, "Nightscout URL",
-                hint: "URL", value: value);
+                hint: "URL", value: Settings().nightscoutURL ?? "");
             if (url == null || url.isEmpty) return;
-            Settings.nightscoutUrl.value = url;
+            Settings().nightscoutURL = url;
           },
         ),
       ],

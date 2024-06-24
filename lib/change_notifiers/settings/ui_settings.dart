@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -48,9 +47,8 @@ enum UILayout {
 
 class UISettingsCN {
   KeyValueStore prefs;
-  SettingsCN settings;
 
-  UISettingsCN({required this.prefs, required this.settings}) {
+  UISettingsCN({required this.prefs}) {
     // Assign the value of the settings from the KVStore
     var screenActive =
         prefs.getBool(UISettings.screenActive.name, defaultValue: true)!;

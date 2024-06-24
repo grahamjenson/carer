@@ -97,12 +97,11 @@ class Stats extends StatelessWidget {
                 power(stateData),
                 cage(stateData),
                 basal(profileBasal),
-                target(
-                    Settings.unit.value, profileLowTarget, profileHighTarget),
-                fifteenMinDiff(Settings.unit.value, sgvs),
+                target(Settings().unit, profileLowTarget, profileHighTarget),
+                fifteenMinDiff(Settings().unit, sgvs),
                 todaysInRange(),
                 yesterdayInRange(),
-                predictions("Exp2", exp2preds, Settings.unit.value),
+                predictions("Exp2", exp2preds, Settings().unit),
               ],
             );
           }),

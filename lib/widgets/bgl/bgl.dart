@@ -65,7 +65,7 @@ class _BGLState extends State<BGL> {
                 heightFactor: 1,
                 child: FittedBox(
                   child: Watch((_) {
-                    var unit = Settings.unit.value;
+                    var unit = Settings().unit;
                     return Text(sgv.sgvStr(unit),
                         style: const TextStyle(
                           color: mainColor,
@@ -83,7 +83,7 @@ class _BGLState extends State<BGL> {
                     Expanded(
                       child: FittedBox(
                         child: Watch((_) {
-                          var unit = Settings.unit.value;
+                          var unit = Settings().unit;
                           return Text(
                             sgv.rate5mWithSign(unit),
                             style: const TextStyle(

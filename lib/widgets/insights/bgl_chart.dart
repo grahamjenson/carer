@@ -179,7 +179,7 @@ class BGLChart extends StatelessWidget {
           dotData: const FlDotData(show: false),
         ),
       ],
-      lineTouchData: lineTouchData(Settings.unit.value),
+      lineTouchData: lineTouchData(Settings().unit),
       betweenBarsData: [
         BetweenBarsData(
             fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
@@ -441,7 +441,7 @@ class BGLChart extends StatelessWidget {
             value.toInt() == TargetSettings.targetHigh.value ||
             value.toInt() == TargetSettings.targetLow.value) {
           return Watch((context) {
-            return Text(Settings.unit.value.str(value),
+            return Text(Settings().unit.str(value),
                 style: style, textAlign: TextAlign.right);
           });
         }

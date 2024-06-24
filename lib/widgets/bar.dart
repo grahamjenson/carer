@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:carer/change_notifiers/alarms_cn.dart';
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
@@ -17,8 +16,7 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<SettingsCN, AlarmsCN>(
-        builder: (context, settings, alarms, child) {
+    return Consumer<AlarmsCN>(builder: (context, alarms, child) {
       var tiles = [
         const Expanded(
           child: SizedBox.shrink(),

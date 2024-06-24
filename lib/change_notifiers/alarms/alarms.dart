@@ -1,12 +1,17 @@
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/utils/math.dart';
 
 Future<Range5> atPredictedTime(int mins) async {
   Exp2Predictor exp2predictor = Exp2Predictor();
   await exp2predictor.init();
+  if (exp2predictor.regression.runtimeType == NoopRegression) {
+    print("Regression noop");
+    return Range5.mid;
+  }
   var sgvAtTime = exp2predictor.predictMin(mins);
   var (range, _) = targetRange(sgvAtTime.value.toInt());
   return range;

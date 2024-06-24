@@ -17,8 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
 class UpdateCN extends ChangeNotifier {
-  SettingsCN settings;
-
   // When this updates lots of things will change
   int summaryLastUpdatedMS = 0;
   int summaryAgeInSeconds() {
@@ -32,14 +30,14 @@ class UpdateCN extends ChangeNotifier {
 
   String _updateReason = "";
 
-  UpdateCN({required this.settings}) {
+  UpdateCN() {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => update());
     update();
 
     // If settings update grab latest summary
     effect(() {
       // Check signal to register
-      var _ = Settings.nightscoutUrl.value;
+      var _ = Settings().nightscoutURL;
       _summaryToBeUpdated = true;
       _updateReason = "Added Listener";
     });
@@ -84,7 +82,7 @@ class UpdateCN extends ChangeNotifier {
   }
 
   updateSummary() async {
-    var (nsURL, nsToken) = nightscoutURLAndToken.value;
+    var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
     Summary? summary =
         await NSClient().getSummary(nsURL, nsToken).catchError((e) {
       log("GETTING SUMMARY ERROR: $e, $nsURL");
@@ -194,7 +192,7 @@ Bad data $badTempBasals, $badTempTargets
   }
 
   void updateEntries() async {
-    var (nsURL, nsToken) = nightscoutURLAndToken.value;
+    var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
     var entries =
         await NSClient().getEntries(nsURL, nsToken, 12 * 48).catchError((e) {
       log("GETTING ENTRIES ERROR: $e, $nsURL");

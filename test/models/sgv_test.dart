@@ -56,8 +56,7 @@ void main() {
     });
 
     test("percents", () async {
-      var settings = SettingsCN();
-      await settings.populate();
+      var settings = Settings();
 
       TargetSettings.targetHigh.value = 180;
       TargetSettings.targetLow.value = 72;

@@ -1,4 +1,3 @@
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals.dart';
 
@@ -58,9 +57,8 @@ Map<TargetSettings, Signal<int>> _settingsSignals = {};
 
 class TargetSettingsCN {
   KeyValueStore prefs;
-  SettingsCN settings;
 
-  TargetSettingsCN({required this.prefs, required this.settings}) {
+  TargetSettingsCN({required this.prefs}) {
     _settingsSignals = {
       TargetSettings.targetHigh: Signal<int>(
           prefs.getInt(TargetSettings.targetHigh.name, defaultValue: 180)!),

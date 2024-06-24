@@ -1,4 +1,3 @@
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -126,11 +125,10 @@ extension AlarmSoundsExtension on AlarmSounds {
 
 class AlarmSettingsCN {
   KeyValueStore prefs;
-  SettingsCN settings;
 
   // ephemeral properters
 
-  AlarmSettingsCN({required this.prefs, required this.settings}) {
+  AlarmSettingsCN({required this.prefs}) {
     _settingsSignals = {
       AlarmSettings.disableAlarms: Signal<bool>(_disableAlarms),
       AlarmSettings.urgentLowAlarm: Signal<bool>(_urgentLowAlarm),

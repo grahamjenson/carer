@@ -33,6 +33,16 @@ abstract class Regression {
   }
 }
 
+class NoopRegression extends Regression {
+  @override
+  double predict(double xValue) {
+    return double.nan;
+  }
+
+  @override
+  double get rmse => double.nan;
+}
+
 abstract class MatrixRegression extends Regression {
   late List<double> xValues;
   late Matrix xM;
