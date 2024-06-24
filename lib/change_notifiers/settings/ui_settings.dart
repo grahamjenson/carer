@@ -1,30 +1,79 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-enum UISettings {
-  screenActive,
-  uiLayoutVertical,
-  uiLayoutHorizontal,
-  uiTheme;
+enum _UINames { screenActive, uiLayoutVertical, uiLayoutHorizontal, uiTheme }
 
-  Signal get _signal {
-    return _settingsSignals[this]!;
-  }
+class UISettings {
+  static final UISettings _singleton = UISettings._();
+  factory UISettings() => _singleton;
 
-  set value(dynamic value) {
-    _settingsSignals[this]!.value = value;
-  }
+  final Map<_UINames, Signal> _signals = {
+    _UINames.screenActive: Signal<bool>(false),
+    _UINames.uiLayoutVertical: Signal<UILayout>(UILayout.showBGL),
+    _UINames.uiLayoutHorizontal: Signal<UILayout>(UILayout.showBGL),
+    _UINames.uiTheme: Signal<UITheme>(UITheme.normal),
+  };
 
-  get value {
-    return _settingsSignals[this]!.value;
+  UISettings._();
+
+  bool get screenActive => _signals[_UINames.screenActive]!.value as bool;
+  set screenActive(bool value) =>
+      _signals[_UINames.screenActive]!.value = value;
+
+  UILayout get uiLayoutVertical =>
+      _signals[_UINames.uiLayoutVertical]!.value as UILayout;
+  set uiLayoutVertical(UILayout value) =>
+      _signals[_UINames.uiLayoutVertical]!.value = value;
+
+  UILayout get uiLayoutHorizontal =>
+      _signals[_UINames.uiLayoutHorizontal]!.value as UILayout;
+  set uiLayoutHorizontal(UILayout value) =>
+      _signals[_UINames.uiLayoutHorizontal]!.value = value;
+
+  UITheme get uiTheme => _signals[_UINames.uiTheme]!.value as UITheme;
+  set uiTheme(UITheme value) => _signals[_UINames.uiTheme]!.value = value;
+
+  setupDBPropagation() async {
+    var prefs = await KeyValueStore.instance;
+
+    // Assign the values from the DB
+    screenActive =
+        prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
+
+    uiLayoutVertical =
+        UILayout.fromString(prefs.getString(_UINames.uiLayoutVertical.name));
+
+    uiLayoutHorizontal =
+        UILayout.fromString(prefs.getString(_UINames.uiLayoutHorizontal.name));
+
+    uiTheme = UITheme.fromString(prefs.getString(_UINames.uiTheme.name));
+
+    // Setup DB sync for when signalls change
+
+    effect(() {
+      prefs.setBool(_UINames.screenActive.name, screenActive);
+      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+        WakelockPlus.toggle(enable: screenActive);
+      }
+    });
+
+    effect(() {
+      prefs.setString(_UINames.uiLayoutVertical.name, uiLayoutVertical.name);
+    });
+
+    effect(() {
+      prefs.setString(
+          _UINames.uiLayoutHorizontal.name, uiLayoutHorizontal.name);
+    });
+
+    effect(() {
+      prefs.setString(_UINames.uiTheme.name, uiTheme.name);
+    });
   }
 }
-
-Map<UISettings, Signal> _settingsSignals = {};
 
 enum UITheme {
   // NS Settings
@@ -33,6 +82,11 @@ enum UITheme {
   final String viewName;
 
   const UITheme(this.viewName);
+
+  static UITheme fromString(String? value) {
+    return UITheme.values
+        .firstWhere((e) => e.name == value, orElse: () => UITheme.normal);
+  }
 }
 
 enum UILayout {
@@ -43,76 +97,9 @@ enum UILayout {
   final String viewName;
 
   const UILayout(this.viewName);
-}
 
-class UISettingsCN {
-  KeyValueStore prefs;
-
-  UISettingsCN({required this.prefs}) {
-    // Assign the value of the settings from the KVStore
-    var screenActive =
-        prefs.getBool(UISettings.screenActive.name, defaultValue: true)!;
-
-    _settingsSignals = {
-      UISettings.screenActive: Signal<bool>(screenActive),
-      UISettings.uiLayoutVertical: Signal<UILayout>(_uiLayoutVertical),
-      UISettings.uiLayoutHorizontal: Signal<UILayout>(_uiLayoutHorizontal),
-      UISettings.uiTheme: Signal<UITheme>(_uiTheme),
-    };
-
-    // On Signal change update the KVStore
-    effect(() {
-      var value = UISettings.screenActive._signal.value;
-      prefs.setBool(UISettings.screenActive.name, value);
-      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
-        WakelockPlus.toggle(enable: value);
-      }
-    });
-
-    effect(() {
-      prefs.setString(UISettings.uiLayoutVertical.name,
-          (UISettings.uiLayoutVertical._signal.value as UILayout).name);
-    });
-
-    effect(() {
-      prefs.setString(UISettings.uiLayoutHorizontal.name,
-          (UISettings.uiLayoutHorizontal._signal.value as UILayout).name);
-    });
-
-    effect(() {
-      var value = UISettings.uiTheme._signal.value as UITheme;
-      prefs.setString(UISettings.uiTheme.name, value.name);
-    });
-
-    Timer.periodic(
-        const Duration(seconds: 15),
-        (Timer t) =>
-            WakelockPlus.toggle(enable: UISettings.screenActive._signal.value));
-  }
-
-  // UI Layout Vertical
-  UILayout get _uiLayoutVertical {
-    var layout = prefs.getString(UISettings.uiLayoutVertical.name,
-        defaultValue: UILayout.showBGL.name);
-
+  static UILayout fromString(String? value) {
     return UILayout.values
-        .firstWhere((e) => e.name == layout, orElse: () => UILayout.showBGL);
-  }
-
-  // UI Layout Horizontal
-  UILayout get _uiLayoutHorizontal {
-    var layout = prefs.getString(UISettings.uiLayoutHorizontal.name,
-        defaultValue: UILayout.showBGL.name);
-
-    return UILayout.values
-        .firstWhere((e) => e.name == layout, orElse: () => UILayout.showBGL);
-  }
-
-  // UI Theme
-  UITheme get _uiTheme {
-    var uiThemePref = prefs.getString(UISettings.uiTheme.name);
-
-    return UITheme.values
-        .firstWhere((e) => e.name == uiThemePref, orElse: () => UITheme.normal);
+        .firstWhere((e) => e.name == value, orElse: () => UILayout.showBGL);
   }
 }

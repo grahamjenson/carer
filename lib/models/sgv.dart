@@ -224,7 +224,7 @@ class SGV extends Model {
     var _ = SGV.sgvWriteSignal.value; // force update on save
     try {
       var value = await _percentInRangeToday(
-          TargetSettings.targetLow.value, TargetSettings.targetHigh.value);
+          TargetSettings().targetLow, TargetSettings().targetHigh);
 
       return value * 100.0;
     } catch (e, s) {
@@ -238,7 +238,7 @@ class SGV extends Model {
     print("updating Future Signal yesterdaysPercentage Signal");
     var _ = SGV.sgvWriteSignal.value; // force update on save
     return _percentInRangeYesterday(
-            TargetSettings.targetLow.value, TargetSettings.targetHigh.value)
+            TargetSettings().targetLow, TargetSettings().targetHigh)
         .then((value) => value * 100.0);
   }, initialValue: 0.0, lazy: false, dependencies: [SGV.sgvWriteSignal]);
 

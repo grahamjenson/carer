@@ -139,7 +139,7 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> treatments,
     LineChartBarData bglLineData,
   ) {
-    double maxY = TargetSettings.urgentHigh.value + 36;
+    double maxY = TargetSettings().urgentHigh + 36;
     double minY = 0;
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now
@@ -355,13 +355,13 @@ class BGLChart extends StatelessWidget {
     return RangeAnnotations(
       horizontalRangeAnnotations: [
         HorizontalRangeAnnotation(
-          y1: TargetSettings.urgentHigh.value.toDouble(),
-          y2: TargetSettings.urgentLow.value.toDouble(),
+          y1: TargetSettings().urgentHigh.toDouble(),
+          y2: TargetSettings().urgentLow.toDouble(),
           color: mainColor.withAlpha(35),
         ),
         HorizontalRangeAnnotation(
-          y1: TargetSettings.targetHigh.value.toDouble(),
-          y2: TargetSettings.targetLow.value.toDouble(),
+          y1: TargetSettings().targetHigh.toDouble(),
+          y2: TargetSettings().targetLow.toDouble(),
           color: mainColor.withAlpha(35),
         ),
       ],
@@ -436,10 +436,10 @@ class BGLChart extends StatelessWidget {
             color: mainColor,
             height: 0.5);
 
-        if (value.toInt() == TargetSettings.urgentHigh.value ||
-            value.toInt() == TargetSettings.urgentLow.value ||
-            value.toInt() == TargetSettings.targetHigh.value ||
-            value.toInt() == TargetSettings.targetLow.value) {
+        if (value.toInt() == TargetSettings().urgentHigh ||
+            value.toInt() == TargetSettings().urgentLow ||
+            value.toInt() == TargetSettings().targetHigh ||
+            value.toInt() == TargetSettings().targetLow) {
           return Watch((context) {
             return Text(Settings().unit.str(value),
                 style: style, textAlign: TextAlign.right);

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:carer/change_notifiers/alarms_cn.dart';
+import 'package:carer/change_notifiers/settings/ui_settings.dart';
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
 import 'package:carer/change_notifiers/update_cn.dart';
@@ -7,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   //databaseFactory = databaseFactory.debugQuickLoggerWrapper();
@@ -32,6 +36,9 @@ void runCarer() async {
   // Load the settings from Shared Preferences before starting
   var settings = Settings();
   await settings.setupDBPropagation();
+
+  Timer.periodic(const Duration(seconds: 15),
+      (Timer t) => WakelockPlus.toggle(enable: UISettings().screenActive));
 
   final summary = UpdateCN();
   final t1d = T1DCN(summaryCn: summary);

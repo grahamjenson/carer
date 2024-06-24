@@ -4,43 +4,61 @@ import 'package:signals/signals.dart';
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
 
-enum TargetSettings {
+enum _TNames {
   targetHigh,
   targetLow,
   urgentHigh,
-  urgentLow;
+  urgentLow,
+}
 
-  Signal get _signal {
-    return _settingsSignals[this]!;
-  }
+class TargetSettings {
+  static final TargetSettings _singleton = TargetSettings._();
+  factory TargetSettings() => _singleton;
 
-  set value(int value) {
-    var clone = {
-      TargetSettings.targetHigh.name: TargetSettings.targetHigh.value,
-      TargetSettings.targetLow.name: TargetSettings.targetLow.value,
-      TargetSettings.urgentHigh.name: TargetSettings.urgentHigh.value,
-      TargetSettings.urgentLow.name: TargetSettings.urgentLow.value,
-    };
+  final Map<_TNames, Signal<int>> _signals = {
+    _TNames.targetHigh: Signal<int>(180),
+    _TNames.targetLow: Signal<int>(72),
+    _TNames.urgentHigh: Signal<int>(270),
+    _TNames.urgentLow: Signal<int>(55),
+  };
 
-    // Override the propesed setting
-    clone[name] = value;
-    if (!validTargets(
-        clone[TargetSettings.urgentLow.name]!,
-        clone[TargetSettings.targetLow.name]!,
-        clone[TargetSettings.targetHigh.name]!,
-        clone[TargetSettings.urgentHigh.name]!)) {
+  TargetSettings._();
+
+  int get targetHigh => _signals[_TNames.targetHigh]!.value;
+  int get targetHighPeek => _signals[_TNames.targetHigh]!.peek();
+  set targetHigh(int value) {
+    if (!validTargets(urgentLow, targetLow, value, urgentHigh)) {
       return;
     }
-
-    _settingsSignals[this]!.value = value;
+    _signals[_TNames.targetHigh]!.value = value;
   }
 
-  int get peek {
-    return _settingsSignals[this]!.peek();
+  int get targetLow => _signals[_TNames.targetLow]!.value;
+  int get targetLowPeek => _signals[_TNames.targetLow]!.peek();
+
+  set targetLow(int value) {
+    if (!validTargets(urgentLow, value, targetHigh, urgentHigh)) {
+      return;
+    }
+    _signals[_TNames.targetLow]!.value = value;
   }
 
-  int get value {
-    return _settingsSignals[this]!.value;
+  int get urgentHigh => _signals[_TNames.urgentHigh]!.value;
+  int get urgentHighPeek => _signals[_TNames.urgentHigh]!.peek();
+  set urgentHigh(int value) {
+    if (!validTargets(urgentLow, targetLow, targetHigh, value)) {
+      return;
+    }
+    _signals[_TNames.urgentHigh]!.value = value;
+  }
+
+  int get urgentLow => _signals[_TNames.urgentLow]!.value;
+  int get urgentLowPeek => _signals[_TNames.urgentLow]!.peek();
+  set urgentLow(int value) {
+    if (!validTargets(value, targetLow, targetHigh, urgentHigh)) {
+      return;
+    }
+    _signals[_TNames.urgentLow]!.value = value;
   }
 
   bool validTargets(
@@ -51,35 +69,16 @@ enum TargetSettings {
         targetHigh <= urgentHigh &&
         urgentHigh <= 360;
   }
-}
 
-Map<TargetSettings, Signal<int>> _settingsSignals = {};
+  setupDBPropagation() async {
+    var prefs = await KeyValueStore.instance;
 
-class TargetSettingsCN {
-  KeyValueStore prefs;
+    effect(() => prefs.setInt(_TNames.targetHigh.name, targetHigh));
 
-  TargetSettingsCN({required this.prefs}) {
-    _settingsSignals = {
-      TargetSettings.targetHigh: Signal<int>(
-          prefs.getInt(TargetSettings.targetHigh.name, defaultValue: 180)!),
-      TargetSettings.targetLow: Signal<int>(
-          prefs.getInt(TargetSettings.targetLow.name, defaultValue: 72)!),
-      TargetSettings.urgentHigh: Signal<int>(
-          prefs.getInt(TargetSettings.urgentHigh.name, defaultValue: 270)!),
-      TargetSettings.urgentLow: Signal<int>(
-          prefs.getInt(TargetSettings.urgentLow.name, defaultValue: 55)!),
-    };
+    effect(() => prefs.setInt(_TNames.targetLow.name, targetLow));
 
-    effect(() => prefs.setInt(
-        TargetSettings.targetHigh.name, TargetSettings.targetHigh.value));
+    effect(() => prefs.setInt(_TNames.urgentHigh.name, urgentHigh));
 
-    effect(() => prefs.setInt(
-        TargetSettings.targetLow.name, TargetSettings.targetLow.value));
-
-    effect(() => prefs.setInt(
-        TargetSettings.urgentHigh.name, TargetSettings.urgentHigh.value));
-
-    effect(() => prefs.setInt(
-        TargetSettings.urgentLow.name, TargetSettings.urgentLow.value));
+    effect(() => prefs.setInt(_TNames.urgentLow.name, urgentLow));
   }
 }

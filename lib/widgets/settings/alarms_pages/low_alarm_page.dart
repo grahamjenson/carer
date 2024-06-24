@@ -28,9 +28,9 @@ class LowAlarmPage extends StatelessWidget {
                 "Low Alarm",
                 style: description,
               ),
-              initialValue: AlarmSettings.lowAlarm.value,
+              initialValue: AlarmSettings().lowAlarm,
               onToggle: (value) {
-                AlarmSettings.lowAlarm.value = value;
+                AlarmSettings().lowAlarm = value;
               },
             ),
             SettingsTile(
@@ -41,10 +41,10 @@ class LowAlarmPage extends StatelessWidget {
                 style: description,
               ),
               trailing: ToggleButton.selectOne<int>(
-                  AlarmSettings.lowMinutes.value,
+                  AlarmSettings().lowMinutes,
                   ["0m", "5m", "10m", "15m", "20m", "30m"],
                   [0, 5, 10, 15, 20, 30],
-                  (value) => AlarmSettings.lowMinutes.value = value),
+                  (value) => AlarmSettings().lowMinutes = value),
             ),
           ]),
         ]);

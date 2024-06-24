@@ -28,7 +28,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           disableAlarms(context),
         ];
 
-        if (!AlarmSettings.disableAlarms.value) {
+        if (!AlarmSettings().disableAlarms) {
           tiles = [
             disableAlarms(context),
             rangeAlarms(context),
@@ -60,10 +60,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         "Turn off all alarms",
         style: description,
       ),
-      initialValue: AlarmSettings.disableAlarms.value,
+      initialValue: AlarmSettings().disableAlarms,
       onToggle: (bool disable) async {
         if (!disable) {
-          AlarmSettings.disableAlarms.value = false;
+          AlarmSettings().disableAlarms = false;
           return;
         }
         // show the dialog
@@ -95,7 +95,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           },
         );
         if (areYouSure == true) {
-          AlarmSettings.disableAlarms.value = true;
+          AlarmSettings().disableAlarms = true;
         }
       },
     );
@@ -104,7 +104,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   SettingsTile rangeAlarms(BuildContext context) {
     return SettingsTile(
       title: const Text("Range"),
-      enabled: !AlarmSettings.disableAlarms.value,
+      enabled: !AlarmSettings().disableAlarms,
       descriptionInlineIos: true,
       description: const Text(
         "Out of range",
@@ -116,16 +116,15 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderRadius: BorderRadius.circular(10),
         borderWidth: 0,
         isSelected: [
-          AlarmSettings.urgentLowAlarm.value,
-          AlarmSettings.lowAlarm.value,
-          AlarmSettings.highAlarm.value,
-          AlarmSettings.urgentHighAlarm.value,
+          AlarmSettings().urgentLowAlarm,
+          AlarmSettings().lowAlarm,
+          AlarmSettings().highAlarm,
+          AlarmSettings().urgentHighAlarm,
         ],
         onPressed: (int index) async {
           switch (index) {
             case 0:
-              AlarmSettings.urgentLowAlarm.value =
-                  !AlarmSettings.urgentLowAlarm.value;
+              AlarmSettings().urgentLowAlarm = !AlarmSettings().urgentLowAlarm;
               break;
             case 1:
               Navigator.push(
@@ -140,8 +139,8 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               );
               break;
             case 3:
-              AlarmSettings.urgentHighAlarm.value =
-                  !AlarmSettings.urgentHighAlarm.value;
+              AlarmSettings().urgentHighAlarm =
+                  !AlarmSettings().urgentHighAlarm;
               break;
           }
         },
@@ -152,13 +151,13 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             width: _size,
           ),
           ToggleButton(
-            text: "Low\n${AlarmSettings.lowMinutes.value}m",
+            text: "Low\n${AlarmSettings().lowMinutes}m",
             height: _size,
             width: _size,
             icon: Icons.more_vert,
           ),
           ToggleButton(
-            text: "High\n${AlarmSettings.highMinutes.value}m",
+            text: "High\n${AlarmSettings().highMinutes}m",
             height: _size,
             width: _size,
             icon: Icons.more_vert,
@@ -187,18 +186,18 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderRadius: BorderRadius.circular(10),
         borderWidth: 0,
         isSelected: [
-          AlarmSettings.fastDropAlarm.value,
-          AlarmSettings.fastRiseAlarm.value,
+          AlarmSettings().fastDropAlarm,
+          AlarmSettings().fastRiseAlarm,
         ],
         onPressed: (int index) {
           switch (index) {
             case 0:
-              AlarmSettings.fastDropAlarm.value =
-                  !AlarmSettings.fastDropAlarm.peek;
+              AlarmSettings().fastDropAlarm =
+                  !AlarmSettings().fastDropAlarmPeek;
               break;
             case 1:
-              AlarmSettings.fastRiseAlarm.value =
-                  !AlarmSettings.fastRiseAlarm.peek;
+              AlarmSettings().fastRiseAlarm =
+                  !AlarmSettings().fastRiseAlarmPeek;
               break;
           }
         },
@@ -206,7 +205,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           ToggleButton(
               height: _size,
               width: _size,
-              text: "Fast Drop\n${AlarmSettings.fastDropAlarmMinutes.value}m",
+              text: "Fast Drop\n${AlarmSettings().fastDropAlarmMinutes}m",
               icon: Icons.more_vert,
               onLongPress: () async {
                 var minutes = await alertDialogOfButtons<int>(
@@ -214,10 +213,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                     "Alert Dropping for:",
                     ["5m", "10m", "15m", "20m", "30m"],
                     [5, 10, 15, 20, 30]);
-                AlarmSettings.fastDropAlarmMinutes.value = minutes;
+                AlarmSettings().fastDropAlarmMinutes = minutes;
               }),
           ToggleButton(
-            text: "Fast Rise\n${AlarmSettings.fastRiseAlarmMinutes.value}m",
+            text: "Fast Rise\n${AlarmSettings().fastRiseAlarmMinutes}m",
             icon: Icons.more_vert,
             height: _size,
             width: _size,
@@ -227,7 +226,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                   "Alert Rising for:",
                   ["5m", "10m", "15m", "20m", "30m"],
                   [5, 10, 15, 20, 30]);
-              AlarmSettings.fastRiseAlarmMinutes.value = minutes;
+              AlarmSettings().fastRiseAlarmMinutes = minutes;
             },
           ),
         ],
@@ -244,9 +243,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderRadius: BorderRadius.circular(10),
         borderWidth: 0,
         isSelected: [
-          10 == AlarmSettings.noDataAlarmMinutes.value,
-          20 == AlarmSettings.noDataAlarmMinutes.value,
-          30 == AlarmSettings.noDataAlarmMinutes.value,
+          10 == AlarmSettings().noDataAlarmMinutes,
+          20 == AlarmSettings().noDataAlarmMinutes,
+          30 == AlarmSettings().noDataAlarmMinutes,
         ],
         onPressed: (int index) {
           var value = -1;
@@ -261,10 +260,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               value = 30;
               break;
           }
-          if (value == AlarmSettings.noDataAlarmMinutes.value) {
+          if (value == AlarmSettings().noDataAlarmMinutes) {
             value = -1; // disable
           }
-          AlarmSettings.noDataAlarmMinutes.value = value;
+          AlarmSettings().noDataAlarmMinutes = value;
         },
         children: const [
           ToggleButton(
@@ -297,19 +296,19 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           borderRadius: BorderRadius.circular(10),
           borderWidth: 0,
           isSelected: [
-            AlarmSettings.lowPredictionAlarm.value,
+            AlarmSettings().lowPredictionAlarm,
           ],
           onPressed: (int index) {
             switch (index) {
               case 0:
-                AlarmSettings.lowPredictionAlarm.value =
-                    !AlarmSettings.lowPredictionAlarm.value;
+                AlarmSettings().lowPredictionAlarm =
+                    !AlarmSettings().lowPredictionAlarm;
                 break;
             }
           },
           children: [
             ToggleButton(
-                text: "Low\n${AlarmSettings.lowPredictionMinutes.value}m",
+                text: "Low\n${AlarmSettings().lowPredictionMinutes}m",
                 height: _size,
                 width: _size,
                 icon: Icons.more_vert,
@@ -319,7 +318,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                       "Alert Low for:",
                       ["0m", "5m", "10m", "15m", "20m", "30m"],
                       [0, 5, 10, 15, 20, 30]);
-                  AlarmSettings.lowPredictionMinutes.value = lowMinutes;
+                  AlarmSettings().lowPredictionMinutes = lowMinutes;
                 }),
           ]),
     );
@@ -333,9 +332,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         "Ignore when  good direction",
         style: description,
       ),
-      initialValue: AlarmSettings.smartSnooze.value,
+      initialValue: AlarmSettings().smartSnooze,
       onToggle: (bool value) {
-        AlarmSettings.smartSnooze.value = value;
+        AlarmSettings().smartSnooze = value;
       },
     );
   }
@@ -343,9 +342,9 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   SettingsTile volumeOverride(BuildContext context) {
     return SettingsTile.switchTile(
       title: const Text("Volume Override"),
-      initialValue: AlarmSettings.volumeOveride.value,
+      initialValue: AlarmSettings().volumeOveride,
       onToggle: (bool value) {
-        AlarmSettings.volumeOveride.value = value;
+        AlarmSettings().volumeOveride = value;
       },
     );
   }
@@ -356,19 +355,19 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     double width = MediaQuery.of(context).size.width;
 
     var color = mainColor;
-    if (!AlarmSettings.volumeOveride.value) {
+    if (!AlarmSettings().volumeOveride) {
       color = Colors.grey;
     }
 
-    ValueChanged<double>? sliderCallback = (double value) =>
-        AlarmSettings.volumeOverrideValue.value = value.toInt();
+    ValueChanged<double>? sliderCallback =
+        (double value) => AlarmSettings().volumeOverrideValue = value.toInt();
 
-    if (!AlarmSettings.volumeOveride.value) {
+    if (!AlarmSettings().volumeOveride) {
       sliderCallback = null;
     }
 
     return SettingsTile(
-        enabled: AlarmSettings.volumeOveride.value,
+        enabled: AlarmSettings().volumeOveride,
         title: const Text(""),
         trailing: SizedBox(
           width: width - 80,
@@ -379,9 +378,8 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Icon(Icons.volume_down, color: color),
                       onTap: () {
-                        var ov =
-                            (AlarmSettings.volumeOverrideValue.peek as int);
-                        AlarmSettings.volumeOverrideValue.value =
+                        var ov = AlarmSettings().volumeOverrideValuePeek;
+                        AlarmSettings().volumeOverrideValue =
                             max(minRange, ov - 10).toInt();
                       })),
               Expanded(
@@ -391,8 +389,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                       height: 20,
                       child: Slider(
                         divisions: 50,
-                        value:
-                            AlarmSettings.volumeOverrideValue.value.toDouble(),
+                        value: AlarmSettings().volumeOverrideValue.toDouble(),
                         min: 0,
                         max: 100,
                         onChanged: sliderCallback,
@@ -405,8 +402,8 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
                     color: color,
                   ),
                   onTap: () {
-                    var ov = (AlarmSettings.volumeOverrideValue.peek as int);
-                    AlarmSettings.volumeOverrideValue.value =
+                    var ov = AlarmSettings().volumeOverrideValuePeek;
+                    AlarmSettings().volumeOverrideValue =
                         min(maxRange, ov + 10).toInt();
                   },
                 ),
@@ -425,11 +422,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderRadius: BorderRadius.circular(10),
         borderWidth: 4,
         isSelected: [
-          10 == AlarmSettings.volumeProgressionSeconds.value,
-          20 == AlarmSettings.volumeProgressionSeconds.value,
-          30 == AlarmSettings.volumeProgressionSeconds.value,
-          60 == AlarmSettings.volumeProgressionSeconds.value,
-          120 == AlarmSettings.volumeProgressionSeconds.value,
+          10 == AlarmSettings().volumeProgressionSeconds,
+          20 == AlarmSettings().volumeProgressionSeconds,
+          30 == AlarmSettings().volumeProgressionSeconds,
+          60 == AlarmSettings().volumeProgressionSeconds,
+          120 == AlarmSettings().volumeProgressionSeconds,
         ],
         onPressed: (int index) {
           var value = -1;
@@ -450,10 +447,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               value = 120;
               break;
           }
-          if (AlarmSettings.volumeProgressionSeconds.value == value) {
+          if (AlarmSettings().volumeProgressionSeconds == value) {
             value = -1; // disable
           }
-          AlarmSettings.volumeProgressionSeconds.value = value;
+          AlarmSettings().volumeProgressionSeconds = value;
         },
         children: const [
           ToggleButton(
@@ -499,20 +496,20 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         borderRadius: BorderRadius.circular(10),
         borderWidth: 4,
         isSelected: [
-          AlarmSettings.alarmAsset.value == AlarmSounds.nightguard,
-          AlarmSettings.alarmAsset.value == AlarmSounds.letsgo,
-          AlarmSettings.alarmAsset.value == AlarmSounds.hybridas,
+          AlarmSettings().alarmAsset == AlarmSounds.nightguard,
+          AlarmSettings().alarmAsset == AlarmSounds.letsgo,
+          AlarmSettings().alarmAsset == AlarmSounds.hybridas,
         ],
         onPressed: (int index) {
           switch (index) {
             case 0:
-              AlarmSettings.alarmAsset.value = AlarmSounds.nightguard;
+              AlarmSettings().alarmAsset = AlarmSounds.nightguard;
               break;
             case 1:
-              AlarmSettings.alarmAsset.value = AlarmSounds.letsgo;
+              AlarmSettings().alarmAsset = AlarmSounds.letsgo;
               break;
             case 2:
-              AlarmSettings.alarmAsset.value = AlarmSounds.hybridas;
+              AlarmSettings().alarmAsset = AlarmSounds.hybridas;
               break;
           }
         },
@@ -541,7 +538,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     double width = MediaQuery.of(context).size.width;
 
     String text = "Test Alarm";
-    if (AlarmSettings.testAlarmPlaying.value) {
+    if (AlarmSettings().testAlarmPlaying) {
       text = "Stop Test";
     }
 

@@ -40,17 +40,17 @@ class PredictiveLowAlarm extends Alarm {
 
   @override
   String get description =>
-      'Triggers when it predicts a low in ${AlarmSettings.lowPredictionMinutes.value}m';
+      'Triggers when it predicts a low in ${AlarmSettings().lowPredictionMinutes}m';
 
   @override
   Future<bool> trigger() async {
-    var range = await atPredictedTime(AlarmSettings.lowPredictionMinutes.value);
+    var range = await atPredictedTime(AlarmSettings().lowPredictionMinutes);
     return range == Range5.veryLow || range == Range5.low;
   }
 
   @override
   bool active() {
-    return AlarmSettings.lowPredictionAlarm.value;
+    return AlarmSettings().lowPredictionAlarm;
   }
 }
 
@@ -70,7 +70,7 @@ class UrgentLowAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.urgentLowAlarm.value;
+    return AlarmSettings().urgentLowAlarm;
   }
 }
 
@@ -78,7 +78,7 @@ class LowAlarm extends Alarm {
   const LowAlarm({required super.t1d});
 
   @override
-  String get name => 'Low Alarm ${AlarmSettings.lowMinutes.value}m';
+  String get name => 'Low Alarm ${AlarmSettings().lowMinutes}m';
 
   @override
   String get description =>
@@ -92,7 +92,7 @@ class LowAlarm extends Alarm {
       return false;
     }
     List<Range5> targets =
-        await t1d.targetRange5ForMins(AlarmSettings.lowMinutes.value);
+        await t1d.targetRange5ForMins(AlarmSettings().lowMinutes);
     if (targets.isEmpty) {
       return true;
     }
@@ -101,7 +101,7 @@ class LowAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.lowAlarm.value;
+    return AlarmSettings().lowAlarm;
   }
 
   @override
@@ -116,7 +116,7 @@ class HighAlarm extends Alarm {
   const HighAlarm({required super.t1d});
 
   @override
-  String get name => 'High Alarm ${AlarmSettings.highMinutes.value}m';
+  String get name => 'High Alarm ${AlarmSettings().highMinutes}m';
 
   @override
   String get description =>
@@ -130,7 +130,7 @@ class HighAlarm extends Alarm {
       return false;
     }
     List<Range5> targets =
-        await t1d.targetRange5ForMins(AlarmSettings.highMinutes.value);
+        await t1d.targetRange5ForMins(AlarmSettings().highMinutes);
     if (targets.isEmpty) {
       return true;
     }
@@ -139,7 +139,7 @@ class HighAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.highAlarm.value;
+    return AlarmSettings().highAlarm;
   }
 
   @override
@@ -165,7 +165,7 @@ class UrgentHighAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.urgentHighAlarm.value;
+    return AlarmSettings().urgentHighAlarm;
   }
 }
 
@@ -173,8 +173,7 @@ class FastRiseAlarm extends Alarm {
   const FastRiseAlarm({required super.t1d});
 
   @override
-  String get name =>
-      'Fast Rise Alarm ${AlarmSettings.fastRiseAlarmMinutes.value}';
+  String get name => 'Fast Rise Alarm ${AlarmSettings().fastRiseAlarmMinutes}';
 
   @override
   String get description => 'Triggers when BGL is rising quickly';
@@ -187,12 +186,11 @@ class FastRiseAlarm extends Alarm {
     }
 
     // Get the diffs for the last n minutes and make sure they are all above the set delta
-    var diffs =
-        await t1d.diffPer5Minute(AlarmSettings.fastRiseAlarmMinutes.value);
+    var diffs = await t1d.diffPer5Minute(AlarmSettings().fastRiseAlarmMinutes);
     if (diffs.isEmpty) {
       return false;
     }
-    if (diffs.every((element) => element > AlarmSettings.fastRiseDelta.value)) {
+    if (diffs.every((element) => element > AlarmSettings().fastRiseDelta)) {
       return true;
     }
     return false;
@@ -200,7 +198,7 @@ class FastRiseAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.fastRiseAlarm.value;
+    return AlarmSettings().fastRiseAlarm;
   }
 }
 
@@ -208,8 +206,7 @@ class FastDropAlarm extends Alarm {
   const FastDropAlarm({required super.t1d});
 
   @override
-  String get name =>
-      'Fast Drop Alarm ${AlarmSettings.fastDropAlarmMinutes.value}';
+  String get name => 'Fast Drop Alarm ${AlarmSettings().fastDropAlarmMinutes}';
 
   @override
   String get description => 'Triggers when BGL is dropping quickly';
@@ -223,13 +220,12 @@ class FastDropAlarm extends Alarm {
     }
 
     // Get the diffs for the last n minutes and make sure they are all below the set delta
-    var diffs =
-        await t1d.diffPer5Minute(AlarmSettings.fastDropAlarmMinutes.value);
+    var diffs = await t1d.diffPer5Minute(AlarmSettings().fastDropAlarmMinutes);
     if (diffs.isEmpty) {
       return false;
     }
 
-    if (diffs.every((element) => element < AlarmSettings.fastDropDelta.value)) {
+    if (diffs.every((element) => element < AlarmSettings().fastDropDelta)) {
       return true;
     }
     return false;
@@ -237,7 +233,7 @@ class FastDropAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.fastDropAlarm.value;
+    return AlarmSettings().fastDropAlarm;
   }
 }
 
@@ -245,14 +241,14 @@ class NoDataAlarm extends Alarm {
   const NoDataAlarm({required super.t1d});
 
   @override
-  String get name => 'No Data Alarm ${AlarmSettings.noDataAlarmMinutes.value}';
+  String get name => 'No Data Alarm ${AlarmSettings().noDataAlarmMinutes}';
 
   @override
   String get description => 'Triggers when no data is received';
 
   // This allows the alarm to still trigger with "default" even when not active
   int alarmMinutes() {
-    var mins = AlarmSettings.noDataAlarmMinutes.value;
+    var mins = AlarmSettings().noDataAlarmMinutes;
     if (mins == -1) {
       mins = 20;
     }
@@ -261,10 +257,10 @@ class NoDataAlarm extends Alarm {
 
   @override
   Future<bool> trigger() async {
-    if (AlarmSettings.noDataAlarmMinutes.value == -1) {
+    if (AlarmSettings().noDataAlarmMinutes == -1) {
       return false;
     }
-    var lastSGV = SGV.lastSGV.value.value;
+    var lastSGV = SGV.lastSGV().value;
     if (lastSGV == null) {
       return false;
     }
@@ -273,6 +269,6 @@ class NoDataAlarm extends Alarm {
 
   @override
   bool active() {
-    return AlarmSettings.noDataAlarmMinutes.value != -1;
+    return AlarmSettings().noDataAlarmMinutes != -1;
   }
 }

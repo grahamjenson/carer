@@ -15,7 +15,7 @@ const se = SetEquality();
 class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
   String get alarmFile {
-    return (AlarmSettings.alarmAsset.value as AlarmSounds).asset;
+    return (AlarmSettings().alarmAsset).asset;
   }
 
   late final Set<Alarm> allAlarms;
@@ -87,7 +87,7 @@ class AlarmsCN extends ChangeNotifier {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
 
     effect(() {
-      var sigs = AlarmSettings.values.map((r) => r.value);
+      var sigs = AlarmSettings().allValues();
       print("Changed Alarm value rechecking alarms");
       checkAlarms();
       stopTestAlarm();
@@ -101,13 +101,13 @@ class AlarmsCN extends ChangeNotifier {
   void checkAlarms() async {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
-    var disabledAllAlarms = AlarmSettings.disableAlarms.value;
+    var disabledAllAlarms = AlarmSettings().disableAlarms;
 
     for (var alarm in allAlarms) {
       var triggered = await alarm.trigger();
       var active = alarm.active();
       var smartSnooze =
-          AlarmSettings.smartSnooze.value && await alarm.smartSnooze();
+          AlarmSettings().smartSnooze && await alarm.smartSnooze();
       // Build the lists
 
       if (triggered) {
@@ -149,8 +149,8 @@ class AlarmsCN extends ChangeNotifier {
       return;
     }
 
-    var override = AlarmSettings.volumeOveride.value;
-    var progression = AlarmSettings.volumeProgressionSeconds.value != -1;
+    var override = AlarmSettings().volumeOveride;
+    var progression = AlarmSettings().volumeProgressionSeconds != -1;
 
     // TODO: Check if the system supports override (e.g. web), if not set to false
 
@@ -185,7 +185,7 @@ class AlarmsCN extends ChangeNotifier {
 
   Future<void> playAlarmWithoutOverrideWithProgression(
       AudioPlayer player) async {
-    int progressionSeconds = AlarmSettings.volumeProgressionSeconds.value;
+    int progressionSeconds = AlarmSettings().volumeProgressionSeconds;
 
     await playerPlay(player, volume: 0);
 
@@ -204,7 +204,7 @@ class AlarmsCN extends ChangeNotifier {
   Future<void> playAlarmWithOverrideWithoutProgression(
       AudioPlayer player) async {
     originalVolume = await FlutterVolumeController.getVolume();
-    var volumeOverride = AlarmSettings.volumeOverrideValue.value;
+    var volumeOverride = AlarmSettings().volumeOverrideValue;
 
     await FlutterVolumeController.setVolume(volumeOverride / 100);
 
@@ -212,8 +212,8 @@ class AlarmsCN extends ChangeNotifier {
   }
 
   Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
-    var finalVolume = AlarmSettings.volumeOverrideValue.value;
-    var progressionSeconds = AlarmSettings.volumeProgressionSeconds.value;
+    var finalVolume = AlarmSettings().volumeOverrideValue;
+    var progressionSeconds = AlarmSettings().volumeProgressionSeconds;
 
     originalVolume = await FlutterVolumeController.getVolume();
 
@@ -247,7 +247,7 @@ class AlarmsCN extends ChangeNotifier {
   Future<bool> stopTestAlarm() async {
     var stopped = await stopAlarm(testPlayer);
     if (stopped) {
-      AlarmSettings.testAlarmPlaying.value = false;
+      AlarmSettings().testAlarmPlaying = false;
     }
     return stopped;
   }
@@ -257,7 +257,7 @@ class AlarmsCN extends ChangeNotifier {
       return;
     }
 
-    AlarmSettings.testAlarmPlaying.value = true;
+    AlarmSettings().testAlarmPlaying = true;
     // This is to make sure that
     await playAlarm(testPlayer);
   }

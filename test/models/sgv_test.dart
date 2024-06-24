@@ -1,5 +1,3 @@
-import 'package:carer/change_notifiers/settings/target_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
@@ -56,11 +54,6 @@ void main() {
     });
 
     test("percents", () async {
-      var settings = Settings();
-
-      TargetSettings.targetHigh.value = 180;
-      TargetSettings.targetLow.value = 72;
-
       expect(await SGV(value: 100, date: now.subtract(hour48)).save(), true);
       expect(
           await SGV(value: 100, date: now.subtract(min5 + min5)).save(), true);

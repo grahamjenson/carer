@@ -15,20 +15,20 @@ class T1DSettingsWidget extends AbstractSettingsSection {
   Widget build(BuildContext context) {
     return Watch((context) {
       var unit = Settings().unit;
-      var high = TargetSettings.targetHigh.value.toDouble();
-      var low = TargetSettings.targetLow.value.toDouble();
+      var high = TargetSettings().targetHigh.toDouble();
+      var low = TargetSettings().targetLow.toDouble();
       var highStr = unit.str(high);
       var lowStr = unit.str(low);
 
-      var uhigh = TargetSettings.urgentHigh.value.toDouble();
-      var ulow = TargetSettings.urgentLow.value.toDouble();
+      var uhigh = TargetSettings().urgentHigh.toDouble();
+      var ulow = TargetSettings().urgentLow.toDouble();
       var uhighStr = unit.str(uhigh);
       var ulowStr = unit.str(ulow);
 
       var deltaMax = 36.0;
-      var drop = AlarmSettings.fastDropDelta.value;
+      var drop = AlarmSettings().fastDropDelta;
       var dropStr = unit.str(drop);
-      var rise = AlarmSettings.fastRiseDelta.value;
+      var rise = AlarmSettings().fastRiseDelta;
       var riseStr = unit.str(rise);
 
       const minRange = 50.0;
@@ -57,8 +57,10 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Text(lowStr, textAlign: TextAlign.end),
                       onTap: () {
-                        TargetSettings.targetLow.value = max(minRange,
-                                TargetSettings.targetLow.peek.toDouble() - diff)
+                        TargetSettings().targetLow = max(
+                                minRange,
+                                TargetSettings().targetLowPeek.toDouble() -
+                                    diff)
                             .toInt();
                       })),
               Expanded(
@@ -74,8 +76,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                         onChanged: (RangeValues vals) {
                           var newLow = vals.start.toInt();
                           var newHigh = vals.end.toInt();
-                          TargetSettings.targetLow.value = newLow;
-                          TargetSettings.targetHigh.value = newHigh;
+                          TargetSettings().targetLow = newLow;
+                          TargetSettings().targetHigh = newHigh;
                         },
                       ))),
               Expanded(
@@ -86,8 +88,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                       textAlign: TextAlign.start,
                     ),
                     onTap: () {
-                      TargetSettings.targetHigh.value =
-                          min(maxRange, TargetSettings.targetHigh.peek + diff)
+                      TargetSettings().targetHigh =
+                          min(maxRange, TargetSettings().targetHighPeek + diff)
                               .toInt();
                     }),
               ),
@@ -101,8 +103,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Text(ulowStr, textAlign: TextAlign.end),
                       onTap: () {
-                        TargetSettings.urgentLow.value =
-                            max(minRange, TargetSettings.urgentLow.peek - diff)
+                        TargetSettings().urgentLow =
+                            max(minRange, TargetSettings().urgentLowPeek - diff)
                                 .toInt();
                       })),
               Expanded(
@@ -116,8 +118,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                         min: minRange,
                         max: maxRange,
                         onChanged: (RangeValues vals) {
-                          TargetSettings.urgentLow.value = vals.start.toInt();
-                          TargetSettings.urgentHigh.value = vals.end.toInt();
+                          TargetSettings().urgentLow = vals.start.toInt();
+                          TargetSettings().urgentHigh = vals.end.toInt();
                         },
                       ))),
               Expanded(
@@ -125,8 +127,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                 child: InkWell(
                   child: Text(uhighStr, textAlign: TextAlign.start),
                   onTap: () {
-                    TargetSettings.urgentHigh.value =
-                        min(maxRange, TargetSettings.urgentHigh.peek + diff)
+                    TargetSettings().urgentHigh =
+                        min(maxRange, TargetSettings().urgentHighPeek + diff)
                             .toInt();
                   },
                 ),
@@ -141,8 +143,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Text(dropStr, textAlign: TextAlign.end),
                       onTap: () {
-                        var frd = (AlarmSettings.fastDropDelta.peek as int);
-                        AlarmSettings.fastDropDelta.value =
+                        var frd = AlarmSettings().fastDropDeltaPeek;
+                        AlarmSettings().fastDropDelta =
                             min(minRange, frd - diff).toInt();
                       })),
               Expanded(
@@ -156,9 +158,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                         min: -deltaMax,
                         max: deltaMax,
                         onChanged: (RangeValues vals) {
-                          AlarmSettings.fastDropDelta.value =
-                              vals.start.toInt();
-                          AlarmSettings.fastRiseDelta.value = vals.end.toInt();
+                          AlarmSettings().fastDropDelta = vals.start.toInt();
+                          AlarmSettings().fastRiseDelta = vals.end.toInt();
                         },
                       ))),
               Expanded(
@@ -166,8 +167,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                 child: InkWell(
                   child: Text(riseStr, textAlign: TextAlign.start),
                   onTap: () {
-                    var frd = (AlarmSettings.fastRiseDelta.peek as int);
-                    AlarmSettings.fastRiseDelta.value =
+                    var frd = AlarmSettings().fastRiseDeltaPeek;
+                    AlarmSettings().fastRiseDelta =
                         min(maxRange, frd + diff).toInt();
                   },
                 ),

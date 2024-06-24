@@ -14,9 +14,9 @@ class UISettingsWidget extends AbstractSettingsSection {
         tiles: [
           SettingsTile.switchTile(
             title: const Text('Keep Screen Active'),
-            initialValue: UISettings.screenActive.value,
+            initialValue: UISettings().screenActive,
             onToggle: (value) async {
-              UISettings.screenActive.value = value;
+              UISettings().screenActive = value;
             },
           ),
           SettingsTile(
@@ -29,10 +29,10 @@ class UISettingsWidget extends AbstractSettingsSection {
                         child: SizedBox(width: 130, child: Text(e.viewName)),
                       ))
                   .toList(),
-              value: UISettings.uiLayoutVertical.value,
+              value: UISettings().uiLayoutVertical,
               onChanged: (value) {
                 if (value == null) return;
-                UISettings.uiLayoutVertical.value = value;
+                UISettings().uiLayoutVertical = value;
               },
             ),
           ),
@@ -45,10 +45,10 @@ class UISettingsWidget extends AbstractSettingsSection {
                         child: SizedBox(width: 130, child: Text(e.viewName)),
                       ))
                   .toList(),
-              value: UISettings.uiLayoutHorizontal.value,
+              value: UISettings().uiLayoutHorizontal,
               onChanged: (value) {
                 if (value == null) return;
-                UISettings.uiLayoutHorizontal.value = value;
+                UISettings().uiLayoutHorizontal = value;
               },
             ),
           ),
@@ -61,10 +61,10 @@ class UISettingsWidget extends AbstractSettingsSection {
                         child: SizedBox(width: 130, child: Text(e.viewName)),
                       ))
                   .toList(),
-              value: UISettings.uiTheme.value,
+              value: UISettings().uiTheme,
               onChanged: (value) {
                 if (value == null) return;
-                UISettings.uiTheme.value = value;
+                UISettings().uiTheme = value;
               },
             ),
           ),

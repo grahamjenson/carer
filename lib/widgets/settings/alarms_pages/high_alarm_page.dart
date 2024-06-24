@@ -28,9 +28,9 @@ class HighAlarmPage extends StatelessWidget {
                 "High Alarm",
                 style: description,
               ),
-              initialValue: AlarmSettings.highAlarm.value,
+              initialValue: AlarmSettings().highAlarm,
               onToggle: (value) {
-                AlarmSettings.highAlarm.value = value;
+                AlarmSettings().highAlarm = value;
               },
             ),
             SettingsTile(
@@ -41,10 +41,10 @@ class HighAlarmPage extends StatelessWidget {
                 style: description,
               ),
               trailing: ToggleButton.selectOne<int>(
-                  AlarmSettings.highMinutes.value,
+                  AlarmSettings().highMinutes,
                   ["0m", "5m", "10m", "15m", "20m", "30m"],
                   [0, 5, 10, 15, 20, 30],
-                  (value) => AlarmSettings.highMinutes.value = value),
+                  (value) => AlarmSettings().highMinutes = value),
             ),
           ]),
         ]);

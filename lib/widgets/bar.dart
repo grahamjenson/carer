@@ -23,7 +23,7 @@ class Bar extends StatelessWidget {
         ),
         getSettingsButton(context),
       ];
-      if (!AlarmSettings.disableAlarms.value) {
+      if (!AlarmSettings().disableAlarms) {
         tiles = [
           getSleepButton(context, alarms),
           getActiveAlarms(context, alarms),
