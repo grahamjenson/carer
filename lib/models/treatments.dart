@@ -72,6 +72,10 @@ class Treatment extends Model {
     return clock.now().difference(date);
   }
 
+  int get minsAgo =>
+      (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/
+      60000;
+
   String get insulinStr {
     if (insulin != null && insulin != 0) {
       return '${toMax2dp(insulin!)}u';

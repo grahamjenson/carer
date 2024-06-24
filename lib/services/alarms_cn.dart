@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:carer/signals/alarms/alarms.dart';
-import 'package:carer/signals/settings/alarm_settings.dart';
-import 'package:carer/signals/settings/target_settings.dart';
-import 'package:carer/signals/t1d_settings.dart';
+import 'package:carer/services/alarms/alarms.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/t1d_settings.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';

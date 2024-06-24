@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/signals/settings/target_settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
 
 enum Range5 { veryLow, low, mid, high, veryHigh }
 

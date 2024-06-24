@@ -11,7 +11,7 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/signals/settings.dart';
+import 'package:carer/services/settings.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 

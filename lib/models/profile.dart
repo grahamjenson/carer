@@ -1,6 +1,4 @@
 import 'package:carer/models/model.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -96,31 +94,6 @@ class Profile extends Model {
 
   factory Profile.fromMap(Map<String, Object?> map) {
     return _q.fromMap(map);
-  }
-
-  static Future<double> basalAtTime(DateTime date) async {
-    var tb = await TempBasal.atTime(date);
-    if (tb != null) {
-      return tb.value;
-    }
-    var profile = await Profile.profile();
-    if (profile == null) {
-      return 0;
-    }
-    return profile.basal[date.hour];
-  }
-
-  static Future<(int, int)> targetAtTime(DateTime date) async {
-    var tt = await TempTarget.atTime(date);
-    if (tt != null) {
-      return (tt.targetHigh, tt.targetLow);
-    }
-    var profile = await Profile.profile();
-    if (profile == null) {
-      return (0, 0);
-    }
-
-    return (profile.targetLow[date.hour], profile.targetHigh[date.hour]);
   }
 
   static Future<Profile?> profile() async {

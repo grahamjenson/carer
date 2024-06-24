@@ -3,6 +3,7 @@ import 'package:carer/models/profile.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
@@ -75,6 +76,10 @@ class ValueAtTime extends Model {
   factory ValueAtTime.fromMap(Map<String, dynamic> map) {
     return _q.fromMap(map);
   }
+
+  int get minsAgo =>
+      (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/
+      60000;
 
   static Future<List<ValueAtTime>> query({
     int? after,

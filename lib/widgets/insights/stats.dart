@@ -1,14 +1,13 @@
 import 'package:carer/models/constants.dart';
-import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
+import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
-import 'package:carer/signals/settings.dart';
+import 'package:carer/services/settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -45,12 +44,23 @@ class Stats extends StatelessWidget {
 
   Future<Widget> futureWindow() async {
     var stateData = await StateData.instance;
-    var profileBasal = await Profile.basalAtTime(clock.now());
-    var (profileLowTarget, profileHighTarget) =
-        await Profile.targetAtTime(clock.now());
+    var iobNow = stateData.iob();
+    var cobNow = stateData.cob();
+    var cageNow = stateData.cage();
+    var powerNow = stateData.battery();
 
     return Watch((context) {
       try {
+        var valuesAtTime = ValueAtTime.lastSixHours().value!;
+        var currentBasal = 0.0;
+        var profileLowTarget = 0;
+        var profileHighTarget = 0;
+        if (valuesAtTime.isNotEmpty) {
+          currentBasal = valuesAtTime.first.basal;
+          profileLowTarget = valuesAtTime.first.targetLow;
+          profileHighTarget = valuesAtTime.first.targetHigh;
+        }
+
         Exp2Predictor exp2predictor = Exp2Predictor();
         exp2predictor.init();
 
@@ -88,11 +98,11 @@ class Stats extends StatelessWidget {
                             width: 50, child: Text('stat', style: heading))),
                   ],
                   rows: [
-                    iob(stateData),
-                    cob(stateData),
-                    power(stateData),
-                    cage(stateData),
-                    basal(profileBasal),
+                    iob(iobNow),
+                    cob(cobNow),
+                    power(powerNow),
+                    cage(cageNow),
+                    basal(currentBasal),
                     target(
                         Settings().unit, profileLowTarget, profileHighTarget),
                     fifteenMinDiff(Settings().unit, sgvs),
@@ -141,7 +151,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow iob(StateData stateData) {
+  DataRow iob(double iob) {
     return DataRow(
       cells: [
         const DataCell(
@@ -150,47 +160,43 @@ class Stats extends StatelessWidget {
         DataCell(
           SmartText(
               textAlign: TextAlign.center,
-              texts: ["${stateData.iob()}", "u"],
+              texts: ["$iob", "u"],
               styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow cob(StateData stateData) {
+  DataRow cob(double cob) {
     return DataRow(
       cells: [
         const DataCell(
           Text("COB", style: heading),
         ),
         DataCell(
-          SmartText(
-              texts: ["${stateData.cob()}", "g"], styles: const [row, small]),
+          SmartText(texts: ["$cob", "g"], styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow power(StateData stateData) {
+  DataRow power(double battery) {
     return DataRow(
       cells: [
         const DataCell(Text("Power", style: heading)),
         DataCell(
-          SmartText(
-              texts: ["${stateData.battery()}", "%"],
-              styles: const [row, small]),
+          SmartText(texts: ["$battery", "%"], styles: const [row, small]),
         ),
       ],
     );
   }
 
-  DataRow cage(StateData stateData) {
+  DataRow cage(double cage) {
     return DataRow(
       cells: [
         const DataCell(Text("cage", style: heading)),
         DataCell(
-          SmartText(
-              texts: ["${stateData.cage()}", "h"], styles: const [row, small]),
+          SmartText(texts: ["$cage}", "h"], styles: const [row, small]),
         ),
       ],
     );

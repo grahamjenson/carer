@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:carer/models/sgv.dart';
-import 'package:carer/signals/settings/alarm_settings.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:signals/signals_flutter.dart';
 

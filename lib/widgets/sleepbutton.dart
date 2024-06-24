@@ -1,4 +1,4 @@
-import 'package:carer/signals/alarms_cn.dart';
+import 'package:carer/services/alarms_cn.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';

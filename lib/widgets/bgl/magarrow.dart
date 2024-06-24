@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/signals/t1d_settings.dart';
+import 'package:carer/services/t1d_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';

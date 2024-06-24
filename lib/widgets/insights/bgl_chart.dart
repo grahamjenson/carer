@@ -2,8 +2,8 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
-import 'package:carer/signals/settings.dart';
-import 'package:carer/signals/settings/target_settings.dart';
+import 'package:carer/services/settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -59,11 +59,18 @@ class BGLChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      int minsAgo = 125;
+      int minsAgo = 120;
 
-      var targets = ValueAtTime.lastSixHours().value!;
-      List<SGV> sgvs = SGV.last3Hours().value!;
-      List<Treatment> lastTreatments = Treatment.lastSixHours().value!;
+      List<ValueAtTime> targets = ValueAtTime.lastSixHours()
+          .value!
+          .where((e) => e.minsAgo < minsAgo)
+          .toList();
+      List<SGV> sgvs =
+          SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
+      List<Treatment> lastTreatments = Treatment.lastSixHours()
+          .value!
+          .where((e) => e.minsAgo < minsAgo)
+          .toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);

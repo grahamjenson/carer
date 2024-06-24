@@ -1,8 +1,8 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
-import 'package:carer/signals/settings/alarm_settings.dart';
-import 'package:carer/signals/t1d_settings.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/t1d_settings.dart';
 import 'package:carer/utils/math.dart';
 
 Future<Range5> atPredictedTime(int mins) async {
