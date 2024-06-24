@@ -5,7 +5,6 @@ import 'package:carer/change_notifiers/settings/target_settings.dart';
 import 'package:carer/change_notifiers/settings/ui_settings.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
-import 'package:flutter/foundation.dart';
 import 'package:signals/signals_flutter.dart';
 
 Map<Settings, Signal> _settingsSignals = {};
@@ -43,7 +42,7 @@ var nightscoutURLAndToken = computed(() {
   return ('', '');
 });
 
-class SettingsCN extends ChangeNotifier {
+class SettingsCN {
   late KeyValueStore prefs;
   late TargetSettingsCN targetSettings;
   late UISettingsCN uiSettings;
@@ -61,11 +60,16 @@ class SettingsCN extends ChangeNotifier {
     };
 
     // On Signal change update the KVStore
-    effect(() => prefs.setString(
-        Settings.nightscoutUrl.name, Settings.nightscoutUrl._signal.value));
+    effect(() {
+      if (Settings.nightscoutUrl.value == null) {
+        return;
+      }
+      prefs.setString(
+          Settings.nightscoutUrl.name, Settings.nightscoutUrl.value);
+    });
 
     effect(() => prefs.setBool(
-        Settings.unit.name, (Settings.unit._signal.value as Unit).toBool()));
+        Settings.unit.name, (Settings.unit.value as Unit).toBool()));
 
     uiSettings = UISettingsCN(prefs: prefs, settings: this);
 

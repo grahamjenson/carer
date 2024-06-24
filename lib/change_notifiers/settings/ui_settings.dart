@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/sql/key_value_store.dart';
@@ -50,8 +51,6 @@ class UISettingsCN {
   SettingsCN settings;
 
   UISettingsCN({required this.prefs, required this.settings}) {
-    // Sometimes the app "forgets" that it is meant to keep the screen active
-
     // Assign the value of the settings from the KVStore
     var screenActive =
         prefs.getBool(UISettings.screenActive.name, defaultValue: true)!;
@@ -67,7 +66,9 @@ class UISettingsCN {
     effect(() {
       var value = UISettings.screenActive._signal.value;
       prefs.setBool(UISettings.screenActive.name, value);
-      WakelockPlus.toggle(enable: value);
+      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+        WakelockPlus.toggle(enable: value);
+      }
     });
 
     effect(() {

@@ -3,18 +3,17 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/change_notifiers/alarms/alarms.dart';
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:signals/signals_flutter.dart';
 
 const se = SetEquality();
 
 class AlarmsCN extends ChangeNotifier {
   T1DCN t1d;
-  SettingsCN settings;
   String get alarmFile {
     return (AlarmSettings.alarmAsset.value as AlarmSounds).asset;
   }
@@ -70,26 +69,28 @@ class AlarmsCN extends ChangeNotifier {
 
   double? originalVolume;
 
-  AlarmsCN({required this.t1d, required this.settings}) {
+  AlarmsCN({required this.t1d}) {
     allAlarms = {
-      UrgentLowAlarm(settings: settings, t1d: t1d),
-      LowAlarm(settings: settings, t1d: t1d),
-      HighAlarm(settings: settings, t1d: t1d),
-      UrgentHighAlarm(settings: settings, t1d: t1d),
+      UrgentLowAlarm(t1d: t1d),
+      LowAlarm(t1d: t1d),
+      HighAlarm(t1d: t1d),
+      UrgentHighAlarm(t1d: t1d),
       //
-      FastDropAlarm(settings: settings, t1d: t1d),
-      FastRiseAlarm(settings: settings, t1d: t1d),
+      FastDropAlarm(t1d: t1d),
+      FastRiseAlarm(t1d: t1d),
       //
-      NoDataAlarm(settings: settings, t1d: t1d),
+      NoDataAlarm(t1d: t1d),
       //
-      PredictiveLowAlarm(settings: settings, t1d: t1d),
+      PredictiveLowAlarm(t1d: t1d),
     };
 
     Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
 
-    settings.addListener(() async {
+    effect(() {
+      var sigs = AlarmSettings.values.map((r) => r.value);
+      print("Changed Alarm value rechecking alarms");
       checkAlarms();
-      await stopTestAlarm();
+      stopTestAlarm();
     });
 
     t1d.addListener(() {

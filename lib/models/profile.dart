@@ -8,20 +8,6 @@ class ProfileRepository extends ModelRepository<Profile> {
 
   @override
   Profile fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["units", "timezone", "dia", "timestamp"] +
-        crKeys +
-        isfKeys +
-        basalKeys +
-        targetLowKeys +
-        targetHighKeys;
-
-    var types = [String, String, int, int];
-    types += List.filled(crKeys.length, int);
-    types += List.filled(isfKeys.length, int);
-    types += List.filled(basalKeys.length, double);
-    types += List.filled(targetLowKeys.length, int);
-    types += List.filled(targetHighKeys.length, int);
-
     List<int> carbratio = crKeys.map((key) => map[key] as int).toList();
     List<int> sens = isfKeys.map((key) => map[key] as int).toList();
     List<double> basal = basalKeys.map((key) => map[key] as double).toList();

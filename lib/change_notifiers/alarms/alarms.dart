@@ -1,11 +1,10 @@
 import 'package:carer/change_notifiers/settings/alarm_settings.dart';
-import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/change_notifiers/t1d_cn.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/utils/math.dart';
 
-Future<Range5> atPredictedTime(int mins, SettingsCN settings) async {
+Future<Range5> atPredictedTime(int mins) async {
   Exp2Predictor exp2predictor = Exp2Predictor();
   await exp2predictor.init();
   var sgvAtTime = exp2predictor.predictMin(mins);
@@ -14,11 +13,9 @@ Future<Range5> atPredictedTime(int mins, SettingsCN settings) async {
 }
 
 abstract class Alarm {
-  final SettingsCN settings;
-
   final T1DCN t1d;
 
-  const Alarm({required this.settings, required this.t1d});
+  const Alarm({required this.t1d});
 
   String get name;
   String get description;
@@ -31,7 +28,7 @@ abstract class Alarm {
 }
 
 class PredictiveLowAlarm extends Alarm {
-  const PredictiveLowAlarm({required super.settings, required super.t1d});
+  const PredictiveLowAlarm({required super.t1d});
 
   @override
   String get name => 'PredictiveLowAlarm Low Alarm';
@@ -42,8 +39,7 @@ class PredictiveLowAlarm extends Alarm {
 
   @override
   Future<bool> trigger() async {
-    var range = await atPredictedTime(
-        AlarmSettings.lowPredictionMinutes.value, settings);
+    var range = await atPredictedTime(AlarmSettings.lowPredictionMinutes.value);
     return range == Range5.veryLow || range == Range5.low;
   }
 
@@ -54,7 +50,7 @@ class PredictiveLowAlarm extends Alarm {
 }
 
 class UrgentLowAlarm extends Alarm {
-  const UrgentLowAlarm({required super.settings, required super.t1d});
+  const UrgentLowAlarm({required super.t1d});
 
   @override
   String get name => 'Urgent Low Alarm';
@@ -74,7 +70,7 @@ class UrgentLowAlarm extends Alarm {
 }
 
 class LowAlarm extends Alarm {
-  const LowAlarm({required super.settings, required super.t1d});
+  const LowAlarm({required super.t1d});
 
   @override
   String get name => 'Low Alarm ${AlarmSettings.lowMinutes.value}m';
@@ -105,14 +101,14 @@ class LowAlarm extends Alarm {
 
   @override
   Future<bool> smartSnooze() async {
-    var range = await atPredictedTime(10, settings);
+    var range = await atPredictedTime(10);
 
     return range == Range5.mid;
   }
 }
 
 class HighAlarm extends Alarm {
-  const HighAlarm({required super.settings, required super.t1d});
+  const HighAlarm({required super.t1d});
 
   @override
   String get name => 'High Alarm ${AlarmSettings.highMinutes.value}m';
@@ -143,13 +139,13 @@ class HighAlarm extends Alarm {
 
   @override
   Future<bool> smartSnooze() async {
-    var range = await atPredictedTime(10, settings);
+    var range = await atPredictedTime(10);
     return range == Range5.mid;
   }
 }
 
 class UrgentHighAlarm extends Alarm {
-  const UrgentHighAlarm({required super.settings, required super.t1d});
+  const UrgentHighAlarm({required super.t1d});
 
   @override
   String get name => 'Urgent High Alarm';
@@ -169,7 +165,7 @@ class UrgentHighAlarm extends Alarm {
 }
 
 class FastRiseAlarm extends Alarm {
-  const FastRiseAlarm({required super.settings, required super.t1d});
+  const FastRiseAlarm({required super.t1d});
 
   @override
   String get name =>
@@ -204,7 +200,7 @@ class FastRiseAlarm extends Alarm {
 }
 
 class FastDropAlarm extends Alarm {
-  const FastDropAlarm({required super.settings, required super.t1d});
+  const FastDropAlarm({required super.t1d});
 
   @override
   String get name =>
@@ -241,7 +237,7 @@ class FastDropAlarm extends Alarm {
 }
 
 class NoDataAlarm extends Alarm {
-  const NoDataAlarm({required super.settings, required super.t1d});
+  const NoDataAlarm({required super.t1d});
 
   @override
   String get name => 'No Data Alarm ${AlarmSettings.noDataAlarmMinutes.value}';

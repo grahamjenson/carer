@@ -1,3 +1,5 @@
+import 'package:carer/change_notifiers/settings/target_settings.dart';
+import 'package:carer/change_notifiers/settings_cn.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
@@ -54,21 +56,20 @@ void main() {
     });
 
     test("percents", () async {
-      expect(await SGV(value: 2, date: now.subtract(hour48)).save(), true);
-      expect(await SGV(value: 2, date: now.subtract(min5 + min5)).save(), true);
-      expect(await SGV(value: 1, date: now.subtract(min5)).save(), true);
+      var settings = SettingsCN();
+      await settings.populate();
 
-      await Future.delayed(const Duration(seconds: 1));
-      await SGV.todaysPercentage.future.onError((e, s) {
-        print("Error: $e");
-        print("Stack: $s");
-        return 2;
-      });
+      TargetSettings.targetHigh.value = 180;
+      TargetSettings.targetLow.value = 72;
+
+      expect(await SGV(value: 100, date: now.subtract(hour48)).save(), true);
+      expect(
+          await SGV(value: 100, date: now.subtract(min5 + min5)).save(), true);
+      expect(await SGV(value: 100, date: now.subtract(min5)).save(), true);
 
       await withClock(Clock.fixed(now), () async {
-        await SGV.todaysPercentage.future;
-        var percent = SGV.todaysPercentage.value.value;
-        expect(percent, 1.0);
+        var percent = await SGV.todaysPercentage.future;
+        expect(percent, 100.0);
       });
     });
 

@@ -219,15 +219,22 @@ class SGV extends Model {
 
   static Signal<int> sgvWriteSignal = Signal(0);
 
-  static FutureSignal<double> todaysPercentage = computedAsync(() {
+  static FutureSignal<double?> todaysPercentage = computedAsync(() async {
     print("updating Future Signal todaysPercentage Signal");
     var _ = SGV.sgvWriteSignal.value; // force update on save
-    return _percentInRangeToday(
-            TargetSettings.targetLow.value, TargetSettings.targetHigh.value)
-        .then((value) => value * 100.0);
-  }, initialValue: 0.0, lazy: false, dependencies: [SGV.sgvWriteSignal]);
+    try {
+      var value = await _percentInRangeToday(
+          TargetSettings.targetLow.value, TargetSettings.targetHigh.value);
 
-  static FutureSignal<double> yesterdaysPercentage = computedAsync(() {
+      return value * 100.0;
+    } catch (e, s) {
+      print("Error todaysPercentage: $e");
+      print("Stack todaysPercentage: $s");
+      return 0.0;
+    }
+  }, initialValue: 0.0);
+
+  static FutureSignal<double?> yesterdaysPercentage = computedAsync(() {
     print("updating Future Signal yesterdaysPercentage Signal");
     var _ = SGV.sgvWriteSignal.value; // force update on save
     return _percentInRangeYesterday(

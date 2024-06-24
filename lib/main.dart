@@ -31,16 +31,14 @@ void runCarer() async {
 
   // Load the settings from Shared Preferences before starting
   var settings = SettingsCN();
-
   await settings.populate();
 
   final summary = UpdateCN(settings: settings);
   final t1d = T1DCN(settings: settings, summaryCn: summary);
-  final alarms = AlarmsCN(t1d: t1d, settings: settings);
+  final alarms = AlarmsCN(t1d: t1d);
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => settings),
       ChangeNotifierProvider(create: (context) => summary),
       ChangeNotifierProvider(create: (context) => alarms),
       ChangeNotifierProvider(create: (context) => t1d),
