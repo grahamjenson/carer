@@ -10,7 +10,7 @@ abstract class Predictor {
   final DateTime _lastReadingDate = DateTime.now();
 
   // Get all the expencive calls done here, and can be repedtly called when new data arrives
-  Future<void> init();
+  init();
 
   // Returns the predicted value at mins
   SGV predictAt(double timestamp);
@@ -86,8 +86,9 @@ abstract class RegressionPredictor extends Predictor {
   List<SGV> sgvs = [];
 
   @override
-  Future<void> init() async {
-    sgvs = await SGV.lastMins(40);
+  init() {
+    sgvs = SGV.last3Hours().value!;
+
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();
       return;
@@ -98,9 +99,6 @@ abstract class RegressionPredictor extends Predictor {
       regression = NoopRegression();
       return;
     }
-
-    @override
-    final lastReadingDate = sgvs.first.date;
 
     var x = sgvs.map((s) => fnX(s.date.millisecondsSinceEpoch)).toList();
     var y = sgvs.map((s) => s.value * 1.0).toList();

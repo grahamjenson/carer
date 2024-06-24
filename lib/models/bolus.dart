@@ -1,9 +1,10 @@
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/math.dart';
+import 'package:signals/signals_flutter.dart';
 
 class BolusRepository extends ModelRepository<Bolus> {
-  const BolusRepository() : super(bolusTableName);
+  BolusRepository() : super(bolusTableName);
 
   @override
   Bolus fromMap(Map<String, Object?> map) {
@@ -32,13 +33,13 @@ class BolusRepository extends ModelRepository<Bolus> {
 }
 
 class Bolus extends Model {
-  static const BolusRepository _q = BolusRepository();
+  static final BolusRepository _q = BolusRepository();
 
   @override
   ModelRepository get repository => _q;
 
   @override
-  final int? id;
+  int? id;
 
   final double value;
   @override
@@ -65,4 +66,7 @@ class Bolus extends Model {
   static Future<List<Bolus>> lastMins(int minsAgo) async {
     return _q.lastMins(minsAgo);
   }
+
+  static Signal<int> get writeSignal => _q.writeSignal;
+  static Future<int> saveAll(List<Bolus> models) => _q.saveAll(models);
 }

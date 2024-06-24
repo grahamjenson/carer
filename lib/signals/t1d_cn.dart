@@ -50,8 +50,9 @@ class T1DCN extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Range5>> targetRange5ForMins(int minutes) async {
-    return (await SGV.lastMins(minutes)).map((e) {
+  List<Range5> targetRange5ForMins(int minsAgo) {
+    var sgvs = SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo);
+    return sgvs.map((e) {
       var (t, _) = targetRange(e.value);
       return t;
     }).toList();
@@ -79,11 +80,10 @@ class T1DCN extends ChangeNotifier {
 
   //// Mungingx
 
-  Future<List<int>> diffPer5Minute(int minutes) async {
-    List<int> diffs = [];
-    var sgvs = await SGV.lastMins(minutes);
+  List<int> diffPer5Minute(int minsAgo) {
+    var sgvs = SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo);
 
-    // TODO double check this
+    List<int> diffs = [];
     for (var sgv in sgvs) {
       diffs.add(sgv.rate5m ?? 0);
     }

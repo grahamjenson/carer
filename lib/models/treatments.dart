@@ -1,11 +1,14 @@
 // Non persisted combined model of Bolus and Carbs
+import 'package:carer/models/bolus.dart';
+import 'package:carer/models/carbs.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
+import 'package:signals/signals_flutter.dart';
 
 class TreatmentRepository extends ModelRepository<Treatment> {
-  const TreatmentRepository()
+  TreatmentRepository()
       : super(concatTreatmentsTableName, timestampField: "max_ts");
 
   @override
@@ -44,13 +47,15 @@ class TreatmentRepository extends ModelRepository<Treatment> {
 }
 
 class Treatment extends Model {
-  static const TreatmentRepository _q = TreatmentRepository();
+  static final TreatmentRepository _q = TreatmentRepository();
 
   @override
   ModelRepository get repository => _q;
 
   @override
   get id => null; // This is a view
+  @override
+  set id(_) {}
 
   @override
   DateTime date;
@@ -59,10 +64,6 @@ class Treatment extends Model {
   int count;
 
   Treatment({required this.date, this.insulin, this.carbs, this.count = 1});
-
-  static Future<List<Treatment>> lastMins(int minsAgo) async {
-    return _q.lastMins(minsAgo);
-  }
 
   bool get isConcated => count > 1;
 
@@ -86,4 +87,17 @@ class Treatment extends Model {
       return "";
     }
   }
+
+  static Future<List<Treatment>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
+
+  ////
+  // Future Signals
+  ////
+
+  static FutureSignal<List<Treatment>> lastSixHours = computedAsync(() async {
+    print("updating Treatments lastSixHours");
+    var b = Bolus.writeSignal.value;
+    var c = Carbs.writeSignal.value;
+    return await Treatment.lastMins(60 * 6);
+  }, initialValue: [], debugLabel: 'treatmentsLastSixHours');
 }

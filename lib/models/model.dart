@@ -1,10 +1,13 @@
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class Model {
   int? get id;
+  set id(int? id);
+
   DateTime get date;
   ModelRepository get repository;
 
@@ -13,12 +16,10 @@ abstract class Model {
   }
 
   Future<bool> save() {
-    // TODO update the id of the model
     return futureProfile("$runtimeType save", repository.save(this));
   }
 
   Future<bool> upsert() {
-    // TODO update the id of the model
     return futureProfile(
         "$runtimeType upsert", repository.upsert(this, uniqueValues()));
   }
@@ -43,7 +44,9 @@ abstract class ModelRepository<T extends Model> {
   final String idField;
   final String timestampField;
 
-  const ModelRepository(
+  final Signal<int> writeSignal = Signal(0, debugLabel: "${T}Write");
+
+  ModelRepository(
     this.tableName, {
     this.idField = "id",
     this.timestampField = "timestamp",
@@ -85,21 +88,26 @@ abstract class ModelRepository<T extends Model> {
   Future<bool> save(T model) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
+
+    var id = 0;
     if (model.id == null) {
-      var ret = await cdb.db.insert(tb, toSQLMap(model),
+      id = await cdb.db.insert(tb, toSQLMap(model),
           conflictAlgorithm: ConflictAlgorithm.ignore);
-      return ret != 0;
     } else {
-      var ret = await cdb.db.update(tb, toSQLMap(model),
+      id = await cdb.db.update(tb, toSQLMap(model),
           where: '$idField = ?', whereArgs: [model.id]);
-      return ret != 0;
     }
+    var ret = id != 0;
+    model.id = id;
+    writeSignal.value = clock.now().millisecondsSinceEpoch;
+    return ret;
   }
 
   Future<int> saveAll(List<T> models) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
     var batch = cdb.db.batch();
+
     for (var model in models) {
       if (model.id == null) {
         batch.insert(tb, toSQLMap(model),
@@ -109,8 +117,21 @@ abstract class ModelRepository<T extends Model> {
             where: '$idField = ?', whereArgs: [model.id]);
       }
     }
-    var ret = await futureProfile("${T.runtimeType} saveAll", batch.commit());
-    return ret.where((v) => v != null && v != 0).length;
+    var ids = await futureProfile("$T saveAll", batch.commit());
+    // assign the ids
+    var saves = 0;
+    for (var i = 0; i < models.length; i++) {
+      var id = ids[i];
+      if (id != null && id != 0 && id is int) {
+        models[i].id = id;
+        saves++;
+      }
+    }
+
+    if (saves > 0) {
+      writeSignal.value = clock.now().millisecondsSinceEpoch;
+    }
+    return saves;
   }
 
   Future<bool> upsert(T model, List<String> uniqueValues) async {
@@ -137,14 +158,18 @@ abstract class ModelRepository<T extends Model> {
       }
 
       if (update) {
-        var ret = await cdb.db.update(
+        var id = await cdb.db.update(
           tb,
           map,
           where: where,
           whereArgs: whereArgs,
         );
 
-        return ret != 0;
+        var ret = id != 0;
+        if (ret) {
+          writeSignal.value = clock.now().millisecondsSinceEpoch;
+        }
+        return ret;
       }
     }
     return save(model);

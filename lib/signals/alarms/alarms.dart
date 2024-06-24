@@ -91,8 +91,7 @@ class LowAlarm extends Alarm {
     if (!latest) {
       return false;
     }
-    List<Range5> targets =
-        await t1d.targetRange5ForMins(AlarmSettings().lowMinutes);
+    List<Range5> targets = t1d.targetRange5ForMins(AlarmSettings().lowMinutes);
     if (targets.isEmpty) {
       return true;
     }
@@ -129,8 +128,7 @@ class HighAlarm extends Alarm {
     if (!latest) {
       return false;
     }
-    List<Range5> targets =
-        await t1d.targetRange5ForMins(AlarmSettings().highMinutes);
+    List<Range5> targets = t1d.targetRange5ForMins(AlarmSettings().highMinutes);
     if (targets.isEmpty) {
       return true;
     }
@@ -186,7 +184,7 @@ class FastRiseAlarm extends Alarm {
     }
 
     // Get the diffs for the last n minutes and make sure they are all above the set delta
-    var diffs = await t1d.diffPer5Minute(AlarmSettings().fastRiseAlarmMinutes);
+    var diffs = t1d.diffPer5Minute(AlarmSettings().fastRiseAlarmMinutes);
     if (diffs.isEmpty) {
       return false;
     }
@@ -220,7 +218,7 @@ class FastDropAlarm extends Alarm {
     }
 
     // Get the diffs for the last n minutes and make sure they are all below the set delta
-    var diffs = await t1d.diffPer5Minute(AlarmSettings().fastDropAlarmMinutes);
+    var diffs = t1d.diffPer5Minute(AlarmSettings().fastDropAlarmMinutes);
     if (diffs.isEmpty) {
       return false;
     }

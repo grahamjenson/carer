@@ -2,10 +2,10 @@ import 'package:carer/models/model.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:clock/clock.dart';
+import 'package:signals/signals_flutter.dart';
 
 class TempBasalRepository extends ModelRepository<TempBasal> {
-  const TempBasalRepository()
-      : super(tempbasalTableName, timestampField: "start");
+  TempBasalRepository() : super(tempbasalTableName, timestampField: "start");
 
   @override
   TempBasal fromMap(Map<String, Object?> map) {
@@ -34,13 +34,13 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
 }
 
 class TempBasal extends Model {
-  static const TempBasalRepository _q = TempBasalRepository();
+  static final TempBasalRepository _q = TempBasalRepository();
 
   @override
   ModelRepository get repository => _q;
 
   @override
-  final int? id;
+  int? id;
 
   @override
   get date => startDate;
@@ -89,4 +89,7 @@ class TempBasal extends Model {
     var cdb = await CarerDB.instance;
     return cdb.fixBadTempBasals();
   }
+
+  static Future<int> saveAll(List<TempBasal> models) => _q.saveAll(models);
+  static Signal<int> get writeSignal => _q.writeSignal;
 }

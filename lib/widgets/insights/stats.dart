@@ -3,7 +3,7 @@ import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
-import 'package:carer/signals/settings_cn.dart';
+import 'package:carer/signals/settings.dart';
 import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -58,7 +58,7 @@ class Stats extends StatelessWidget {
     var (profileLowTarget, profileHighTarget) =
         await Profile.targetAtTime(clock.now());
 
-    var sgvs = await SGV.lastMins(15);
+    var sgvs = SGV.last3Hours().value!;
 
     var exp2preds = exp2predictor.predictNextHour();
 
@@ -272,7 +272,8 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  DataRow fifteenMinDiff(Unit unit, List<SGV> sgvs) {
+  DataRow fifteenMinDiff(Unit unit, List<SGV> bigsgvs) {
+    var sgvs = bigsgvs.sublist(0, 3);
     if (sgvs.isEmpty) {
       return const DataRow(
         cells: [

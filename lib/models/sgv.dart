@@ -6,7 +6,7 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class SGVRepository extends ModelRepository<SGV> {
-  const SGVRepository()
+  SGVRepository()
       : super(sgvsCleanViewTableName, writeTableName: sgvsTableName);
 
   @override
@@ -39,13 +39,13 @@ class SGVRepository extends ModelRepository<SGV> {
 }
 
 class SGV extends Model {
-  static const SGVRepository _q = SGVRepository();
+  static final SGVRepository _q = SGVRepository();
 
   @override
   ModelRepository get repository => _q;
 
   @override
-  final int? id;
+  int? id;
   final int value;
 
   @override
@@ -137,17 +137,7 @@ class SGV extends Model {
         name: name);
   }
 
-  // return the last sgvs for minutes'
-  static Map<int, List<SGV>> lastMinsCache = {};
-
-  static Future<List<SGV>> lastMins(int minsAgo) async {
-    if (lastMinsCache[minsAgo] != null) {
-      return lastMinsCache[minsAgo]!;
-    }
-    var ret = (await _q.lastMins(minsAgo));
-    lastMinsCache[minsAgo] = ret;
-    return ret;
-  }
+  static Future<List<SGV>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
 
   static Future<double> _percentInRangeToday(int low, int high) async {
     DateTime now = clock.now();
@@ -191,37 +181,15 @@ class SGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
-  // overside save to cache lastMins and lastSGV values
-  @override
-  Future<bool> save() async {
-    var ret = await super.save();
-    if (ret) {
-      lastMinsCache = {};
-      SGV.sgvWriteSignal.value = clock.now().millisecondsSinceEpoch;
-    }
+  static Future<int> saveAll(List<SGV> sgvs) => _q.saveAll(sgvs);
 
-    return ret;
-  }
-
-  static Future<int> saveAll(List<SGV> sgvs) async {
-    var ret = await _q.saveAll(sgvs);
-
-    if (ret > 0) {
-      lastMinsCache = {};
-      SGV.sgvWriteSignal.value = clock.now().millisecondsSinceEpoch;
-    }
-
-    return ret;
-  }
   ////
   // SIGNALS
   ////
 
-  static Signal<int> sgvWriteSignal = Signal(0, debugLabel: "SGVWrite");
-
   static FutureSignal<double?> todaysPercentage = computedAsync(() async {
     print("updating Future Signal todaysPercentage Signal");
-    var _ = SGV.sgvWriteSignal.value; // force update on save
+    var _ = _q.writeSignal.value; // force update on save
     try {
       var value = await _percentInRangeToday(
           TargetSettings().targetLow, TargetSettings().targetHigh);
@@ -236,7 +204,7 @@ class SGV extends Model {
 
   static FutureSignal<double?> yesterdaysPercentage = computedAsync(() {
     print("updating Future Signal yesterdaysPercentage Signal");
-    var _ = SGV.sgvWriteSignal.value; // force update on save
+    var _ = _q.writeSignal.value; // force update on save
     return _percentInRangeYesterday(
             TargetSettings().targetLow, TargetSettings().targetHigh)
         .then((value) => value * 100.0);
@@ -244,10 +212,17 @@ class SGV extends Model {
 
   static FutureSignal<SGV?> lastSGV = computedAsync(() {
     print("updating LastSGV Signal");
-    var _ = SGV.sgvWriteSignal.value; // force update on save
+    var _ = _q.writeSignal.value; // force update on save
 
     return _q
         .query(limit: 1, name: "lastSGV")
         .then((value) => value.firstOrNull);
   }, debugLabel: 'LastSGV');
+
+  static FutureSignal<List<SGV>> last3Hours = computedAsync(() {
+    print("updating last2Hours Signal");
+    var _ = _q.writeSignal.value; // force update on save
+
+    return SGV.lastMins(60 * 3);
+  }, initialValue: [], debugLabel: 'last3Hours');
 }

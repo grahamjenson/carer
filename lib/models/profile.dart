@@ -2,9 +2,10 @@ import 'package:carer/models/model.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:signals/signals_flutter.dart';
 
 class ProfileRepository extends ModelRepository<Profile> {
-  const ProfileRepository() : super(profileTableName);
+  ProfileRepository() : super(profileTableName);
 
   @override
   Profile fromMap(Map<String, Object?> map) {
@@ -60,13 +61,13 @@ class ProfileRepository extends ModelRepository<Profile> {
 }
 
 class Profile extends Model {
-  static const ProfileRepository _q = ProfileRepository();
+  static final ProfileRepository _q = ProfileRepository();
 
   @override
   ModelRepository get repository => _q;
 
   @override
-  final int? id;
+  int? id;
 
   @override
   final DateTime date;
@@ -130,6 +131,8 @@ class Profile extends Model {
       {int? after, int? before, Map<String, Object>? conditions}) async {
     return _q.count(after: after, before: before, conditions: conditions);
   }
+
+  static Signal<int> get writeSignal => _q.writeSignal;
 }
 
 const crKeys = [

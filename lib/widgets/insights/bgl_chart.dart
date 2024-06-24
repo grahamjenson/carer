@@ -2,17 +2,14 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
+import 'package:carer/signals/settings.dart';
 import 'package:carer/signals/settings/target_settings.dart';
-import 'package:carer/signals/settings_cn.dart';
-import 'package:carer/signals/update_cn.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
-import 'package:clock/clock.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TreatmentSpot extends FlSpot {
@@ -61,72 +58,50 @@ class BGLChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UpdateCN>(builder: (context, summaryCn, child) {
-      // Breaking down the objects
+    return Watch((context) {
+      int minsAgo = 125;
 
-      return FutureBuilder<Window>(
-          future: futureWindow(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              print("BGLChart snapshot error $context: ${snapshot.error}");
-              return const CircularProgressIndicator();
-            }
-            if (snapshot.hasData) {
-              return snapshot.data!;
-            } else {
-              return const CircularProgressIndicator();
-            }
-          });
+      var targets = ValueAtTime.lastSixHours().value!;
+      List<SGV> sgvs = SGV.last3Hours().value!;
+      List<Treatment> lastTreatments = Treatment.lastSixHours().value!;
+
+      // convert the last hours of summary sgvs into flspots
+      var bglSpotData = bglSpots(sgvs);
+      var (basalSpotData, maxBasal) = basalSpots(targets);
+      var (lowTargets, highTargets) = targetSpots(targets);
+      var treatments = treatmentsSpots(lastTreatments);
+
+      var bglLineData = LineChartBarData(
+        color: mainColor,
+        spots: bglSpotData,
+        barWidth: 1,
+        dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+      );
+
+      return Window(
+        title: "Chart",
+        child: Expanded(
+            child: Padding(
+                padding: const EdgeInsets.only(
+                  right: 10,
+                  top: 5,
+                ),
+                child: Watch((context) {
+                  return LineChart(
+                    buildlineChartData(
+                        minsAgo,
+                        maxBasal,
+                        bglSpotData,
+                        basalSpotData,
+                        lowTargets,
+                        highTargets,
+                        treatments,
+                        bglLineData),
+                    duration: Duration.zero,
+                  );
+                }))),
+      );
     });
-  }
-
-  Future<Window> futureWindow() async {
-    int minsAgo = 125;
-
-    var after = clock
-        .now()
-        .subtract(Duration(minutes: minsAgo + 1))
-        .millisecondsSinceEpoch;
-    var before = clock.now().millisecondsSinceEpoch;
-
-    var targets = await ValueAtTime.query(before: before, after: after);
-
-    // convert the last hours of summary sgvs into flspots
-    var bglSpotData = await bglSpots(minsAgo);
-    var (basalSpotData, maxBasal) = await basalSpots(targets);
-    var (lowTargets, highTargets) = await targetSpots(targets);
-    var treatments = await treatmentsSpots(minsAgo);
-
-    var bglLineData = LineChartBarData(
-      color: mainColor,
-      spots: bglSpotData,
-      barWidth: 1,
-      dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
-    );
-
-    return Window(
-      title: "Chart",
-      child: Expanded(
-          child: Padding(
-              padding: const EdgeInsets.only(
-                right: 10,
-                top: 5,
-              ),
-              child: Watch((context) {
-                return LineChart(
-                  buildlineChartData(
-                      minsAgo,
-                      maxBasal,
-                      bglSpotData,
-                      basalSpotData,
-                      lowTargets,
-                      highTargets,
-                      treatments,
-                      bglLineData),
-                  duration: Duration.zero,
-                );
-              }))),
-    );
   }
 
   LineChartData buildlineChartData(
@@ -187,9 +162,8 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  Future<List<FlSpot>> treatmentsSpots(int minsAgo) async {
+  List<FlSpot> treatmentsSpots(List<Treatment> lastTreatments) {
     List<FlSpot> spots = [];
-    var lastTreatments = await Treatment.lastMins(minsAgo);
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
     Treatment? lastTreatment;
@@ -212,8 +186,7 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  Future<List<FlSpot>> bglSpots(int minsAgo) async {
-    List<SGV> sgvs = await SGV.lastMins(minsAgo);
+  List<FlSpot> bglSpots(List<SGV> sgvs) {
     List<FlSpot> spots = [];
     for (var i = 0; i < sgvs.length; i++) {
       var sgv = sgvs[i];
@@ -223,7 +196,7 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  Future<(List<FlSpot>, double)> basalSpots(List<ValueAtTime> targets) async {
+  (List<FlSpot>, double) basalSpots(List<ValueAtTime> targets) {
     List<BasalSpot> spots = [];
     // Check the basal at every minute
     for (var t in targets) {
@@ -251,8 +224,7 @@ class BGLChart extends StatelessWidget {
     return (spots, maxBasal);
   }
 
-  Future<(List<FlSpot>, List<FlSpot>)> targetSpots(
-      List<ValueAtTime> targets) async {
+  (List<FlSpot>, List<FlSpot>) targetSpots(List<ValueAtTime> targets) {
     List<FlSpot> lowTargets = [];
     List<FlSpot> highTargets = [];
 

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:carer/signals/alarms_cn.dart';
+import 'package:carer/signals/settings.dart';
 import 'package:carer/signals/settings/ui_settings.dart';
-import 'package:carer/signals/settings_cn.dart';
 import 'package:carer/signals/t1d_cn.dart';
 import 'package:carer/signals/update_cn.dart';
 import 'package:carer/widgets/pages/homepage.dart';

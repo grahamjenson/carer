@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:carer/models/sgv.dart';
-import 'package:carer/signals/settings_cn.dart';
+import 'package:carer/signals/settings.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';

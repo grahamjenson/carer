@@ -11,7 +11,7 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/signals/settings_cn.dart';
+import 'package:carer/signals/settings.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -98,42 +98,42 @@ class UpdateCN extends ChangeNotifier {
     summaryLastUpdatedMS = clock.now().millisecondsSinceEpoch;
 
     // convert the summary to models
-    List<SGV> models = [];
+    List<SGV> sgvs = [];
     for (var sgv in summary.sgvs.sgvs) {
-      models.add(SGV(value: sgv.sgv, date: sgv.mills));
+      sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
     }
-    var sgvUpdates = await SGV.saveAll(models);
+    var sgvUpdates = await SGV.saveAll(sgvs);
 
-    int bolusUpdates = 0;
+    List<Bolus> boluses = [];
     for (var bolus in summary.treatments.boluses()) {
-      var bolusModel = Bolus(value: bolus.insulin!, date: bolus.date);
-      sgvUpdates += (await bolusModel.save()) ? 1 : 0;
+      boluses.add(Bolus(value: bolus.insulin!, date: bolus.date));
     }
+    int bolusUpdates = await Bolus.saveAll(boluses);
 
-    int carbUpdates = 0;
+    List<Carbs> carbs = [];
     for (var carb in summary.treatments.carbs()) {
-      var carbModel = Carbs(value: carb.carbs!.round(), date: carb.date);
-      carbUpdates += (await carbModel.save()) ? 1 : 0;
+      carbs.add(Carbs(value: carb.carbs!.round(), date: carb.date));
     }
+    int carbUpdates = await Carbs.saveAll(carbs);
 
-    int tempBasalUpdates = 0;
+    List<TempBasal> tempBasals = [];
     for (var tempBasal in summary.tempBasals.tempBasals) {
-      var tbModel = TempBasal(
+      tempBasals.add(TempBasal(
           startDate: tempBasal.start,
           duration: tempBasal.duration.toInt(),
-          value: tempBasal.absolute);
-      tempBasalUpdates += (await tbModel.upsert()) ? 1 : 0;
+          value: tempBasal.absolute));
     }
+    int tempBasalUpdates = await TempBasal.saveAll(tempBasals);
 
-    int tempTargetUpdates = 0;
+    List<TempTarget> tempTargets = [];
     for (var tempTarget in summary.targets.targets) {
-      var ttModel = TempTarget(
+      tempTargets.add(TempTarget(
           startDate: tempTarget.start,
           duration: tempTarget.duration,
           targetHigh: tempTarget.targetTop,
-          targetLow: tempTarget.targetBottom);
-      tempTargetUpdates += (await ttModel.upsert()) ? 1 : 0;
+          targetLow: tempTarget.targetBottom));
     }
+    int tempTargetUpdates = await TempTarget.saveAll(tempTargets);
 
     SummaryProfile summaryProfile = summary.profile;
 

@@ -4,6 +4,7 @@ import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
 class History extends StatelessWidget {
   const History({super.key});
@@ -30,70 +31,59 @@ class History extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Window>(
-        future: futureWindow(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            print("History snapshot error: ${snapshot.error}");
-          }
-          if (snapshot.hasData) {
-            return snapshot.data!;
-          } else {
-            return const CircularProgressIndicator();
-          }
-        });
-  }
+    return Watch((context) {
+      var loader = const CircularProgressIndicator();
 
-  Future<Window> futureWindow() async {
-    var history = await historyContainers();
+      var treatments = Treatment.lastSixHours().value;
+      if (treatments == null) {
+        return loader;
+      }
 
-    return Window(
-      title: "History",
-      child: Expanded(
-        child: SingleChildScrollView(
-            child: Container(
-                alignment: Alignment.center,
-                child: DataTable(
-                    border: const TableBorder(
-                      verticalInside: BorderSide(color: mainColor, width: 0.2),
-                      horizontalInside:
-                          BorderSide(color: mainColor, width: 0.2),
-                    ),
-                    columnSpacing: 5,
-                    dividerThickness: 0.01,
-                    headingRowHeight: 12,
-                    dataRowMinHeight: 14,
-                    dataRowMaxHeight: 20,
-                    horizontalMargin: 0,
-                    columns: [
-                      DataColumn(
-                          numeric: true,
-                          label: Container(
-                              alignment: Alignment.center,
-                              child: const Text('', style: heading))),
-                      DataColumn(
-                          numeric: true,
-                          label: Container(
-                              alignment: Alignment.center,
-                              child: const Text('', style: heading))),
-                      DataColumn(
-                          numeric: true,
-                          label: Container(
-                              alignment: Alignment.center,
-                              child: const Text('', style: heading))),
-                    ],
-                    rows: history))),
-      ),
-    );
-  }
+      var history = [for (var t in treatments) historyRow(t)]
+          .where((row) => row != null)
+          .map((row) => row as DataRow)
+          .toList();
 
-  Future<List<DataRow>> historyContainers() async {
-    var history = await Treatment.lastMins(60 * 6);
-
-    return [for (var t in history) historyRow(t)]
-        .where((row) => row != null)
-        .map((row) => row as DataRow)
-        .toList();
+      return Window(
+        title: "History",
+        child: Expanded(
+          child: SingleChildScrollView(
+              child: Container(
+                  alignment: Alignment.center,
+                  child: DataTable(
+                      border: const TableBorder(
+                        verticalInside:
+                            BorderSide(color: mainColor, width: 0.2),
+                        horizontalInside:
+                            BorderSide(color: mainColor, width: 0.2),
+                      ),
+                      columnSpacing: 5,
+                      dividerThickness: 0.01,
+                      headingRowHeight: 12,
+                      dataRowMinHeight: 14,
+                      dataRowMaxHeight: 20,
+                      horizontalMargin: 0,
+                      columns: [
+                        DataColumn(
+                            numeric: true,
+                            label: Container(
+                                alignment: Alignment.center,
+                                child: const Text('', style: heading))),
+                        DataColumn(
+                            numeric: true,
+                            label: Container(
+                                alignment: Alignment.center,
+                                child: const Text('', style: heading))),
+                        DataColumn(
+                            numeric: true,
+                            label: Container(
+                                alignment: Alignment.center,
+                                child: const Text('', style: heading))),
+                      ],
+                      rows: history))),
+        ),
+      );
+    });
   }
 
   DataRow? historyRow(Treatment treatment) {

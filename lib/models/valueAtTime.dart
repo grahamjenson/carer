@@ -1,8 +1,12 @@
 import 'package:carer/models/model.dart';
+import 'package:carer/models/profile.dart';
+import 'package:carer/models/tempbasal.dart';
+import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:signals/signals_flutter.dart';
 
 class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
-  const ValueAtTimeRepository() : super(valuesAtTimeViewName);
+  ValueAtTimeRepository() : super(valuesAtTimeViewName);
 
   @override
   ValueAtTime fromMap(Map<String, Object?> map) {
@@ -41,13 +45,15 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
 }
 
 class ValueAtTime extends Model {
-  static const ValueAtTimeRepository _q = ValueAtTimeRepository();
+  static final ValueAtTimeRepository _q = ValueAtTimeRepository();
 
   @override
   ModelRepository get repository => _q;
 
   @override
   get id => null; // This is a view
+  @override
+  set id(_) {}
 
   @override
   final DateTime date;
@@ -79,4 +85,15 @@ class ValueAtTime extends Model {
     return _q.query(
         before: before, after: after, limit: limit, conditions: conditions);
   }
+
+  static Future<List<ValueAtTime>> lastMins(int minsAgo) =>
+      _q.lastMins(minsAgo);
+
+  static FutureSignal<List<ValueAtTime>> lastSixHours = computedAsync(() async {
+    print("updating Treatments lastSixHours");
+    var b = TempTarget.writeSignal.value;
+    var c = TempBasal.writeSignal.value;
+    var d = Profile.writeSignal.value;
+    return await ValueAtTime.lastMins(60 * 6);
+  }, initialValue: [], debugLabel: 'treatmentsLastSixHours');
 }
