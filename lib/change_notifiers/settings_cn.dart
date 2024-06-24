@@ -19,9 +19,8 @@ class Settings {
   final alarmSettings = AlarmSettings();
 
   final Map<_SNames, Signal> _signals = {
-    _SNames.nightscoutUrl:
-        Signal<String?>(null, debugLabel: _SNames.nightscoutUrl.name),
-    _SNames.unit: Signal<Unit>(Unit.mg, debugLabel: _SNames.unit.name),
+    _SNames.nightscoutUrl: Signal<String?>(null, debugLabel: 'nightscoutUrl'),
+    _SNames.unit: Signal<Unit>(Unit.mg, debugLabel: 'unit'),
   };
 
   late final Computed<(String, String)> _nightscoutURLAndTokenSignal;

@@ -217,7 +217,7 @@ class SGV extends Model {
   // SIGNALS
   ////
 
-  static Signal<int> sgvWriteSignal = Signal(0);
+  static Signal<int> sgvWriteSignal = Signal(0, debugLabel: "SGVWrite");
 
   static FutureSignal<double?> todaysPercentage = computedAsync(() async {
     print("updating Future Signal todaysPercentage Signal");
@@ -232,7 +232,7 @@ class SGV extends Model {
       print("Stack todaysPercentage: $s");
       return 0.0;
     }
-  }, initialValue: 0.0);
+  }, initialValue: 0.0, debugLabel: 'todaysPercentage');
 
   static FutureSignal<double?> yesterdaysPercentage = computedAsync(() {
     print("updating Future Signal yesterdaysPercentage Signal");
@@ -240,7 +240,7 @@ class SGV extends Model {
     return _percentInRangeYesterday(
             TargetSettings().targetLow, TargetSettings().targetHigh)
         .then((value) => value * 100.0);
-  }, initialValue: 0.0, lazy: false, dependencies: [SGV.sgvWriteSignal]);
+  }, initialValue: 0.0, debugLabel: 'yesterdaysPercentage');
 
   static FutureSignal<SGV?> lastSGV = computedAsync(() {
     print("updating LastSGV Signal");
@@ -249,5 +249,5 @@ class SGV extends Model {
     return _q
         .query(limit: 1, name: "lastSGV")
         .then((value) => value.firstOrNull);
-  }, lazy: false);
+  }, debugLabel: 'LastSGV');
 }

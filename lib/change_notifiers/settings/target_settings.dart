@@ -16,10 +16,10 @@ class TargetSettings {
   factory TargetSettings() => _singleton;
 
   final Map<_TNames, Signal<int>> _signals = {
-    _TNames.targetHigh: Signal<int>(180),
-    _TNames.targetLow: Signal<int>(72),
-    _TNames.urgentHigh: Signal<int>(270),
-    _TNames.urgentLow: Signal<int>(55),
+    _TNames.targetHigh: Signal<int>(180, debugLabel: 'targetHigh'),
+    _TNames.targetLow: Signal<int>(72, debugLabel: 'targetLow'),
+    _TNames.urgentHigh: Signal<int>(270, debugLabel: 'urgentHigh'),
+    _TNames.urgentLow: Signal<int>(55, debugLabel: 'urgentLow'),
   };
 
   TargetSettings._();

@@ -11,10 +11,12 @@ class UISettings {
   factory UISettings() => _singleton;
 
   final Map<_UINames, Signal> _signals = {
-    _UINames.screenActive: Signal<bool>(false),
-    _UINames.uiLayoutVertical: Signal<UILayout>(UILayout.showBGL),
-    _UINames.uiLayoutHorizontal: Signal<UILayout>(UILayout.showBGL),
-    _UINames.uiTheme: Signal<UITheme>(UITheme.normal),
+    _UINames.screenActive: Signal<bool>(false, debugLabel: 'screenActive'),
+    _UINames.uiLayoutVertical:
+        Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutVertical'),
+    _UINames.uiLayoutHorizontal:
+        Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutHorizontal'),
+    _UINames.uiTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'uiTheme'),
   };
 
   UISettings._();

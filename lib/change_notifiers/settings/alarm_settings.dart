@@ -37,28 +37,39 @@ class AlarmSettings {
   factory AlarmSettings() => _singleton;
 
   final Map<_AlarmNames, Signal> _signals = {
-    _AlarmNames.disableAlarms: Signal<bool>(true),
-    _AlarmNames.urgentLowAlarm: Signal<bool>(false),
-    _AlarmNames.lowAlarm: Signal<bool>(false),
-    _AlarmNames.lowMinutes: Signal<int>(5),
-    _AlarmNames.highAlarm: Signal<bool>(false),
-    _AlarmNames.highMinutes: Signal<int>(5),
-    _AlarmNames.urgentHighAlarm: Signal<bool>(false),
-    _AlarmNames.fastDropAlarm: Signal<bool>(false),
-    _AlarmNames.fastDropAlarmMinutes: Signal<int>(5),
-    _AlarmNames.fastDropDelta: Signal<int>(9),
-    _AlarmNames.fastRiseAlarm: Signal<bool>(false),
-    _AlarmNames.fastRiseAlarmMinutes: Signal<int>(5),
-    _AlarmNames.fastRiseDelta: Signal<int>(-9),
-    _AlarmNames.noDataAlarmMinutes: Signal<int>(5),
-    _AlarmNames.lowPredictionAlarm: Signal<bool>(false),
-    _AlarmNames.lowPredictionMinutes: Signal<int>(5),
-    _AlarmNames.smartSnooze: Signal<bool>(false),
-    _AlarmNames.volumeOveride: Signal<bool>(false),
-    _AlarmNames.volumeOverrideValue: Signal<int>(10),
-    _AlarmNames.volumeProgressionSeconds: Signal<int>(10),
-    _AlarmNames.testAlarmPlaying: Signal<bool>(false),
-    _AlarmNames.alarmAsset: Signal<AlarmSounds>(AlarmSounds.nightguard),
+    _AlarmNames.disableAlarms: Signal<bool>(true, debugLabel: 'disableAlarms'),
+    _AlarmNames.urgentLowAlarm:
+        Signal<bool>(false, debugLabel: 'urgentLowAlarm'),
+    _AlarmNames.lowAlarm: Signal<bool>(false, debugLabel: 'lowAlarm'),
+    _AlarmNames.lowMinutes: Signal<int>(5, debugLabel: 'lowMinutes'),
+    _AlarmNames.highAlarm: Signal<bool>(false, debugLabel: 'highAlarm'),
+    _AlarmNames.highMinutes: Signal<int>(5, debugLabel: 'highMinutes'),
+    _AlarmNames.urgentHighAlarm:
+        Signal<bool>(false, debugLabel: 'urgentHighAlarm'),
+    _AlarmNames.fastDropAlarm: Signal<bool>(false, debugLabel: 'fastDropAlarm'),
+    _AlarmNames.fastDropAlarmMinutes:
+        Signal<int>(5, debugLabel: 'fastDropAlarmMinutes'),
+    _AlarmNames.fastDropDelta: Signal<int>(9, debugLabel: 'fastDropDelta'),
+    _AlarmNames.fastRiseAlarm: Signal<bool>(false, debugLabel: 'fastRiseAlarm'),
+    _AlarmNames.fastRiseAlarmMinutes:
+        Signal<int>(5, debugLabel: 'fastRiseAlarmMinutes'),
+    _AlarmNames.fastRiseDelta: Signal<int>(-9, debugLabel: 'fastRiseDelta'),
+    _AlarmNames.noDataAlarmMinutes:
+        Signal<int>(5, debugLabel: 'noDataAlarmMinutes'),
+    _AlarmNames.lowPredictionAlarm:
+        Signal<bool>(false, debugLabel: 'lowPredictionAlarm'),
+    _AlarmNames.lowPredictionMinutes:
+        Signal<int>(5, debugLabel: 'lowPredictionMinutes'),
+    _AlarmNames.smartSnooze: Signal<bool>(false, debugLabel: 'smartSnooze'),
+    _AlarmNames.volumeOveride: Signal<bool>(false, debugLabel: 'volumeOveride'),
+    _AlarmNames.volumeOverrideValue:
+        Signal<int>(10, debugLabel: 'volumeOverrideValue'),
+    _AlarmNames.volumeProgressionSeconds:
+        Signal<int>(10, debugLabel: 'volumeProgressionSeconds'),
+    _AlarmNames.testAlarmPlaying:
+        Signal<bool>(false, debugLabel: 'testAlarmPlaying'),
+    _AlarmNames.alarmAsset:
+        Signal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
   };
 
   AlarmSettings._();
@@ -146,16 +157,16 @@ class AlarmSettings {
       _signals[_AlarmNames.smartSnooze]!.value = value;
 
   bool get volumeOveride => _signals[_AlarmNames.volumeOveride]!.value as bool;
-  set volumeOveride(bool value) => volumeOverrideValueSet(
-      _signals[_AlarmNames.volumeOveride]!.value as Signal<int>, value);
+  set volumeOveride(bool value) =>
+      _signals[_AlarmNames.volumeOveride]!.value = value;
 
   int get volumeOverrideValue =>
       _signals[_AlarmNames.volumeOverrideValue]!.value as int;
   int get volumeOverrideValuePeek =>
       _signals[_AlarmNames.volumeOverrideValue]!.peek as int;
 
-  set volumeOverrideValue(int value) =>
-      _signals[_AlarmNames.volumeOverrideValue]!.value = value;
+  set volumeOverrideValue(int value) => volumeOverrideValueSet(
+      _signals[_AlarmNames.volumeOverrideValue]! as Signal<int>, value);
 
   int get volumeProgressionSeconds =>
       _signals[_AlarmNames.volumeProgressionSeconds]!.value as int;
