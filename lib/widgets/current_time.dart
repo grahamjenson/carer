@@ -1,40 +1,11 @@
-import 'dart:async';
-
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
-class CurrentTimeWidget extends StatefulWidget {
+class CurrentTimeWidget extends StatelessWidget {
   const CurrentTimeWidget({super.key});
-
-  @override
-  CurrentTimeWidgetState createState() => CurrentTimeWidgetState();
-}
-
-class CurrentTimeWidgetState extends State<CurrentTimeWidget> {
-  late String _timeString;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    _timeString = _formatDateTime(clock.now());
-    _timer =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void _getTime() {
-    final String formattedDateTime = _formatDateTime(clock.now());
-    setState(() {
-      _timeString = formattedDateTime;
-    });
-  }
 
   String _formatDateTime(DateTime dateTime) {
     //formats the dateTime as 'hh:mm' this forces each int to be 2 digits
@@ -43,11 +14,10 @@ class CurrentTimeWidgetState extends State<CurrentTimeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(_timeString,
-        style: const TextStyle(
-            height: 0.5,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: mainColor));
+    return Watch((context) {
+      var _ = TimerService().secondSignal.value;
+      final String formattedDateTime = _formatDateTime(clock.now());
+      return Text(formattedDateTime, style: const TextStyle(height: 0.5, fontSize: 32, fontWeight: FontWeight.bold, color: mainColor));
+    });
   }
 }

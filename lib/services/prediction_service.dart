@@ -1,6 +1,7 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/math.dart';
 import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
@@ -13,6 +14,7 @@ class PredictionService {
   PredictionService._() {
     effect(() {
       try {
+        var _ = TimerService().minuteSignal.value;
         _updatePrediction();
       } catch (e) {
         print("Error in _updatePrediction PredictionService effect: $e");
@@ -30,10 +32,11 @@ class PredictionService {
     }).toList();
   }
 
-  Range5 atPredictedTime(int mins) {
-    var sgv = predictions.firstWhereOrNull((e) => e.minsAgo >= mins);
+  Range5? atPredictedTime(int mins) {
+    var sgv = predictions.firstWhereOrNull((e) => e.minsFromNow >= mins);
+
     if (sgv == null) {
-      return Range5.mid;
+      return null;
     }
     var (range, _) = targetRange(sgv.value);
     return range;

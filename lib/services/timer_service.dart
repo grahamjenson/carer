@@ -4,7 +4,9 @@ class TimerService {
   static final TimerService _singleton = TimerService._();
   factory TimerService() => _singleton;
 
-  TimerSignal minuteSignal = TimerSignal(
-      every: const Duration(minutes: 1), debugLabel: "MinuteSignal");
+  TimerSignal minuteSignal = TimerSignal(every: const Duration(minutes: 1), debugLabel: "MinuteSignal");
+
+  TimerSignal secondSignal = TimerSignal(every: const Duration(seconds: 1), debugLabel: "SecondsSignal");
+
   TimerService._();
 }

@@ -6,14 +6,12 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class SGVRepository extends ModelRepository<SGV> {
-  SGVRepository()
-      : super(sgvsCleanViewTableName, writeTableName: sgvsTableName);
+  SGVRepository() : super(sgvsCleanViewTableName, writeTableName: sgvsTableName);
 
   @override
   SGV fromMap(Map<String, Object?> map) {
     var requiredKeys = ["value", "timestamp"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, requiredKeys, [int, int]))) {
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 
@@ -67,9 +65,8 @@ class SGV extends Model {
     return _q.fromMap(map);
   }
 
-  int get minsAgo =>
-      (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/
-      60000;
+  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
+  int get minsFromNow => (date.millisecondsSinceEpoch - clock.now().millisecondsSinceEpoch) ~/ 60000;
 
   double sgvU(Unit unit) {
     return unit.val(value);
@@ -102,8 +99,7 @@ class SGV extends Model {
   }
 
   // STATIC FUNCTIONS
-  static Future<int?> count(
-      {int? after, int? before, int? low, int? high}) async {
+  static Future<int?> count({int? after, int? before, int? low, int? high}) async {
     var conditions = <String, Object>{};
     if (low != null) {
       conditions["value >= ?"] = low;
@@ -114,13 +110,7 @@ class SGV extends Model {
     return _q.count(after: after, before: before, conditions: conditions);
   }
 
-  static Future<List<SGV>> query(
-      {int? after,
-      int? before,
-      int? low,
-      int? high,
-      int? limit,
-      String? name}) async {
+  static Future<List<SGV>> query({int? after, int? before, int? low, int? high, int? limit, String? name}) async {
     var conditions = <String, Object>{};
     if (low != null) {
       conditions["value >= ?"] = low;
@@ -129,12 +119,7 @@ class SGV extends Model {
       conditions["value < ?"] = high;
     }
 
-    return _q.query(
-        after: after,
-        before: before,
-        conditions: conditions,
-        limit: limit,
-        name: name);
+    return _q.query(after: after, before: before, conditions: conditions, limit: limit, name: name);
   }
 
   static Future<List<SGV>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
@@ -171,8 +156,7 @@ class SGV extends Model {
       conditions: {"value >= ?": low, "value < ?": high},
     );
 
-    var sgvsToday =
-        await _q.count(after: startOfYesterdayEpoch, before: startOfDayEpoch);
+    var sgvsToday = await _q.count(after: startOfYesterdayEpoch, before: startOfDayEpoch);
 
     if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
       return 0.0;
@@ -191,8 +175,7 @@ class SGV extends Model {
     print("updating Future Signal todaysPercentage Signal");
     var _ = _q.writeSignal.value; // force update on save
     try {
-      var value = await _percentInRangeToday(
-          TargetSettings().targetLow, TargetSettings().targetHigh);
+      var value = await _percentInRangeToday(TargetSettings().targetLow, TargetSettings().targetHigh);
 
       return value * 100.0;
     } catch (e, s) {
@@ -206,8 +189,7 @@ class SGV extends Model {
     print("updating Future Signal yesterdaysPercentage Signal");
     var _ = _q.writeSignal.value; // force update on save
     try {
-      var value = await _percentInRangeYesterday(
-          TargetSettings().targetLow, TargetSettings().targetHigh);
+      var value = await _percentInRangeYesterday(TargetSettings().targetLow, TargetSettings().targetHigh);
       return value * 100.0;
     } catch (e, s) {
       print("Error yesterdaysPercentage: $e");
@@ -220,9 +202,7 @@ class SGV extends Model {
     print("updating LastSGV Signal");
     var _ = _q.writeSignal.value; // force update on save
 
-    return _q
-        .query(limit: 1, name: "lastSGV")
-        .then((value) => value.firstOrNull);
+    return _q.query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
   }, debugLabel: 'LastSGV');
 
   static FutureSignal<List<SGV>> last3Hours = computedAsync(() async {

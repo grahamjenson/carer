@@ -45,6 +45,7 @@ class Stats extends StatelessWidget {
         var powerNow = StateData().battery();
         var exp2preds = PredictionService().predictions;
 
+        exp2preds = exp2preds.where((e) => e.minsFromNow != 0 && e.minsFromNow % 5 == 0).toList();
         var sgvs = SGV.last3Hours().value!;
 
         return Window(

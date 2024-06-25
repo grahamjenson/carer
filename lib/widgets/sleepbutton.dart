@@ -5,6 +5,14 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
+Computed<String> sleepStringSignal = computed(() {
+  var duration = AlarmsService().sleepDuration;
+  if (duration == null) {
+    return "";
+  }
+  return Dates.shortSecondsLeft(duration);
+});
+
 class SleepButton extends StatelessWidget {
   ///Change it to gave a label on a widget of your choice.
   final Widget? label;
@@ -28,8 +36,8 @@ class SleepButton extends StatelessWidget {
     return Watch((context) {
       try {
         // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
-        stopSleep() async {
-          AlarmsService().sleepDurationSeconds = 0;
+        stopSleep() {
+          AlarmsService().sleepDurationSeconds = null;
         }
 
         openSleepDialog() async {
@@ -38,9 +46,10 @@ class SleepButton extends StatelessWidget {
           AlarmsService().sleepDurationSeconds = sleepTime;
         }
 
+        var sleepDuration = AlarmsService().sleepDuration;
         Widget child;
         // There is currently a sleep value
-        if (AlarmsService().sleepDuration.inSeconds > 0) {
+        if (sleepDuration != null) {
           child = TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: mainColor.withAlpha(20),
@@ -50,11 +59,8 @@ class SleepButton extends StatelessWidget {
                 width: width,
                 child: Text(
                   textAlign: TextAlign.center,
-                  Dates.shortSecondsLeft(AlarmsService().sleepDuration),
-                  style: const TextStyle(
-                      color: mainColor,
-                      fontWeight: FontWeight.bold,
-                      height: 0.8),
+                  sleepStringSignal.value,
+                  style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
                 ),
               ));
         } else {
@@ -82,9 +88,7 @@ class SleepButton extends StatelessWidget {
               child: Container(
                 height: height,
                 width: height,
-                decoration: BoxDecoration(
-                    color: buttonColor,
-                    borderRadius: BorderRadius.circular(100)),
+                decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(100)),
                 child: Center(child: icon),
               ),
             ),
@@ -93,8 +97,7 @@ class SleepButton extends StatelessWidget {
         return Container(
           height: height,
           width: width,
-          decoration: BoxDecoration(
-              color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
           alignment: Alignment.centerLeft,
           child: child,
         );
@@ -161,8 +164,7 @@ Future<int?> _openSleepDialog(BuildContext context) {
     borderWidth: 0,
     isSelected: List<bool>.generate(timeTimes.length, (int index) => false),
     onPressed: (int index) {
-      Navigator.of(context)
-          .pop(Dates.secondsTillNext24HourTime(timeTimes[index]));
+      Navigator.of(context).pop(Dates.secondsTillNext24HourTime(timeTimes[index]));
     },
     children: List<ToggleButton>.generate(
       timeTimes.length,

@@ -37,7 +37,7 @@ void main() {
       await pr.init();
 
       var sgvs = pr.predictNextHour();
-      expect(sgvs.length, 12);
+      expect(sgvs.length, 60);
 
       var firstSGV = sgvs[0];
       var secondSGV = sgvs[1];
@@ -46,12 +46,10 @@ void main() {
       expect(secondSGV.value, 120);
       expect(secondSGV.date, min10fromNow);
 
-      var rmse =
-          await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [140, 140]);
+      var rmse = await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [140, 140]);
       expect(rmse.toInt(), 15);
 
-      rmse =
-          await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
+      rmse = await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
       print("$pr RMSE: $rmse $sgvs");
       expect(rmse.toInt(), 0);
     });

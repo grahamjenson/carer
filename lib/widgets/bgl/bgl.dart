@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +23,6 @@ class _BGLState extends State<BGL> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        // This will trigger a rebuild of your widget every second.
-      });
-    });
   }
 
   @override
@@ -38,6 +34,7 @@ class _BGLState extends State<BGL> {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
+      var _ = TimerService().secondSignal.value;
       const loader = Center(child: CircularProgressIndicator());
 
       var sgv = SGV.lastSGV.value.value;

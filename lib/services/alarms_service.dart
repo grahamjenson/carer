@@ -80,15 +80,33 @@ class AlarmsService {
     _activeAlarmsSignal.value = value;
   }
 
-  // Minutes of sleep time
-  final Signal<DateTime> _sleepUntilSignal = Signal(clock.daysAgo(1), debugLabel: "sleepUntil");
+  // Sleep
+  final Signal<DateTime?> _sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
 
   bool get notSleeping {
-    return sleepDuration.inSeconds <= 0;
+    return _sleepUntilSignal.value == null;
   }
 
-  Duration get sleepDuration => _sleepUntilSignal.value.difference(clock.now());
-  set sleepDurationSeconds(int value) {
+  Timer sleepTimer = Timer(const Duration(seconds: 0), () {});
+  Duration? get sleepDuration {
+    if (_sleepUntilSignal.value == null) {
+      return null;
+    }
+    return _sleepUntilSignal.value!.difference(clock.now());
+  }
+
+  set sleepDurationSeconds(int? value) {
+    sleepTimer.cancel(); // Always cancel
+
+    if (value == null) {
+      _sleepUntilSignal.value = null;
+      return;
+    }
+
+    sleepTimer = Timer(Duration(seconds: value), () {
+      _sleepUntilSignal.value = null;
+    });
+
     _sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
   }
 
@@ -125,6 +143,9 @@ class AlarmsService {
     // Set alarms that have been triggered
     triggeredAlarms = newTriggeredAlarms;
     activeAlarms = newActiveAlarms;
+
+    print(newActiveAlarms);
+    print(newTriggeredAlarms);
 
     // Set alarms
     if (activeAlarms.isEmpty) {

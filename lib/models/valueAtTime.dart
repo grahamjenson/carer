@@ -11,16 +11,8 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
 
   @override
   ValueAtTime fromMap(Map<String, Object?> map) {
-    var requiredKeys = [
-      "timestamp",
-      "targetLow",
-      "targetHigh",
-      "isTempTarget",
-      "basal",
-      "isTempBasal"
-    ];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, requiredKeys, [int, int, int, int, double, int]))) {
+    var requiredKeys = ["timestamp", "targetLow", "targetHigh", "isTempTarget", "basal", "isTempBasal"];
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int, double, int]))) {
       throw ArgumentError("Invalid Target Map: $map");
     }
 
@@ -77,9 +69,7 @@ class ValueAtTime extends Model {
     return _q.fromMap(map);
   }
 
-  int get minsAgo =>
-      (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/
-      60000;
+  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
 
   static Future<List<ValueAtTime>> query({
     int? after,
@@ -87,12 +77,10 @@ class ValueAtTime extends Model {
     Map<String, Object>? conditions,
     int? limit,
   }) {
-    return _q.query(
-        before: before, after: after, limit: limit, conditions: conditions);
+    return _q.query(before: before, after: after, limit: limit, conditions: conditions);
   }
 
-  static Future<List<ValueAtTime>> lastMins(int minsAgo) =>
-      _q.lastMins(minsAgo);
+  static Future<List<ValueAtTime>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
 
   static FutureSignal<List<ValueAtTime>> lastSixHours = computedAsync(() async {
     print("updating Treatments lastSixHours");

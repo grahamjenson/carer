@@ -8,15 +8,13 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TreatmentRepository extends ModelRepository<Treatment> {
-  TreatmentRepository()
-      : super(concatTreatmentsTableName, timestampField: "max_ts");
+  TreatmentRepository() : super(concatTreatmentsTableName, timestampField: "max_ts");
 
   @override
   Treatment fromMap(Map<String, Object?> map) {
     var requiredKeys = ["count", "max_ts"];
     var allKeys = ["count", "max_ts", "carbs", "insulin"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, allKeys, [int, int, int, double]))) {
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, allKeys, [int, int, int, double]))) {
       throw ArgumentError("Invalid Treatment Map: $map");
     }
 
@@ -72,9 +70,7 @@ class Treatment extends Model {
     return clock.now().difference(date);
   }
 
-  int get minsAgo =>
-      (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/
-      60000;
+  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
 
   String get insulinStr {
     if (insulin != null && insulin != 0) {

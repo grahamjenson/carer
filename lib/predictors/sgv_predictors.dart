@@ -28,30 +28,19 @@ abstract class Predictor {
   }
 
   List<SGV> predictNextHour() {
-    var times = List.generate(
-        12,
-        (i) => lastReadingDate
-            .add(Duration(minutes: (i + 1) * 5))
-            .millisecondsSinceEpoch
-            .toDouble());
+    var times = List.generate(60, (i) => lastReadingDate.add(Duration(minutes: (i + 1))).millisecondsSinceEpoch.toDouble());
 
     return predictRange(times);
   }
 
   SGV predictNext() {
-    var time = lastReadingDate
-        .add(const Duration(minutes: 5))
-        .millisecondsSinceEpoch
-        .toDouble();
+    var time = lastReadingDate.add(const Duration(minutes: 5)).millisecondsSinceEpoch.toDouble();
 
     return predictAt(time);
   }
 
   SGV predictMin(int mins) {
-    var time = lastReadingDate
-        .add(Duration(minutes: mins))
-        .millisecondsSinceEpoch
-        .toDouble();
+    var time = lastReadingDate.add(Duration(minutes: mins)).millisecondsSinceEpoch.toDouble();
 
     return predictAt(time);
   }
@@ -66,9 +55,7 @@ abstract class Predictor {
 abstract class RegressionPredictor extends Predictor {
   Regression createRegression(List<double> x, List<double> y);
 
-  final double mimnutesFromEpochToLastWeek =
-      clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch /
-          60000;
+  final double mimnutesFromEpochToLastWeek = clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch / 60000;
 
   int get pastReadings => 5;
 
@@ -78,10 +65,8 @@ abstract class RegressionPredictor extends Predictor {
   late Regression regression;
   // When processing very large numbers, by squaring and cubing this can cause lots of issues
   // These functions drop x from milliseconds since epoch to
-  double fnX(num x) =>
-      (x / 60000.0).round().toDouble() - mimnutesFromEpochToLastWeek;
-  int fnRX(double x) =>
-      (x * 60000.0).toInt() + mimnutesFromEpochToLastWeek.toInt();
+  double fnX(num x) => (x / 60000.0).round().toDouble() - mimnutesFromEpochToLastWeek;
+  int fnRX(double x) => (x * 60000.0).toInt() + mimnutesFromEpochToLastWeek.toInt();
 
   List<SGV> sgvs = [];
 
@@ -109,14 +94,10 @@ abstract class RegressionPredictor extends Predictor {
   SGV predictAt(double timestamp) {
     var pred = regression.predict(fnX(timestamp));
     if (pred.isNaN || pred.isInfinite) {
-      return SGV(
-          value: 0,
-          date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
+      return SGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
     }
     int limitedValue = pred.toInt().clamp(20, 500);
-    return SGV(
-        value: limitedValue,
-        date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
+    return SGV(value: limitedValue, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
   }
 }
 

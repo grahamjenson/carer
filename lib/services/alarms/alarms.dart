@@ -91,7 +91,7 @@ class LowAlarm extends Alarm {
   const LowAlarm();
 
   @override
-  String get name => 'Low Alarm ${AlarmSettings().lowMinutes}m';
+  String get name => 'Low Alarm ${AlarmSettings().lowMinutes}m ${smartSnooze()}';
 
   @override
   String get description => 'Triggers when all BGLs for a time period are below the low target';
@@ -117,7 +117,6 @@ class LowAlarm extends Alarm {
   @override
   bool smartSnooze() {
     var range = PredictionService().atPredictedTime(10);
-
     return range == Range5.mid;
   }
 }
@@ -126,14 +125,16 @@ class HighAlarm extends Alarm {
   const HighAlarm();
 
   @override
-  String get name => 'High Alarm ${AlarmSettings().highMinutes}m';
+  String get name => 'High Alarm ${AlarmSettings().highMinutes}m ${smartSnooze()}';
 
   @override
   String get description => 'Triggers when all BGLs for a time period are above the high target';
 
   @override
   bool trigger() {
-    var latest = targetRange5 == Range5.high || targetRange5 == Range5.veryHigh;
+    var tr = targetRange5;
+
+    var latest = tr == Range5.high || tr == Range5.veryHigh;
     if (!latest) {
       return false;
     }
