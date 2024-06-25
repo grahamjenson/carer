@@ -1,4 +1,5 @@
 import 'package:carer/models/constants.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -17,6 +18,7 @@ class Settings {
   final uiSettings = UISettings();
   final targetSettings = TargetSettings();
   final alarmSettings = AlarmSettings();
+  final alarmAlertSettings = AlarmAlertSettings();
 
   final Map<_SNames, Signal> _signals = {
     _SNames.nightscoutUrl: Signal<String?>(null, debugLabel: 'nightscoutUrl'),
@@ -39,16 +41,13 @@ class Settings {
     }, debugLabel: 'nightscoutURLAndToken');
   }
 
-  String? get nightscoutURL =>
-      _signals[_SNames.nightscoutUrl]!.value as String?;
-  set nightscoutURL(String? value) =>
-      _signals[_SNames.nightscoutUrl]!.value = value;
+  String? get nightscoutURL => _signals[_SNames.nightscoutUrl]!.value as String?;
+  set nightscoutURL(String? value) => _signals[_SNames.nightscoutUrl]!.value = value;
 
   Unit get unit => _signals[_SNames.unit]!.value as Unit;
   set unit(Unit value) => _signals[_SNames.unit]!.value = value;
 
-  (String, String) get nightscoutURLAndToken =>
-      _nightscoutURLAndTokenSignal.value;
+  (String, String) get nightscoutURLAndToken => _nightscoutURLAndTokenSignal.value;
 
   setupDBPropagation() async {
     var prefs = await KeyValueStore.instance;
@@ -67,5 +66,6 @@ class Settings {
     await uiSettings.setupDBPropagation();
     await targetSettings.setupDBPropagation();
     await alarmSettings.setupDBPropagation();
+    await alarmAlertSettings.setupDBPropagation();
   }
 }

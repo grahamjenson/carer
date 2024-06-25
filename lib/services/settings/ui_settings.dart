@@ -12,28 +12,21 @@ class UISettings {
 
   final Map<_UINames, Signal> _signals = {
     _UINames.screenActive: Signal<bool>(false, debugLabel: 'screenActive'),
-    _UINames.uiLayoutVertical:
-        Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutVertical'),
-    _UINames.uiLayoutHorizontal:
-        Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutHorizontal'),
+    _UINames.uiLayoutVertical: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutVertical'),
+    _UINames.uiLayoutHorizontal: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutHorizontal'),
     _UINames.uiTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'uiTheme'),
   };
 
   UISettings._();
 
   bool get screenActive => _signals[_UINames.screenActive]!.value as bool;
-  set screenActive(bool value) =>
-      _signals[_UINames.screenActive]!.value = value;
+  set screenActive(bool value) => _signals[_UINames.screenActive]!.value = value;
 
-  UILayout get uiLayoutVertical =>
-      _signals[_UINames.uiLayoutVertical]!.value as UILayout;
-  set uiLayoutVertical(UILayout value) =>
-      _signals[_UINames.uiLayoutVertical]!.value = value;
+  UILayout get uiLayoutVertical => _signals[_UINames.uiLayoutVertical]!.value as UILayout;
+  set uiLayoutVertical(UILayout value) => _signals[_UINames.uiLayoutVertical]!.value = value;
 
-  UILayout get uiLayoutHorizontal =>
-      _signals[_UINames.uiLayoutHorizontal]!.value as UILayout;
-  set uiLayoutHorizontal(UILayout value) =>
-      _signals[_UINames.uiLayoutHorizontal]!.value = value;
+  UILayout get uiLayoutHorizontal => _signals[_UINames.uiLayoutHorizontal]!.value as UILayout;
+  set uiLayoutHorizontal(UILayout value) => _signals[_UINames.uiLayoutHorizontal]!.value = value;
 
   UITheme get uiTheme => _signals[_UINames.uiTheme]!.value as UITheme;
   set uiTheme(UITheme value) => _signals[_UINames.uiTheme]!.value = value;
@@ -42,14 +35,11 @@ class UISettings {
     var prefs = await KeyValueStore.instance;
 
     // Assign the values from the DB
-    screenActive =
-        prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
+    screenActive = prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
 
-    uiLayoutVertical =
-        UILayout.fromString(prefs.getString(_UINames.uiLayoutVertical.name));
+    uiLayoutVertical = UILayout.fromString(prefs.getString(_UINames.uiLayoutVertical.name));
 
-    uiLayoutHorizontal =
-        UILayout.fromString(prefs.getString(_UINames.uiLayoutHorizontal.name));
+    uiLayoutHorizontal = UILayout.fromString(prefs.getString(_UINames.uiLayoutHorizontal.name));
 
     uiTheme = UITheme.fromString(prefs.getString(_UINames.uiTheme.name));
 
@@ -67,8 +57,7 @@ class UISettings {
     });
 
     effect(() {
-      prefs.setString(
-          _UINames.uiLayoutHorizontal.name, uiLayoutHorizontal.name);
+      prefs.setString(_UINames.uiLayoutHorizontal.name, uiLayoutHorizontal.name);
     });
 
     effect(() {
@@ -86,8 +75,7 @@ enum UITheme {
   const UITheme(this.viewName);
 
   static UITheme fromString(String? value) {
-    return UITheme.values
-        .firstWhere((e) => e.name == value, orElse: () => UITheme.normal);
+    return UITheme.values.firstWhere((e) => e.name == value, orElse: () => UITheme.normal);
   }
 }
 
@@ -101,7 +89,6 @@ enum UILayout {
   const UILayout(this.viewName);
 
   static UILayout fromString(String? value) {
-    return UILayout.values
-        .firstWhere((e) => e.name == value, orElse: () => UILayout.showBGL);
+    return UILayout.values.firstWhere((e) => e.name == value, orElse: () => UILayout.showBGL);
   }
 }

@@ -2,7 +2,7 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
-import 'package:carer/services/settings.dart';
+import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
@@ -27,29 +27,24 @@ class BasalSpot extends FlSpot {
   BasalSpot(super.x, super.y, this.basal);
 }
 
-const TextStyle touchedTextStyle = TextStyle(
-    fontSize: 10,
-    height: 0.6,
-    fontWeight: FontWeight.w700,
-    color: mainColor,
-    shadows: [
-      Shadow(
-          // bottomLeft
-          offset: Offset(-1.5, -1.5),
-          color: Colors.black),
-      Shadow(
-          // bottomRight
-          offset: Offset(1.5, -1.5),
-          color: Colors.black),
-      Shadow(
-          // topRight
-          offset: Offset(1.5, 1.5),
-          color: Colors.black),
-      Shadow(
-          // topLeft
-          offset: Offset(-1.5, 1.5),
-          color: Colors.black),
-    ]);
+const TextStyle touchedTextStyle = TextStyle(fontSize: 10, height: 0.6, fontWeight: FontWeight.w700, color: mainColor, shadows: [
+  Shadow(
+      // bottomLeft
+      offset: Offset(-1.5, -1.5),
+      color: Colors.black),
+  Shadow(
+      // bottomRight
+      offset: Offset(1.5, -1.5),
+      color: Colors.black),
+  Shadow(
+      // topRight
+      offset: Offset(1.5, 1.5),
+      color: Colors.black),
+  Shadow(
+      // topLeft
+      offset: Offset(-1.5, 1.5),
+      color: Colors.black),
+]);
 
 class BGLChart extends StatelessWidget {
   final basalMultiplier = 18 * 3;
@@ -61,16 +56,9 @@ class BGLChart extends StatelessWidget {
     return Watch((context) {
       int minsAgo = 120;
 
-      List<ValueAtTime> targets = ValueAtTime.lastSixHours()
-          .value!
-          .where((e) => e.minsAgo < minsAgo)
-          .toList();
-      List<SGV> sgvs =
-          SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
-      List<Treatment> lastTreatments = Treatment.lastSixHours()
-          .value!
-          .where((e) => e.minsAgo < minsAgo)
-          .toList();
+      List<ValueAtTime> targets = ValueAtTime.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
+      List<SGV> sgvs = SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
+      List<Treatment> lastTreatments = Treatment.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);
@@ -95,15 +83,7 @@ class BGLChart extends StatelessWidget {
                 ),
                 child: Watch((context) {
                   return LineChart(
-                    buildlineChartData(
-                        minsAgo,
-                        maxBasal,
-                        bglSpotData,
-                        basalSpotData,
-                        lowTargets,
-                        highTargets,
-                        treatments,
-                        bglLineData),
+                    buildlineChartData(minsAgo, maxBasal, bglSpotData, basalSpotData, lowTargets, highTargets, treatments, bglLineData),
                     duration: Duration.zero,
                   );
                 }))),
@@ -163,8 +143,7 @@ class BGLChart extends StatelessWidget {
       ],
       lineTouchData: lineTouchData(Settings().unit),
       betweenBarsData: [
-        BetweenBarsData(
-            fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
+        BetweenBarsData(fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
       ],
     );
   }
@@ -177,15 +156,13 @@ class BGLChart extends StatelessWidget {
     var diff = 0.0;
     const double change = 20;
     for (var treatment in lastTreatments) {
-      if (lastTreatment != null &&
-          treatment.age.inMinutes - lastTreatment.age.inMinutes < 12) {
+      if (lastTreatment != null && treatment.age.inMinutes - lastTreatment.age.inMinutes < 12) {
         diff = (diff + change) % (change * 2);
       } else {
         diff = 0;
       }
 
-      spots.add(
-          TreatmentSpot(-treatment.age.inMinutes.toDouble(), 270, treatment));
+      spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 270, treatment));
 
       lastTreatment = treatment;
     }
@@ -197,8 +174,7 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> spots = [];
     for (var i = 0; i < sgvs.length; i++) {
       var sgv = sgvs[i];
-      spots.add(
-          BGLSpot(-sgv.age.inMinutes.toDouble(), sgv.value.toDouble(), sgv));
+      spots.add(BGLSpot(-sgv.age.inMinutes.toDouble(), sgv.value.toDouble(), sgv));
     }
     return spots;
   }
@@ -214,18 +190,13 @@ class BGLChart extends StatelessWidget {
       return (spots, 1.0);
     }
     // Max basal from the list
-    double maxBasal = spots
-        .reduce((value, element) => value.y > element.y ? value : element)
-        .y;
+    double maxBasal = spots.reduce((value, element) => value.y > element.y ? value : element).y;
 
     // we are going to normilize the list of basals to the max basal so all values are betwen 0 and 1, then multiplied by size
     if (maxBasal == 0) {
       spots = spots.map((e) => BasalSpot(e.x, 0, 0)).toList();
     } else {
-      spots = spots
-          .map((e) =>
-              BasalSpot(e.x, (e.y / maxBasal) * basalMultiplier, e.basal))
-          .toList();
+      spots = spots.map((e) => BasalSpot(e.x, (e.y / maxBasal) * basalMultiplier, e.basal)).toList();
     }
 
     return (spots, maxBasal);
@@ -236,10 +207,8 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> highTargets = [];
 
     for (var t in targets) {
-      lowTargets
-          .add(FlSpot(-t.age.inMinutes.toDouble(), t.targetLow.toDouble()));
-      highTargets
-          .add(FlSpot(-t.age.inMinutes.toDouble(), t.targetHigh.toDouble()));
+      lowTargets.add(FlSpot(-t.age.inMinutes.toDouble(), t.targetLow.toDouble()));
+      highTargets.add(FlSpot(-t.age.inMinutes.toDouble(), t.targetHigh.toDouble()));
     }
 
     return (lowTargets, highTargets);
@@ -250,11 +219,9 @@ class BGLChart extends StatelessWidget {
       enabled: true,
       touchTooltipData: LineTouchTooltipData(
         // kill all tootips
-        getTooltipItems: (touchedSpots) =>
-            touchedSpots.map((e) => null).toList(),
+        getTooltipItems: (touchedSpots) => touchedSpots.map((e) => null).toList(),
       ),
-      getTouchedSpotIndicator:
-          (LineChartBarData barData, List<int> indicators) {
+      getTouchedSpotIndicator: (LineChartBarData barData, List<int> indicators) {
         return indicators.map(
           (int index) {
             var spot = barData.spots[index];
@@ -353,11 +320,7 @@ class BGLChart extends StatelessWidget {
         reservedSize: 17,
         interval: 30,
         getTitlesWidget: (double value, TitleMeta meta) {
-          const style = TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 7,
-              color: mainColor,
-              height: 0.5);
+          const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 7, color: mainColor, height: 0.5);
 
           //return Spacer if value is not mod 30
           if (value.toInt() % 30 != 0) {
@@ -366,9 +329,7 @@ class BGLChart extends StatelessWidget {
 
           return SideTitleWidget(
             axisSide: meta.axisSide,
-            child: Text(
-                Dates.dateAgoShort(Duration(minutes: value.toInt().abs())),
-                style: style),
+            child: Text(Dates.dateAgoShort(Duration(minutes: value.toInt().abs())), style: style),
           );
         });
   }
@@ -379,14 +340,9 @@ class BGLChart extends StatelessWidget {
       interval: 1,
       reservedSize: 19,
       getTitlesWidget: (double value, TitleMeta meta) {
-        const style = TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 6,
-            color: mainColor,
-            height: 0.5);
+        const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
 
-        bool drawTitle = (value == basalMultiplier.toDouble() ||
-            value == basalMultiplier.toDouble() / 2);
+        bool drawTitle = (value == basalMultiplier.toDouble() || value == basalMultiplier.toDouble() / 2);
 
         if (maxBasal == 0) {
           drawTitle = value == 0;
@@ -409,19 +365,14 @@ class BGLChart extends StatelessWidget {
       interval: 1,
       reservedSize: 18,
       getTitlesWidget: (double value, TitleMeta meta) {
-        const style = TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 6,
-            color: mainColor,
-            height: 0.5);
+        const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
 
         if (value.toInt() == TargetSettings().urgentHigh ||
             value.toInt() == TargetSettings().urgentLow ||
             value.toInt() == TargetSettings().targetHigh ||
             value.toInt() == TargetSettings().targetLow) {
           return Watch((context) {
-            return Text(Settings().unit.str(value),
-                style: style, textAlign: TextAlign.right);
+            return Text(Settings().unit.str(value), style: style, textAlign: TextAlign.right);
           });
         }
         return const SizedBox();
@@ -569,29 +520,24 @@ class FlTextPainterPainter extends FlDotPainter {
   double strokeWidth;
 
   TextStyle get style {
-    return TextStyle(
-        fontSize: size,
-        height: 0.6,
-        fontWeight: FontWeight.w700,
-        color: color,
-        shadows: [
-          Shadow(
-              // bottomLeft
-              offset: Offset(-strokeWidth, -strokeWidth),
-              color: strokeColor),
-          Shadow(
-              // bottomRight
-              offset: Offset(strokeWidth, -strokeWidth),
-              color: strokeColor),
-          Shadow(
-              // topRight
-              offset: Offset(strokeWidth, strokeWidth),
-              color: strokeColor),
-          Shadow(
-              // topLeft
-              offset: Offset(-strokeWidth, strokeWidth),
-              color: strokeColor),
-        ]);
+    return TextStyle(fontSize: size, height: 0.6, fontWeight: FontWeight.w700, color: color, shadows: [
+      Shadow(
+          // bottomLeft
+          offset: Offset(-strokeWidth, -strokeWidth),
+          color: strokeColor),
+      Shadow(
+          // bottomRight
+          offset: Offset(strokeWidth, -strokeWidth),
+          color: strokeColor),
+      Shadow(
+          // topRight
+          offset: Offset(strokeWidth, strokeWidth),
+          color: strokeColor),
+      Shadow(
+          // topLeft
+          offset: Offset(-strokeWidth, strokeWidth),
+          color: strokeColor),
+    ]);
   }
 
   /// Implementation of the parent class to draw the square

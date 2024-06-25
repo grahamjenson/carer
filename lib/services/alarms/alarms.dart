@@ -1,6 +1,7 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/math.dart';
 
 abstract class Alarm {
@@ -52,13 +53,11 @@ class PredictiveLowAlarm extends Alarm {
   String get name => 'PredictiveLowAlarm Low Alarm';
 
   @override
-  String get description =>
-      'Triggers when it predicts a low in ${AlarmSettings().lowPredictionMinutes}m';
+  String get description => 'Triggers when it predicts a low in ${AlarmSettings().lowPredictionMinutes}m';
 
   @override
   bool trigger() {
-    var range = PredictionService()
-        .atPredictedTime(AlarmSettings().lowPredictionMinutes);
+    var range = PredictionService().atPredictedTime(AlarmSettings().lowPredictionMinutes);
     return range == Range5.veryLow || range == Range5.low;
   }
 
@@ -95,8 +94,7 @@ class LowAlarm extends Alarm {
   String get name => 'Low Alarm ${AlarmSettings().lowMinutes}m';
 
   @override
-  String get description =>
-      'Triggers when all BGLs for a time period are below the low target';
+  String get description => 'Triggers when all BGLs for a time period are below the low target';
 
   @override
   bool trigger() {
@@ -131,8 +129,7 @@ class HighAlarm extends Alarm {
   String get name => 'High Alarm ${AlarmSettings().highMinutes}m';
 
   @override
-  String get description =>
-      'Triggers when all BGLs for a time period are above the high target';
+  String get description => 'Triggers when all BGLs for a time period are above the high target';
 
   @override
   bool trigger() {
@@ -200,7 +197,7 @@ class FastRiseAlarm extends Alarm {
     if (diffs.isEmpty) {
       return false;
     }
-    if (diffs.every((element) => element > AlarmSettings().fastRiseDelta)) {
+    if (diffs.every((element) => element > TargetSettings().fastRiseDelta)) {
       return true;
     }
     return false;
@@ -234,7 +231,7 @@ class FastDropAlarm extends Alarm {
       return false;
     }
 
-    if (diffs.every((element) => element < AlarmSettings().fastDropDelta)) {
+    if (diffs.every((element) => element < TargetSettings().fastDropDelta)) {
       return true;
     }
     return false;

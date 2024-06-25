@@ -1,8 +1,7 @@
 import 'dart:math';
 
 import 'package:carer/models/constants.dart';
-import 'package:carer/services/settings.dart';
-import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -26,9 +25,9 @@ class T1DSettingsWidget extends AbstractSettingsSection {
       var ulowStr = unit.str(ulow);
 
       var deltaMax = 36.0;
-      var drop = AlarmSettings().fastDropDelta;
+      var drop = TargetSettings().fastDropDelta;
       var dropStr = unit.str(drop);
-      var rise = AlarmSettings().fastRiseDelta;
+      var rise = TargetSettings().fastRiseDelta;
       var riseStr = unit.str(rise);
 
       const minRange = 50.0;
@@ -57,11 +56,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Text(lowStr, textAlign: TextAlign.end),
                       onTap: () {
-                        TargetSettings().targetLow = max(
-                                minRange,
-                                TargetSettings().targetLowPeek.toDouble() -
-                                    diff)
-                            .toInt();
+                        TargetSettings().targetLow = max(minRange, TargetSettings().targetLowPeek.toDouble() - diff).toInt();
                       })),
               Expanded(
                   flex: 6,
@@ -88,9 +83,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                       textAlign: TextAlign.start,
                     ),
                     onTap: () {
-                      TargetSettings().targetHigh =
-                          min(maxRange, TargetSettings().targetHighPeek + diff)
-                              .toInt();
+                      TargetSettings().targetHigh = min(maxRange, TargetSettings().targetHighPeek + diff).toInt();
                     }),
               ),
             ]),
@@ -103,9 +96,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Text(ulowStr, textAlign: TextAlign.end),
                       onTap: () {
-                        TargetSettings().urgentLow =
-                            max(minRange, TargetSettings().urgentLowPeek - diff)
-                                .toInt();
+                        TargetSettings().urgentLow = max(minRange, TargetSettings().urgentLowPeek - diff).toInt();
                       })),
               Expanded(
                   flex: 6,
@@ -127,9 +118,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                 child: InkWell(
                   child: Text(uhighStr, textAlign: TextAlign.start),
                   onTap: () {
-                    TargetSettings().urgentHigh =
-                        min(maxRange, TargetSettings().urgentHighPeek + diff)
-                            .toInt();
+                    TargetSettings().urgentHigh = min(maxRange, TargetSettings().urgentHighPeek + diff).toInt();
                   },
                 ),
               ),
@@ -143,9 +132,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                   child: InkWell(
                       child: Text(dropStr, textAlign: TextAlign.end),
                       onTap: () {
-                        var frd = AlarmSettings().fastDropDeltaPeek;
-                        AlarmSettings().fastDropDelta =
-                            min(minRange, frd - diff).toInt();
+                        var frd = TargetSettings().fastDropDeltaPeek;
+                        TargetSettings().fastDropDelta = min(minRange, frd - diff).toInt();
                       })),
               Expanded(
                   flex: 6,
@@ -158,8 +146,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                         min: -deltaMax,
                         max: deltaMax,
                         onChanged: (RangeValues vals) {
-                          AlarmSettings().fastDropDelta = vals.start.toInt();
-                          AlarmSettings().fastRiseDelta = vals.end.toInt();
+                          TargetSettings().fastDropDelta = vals.start.toInt();
+                          TargetSettings().fastRiseDelta = vals.end.toInt();
                         },
                       ))),
               Expanded(
@@ -167,9 +155,8 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                 child: InkWell(
                   child: Text(riseStr, textAlign: TextAlign.start),
                   onTap: () {
-                    var frd = AlarmSettings().fastRiseDeltaPeek;
-                    AlarmSettings().fastRiseDelta =
-                        min(maxRange, frd + diff).toInt();
+                    var frd = TargetSettings().fastRiseDeltaPeek;
+                    TargetSettings().fastRiseDelta = min(maxRange, frd + diff).toInt();
                   },
                 ),
               ),

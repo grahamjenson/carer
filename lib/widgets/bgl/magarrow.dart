@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:carer/models/sgv.dart';
-import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
@@ -108,8 +108,8 @@ Range7 diffRange7() {
   if (lastSGV == null) {
     return Range7.mid;
   }
-  var (dr, _) = diffRange(AlarmSettings().fastDropDelta,
-      AlarmSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
+  var (dr, _) = diffRange(TargetSettings().fastDropDelta,
+      TargetSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
 
   return dr;
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/services/alarms/alarms.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:clock/clock.dart';
@@ -37,6 +38,7 @@ class AlarmsService {
       try {
         // When an alarm settings
         var sigs = AlarmSettings().allValues();
+        var aas = AlarmAlertSettings().allValues();
         // When a Target setting changes
         var tigs = TargetSettings().allValues();
         // Stop test alarm
@@ -49,6 +51,7 @@ class AlarmsService {
     effect(() {
       try {
         checkAlarms();
+        print("checking alarms");
       } catch (e) {
         print("Error in CheckAlarms AlarmsService effect: $e");
       }
@@ -56,11 +59,10 @@ class AlarmsService {
   }
 
   String get alarmFile {
-    return (AlarmSettings().alarmAsset).asset;
+    return (AlarmAlertSettings().alarmAsset).asset;
   }
 
-  final Signal<Set<Alarm>> _triggeredAlarmsSignal =
-      Signal(<Alarm>{}, debugLabel: "triggeredAlarms");
+  final Signal<Set<Alarm>> _triggeredAlarmsSignal = Signal(<Alarm>{}, debugLabel: "triggeredAlarms");
   Set<Alarm> get triggeredAlarms => _triggeredAlarmsSignal.value;
   set triggeredAlarms(Set<Alarm> value) {
     if (se.equals(value, _triggeredAlarmsSignal.value)) {
@@ -69,8 +71,7 @@ class AlarmsService {
     _triggeredAlarmsSignal.value = value;
   }
 
-  final Signal<Set<Alarm>> _activeAlarmsSignal =
-      Signal(<Alarm>{}, debugLabel: "activeAlarms");
+  final Signal<Set<Alarm>> _activeAlarmsSignal = Signal(<Alarm>{}, debugLabel: "activeAlarms");
   Set<Alarm> get activeAlarms => _activeAlarmsSignal.value;
   set activeAlarms(Set<Alarm> value) {
     if (se.equals(value, _activeAlarmsSignal.value)) {
@@ -80,8 +81,7 @@ class AlarmsService {
   }
 
   // Minutes of sleep time
-  final Signal<DateTime> _sleepUntilSignal =
-      Signal(clock.daysAgo(1), debugLabel: "sleepUntil");
+  final Signal<DateTime> _sleepUntilSignal = Signal(clock.daysAgo(1), debugLabel: "sleepUntil");
 
   bool get notSleeping {
     return sleepDuration.inSeconds <= 0;
@@ -105,7 +105,7 @@ class AlarmsService {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
     var disabledAllAlarms = AlarmSettings().disableAlarms;
-    var smartSnooze = AlarmSettings().smartSnooze;
+    var smartSnooze = AlarmAlertSettings().smartSnooze;
     for (var alarm in allAlarms) {
       var triggered = alarm.trigger();
       var active = alarm.active();
@@ -117,11 +117,7 @@ class AlarmsService {
         newTriggeredAlarms.add(alarm);
       }
       // If Sleeping do not add
-      if (!disabledAllAlarms &&
-          triggered &&
-          active &&
-          notSleeping &&
-          !(smartSnooze && alarmSmartSnooze)) {
+      if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnooze && alarmSmartSnooze)) {
         newActiveAlarms.add(alarm);
       }
     }
@@ -152,8 +148,8 @@ class AlarmsService {
       return;
     }
 
-    var override = AlarmSettings().volumeOveride;
-    var progression = AlarmSettings().volumeProgressionSeconds != -1;
+    var override = AlarmAlertSettings().volumeOveride;
+    var progression = AlarmAlertSettings().volumeProgressionSeconds != -1;
 
     // TODO: Check if the system supports override (e.g. web), if not set to false
 
@@ -181,14 +177,12 @@ class AlarmsService {
     );
   }
 
-  Future<void> playAlarmWithoutOverrideWithoutProgression(
-      AudioPlayer player) async {
+  Future<void> playAlarmWithoutOverrideWithoutProgression(AudioPlayer player) async {
     return playerPlay(player);
   }
 
-  Future<void> playAlarmWithoutOverrideWithProgression(
-      AudioPlayer player) async {
-    int progressionSeconds = AlarmSettings().volumeProgressionSeconds;
+  Future<void> playAlarmWithoutOverrideWithProgression(AudioPlayer player) async {
+    int progressionSeconds = AlarmAlertSettings().volumeProgressionSeconds;
 
     await playerPlay(player, volume: 0);
 
@@ -204,10 +198,9 @@ class AlarmsService {
     }
   }
 
-  Future<void> playAlarmWithOverrideWithoutProgression(
-      AudioPlayer player) async {
+  Future<void> playAlarmWithOverrideWithoutProgression(AudioPlayer player) async {
     originalVolume = await FlutterVolumeController.getVolume();
-    var volumeOverride = AlarmSettings().volumeOverrideValue;
+    var volumeOverride = AlarmAlertSettings().volumeOverrideValue;
 
     await FlutterVolumeController.setVolume(volumeOverride / 100);
 
@@ -215,8 +208,8 @@ class AlarmsService {
   }
 
   Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
-    var finalVolume = AlarmSettings().volumeOverrideValue;
-    var progressionSeconds = AlarmSettings().volumeProgressionSeconds;
+    var finalVolume = AlarmAlertSettings().volumeOverrideValue;
+    var progressionSeconds = AlarmAlertSettings().volumeProgressionSeconds;
 
     originalVolume = await FlutterVolumeController.getVolume();
 

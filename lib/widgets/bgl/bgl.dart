@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:carer/models/sgv.dart';
-import 'package:carer/services/settings.dart';
+import 'package:carer/services/settings/settings.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
@@ -94,9 +94,7 @@ class _BGLState extends State<BGL> {
                         }),
                       ),
                     ),
-                    const Flexible(
-                        child: FractionallySizedBox(
-                            heightFactor: 1, child: MagArrow())),
+                    const Flexible(child: FractionallySizedBox(heightFactor: 1, child: MagArrow())),
                   ]),
                 ),
               ),
@@ -118,8 +116,7 @@ class _BGLState extends State<BGL> {
     var seconds = delta.age.inSeconds % 300;
     var additionalTX = const TextSpan(text: "");
     if ((delta.age.inSeconds > 300 && seconds < 15)) {
-      additionalTX = TextSpan(
-          text: " (~${seconds}s late)", style: const TextStyle(fontSize: 3));
+      additionalTX = TextSpan(text: " (~${seconds}s late)", style: const TextStyle(fontSize: 3));
     }
     return RichText(
         text: TextSpan(

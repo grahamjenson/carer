@@ -11,7 +11,7 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/services/settings.dart';
+import 'package:carer/services/settings/settings.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -19,8 +19,7 @@ class UpdateService {
   // When this updates lots of things will change
   int summaryLastUpdatedMS = 0;
   int summaryAgeInSeconds() {
-    var dateRetrieved =
-        DateTime.fromMillisecondsSinceEpoch(summaryLastUpdatedMS);
+    var dateRetrieved = DateTime.fromMillisecondsSinceEpoch(summaryLastUpdatedMS);
     return clock.now().difference(dateRetrieved).inSeconds;
   }
 
@@ -82,8 +81,7 @@ class UpdateService {
 
   updateSummary() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
-    Summary? summary =
-        await NSClient().getSummary(nsURL, nsToken).catchError((e) {
+    Summary? summary = await NSClient().getSummary(nsURL, nsToken).catchError((e) {
       log("GETTING SUMMARY ERROR: $e, $nsURL");
       _summaryToBeUpdated = true;
       return null;
@@ -117,20 +115,14 @@ class UpdateService {
 
     List<TempBasal> tempBasals = [];
     for (var tempBasal in summary.tempBasals.tempBasals) {
-      tempBasals.add(TempBasal(
-          startDate: tempBasal.start,
-          duration: tempBasal.duration.toInt(),
-          value: tempBasal.absolute));
+      tempBasals.add(TempBasal(startDate: tempBasal.start, duration: tempBasal.duration.toInt(), value: tempBasal.absolute));
     }
     int tempBasalUpdates = await TempBasal.saveAll(tempBasals);
 
     List<TempTarget> tempTargets = [];
     for (var tempTarget in summary.targets.targets) {
       tempTargets.add(TempTarget(
-          startDate: tempTarget.start,
-          duration: tempTarget.duration,
-          targetHigh: tempTarget.targetTop,
-          targetLow: tempTarget.targetBottom));
+          startDate: tempTarget.start, duration: tempTarget.duration, targetHigh: tempTarget.targetTop, targetLow: tempTarget.targetBottom));
     }
     int tempTargetUpdates = await TempTarget.saveAll(tempTargets);
 
@@ -177,8 +169,7 @@ Bad data $badTempBasals, $badTempTargets
 
   void updateEntries() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
-    var entries =
-        await NSClient().getEntries(nsURL, nsToken, 12 * 48).catchError((e) {
+    var entries = await NSClient().getEntries(nsURL, nsToken, 12 * 48).catchError((e) {
       log("GETTING ENTRIES ERROR: $e, $nsURL");
 
       return NSEntries.empty();

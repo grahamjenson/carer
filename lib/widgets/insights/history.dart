@@ -1,4 +1,5 @@
 import 'package:carer/models/treatments.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -32,6 +33,8 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
+      var _ = TimerService().minuteSignal.value; // Refresh every minute
+
       var loader = const CircularProgressIndicator();
 
       var treatments = Treatment.lastSixHours().value;

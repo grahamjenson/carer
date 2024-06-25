@@ -9,6 +9,8 @@ enum _TNames {
   targetLow,
   urgentHigh,
   urgentLow,
+  fastDropDelta,
+  fastRiseDelta,
 }
 
 class TargetSettings {
@@ -20,6 +22,8 @@ class TargetSettings {
     _TNames.targetLow: Signal<int>(72, debugLabel: 'targetLow'),
     _TNames.urgentHigh: Signal<int>(270, debugLabel: 'urgentHigh'),
     _TNames.urgentLow: Signal<int>(55, debugLabel: 'urgentLow'),
+    _TNames.fastDropDelta: Signal<int>(9, debugLabel: 'fastDropDelta'),
+    _TNames.fastRiseDelta: Signal<int>(-9, debugLabel: 'fastRiseDelta'),
   };
 
   TargetSettings._();
@@ -67,17 +71,46 @@ class TargetSettings {
     _signals[_TNames.urgentLow]!.value = value;
   }
 
-  bool validTargets(
-      int urgentLow, int targetLow, int targetHigh, int urgentHigh) {
-    return 9 <= urgentLow &&
-        urgentLow <= targetLow &&
-        targetLow <= targetHigh &&
-        targetHigh <= urgentHigh &&
-        urgentHigh <= 360;
+  int get fastDropDelta => _signals[_TNames.fastDropDelta]!.value;
+  int get fastDropDeltaPeek => _signals[_TNames.fastDropDelta]!.peek();
+
+  set fastDropDelta(int value) => fastDropDeltaSet(_signals[_TNames.fastDropDelta]!, value);
+
+  int get fastRiseDelta => _signals[_TNames.fastRiseDelta]!.value;
+  int get fastRiseDeltaPeek => _signals[_TNames.fastRiseDelta]!.peek();
+
+  set fastRiseDelta(int value) => fastRiseDeltaSet(_signals[_TNames.fastRiseDelta]!, value);
+
+  bool validTargets(int urgentLow, int targetLow, int targetHigh, int urgentHigh) {
+    return 9 <= urgentLow && urgentLow <= targetLow && targetLow <= targetHigh && targetHigh <= urgentHigh && urgentHigh <= 360;
+  }
+
+  fastDropDeltaSet(Signal<int> signal, value) {
+    if (value > -8) {
+      value = -8;
+    }
+    signal.value = value;
+  }
+
+  fastRiseDeltaSet(Signal<int> signal, value) {
+    if (value < 8) {
+      value = 8;
+    }
+    signal.value = value;
   }
 
   setupDBPropagation() async {
     var prefs = await KeyValueStore.instance;
+    targetHigh = prefs.getInt(_TNames.targetHigh.name) ?? 180;
+    targetLow = prefs.getInt(_TNames.targetLow.name) ?? 72;
+    urgentHigh = prefs.getInt(_TNames.urgentHigh.name) ?? 270;
+    urgentLow = prefs.getInt(_TNames.urgentLow.name) ?? 55;
+    fastDropDelta = prefs.getInt(_TNames.fastDropDelta.name, defaultValue: -20)!;
+    fastRiseDelta = prefs.getInt(_TNames.fastRiseDelta.name, defaultValue: 20)!;
+
+    effect(() => prefs.setInt(_TNames.fastDropDelta.name, fastDropDelta));
+
+    effect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta));
 
     effect(() => prefs.setInt(_TNames.targetHigh.name, targetHigh));
 

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
-import 'package:carer/services/settings.dart';
+import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/widgets/pages/homepage.dart';
@@ -16,8 +16,7 @@ void main() async {
 
   await SentryFlutter.init(
     (options) {
-      options.dsn =
-          'https://635c475aa48824327a23e3723e92a278@o4507178414243840.ingest.us.sentry.io/4507178416996352';
+      options.dsn = 'https://635c475aa48824327a23e3723e92a278@o4507178414243840.ingest.us.sentry.io/4507178416996352';
       // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
       // We recommend adjusting this value in production.
       options.tracesSampleRate = 0.001;
@@ -40,8 +39,7 @@ void runCarer() async {
   await StateData().setupDBPropagation();
 
   // For some reason screens forget to stay awake
-  Timer.periodic(const Duration(seconds: 15),
-      (Timer t) => WakelockPlus.toggle(enable: UISettings().screenActive));
+  Timer.periodic(const Duration(seconds: 15), (Timer t) => WakelockPlus.toggle(enable: UISettings().screenActive));
 
   UpdateService();
   AlarmsService();
@@ -60,9 +58,7 @@ class MyApp extends StatelessWidget {
         title: 'Carer',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 0, 50, 0),
-              brightness: Brightness.dark),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 50, 0), brightness: Brightness.dark),
           useMaterial3: true,
         ),
         home: const HomePage(),

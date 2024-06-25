@@ -3,7 +3,7 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/prediction_service.dart';
-import 'package:carer/services/settings.dart';
+import 'package:carer/services/settings/settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -14,8 +14,7 @@ import 'package:signals/signals_flutter.dart';
 class Stats extends StatelessWidget {
   const Stats({super.key});
 
-  static const heading =
-      TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
+  static const heading = TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
 
   static const row = TextStyle(
     color: mainColor,
@@ -73,9 +72,7 @@ class Stats extends StatelessWidget {
                         child: Text('name', style: heading),
                       ),
                     ),
-                    DataColumn(
-                        label: SizedBox(
-                            width: 50, child: Text('stat', style: heading))),
+                    DataColumn(label: SizedBox(width: 50, child: Text('stat', style: heading))),
                   ],
                   rows: [
                     iob(iobNow),
@@ -83,8 +80,7 @@ class Stats extends StatelessWidget {
                     power(powerNow),
                     cage(cageNow),
                     basal(currentBasal),
-                    target(
-                        Settings().unit, profileLowTarget, profileHighTarget),
+                    target(Settings().unit, profileLowTarget, profileHighTarget),
                     fifteenMinDiff(Settings().unit, sgvs),
                     todaysInRange(),
                     yesterdayInRange(),
@@ -138,10 +134,7 @@ class Stats extends StatelessWidget {
           Text("IOB", style: heading),
         ),
         DataCell(
-          SmartText(
-              textAlign: TextAlign.center,
-              texts: ["$iob", "u"],
-              styles: const [row, small]),
+          SmartText(textAlign: TextAlign.center, texts: ["$iob", "u"], styles: const [row, small]),
         ),
       ],
     );
@@ -233,8 +226,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  SmartText targetDesciption(
-      num low, num high, Unit unit, Duration? remaining) {
+  SmartText targetDesciption(num low, num high, Unit unit, Duration? remaining) {
     List<String> texts = [];
     List<TextStyle> styles = [];
     if (low == high) {
@@ -278,9 +270,7 @@ class Stats extends StatelessWidget {
       cells: [
         const DataCell(Text("15m Δ", style: heading)),
         DataCell(
-          SmartText(
-              texts: [(unit.str(diff)), (unit.name)],
-              styles: const [row, small]),
+          SmartText(texts: [(unit.str(diff)), (unit.name)], styles: const [row, small]),
         ),
       ],
     );
@@ -295,9 +285,7 @@ class Stats extends StatelessWidget {
       cells: [
         const DataCell(Text("TIR", style: heading)),
         DataCell(
-          SmartText(
-              texts: [percent.toStringAsFixed(0), "%"],
-              styles: const [row, small]),
+          SmartText(texts: [percent.toStringAsFixed(0), "%"], styles: const [row, small]),
         ),
       ],
     );
@@ -313,9 +301,7 @@ class Stats extends StatelessWidget {
       cells: [
         const DataCell(Text("YIR", style: heading)),
         DataCell(
-          SmartText(
-              texts: [percent.toStringAsFixed(0), "%"],
-              styles: const [row, small]),
+          SmartText(texts: [percent.toStringAsFixed(0), "%"], styles: const [row, small]),
         ),
       ],
     );
