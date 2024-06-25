@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:carer/services/alarms_cn.dart';
+import 'package:carer/models/state_data.dart';
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
-import 'package:carer/services/t1d_settings.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -37,19 +36,17 @@ void runCarer() async {
   var settings = Settings();
   await settings.setupDBPropagation();
 
+  // Setup the StateData DB stuff
+  await StateData().setupDBPropagation();
+
+  // For some reason screens forget to stay awake
   Timer.periodic(const Duration(seconds: 15),
       (Timer t) => WakelockPlus.toggle(enable: UISettings().screenActive));
 
   UpdateService();
-  final t1d = T1DSettings();
-  final alarms = AlarmsCN(t1d: t1d);
+  AlarmsService();
 
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (context) => alarms),
-    ],
-    child: const MyApp(),
-  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

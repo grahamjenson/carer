@@ -1,59 +1,84 @@
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:signals/signals_flutter.dart';
 
 enum StateDataName {
   summaryIOB,
   summaryCOB,
-  summaryBWP,
   summaryCAge,
-  summaryIAge,
-  summaryBAge,
   summaryBattery,
 }
 
-class StateData extends KeyValueStore {
-  static final Future<StateData> _instance = _createInstance();
-  static Future<StateData> get instance => _instance;
+class StateData {
+  static final StateData _singleton = StateData._();
+  factory StateData() => _singleton;
 
-  StateData(super.db);
+  final Map<StateDataName, Signal> _signals = {
+    StateDataName.summaryIOB: Signal<double>(0.0, debugLabel: 'summaryIOB'),
+    StateDataName.summaryCOB: Signal<double>(0.0, debugLabel: 'summaryCOB'),
+    StateDataName.summaryCAge: Signal<double>(0.0, debugLabel: 'summaryCAge'),
+    StateDataName.summaryBattery:
+        Signal<double>(0.0, debugLabel: 'summaryBattery'),
+  };
+
+  StateData._();
 
   // Constructor
-  static Future<StateData> _createInstance() async {
+  setupDBPropagation() async {
     final db = (await CarerDB.instance).db;
-    var stateDB = StateData(db);
-    await stateDB.internalPopulate();
-    return stateDB;
+    var kvdb = KeyValueStore(db);
+    await kvdb.internalPopulate();
+
+    effect(() {
+      kvdb.setDouble(StateDataName.summaryBattery.name,
+          _signals[StateDataName.summaryBattery]!.value);
+    });
+
+    effect(() {
+      kvdb.setDouble(StateDataName.summaryCOB.name,
+          _signals[StateDataName.summaryCOB]!.value);
+    });
+
+    effect(() {
+      kvdb.setDouble(StateDataName.summaryIOB.name,
+          _signals[StateDataName.summaryIOB]!.value);
+    });
+
+    effect(() {
+      kvdb.setDouble(StateDataName.summaryCAge.name,
+          _signals[StateDataName.summaryCAge]!.value);
+    });
   }
 
   double iob() {
-    return getDouble(StateDataName.summaryIOB.name) ?? 0;
+    return _signals[StateDataName.summaryIOB]!.value;
   }
 
   double cob() {
-    return getDouble(StateDataName.summaryCOB.name) ?? 0;
+    return _signals[StateDataName.summaryCOB]!.value;
   }
 
   double cage() {
-    return getDouble(StateDataName.summaryCAge.name) ?? 0;
+    return _signals[StateDataName.summaryCAge]!.value;
   }
 
   double battery() {
-    return getDouble(StateDataName.summaryBattery.name) ?? 0;
+    return _signals[StateDataName.summaryBattery]!.value;
   }
 
-  Future<bool> setIOB(double iob) {
-    return setDouble(StateDataName.summaryIOB.name, iob);
+  setIOB(double iob) {
+    _signals[StateDataName.summaryIOB]!.value = iob;
   }
 
-  Future<bool> setCOB(double cob) {
-    return setDouble(StateDataName.summaryCOB.name, cob);
+  setCOB(double cob) {
+    _signals[StateDataName.summaryCOB]!.value = cob;
   }
 
-  Future<bool> setCAge(double bwp) {
-    return setDouble(StateDataName.summaryCAge.name, bwp);
+  setCAge(double cage) {
+    _signals[StateDataName.summaryCAge]!.value = cage;
   }
 
-  Future<bool> setBattery(double battery) {
-    return setDouble(StateDataName.summaryBattery.name, battery);
+  setBattery(double battery) {
+    _signals[StateDataName.summaryBattery]!.value = battery;
   }
 }

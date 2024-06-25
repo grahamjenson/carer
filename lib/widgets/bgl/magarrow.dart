@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/services/t1d_settings.dart';
+import 'package:carer/models/sgv.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
 class MagArrow extends StatefulWidget {
   const MagArrow({super.key});
@@ -41,35 +43,41 @@ class _MagArrowState extends State<MagArrow> {
 
   @override
   Widget build(BuildContext context) {
-    var mag = findMagnitude();
-    int? value = mag;
-    if (mag == null) {
-      value = mag;
-    } else if (mag == 0) {
-      value = 0;
-      diff = 0;
-      limit = 1;
-    } else if (mag > 0) {
-      value = diff;
-      limit = mag.abs() + 1;
-    } else if (mag < 0) {
-      value = -diff;
-      limit = mag.abs() + 1;
-    }
+    return Watch((context) {
+      try {
+        var mag = findMagnitude();
+        int? value = mag;
+        if (mag == null) {
+          value = mag;
+        } else if (mag == 0) {
+          value = 0;
+          diff = 0;
+          limit = 1;
+        } else if (mag > 0) {
+          value = diff;
+          limit = mag.abs() + 1;
+        } else if (mag < 0) {
+          value = -diff;
+          limit = mag.abs() + 1;
+        }
 
-    return AspectRatio(
-      aspectRatio: 0.3,
-      child: CustomPaint(
-        painter: MyPainter(value),
-      ),
-    );
+        return AspectRatio(
+          aspectRatio: 0.3,
+          child: CustomPaint(
+            painter: MyPainter(value),
+          ),
+        );
+      } catch (e) {
+        print("Error in mag arrow: $e");
+        return const SizedBox();
+      }
+    });
   }
 }
 
 int? findMagnitude() {
-  var diffRange7 = T1DSettings().diffRange7;
   var mag = 0;
-  switch (diffRange7) {
+  switch (diffRange7()) {
     case Range7.veryVeryLow:
       mag = -3;
       break;
@@ -93,6 +101,17 @@ int? findMagnitude() {
       break;
   }
   return mag;
+}
+
+Range7 diffRange7() {
+  var lastSGV = SGV.lastSGV.value.value;
+  if (lastSGV == null) {
+    return Range7.mid;
+  }
+  var (dr, _) = diffRange(AlarmSettings().fastDropDelta,
+      AlarmSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
+
+  return dr;
 }
 
 class MyPainter extends CustomPainter {

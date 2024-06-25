@@ -2,7 +2,7 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/models/valueAtTime.dart';
-import 'package:carer/predictors/sgv_predictors.dart';
+import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -28,27 +28,6 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Widget>(
-        future: futureWindow(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            print("Stats snapshot error: ${snapshot.error}");
-          }
-          if (snapshot.hasData) {
-            return snapshot.data!;
-          } else {
-            return const CircularProgressIndicator();
-          }
-        });
-  }
-
-  Future<Widget> futureWindow() async {
-    var stateData = await StateData.instance;
-    var iobNow = stateData.iob();
-    var cobNow = stateData.cob();
-    var cageNow = stateData.cage();
-    var powerNow = stateData.battery();
-
     return Watch((context) {
       try {
         var valuesAtTime = ValueAtTime.lastSixHours().value!;
@@ -61,12 +40,13 @@ class Stats extends StatelessWidget {
           profileHighTarget = valuesAtTime.first.targetHigh;
         }
 
-        Exp2Predictor exp2predictor = Exp2Predictor();
-        exp2predictor.init();
+        var iobNow = StateData().iob();
+        var cobNow = StateData().cob();
+        var cageNow = StateData().cage();
+        var powerNow = StateData().battery();
+        var exp2preds = PredictionService().predictions;
 
         var sgvs = SGV.last3Hours().value!;
-
-        var exp2preds = exp2predictor.predictNextHour();
 
         return Window(
           title: "Stats",

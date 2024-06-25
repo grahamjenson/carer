@@ -150,19 +150,18 @@ class UpdateService {
     var profileUpdate = await profile.save();
 
     var state = summary.state;
-    var stateData = await StateData.instance;
-    bool iob = false, cob = false, battery = false, cage = false;
+
     if (state.iob != null) {
-      iob = await stateData.setIOB(state.iob!.toDouble());
+      StateData().setIOB(state.iob!.toDouble());
     }
     if (state.cob != null) {
-      cob = await stateData.setCOB(state.cob!.toDouble());
+      StateData().setCOB(state.cob!.toDouble());
     }
     if (state.battery != null) {
-      battery = await stateData.setBattery(state.battery!.toDouble());
+      StateData().setBattery(state.battery!.toDouble());
     }
     if (state.cage != null) {
-      cage = await stateData.setCAge(state.cage!.toDouble());
+      StateData().setCAge(state.cage!.toDouble());
     }
 
     // summary is not trustworthy source of information
@@ -171,7 +170,7 @@ class UpdateService {
     var badTempTargets = await TempTarget.fixData();
 
     print('''
-updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate, $iob, $cob, $battery, $cage
+updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate
 Bad data $badTempBasals, $badTempTargets
           ''');
   }

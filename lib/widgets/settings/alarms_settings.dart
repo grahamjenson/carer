@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/services/alarms_cn.dart';
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
@@ -8,7 +8,6 @@ import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 
 class AlarmsSettingsWidget extends AbstractSettingsSection {
@@ -22,8 +21,8 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AlarmsCN>(builder: (context, alarms, child) {
-      return Watch((_) {
+    return Watch((_) {
+      try {
         var tiles = [
           disableAlarms(context),
         ];
@@ -41,14 +40,17 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             volumeSettings(context),
             progressiveVolume(context),
             alarmFileSelect(),
-            testAlert(context, alarms),
+            testAlert(context),
           ];
         }
         return SettingsSection(
           title: const Text('Alarms'),
           tiles: tiles,
         );
-      });
+      } catch (e) {
+        print("Error in AlarmsSettingsWidget: $e");
+        return const SizedBox();
+      }
     });
   }
 
@@ -534,11 +536,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
-  SettingsTile testAlert(BuildContext context, AlarmsCN alarms) {
+  SettingsTile testAlert(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
     String text = "Test Alarm";
-    if (AlarmSettings().testAlarmPlaying) {
+    if (AlarmsService().testAlarmPlaying) {
       text = "Stop Test";
     }
 
@@ -549,7 +551,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             child: Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  await alarms.testAlarm();
+                  await AlarmsService().testAlarm();
                 },
                 child: Text(text),
               ),

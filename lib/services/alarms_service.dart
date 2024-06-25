@@ -4,61 +4,89 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
-import 'package:carer/services/t1d_settings.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:signals/signals_flutter.dart';
 
 const se = SetEquality();
 
-class AlarmsCN extends ChangeNotifier {
-  T1DSettings t1d;
+class AlarmsService {
+  static final AlarmsService _singleton = AlarmsService._();
+  factory AlarmsService() => _singleton;
+  late final Set<Alarm> allAlarms = {
+    const UrgentLowAlarm(),
+    const LowAlarm(),
+    const HighAlarm(),
+    const UrgentHighAlarm(),
+    //
+    const FastDropAlarm(),
+    const FastRiseAlarm(),
+    //
+    const NoDataAlarm(),
+    //
+    const PredictiveLowAlarm(),
+  };
+
+  Signal<bool> get _testAlarmPlayingSignal => Signal<bool>(false);
+  bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
+  set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
+
+  AlarmsService._() {
+    effect(() {
+      try {
+        // When an alarm settings
+        var sigs = AlarmSettings().allValues();
+        // When a Target setting changes
+        var tigs = TargetSettings().allValues();
+        // Stop test alarm
+        stopTestAlarm();
+      } catch (e) {
+        print("Error in StopTestAlarm AlarmsService effect: $e");
+      }
+    }, debugLabel: "StopTestAlarm");
+
+    effect(() {
+      try {
+        checkAlarms();
+      } catch (e) {
+        print("Error in CheckAlarms AlarmsService effect: $e");
+      }
+    }, debugLabel: "CheckAlarms");
+  }
+
   String get alarmFile {
     return (AlarmSettings().alarmAsset).asset;
   }
 
-  late final Set<Alarm> allAlarms;
-
-  final Set<Alarm> _triggeredAlarms = <Alarm>{};
-  Set<Alarm> get triggeredAlarms => _triggeredAlarms;
+  final Signal<Set<Alarm>> _triggeredAlarmsSignal = Signal(<Alarm>{});
+  Set<Alarm> get triggeredAlarms => _triggeredAlarmsSignal.value;
   set triggeredAlarms(Set<Alarm> value) {
-    if (se.equals(value, _triggeredAlarms)) {
+    if (se.equals(value, _triggeredAlarmsSignal.value)) {
       return;
     }
-    _triggeredAlarms.clear();
-    _triggeredAlarms.addAll(value);
-    notifyListeners();
+    _triggeredAlarmsSignal.value = value;
   }
 
-  final Set<Alarm> _activeAlarms = <Alarm>{};
-  Set<Alarm> get activeAlarms => _activeAlarms;
+  final Signal<Set<Alarm>> _activeAlarmsSignal = Signal(<Alarm>{});
+  Set<Alarm> get activeAlarms => _activeAlarmsSignal.value;
   set activeAlarms(Set<Alarm> value) {
-    if (se.equals(value, _activeAlarms)) {
+    if (se.equals(value, _activeAlarmsSignal.value)) {
       return;
     }
-    _activeAlarms.clear();
-    _activeAlarms.addAll(value);
-    notifyListeners();
+    _activeAlarmsSignal.value = value;
   }
 
   // Minutes of sleep time
-  DateTime _sleepUntil = clock.now();
-  DateTime get sleepUntil => _sleepUntil;
-  set sleepUntil(DateTime value) {
-    _sleepUntil = value;
-    notifyListeners();
-  }
+  final Signal<DateTime> _sleepUntilSignal = Signal(clock.daysAgo(1));
 
   bool get notSleeping {
     return sleepDuration.inSeconds <= 0;
   }
 
-  Duration get sleepDuration => _sleepUntil.difference(clock.now());
+  Duration get sleepDuration => _sleepUntilSignal.value.difference(clock.now());
   set sleepDurationSeconds(int value) {
-    _sleepUntil = clock.now().add(Duration(seconds: value));
-    notifyListeners();
+    _sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
   }
 
   final alarmPlayer = AudioPlayer();
@@ -70,46 +98,16 @@ class AlarmsCN extends ChangeNotifier {
 
   double? originalVolume;
 
-  AlarmsCN({required this.t1d}) {
-    allAlarms = {
-      UrgentLowAlarm(t1d: t1d),
-      LowAlarm(t1d: t1d),
-      HighAlarm(t1d: t1d),
-      UrgentHighAlarm(t1d: t1d),
-      //
-      FastDropAlarm(t1d: t1d),
-      FastRiseAlarm(t1d: t1d),
-      //
-      NoDataAlarm(t1d: t1d),
-      //
-      PredictiveLowAlarm(t1d: t1d),
-    };
-
-    Timer.periodic(const Duration(seconds: 1), (Timer t) => checkAlarms());
-
-    effect(() {
-      try {
-        var sigs = AlarmSettings().allValues();
-        var tigs = TargetSettings().allValues();
-        print("Changed Alarm value rechecking alarms");
-        checkAlarms();
-        stopTestAlarm();
-      } catch (e) {
-        print("Error in AlarmsCN effect: $e");
-      }
-    });
-  }
-
   void checkAlarms() async {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
     var disabledAllAlarms = AlarmSettings().disableAlarms;
-
+    var smartSnooze = AlarmSettings().smartSnooze;
     for (var alarm in allAlarms) {
-      var triggered = await alarm.trigger();
+      var triggered = alarm.trigger();
       var active = alarm.active();
-      var smartSnooze =
-          AlarmSettings().smartSnooze && await alarm.smartSnooze();
+      var alarmSmartSnooze = alarm.smartSnooze();
+
       // Build the lists
 
       if (triggered) {
@@ -120,7 +118,7 @@ class AlarmsCN extends ChangeNotifier {
           triggered &&
           active &&
           notSleeping &&
-          !smartSnooze) {
+          !(smartSnooze && alarmSmartSnooze)) {
         newActiveAlarms.add(alarm);
       }
     }
@@ -249,7 +247,7 @@ class AlarmsCN extends ChangeNotifier {
   Future<bool> stopTestAlarm() async {
     var stopped = await stopAlarm(testPlayer);
     if (stopped) {
-      AlarmSettings().testAlarmPlaying = false;
+      testAlarmPlaying = false;
     }
     return stopped;
   }
@@ -258,8 +256,7 @@ class AlarmsCN extends ChangeNotifier {
     if (await stopTestAlarm()) {
       return;
     }
-
-    AlarmSettings().testAlarmPlaying = true;
+    testAlarmPlaying = true;
     // This is to make sure that
     await playAlarm(testPlayer);
   }

@@ -1,9 +1,9 @@
-import 'package:carer/services/alarms_cn.dart';
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 class SleepButton extends StatelessWidget {
   ///Change it to gave a label on a widget of your choice.
@@ -25,75 +25,83 @@ class SleepButton extends StatelessWidget {
     var width = 150.0;
     var height = 35.0;
 
-    return Consumer<AlarmsCN>(builder: (context, alarms, child) {
-      // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
-      stopSleep() async {
-        alarms.sleepDurationSeconds = 0;
-      }
+    return Watch((context) {
+      try {
+        // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
+        stopSleep() async {
+          AlarmsService().sleepDurationSeconds = 0;
+        }
 
-      openSleepDialog() async {
-        var sleepTime = await _openSleepDialog(context);
-        sleepTime ??= 0;
-        alarms.sleepDurationSeconds = sleepTime;
-      }
+        openSleepDialog() async {
+          var sleepTime = await _openSleepDialog(context);
+          sleepTime ??= 0;
+          AlarmsService().sleepDurationSeconds = sleepTime;
+        }
 
-      Widget child;
-      // There is currently a sleep value
-      if (alarms.sleepDuration.inSeconds > 0) {
-        child = TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: mainColor.withAlpha(20),
-            ),
-            onPressed: stopSleep,
-            child: SizedBox(
-              width: width,
-              child: Text(
-                textAlign: TextAlign.center,
-                Dates.shortSecondsLeft(alarms.sleepDuration),
-                style: const TextStyle(
-                    color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
+        Widget child;
+        // There is currently a sleep value
+        if (AlarmsService().sleepDuration.inSeconds > 0) {
+          child = TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: mainColor.withAlpha(20),
               ),
-            ));
-      } else {
-        child = Dismissible(
-          key: UniqueKey(),
-          direction: DismissDirection.startToEnd,
-          dismissThresholds: const {DismissDirection.startToEnd: 0.75},
-          confirmDismiss: (_) async {
-            bool result;
-            try {
-              result = (await openSleepDialog()) ?? true;
-            } catch (e) {
-              result = false;
-            }
+              onPressed: stopSleep,
+              child: SizedBox(
+                width: width,
+                child: Text(
+                  textAlign: TextAlign.center,
+                  Dates.shortSecondsLeft(AlarmsService().sleepDuration),
+                  style: const TextStyle(
+                      color: mainColor,
+                      fontWeight: FontWeight.bold,
+                      height: 0.8),
+                ),
+              ));
+        } else {
+          child = Dismissible(
+            key: UniqueKey(),
+            direction: DismissDirection.startToEnd,
+            dismissThresholds: const {DismissDirection.startToEnd: 0.75},
+            confirmDismiss: (_) async {
+              bool result;
+              try {
+                result = (await openSleepDialog()) ?? true;
+              } catch (e) {
+                result = false;
+              }
 
-            ///break the action
-            if (!result) return false;
+              ///break the action
+              if (!result) return false;
 
-            return true;
-          },
-          child: Container(
-            width: width - height,
-            height: height,
-            alignment: Alignment.centerLeft,
+              return true;
+            },
             child: Container(
+              width: width - height,
               height: height,
-              width: height,
-              decoration: BoxDecoration(
-                  color: buttonColor, borderRadius: BorderRadius.circular(100)),
-              child: Center(child: icon),
+              alignment: Alignment.centerLeft,
+              child: Container(
+                height: height,
+                width: height,
+                decoration: BoxDecoration(
+                    color: buttonColor,
+                    borderRadius: BorderRadius.circular(100)),
+                child: Center(child: icon),
+              ),
             ),
-          ),
+          );
+        }
+        return Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+              color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+          alignment: Alignment.centerLeft,
+          child: child,
         );
+      } catch (e) {
+        print("Error in sleep button: $e");
+        return Container();
       }
-      return Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-            color: backgroundColor, borderRadius: BorderRadius.circular(100)),
-        alignment: Alignment.centerLeft,
-        child: child,
-      );
     });
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/services/alarms_cn.dart';
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -8,7 +8,7 @@ import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:carer/widgets/sleepbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 class Bar extends StatelessWidget {
@@ -16,32 +16,39 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AlarmsCN>(builder: (context, alarms, child) {
-      var tiles = [
-        const Expanded(
-          child: SizedBox.shrink(),
-        ),
-        getSettingsButton(context),
-      ];
-      if (!AlarmSettings().disableAlarms) {
-        tiles = [
-          getSleepButton(context, alarms),
-          getActiveAlarms(context, alarms),
+    return Watch((context) {
+      try {
+        var tiles = [
           const Expanded(
             child: SizedBox.shrink(),
           ),
           getSettingsButton(context),
         ];
+        if (!AlarmSettings().disableAlarms) {
+          tiles = [
+            getSleepButton(context),
+            getActiveAlarms(context),
+            const Expanded(
+              child: SizedBox.shrink(),
+            ),
+            getSettingsButton(context),
+          ];
+        }
+        return BottomAppBar(
+          color: Colors.transparent,
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          height: 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: tiles,
+          ),
+        );
+      } catch (e) {
+        print("Error in Bar: $e");
+        return BottomAppBar(
+          child: Text(e.toString()),
+        );
       }
-      return BottomAppBar(
-        color: Colors.transparent,
-        padding: const EdgeInsets.only(left: 8, right: 8),
-        height: 40,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: tiles,
-        ),
-      );
     });
   }
 
@@ -61,21 +68,21 @@ class Bar extends StatelessWidget {
     );
   }
 
-  Widget getSleepButton(BuildContext context, AlarmsCN alarms) {
+  Widget getSleepButton(BuildContext context) {
     return const SleepButton(
       icon: Icon(Icons.bedtime, color: mainColor),
     );
   }
 
-  Widget getActiveAlarms(BuildContext context, AlarmsCN alarms) {
+  Widget getActiveAlarms(BuildContext context) {
     // Returns a small container that contains the active alarm
-    if (alarms.triggeredAlarms.isEmpty) {
+    if (AlarmsService().triggeredAlarms.isEmpty) {
       return const SizedBox.shrink();
     }
 
     List<Widget> alarmsBoxes = [];
-    if (alarms.triggeredAlarms.isNotEmpty) {
-      for (var alarm in alarms.triggeredAlarms) {
+    if (AlarmsService().triggeredAlarms.isNotEmpty) {
+      for (var alarm in AlarmsService().triggeredAlarms) {
         alarmsBoxes.add(Text("${alarm.name} "));
       }
     }
@@ -93,7 +100,8 @@ class Bar extends StatelessWidget {
               (context, t) {
                 return CustomAnimationToast(
                     value: t,
-                    str: alarms.triggeredAlarms
+                    str: AlarmsService()
+                        .triggeredAlarms
                         .map((alarm) => alarm.name)
                         .join('\n'));
               },

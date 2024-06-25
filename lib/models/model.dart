@@ -98,8 +98,10 @@ abstract class ModelRepository<T extends Model> {
           where: '$idField = ?', whereArgs: [model.id]);
     }
     var ret = id != 0;
-    model.id = id;
-    writeSignal.value = clock.now().millisecondsSinceEpoch;
+    if (ret) {
+      model.id = id;
+      writeSignal.value = clock.now().millisecondsSinceEpoch;
+    }
     return ret;
   }
 

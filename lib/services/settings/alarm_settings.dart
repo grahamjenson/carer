@@ -3,7 +3,6 @@ import 'package:signals/signals_flutter.dart';
 
 enum _AlarmNames {
   disableAlarms,
-  testAlarmPlaying,
   alarmAsset,
 
   urgentLowAlarm,
@@ -66,8 +65,6 @@ class AlarmSettings {
         Signal<int>(10, debugLabel: 'volumeOverrideValue'),
     _AlarmNames.volumeProgressionSeconds:
         Signal<int>(10, debugLabel: 'volumeProgressionSeconds'),
-    _AlarmNames.testAlarmPlaying:
-        Signal<bool>(false, debugLabel: 'testAlarmPlaying'),
     _AlarmNames.alarmAsset:
         Signal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
   };
@@ -174,11 +171,6 @@ class AlarmSettings {
       _signals[_AlarmNames.volumeProgressionSeconds]!.value as int;
   set volumeProgressionSeconds(int value) => volumeProgressionSecondsSet(
       _signals[_AlarmNames.volumeProgressionSeconds]! as Signal<int>, value);
-
-  bool get testAlarmPlaying =>
-      _signals[_AlarmNames.testAlarmPlaying]!.value as bool;
-  set testAlarmPlaying(bool value) =>
-      _signals[_AlarmNames.testAlarmPlaying]!.value = value;
 
   AlarmSounds get alarmAsset =>
       _signals[_AlarmNames.alarmAsset]!.value as AlarmSounds;
