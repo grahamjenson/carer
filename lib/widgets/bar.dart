@@ -80,17 +80,6 @@ class Bar extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    List<Widget> alarmsBoxes = [];
-    if (AlarmsService().triggeredAlarms.isNotEmpty) {
-      for (var alarm in AlarmsService().triggeredAlarms) {
-        alarmsBoxes.add(Text("${alarm.name} "));
-      }
-    }
-
-    // return SizedBox(
-    //     child: Row(
-    //   children: alarmsBoxes,
-    // ));
     OverlaySupportEntry? diss;
     return Container(
         padding: const EdgeInsets.only(left: 5),
@@ -98,7 +87,7 @@ class Bar extends StatelessWidget {
           onPointerDown: (e) {
             diss = showOverlay(
               (context, t) {
-                return CustomAnimationToast(value: t, str: AlarmsService().triggeredAlarms.map((alarm) => alarm.name).join('\n'));
+                return CustomAnimationToast(value: t, str: AlarmsService().triggeredAlarms.map((alarm) => alarm.name).join('\n\n'));
               },
               duration: const Duration(seconds: 10),
             );
