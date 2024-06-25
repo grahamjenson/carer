@@ -38,8 +38,7 @@ class TimeValues {
   }
 
   factory TimeValues.fromJson(List<dynamic> json) {
-    List<TimeValue> values =
-        json.map((valueJson) => TimeValue.fromJson(valueJson)).toList();
+    List<TimeValue> values = json.map((valueJson) => TimeValue.fromJson(valueJson)).toList();
 
     // Sort this to make the TimeValues chronologically ordered
     return TimeValues(values: values);
@@ -150,9 +149,7 @@ class SummaryTempTarget {
       targetTop: json['targetTop'],
       targetBottom: json['targetBottom'],
       duration: json['duration'],
-      start: json['mills'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['mills'])
-          : Dates.earliest,
+      start: json['mills'] != null ? DateTime.fromMillisecondsSinceEpoch(json['mills']) : Dates.earliest,
     );
   }
 }
@@ -197,8 +194,7 @@ class SummarySGVs {
   });
 
   factory SummarySGVs.fromJson(List<dynamic> json) {
-    List<SummarySGV> sgvs =
-        json.map((sgvJson) => SummarySGV.fromJson(sgvJson)).toList();
+    List<SummarySGV> sgvs = json.map((sgvJson) => SummarySGV.fromJson(sgvJson)).toList();
 
     return SummarySGVs(sgvs: sgvs);
   }
@@ -258,9 +254,7 @@ class SummaryTreatments {
   });
 
   factory SummaryTreatments.fromJson(List<dynamic> json) {
-    List<SummaryTreatment> treatments = json
-        .map((treatmentJson) => SummaryTreatment.fromJson(treatmentJson))
-        .toList();
+    List<SummaryTreatment> treatments = json.map((treatmentJson) => SummaryTreatment.fromJson(treatmentJson)).toList();
     return SummaryTreatments(treatments: treatments);
   }
 
@@ -294,14 +288,11 @@ class SummaryProfile {
     required this.timezone,
   });
 
-  List<int> expandedCarbratio() =>
-      carbratio.expand().map((e) => e.round()).toList();
+  List<int> expandedCarbratio() => carbratio.expand().map((e) => e.round()).toList();
   List<int> expandedSens() => sens.expand().map((e) => e.round()).toList();
   List<double> expandedBasal() => basal.expand();
-  List<int> expandedTargetLow() =>
-      targetLow.expand().map((e) => e.round()).toList();
-  List<int> expandedTargetHigh() =>
-      targetHigh.expand().map((e) => e.round()).toList();
+  List<int> expandedTargetLow() => targetLow.expand().map((e) => e.round()).toList();
+  List<int> expandedTargetHigh() => targetHigh.expand().map((e) => e.round()).toList();
 
   factory SummaryProfile.fromJson(Map<String, dynamic> json) {
     var units = json['units'];
@@ -360,8 +351,7 @@ class Summary {
         raw: jsonString,
         sgvs: SummarySGVs.fromJson(json['sgvs']),
         tempBasals: TempBasals.fromJson(json['treatments']['tempBasals']),
-        treatments:
-            SummaryTreatments.fromJson(json['treatments']['treatments']),
+        treatments: SummaryTreatments.fromJson(json['treatments']['treatments']),
         targets: SummaryTargets.fromJson(json['treatments']['targets']),
         state: SummaryState.fromJson(json['state']),
         profile: SummaryProfile.fromJson(json['profile']),

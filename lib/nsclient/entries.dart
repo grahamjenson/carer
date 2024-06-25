@@ -81,8 +81,7 @@ class NSEntries {
   factory NSEntries.fromJson(String jsonStr) {
     try {
       final List<dynamic> jsonList = json.decode(jsonStr);
-      List<NSEntry> entries =
-          jsonList.map((json) => NSEntry.fromJson(json)).toList();
+      List<NSEntry> entries = jsonList.map((json) => NSEntry.fromJson(json)).toList();
       return NSEntries(entries: entries);
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);

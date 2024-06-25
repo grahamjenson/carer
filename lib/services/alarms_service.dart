@@ -16,16 +16,17 @@ class AlarmsService {
   static final AlarmsService _singleton = AlarmsService._();
   factory AlarmsService() => _singleton;
   late final Set<Alarm> allAlarms = {
+    // Target Alarms
     const UrgentLowAlarm(),
     const LowAlarm(),
     const HighAlarm(),
     const UrgentHighAlarm(),
-    //
+    // Rate Alarms
     const FastDropAlarm(),
     const FastRiseAlarm(),
-    //
+    // No Data Alarm
     const NoDataAlarm(),
-    //
+    // Predictive Alarms
     const PredictiveLowAlarm(),
   };
 

@@ -63,8 +63,7 @@ class NSTreatments {
   factory NSTreatments.fromJson(String jsonString) {
     try {
       final List<dynamic> jsonList = json.decode(jsonString);
-      List<NSTreatment> treatmentsList =
-          jsonList.map((json) => NSTreatment.fromJson(json)).toList();
+      List<NSTreatment> treatmentsList = jsonList.map((json) => NSTreatment.fromJson(json)).toList();
 
       return NSTreatments(treatments: treatmentsList);
     } catch (e, stackTrace) {

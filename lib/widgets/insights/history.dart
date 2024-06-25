@@ -10,8 +10,7 @@ import 'package:signals/signals_flutter.dart';
 class History extends StatelessWidget {
   const History({super.key});
 
-  static const heading =
-      TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
+  static const heading = TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
 
   static const row = TextStyle(
     color: mainColor,
@@ -42,10 +41,7 @@ class History extends StatelessWidget {
         return loader;
       }
 
-      var history = [for (var t in treatments) historyRow(t)]
-          .where((row) => row != null)
-          .map((row) => row as DataRow)
-          .toList();
+      var history = [for (var t in treatments) historyRow(t)].where((row) => row != null).map((row) => row as DataRow).toList();
 
       return Window(
         title: "History",
@@ -55,10 +51,8 @@ class History extends StatelessWidget {
                   alignment: Alignment.center,
                   child: DataTable(
                       border: const TableBorder(
-                        verticalInside:
-                            BorderSide(color: mainColor, width: 0.2),
-                        horizontalInside:
-                            BorderSide(color: mainColor, width: 0.2),
+                        verticalInside: BorderSide(color: mainColor, width: 0.2),
+                        horizontalInside: BorderSide(color: mainColor, width: 0.2),
                       ),
                       columnSpacing: 5,
                       dividerThickness: 0.01,
@@ -67,21 +61,9 @@ class History extends StatelessWidget {
                       dataRowMaxHeight: 20,
                       horizontalMargin: 0,
                       columns: [
-                        DataColumn(
-                            numeric: true,
-                            label: Container(
-                                alignment: Alignment.center,
-                                child: const Text('', style: heading))),
-                        DataColumn(
-                            numeric: true,
-                            label: Container(
-                                alignment: Alignment.center,
-                                child: const Text('', style: heading))),
-                        DataColumn(
-                            numeric: true,
-                            label: Container(
-                                alignment: Alignment.center,
-                                child: const Text('', style: heading))),
+                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('', style: heading))),
+                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('', style: heading))),
+                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('', style: heading))),
                       ],
                       rows: history))),
         ),
@@ -130,17 +112,13 @@ class History extends StatelessWidget {
     if (treatment.insulin == 0 || treatment.insulin == null) {
       return const SizedBox.shrink();
     }
-    return SmartText(
-        texts: ["${toMax2dp(treatment.insulin!)}", "u"],
-        styles: const [row, small]);
+    return SmartText(texts: ["${toMax2dp(treatment.insulin!)}", "u"], styles: const [row, small]);
   }
 
   Widget carbsSmartText(Treatment treatment) {
     if (treatment.carbs == 0 || treatment.carbs == null) {
       return const SizedBox.shrink();
     }
-    return SmartText(
-        texts: ["${treatment.carbs!.round()}", "g"],
-        styles: const [row, small]);
+    return SmartText(texts: ["${treatment.carbs!.round()}", "g"], styles: const [row, small]);
   }
 }

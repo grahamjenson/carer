@@ -19,12 +19,10 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 
 (Range7, double) diffRange(int fastDrop, int fastRise, int diff) {
   // This is bases on percentage of the current sgv because the closer to low the more important it is
-  return range7(fastDrop.toDouble(), fastDrop / 2, fastDrop / 3, fastRise / 3,
-      fastRise / 2, fastRise.toDouble(), diff.toDouble());
+  return range7(fastDrop.toDouble(), fastDrop / 2, fastDrop / 3, fastRise / 3, fastRise / 2, fastRise.toDouble(), diff.toDouble());
 }
 
-(Range5, double) range5(
-    double veryLow, double low, double high, double veryHigh, num value) {
+(Range5, double) range5(double veryLow, double low, double high, double veryHigh, num value) {
   if (value < veryLow) {
     return (Range5.veryLow, (veryLow - value).abs().toDouble());
   } else if (value < low) {
@@ -38,8 +36,7 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
   }
 }
 
-(Range7, double) range7(double veryVeryLow, double veryLow, double low,
-    double high, double veryHigh, double veryVeryHigh, num value) {
+(Range7, double) range7(double veryVeryLow, double veryLow, double low, double high, double veryHigh, double veryVeryHigh, num value) {
   if (value < veryVeryLow) {
     return (Range7.veryVeryLow, (veryVeryLow - value).abs().toDouble());
   } else if (value < veryLow) {
@@ -51,10 +48,7 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
   } else if (value < veryHigh) {
     return (Range7.high, (veryHigh - value) / (veryHigh - high));
   } else if (value < veryVeryHigh) {
-    return (
-      Range7.veryHigh,
-      (veryVeryHigh - value) / (veryVeryHigh - veryHigh)
-    );
+    return (Range7.veryHigh, (veryVeryHigh - value) / (veryVeryHigh - veryHigh));
   } else {
     return (Range7.veryVeryHigh, (value - veryVeryHigh).abs().toDouble());
   }
@@ -70,12 +64,8 @@ int mean(List<int> l) {
 }
 
 class Math {
-  static double rootMeanSquaredError(
-      List<double> xValues, List<double> yValues, List<double> predictions) {
-    assert(
-        xValues.length == yValues.length &&
-            xValues.length == predictions.length,
-        'x should have the same length as y');
+  static double rootMeanSquaredError(List<double> xValues, List<double> yValues, List<double> predictions) {
+    assert(xValues.length == yValues.length && xValues.length == predictions.length, 'x should have the same length as y');
 
     int count = xValues.length;
 

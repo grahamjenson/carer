@@ -20,8 +20,7 @@ abstract class Model {
   }
 
   Future<bool> upsert() {
-    return futureProfile(
-        "$runtimeType upsert", repository.upsert(this, uniqueValues()));
+    return futureProfile("$runtimeType upsert", repository.upsert(this, uniqueValues()));
   }
 
   List<String> uniqueValues() {
@@ -64,25 +63,14 @@ abstract class ModelRepository<T extends Model> {
     String? name, // Optional for debugging
   }) async {
     var cdb = await CarerDB.instance;
-    var (where, whereArgs) = _buildWhereStatement(
-        after: after, before: before, conditions: conditions);
+    var (where, whereArgs) = _buildWhereStatement(after: after, before: before, conditions: conditions);
     var res = await futureProfile(
-        "$runtimeType ${name ?? "q"}",
-        cdb.db.query(tableName,
-            where: where,
-            whereArgs: whereArgs,
-            limit: limit,
-            orderBy: "$timestampField DESC"));
+        "$runtimeType ${name ?? "q"}", cdb.db.query(tableName, where: where, whereArgs: whereArgs, limit: limit, orderBy: "$timestampField DESC"));
     return res.map((e) => fromMap(e)).toList();
   }
 
   Future<List<T>> lastMins(int minsAgo) async {
-    return (await query(
-        name: "lastMins",
-        after: clock
-            .now()
-            .subtract(Duration(minutes: minsAgo))
-            .millisecondsSinceEpoch));
+    return (await query(name: "lastMins", after: clock.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch));
   }
 
   Future<bool> save(T model) async {
@@ -91,11 +79,9 @@ abstract class ModelRepository<T extends Model> {
 
     var id = 0;
     if (model.id == null) {
-      id = await cdb.db.insert(tb, toSQLMap(model),
-          conflictAlgorithm: ConflictAlgorithm.ignore);
+      id = await cdb.db.insert(tb, toSQLMap(model), conflictAlgorithm: ConflictAlgorithm.ignore);
     } else {
-      id = await cdb.db.update(tb, toSQLMap(model),
-          where: '$idField = ?', whereArgs: [model.id]);
+      id = await cdb.db.update(tb, toSQLMap(model), where: '$idField = ?', whereArgs: [model.id]);
     }
     var ret = id != 0;
     if (ret) {
@@ -112,11 +98,9 @@ abstract class ModelRepository<T extends Model> {
 
     for (var model in models) {
       if (model.id == null) {
-        batch.insert(tb, toSQLMap(model),
-            conflictAlgorithm: ConflictAlgorithm.ignore);
+        batch.insert(tb, toSQLMap(model), conflictAlgorithm: ConflictAlgorithm.ignore);
       } else {
-        batch.update(tb, toSQLMap(model),
-            where: '$idField = ?', whereArgs: [model.id]);
+        batch.update(tb, toSQLMap(model), where: '$idField = ?', whereArgs: [model.id]);
       }
     }
     var ids = await futureProfile("$T saveAll", batch.commit());
@@ -146,8 +130,7 @@ abstract class ModelRepository<T extends Model> {
     var whereArgs = uniqueValues.map((e) => map[e]).toList();
 
     // Get current value
-    var oldModel = await cdb.db
-        .query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1);
+    var oldModel = await cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1);
 
     if (oldModel.isNotEmpty) {
       // check if there is need for any changes
@@ -177,20 +160,16 @@ abstract class ModelRepository<T extends Model> {
     return save(model);
   }
 
-  Future<int?> count(
-      {int? after, int? before, Map<String, Object>? conditions}) async {
+  Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {
     var cdb = await CarerDB.instance;
-    var (where, whereArgs) = _buildWhereStatement(
-        after: after, before: before, conditions: conditions);
+    var (where, whereArgs) = _buildWhereStatement(after: after, before: before, conditions: conditions);
 
-    var res = await cdb.db.query(tableName,
-        columns: ['COUNT(*)'], where: where, whereArgs: whereArgs);
+    var res = await cdb.db.query(tableName, columns: ['COUNT(*)'], where: where, whereArgs: whereArgs);
     return res.first.values.first as int?;
   }
 
   // utils
-  (String?, List<Object>?) _buildWhereStatement(
-      {int? after, int? before, Map<String, Object>? conditions}) {
+  (String?, List<Object>?) _buildWhereStatement({int? after, int? before, Map<String, Object>? conditions}) {
     var where = <String>[];
     var whereArgs = <Object>[];
     if (after != null) {
@@ -222,8 +201,7 @@ abstract class ModelRepository<T extends Model> {
     return true;
   }
 
-  bool validateType(
-      Map<String, Object?> m, List<String> keys, List<Type> types) {
+  bool validateType(Map<String, Object?> m, List<String> keys, List<Type> types) {
     assert(keys.length == types.length);
 
     for (var i = 0; i < keys.length; i++) {

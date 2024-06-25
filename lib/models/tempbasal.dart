@@ -10,8 +10,7 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
   @override
   TempBasal fromMap(Map<String, Object?> map) {
     var requiredKeys = ["start", "duration", "value"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, requiredKeys, [int, int, double]))) {
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, double]))) {
       throw ArgumentError("Invalid TempBasal Map: $map");
     }
 
@@ -25,11 +24,7 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
 
   @override
   Map<String, Object> toSQLMap(TempBasal model) {
-    return {
-      "start": model.startDate.millisecondsSinceEpoch,
-      "duration": model.duration,
-      "value": model.value
-    };
+    return {"start": model.startDate.millisecondsSinceEpoch, "duration": model.duration, "value": model.value};
   }
 }
 
@@ -73,16 +68,13 @@ class TempBasal extends Model {
     return _q.fromMap(map);
   }
 
-  static Future<List<TempBasal>> query(
-      {int? after, int? before, int? limit}) async {
+  static Future<List<TempBasal>> query({int? after, int? before, int? limit}) async {
     return _q.query(after: after, before: before, limit: limit);
   }
 
   static Future<TempBasal?> atTime(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
-    return (await _q
-            .query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1))
-        .firstOrNull;
+    return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
   }
 
   static Future<int> fixData() async {

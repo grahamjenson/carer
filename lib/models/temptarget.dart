@@ -10,8 +10,7 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
   @override
   TempTarget fromMap(Map<String, Object?> map) {
     var requiredKeys = ["start", "duration", "targetHigh", "targetLow"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, requiredKeys, [int, int, int, int]))) {
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 
@@ -77,16 +76,13 @@ class TempTarget extends Model {
     return _q.fromMap(map);
   }
 
-  static Future<List<TempTarget>> query(
-      {int? after, int? before, int? limit}) async {
+  static Future<List<TempTarget>> query({int? after, int? before, int? limit}) async {
     return _q.query(after: after, before: before, limit: limit);
   }
 
   static Future<TempTarget?> atTime(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
-    return (await _q
-            .query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1))
-        .firstOrNull;
+    return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
   }
 
   static Future<int> fixData() async {

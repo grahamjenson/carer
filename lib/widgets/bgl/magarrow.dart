@@ -108,8 +108,7 @@ Range7 diffRange7() {
   if (lastSGV == null) {
     return Range7.mid;
   }
-  var (dr, _) = diffRange(TargetSettings().fastDropDelta,
-      TargetSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
+  var (dr, _) = diffRange(TargetSettings().fastDropDelta, TargetSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
 
   return dr;
 }

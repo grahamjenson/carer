@@ -22,10 +22,7 @@ class HomePage extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(8),
-            child: Watch((context) => getLayout(
-                context,
-                UISettings().uiLayoutVertical,
-                UISettings().uiLayoutHorizontal)),
+            child: Watch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
           ),
           const Positioned(
             top: 10, // Adjust these values as needed
@@ -38,8 +35,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget getLayout(
-      BuildContext context, UILayout uiLayoutVertical, uiLayoutHorizontal) {
+  Widget getLayout(BuildContext context, UILayout uiLayoutVertical, uiLayoutHorizontal) {
     final aspectRatio = MediaQuery.of(context).size.aspectRatio;
     final isHorizontal = aspectRatio > 1.0;
 
@@ -50,32 +46,23 @@ class HomePage extends StatelessWidget {
 
     var bgl = const Flexible(flex: 4, child: BGL());
 
-    Widget mainLine = Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl]);
+    Widget mainLine = Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl]);
 
     if (isHorizontal) {
       switch (layout) {
         case UILayout.showBGLChartHistoryStats:
-          mainLine = Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [bgl, Flexible(flex: 3, child: getInsights())]);
+          mainLine = Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl, Flexible(flex: 3, child: getInsights())]);
           break;
         default:
-          mainLine = Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [bgl]);
+          mainLine = Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl]);
       }
     } else {
       switch (layout) {
         case UILayout.showBGLChartHistoryStats:
-          mainLine = Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [bgl, Flexible(flex: 5, child: getInsights())]);
+          mainLine = Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl, Flexible(flex: 5, child: getInsights())]);
           break;
         default:
-          mainLine = Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [bgl]);
+          mainLine = Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl]);
       }
     }
     return mainLine;
@@ -90,7 +77,6 @@ class HomePage extends StatelessWidget {
       Expanded(child: Stats()),
     ])));
 
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
   }
 }

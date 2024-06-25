@@ -17,8 +17,7 @@ class StateData {
     StateDataName.summaryIOB: Signal<double>(0.0, debugLabel: 'summaryIOB'),
     StateDataName.summaryCOB: Signal<double>(0.0, debugLabel: 'summaryCOB'),
     StateDataName.summaryCAge: Signal<double>(0.0, debugLabel: 'summaryCAge'),
-    StateDataName.summaryBattery:
-        Signal<double>(0.0, debugLabel: 'summaryBattery'),
+    StateDataName.summaryBattery: Signal<double>(0.0, debugLabel: 'summaryBattery'),
   };
 
   StateData._();
@@ -30,23 +29,19 @@ class StateData {
     await kvdb.internalPopulate();
 
     effect(() {
-      kvdb.setDouble(StateDataName.summaryBattery.name,
-          _signals[StateDataName.summaryBattery]!.value);
+      kvdb.setDouble(StateDataName.summaryBattery.name, _signals[StateDataName.summaryBattery]!.value);
     });
 
     effect(() {
-      kvdb.setDouble(StateDataName.summaryCOB.name,
-          _signals[StateDataName.summaryCOB]!.value);
+      kvdb.setDouble(StateDataName.summaryCOB.name, _signals[StateDataName.summaryCOB]!.value);
     });
 
     effect(() {
-      kvdb.setDouble(StateDataName.summaryIOB.name,
-          _signals[StateDataName.summaryIOB]!.value);
+      kvdb.setDouble(StateDataName.summaryIOB.name, _signals[StateDataName.summaryIOB]!.value);
     });
 
     effect(() {
-      kvdb.setDouble(StateDataName.summaryCAge.name,
-          _signals[StateDataName.summaryCAge]!.value);
+      kvdb.setDouble(StateDataName.summaryCAge.name, _signals[StateDataName.summaryCAge]!.value);
     });
   }
 

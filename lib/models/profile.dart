@@ -11,8 +11,7 @@ class ProfileRepository extends ModelRepository<Profile> {
     List<int> sens = isfKeys.map((key) => map[key] as int).toList();
     List<double> basal = basalKeys.map((key) => map[key] as double).toList();
     List<int> targetLow = targetLowKeys.map((key) => map[key] as int).toList();
-    List<int> targetHigh =
-        targetHighKeys.map((key) => map[key] as int).toList();
+    List<int> targetHigh = targetHighKeys.map((key) => map[key] as int).toList();
 
     {
       return Profile(
@@ -100,8 +99,7 @@ class Profile extends Model {
     return (await _q.query(limit: 1)).firstOrNull;
   }
 
-  static Future<int?> count(
-      {int? after, int? before, Map<String, Object>? conditions}) async {
+  static Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {
     return _q.count(after: after, before: before, conditions: conditions);
   }
 

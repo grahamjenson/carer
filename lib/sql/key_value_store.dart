@@ -113,13 +113,11 @@ class KeyValueStore {
   Set<String> getKeys() => Set<String>.from(_cache.keys);
 
   /// Reads a value of any type from persistent storage.
-  Object? get(String key, {Object? defaultValue}) =>
-      _cache[key] ?? defaultValue;
+  Object? get(String key, {Object? defaultValue}) => _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// bool.
-  bool? getBool(String key, {bool? defaultValue}) =>
-      _cache[key] ?? defaultValue;
+  bool? getBool(String key, {bool? defaultValue}) => _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not
   /// an int.
@@ -127,13 +125,11 @@ class KeyValueStore {
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// double.
-  double? getDouble(String key, {double? defaultValue}) =>
-      _cache[key] ?? defaultValue;
+  double? getDouble(String key, {double? defaultValue}) => _cache[key] ?? defaultValue;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// String.
-  String? getString(String key, {String? defaultValue}) =>
-      _cache[key] ?? defaultValue;
+  String? getString(String key, {String? defaultValue}) => _cache[key] ?? defaultValue;
 
   /// Returns true if the persistent storage contains the given [key].
   bool containsKey(String key) => _cache.containsKey(key);
@@ -147,12 +143,10 @@ class KeyValueStore {
   /// Saves a double [value] to persistent storage in the background.
   ///
   /// Android doesn't support storing doubles, so it will be stored as a float.
-  Future<bool> setDouble(String key, double value) =>
-      _setValue('Double', key, value);
+  Future<bool> setDouble(String key, double value) => _setValue('Double', key, value);
 
   /// Saves a string [value] to persistent storage in the background.
-  Future<bool> setString(String key, String value) =>
-      _setValue('String', key, value);
+  Future<bool> setString(String key, String value) => _setValue('String', key, value);
 
   Future<bool> _setValue(String valueType, String key, Object value) async {
     ArgumentError.checkNotNull(value, 'value');
@@ -166,8 +160,7 @@ class KeyValueStore {
       value = (value as bool) ? '1' : '0';
     }
 
-    int ret = await _db
-        .rawInsert(KVQueries.upsert, [key, value, valueType, value, valueType]);
+    int ret = await _db.rawInsert(KVQueries.upsert, [key, value, valueType, value, valueType]);
     return ret == 1;
   }
 }

@@ -9,8 +9,7 @@ class BolusRepository extends ModelRepository<Bolus> {
   @override
   Bolus fromMap(Map<String, Object?> map) {
     var requiredKeys = ["value", "timestamp"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, requiredKeys, [double, int]))) {
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [double, int]))) {
       throw ArgumentError("Invalid Bolus Map: $map");
     }
 

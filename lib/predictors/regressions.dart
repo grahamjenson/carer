@@ -25,8 +25,7 @@ abstract class Regression {
 
   double get rmse;
 
-  (double, List<double>) rootMeanSquaredError(
-      List<double> testXValues, List<double> testYValues) {
+  (double, List<double>) rootMeanSquaredError(List<double> testXValues, List<double> testYValues) {
     var predictions = predictAll(testXValues);
     var rmse = Math.rootMeanSquaredError(testXValues, testYValues, predictions);
     return (rmse, predictions);
@@ -55,8 +54,7 @@ abstract class MatrixRegression extends Regression {
   late double _rmse;
 
   MatrixRegression(this.xValues, this.yValues) {
-    assert(
-        xValues.length == yValues.length, 'x should have the same length as y');
+    assert(xValues.length == yValues.length, 'x should have the same length as y');
 
     xM = Matrix.fromColumnList(xValues);
 
@@ -130,8 +128,7 @@ class LogRegression extends MatrixRegression {
 
   @override
   Matrix expandX(Matrix x) {
-    Matrix logX =
-        Matrix.fromColumnList(x.column(0).map((v) => log(v)).toList());
+    Matrix logX = Matrix.fromColumnList(x.column(0).map((v) => log(v)).toList());
 
     x.appendColumns(logX);
 
@@ -147,8 +144,7 @@ class LogRegressionLogY extends MatrixRegression {
 
   @override
   Matrix expandX(Matrix x) {
-    Matrix logX =
-        Matrix.fromColumnList(x.column(0).map((v) => log(v)).toList());
+    Matrix logX = Matrix.fromColumnList(x.column(0).map((v) => log(v)).toList());
 
     x.appendColumns(logX);
 
@@ -170,8 +166,7 @@ class SqrtRegression extends MatrixRegression {
 
   @override
   Matrix expandX(Matrix x) {
-    Matrix sqrtX =
-        Matrix.fromColumnList(x.column(0).map((v) => sqrt(v)).toList());
+    Matrix sqrtX = Matrix.fromColumnList(x.column(0).map((v) => sqrt(v)).toList());
 
     x.appendColumns(sqrtX);
 
@@ -248,16 +243,14 @@ class GradientRegression extends Regression {
 }
 
 class LinearRegression extends PolynomialRegression {
-  LinearRegression(List<double> xValues, List<double> yValues)
-      : super(xValues, yValues, 1);
+  LinearRegression(List<double> xValues, List<double> yValues) : super(xValues, yValues, 1);
 
   @override
   String toString() => 'Linear';
 }
 
 class QuadraticRegression extends PolynomialRegression {
-  QuadraticRegression(List<double> xValues, List<double> yValues)
-      : super(xValues, yValues, 2);
+  QuadraticRegression(List<double> xValues, List<double> yValues) : super(xValues, yValues, 2);
 
   @override
   String toString() => 'Quadratic';
@@ -313,8 +306,7 @@ class BestMatchRegression extends Regression {
   double get rmse => selected.rmse;
 
   @override
-  (double, List<double>) rootMeanSquaredError(
-      List<double> testXValues, List<double> testYValues) {
+  (double, List<double>) rootMeanSquaredError(List<double> testXValues, List<double> testYValues) {
     return selected.rootMeanSquaredError(testXValues, testYValues);
   }
 }

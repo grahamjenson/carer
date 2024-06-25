@@ -6,20 +6,14 @@ import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/utils/errors.dart';
 import 'package:http/http.dart' as http;
 
-Uri entryEndpoint(nsURL, token, int count) =>
-    Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
-Uri treatmentsEndpoint(nsURL, token) =>
-    Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
+Uri entryEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
+Uri treatmentsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
 
-Uri summaryEndpoint(nsURL, token) =>
-    Uri.parse('$nsURL/api/v2/summary.json?token=$token');
+Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
 
-Uri iobEndpoint(nsURL, token) =>
-    Uri.parse('$nsURL/api/v2/properties/iob.json?token=$token');
-Uri cobEndpoint(nsURL, token) =>
-    Uri.parse('$nsURL/api/v2/properties/cob.json?token=$token');
-Uri basalEndpoint(nsURL, token) =>
-    Uri.parse('$nsURL/api/v2/properties/basal.json?token=$token');
+Uri iobEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/iob.json?token=$token');
+Uri cobEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/cob.json?token=$token');
+Uri basalEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/basal.json?token=$token');
 
 // Singleton
 class NSClient {

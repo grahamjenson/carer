@@ -71,8 +71,7 @@ class ToggleButton extends StatelessWidget {
     );
   }
 
-  static ToggleButtons selectOne<T>(
-      T value, List<String> titles, List<T> values, Function(T) onSelected) {
+  static ToggleButtons selectOne<T>(T value, List<String> titles, List<T> values, Function(T) onSelected) {
     assert(titles.length == values.length);
     return ToggleButtons(
       constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
@@ -93,8 +92,7 @@ class ToggleButton extends StatelessWidget {
   }
 }
 
-Future<T> alertDialogOfButtons<T>(
-    BuildContext context, String title, List<String> titles, List<T> values) {
+Future<T> alertDialogOfButtons<T>(BuildContext context, String title, List<String> titles, List<T> values) {
   assert(titles.length == values.length);
   return showDialog<int>(
       context: context,
@@ -111,13 +109,11 @@ Future<T> alertDialogOfButtons<T>(
               height: 50,
               child: Center(
                 child: ToggleButtons(
-                  constraints:
-                      const BoxConstraints(maxHeight: 40, maxWidth: 40),
+                  constraints: const BoxConstraints(maxHeight: 40, maxWidth: 40),
                   renderBorder: true,
                   borderRadius: BorderRadius.circular(10),
                   borderWidth: 0,
-                  isSelected:
-                      List<bool>.generate(titles.length, (int index) => false),
+                  isSelected: List<bool>.generate(titles.length, (int index) => false),
                   onPressed: (int index) {
                     Navigator.of(context).pop(index);
                   },

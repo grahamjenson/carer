@@ -40,10 +40,7 @@ class LowAlarmPage extends StatelessWidget {
                 "Alarm after",
                 style: description,
               ),
-              trailing: ToggleButton.selectOne<int>(
-                  AlarmSettings().lowMinutes,
-                  ["0m", "5m", "10m", "15m", "20m", "30m"],
-                  [0, 5, 10, 15, 20, 30],
+              trailing: ToggleButton.selectOne<int>(AlarmSettings().lowMinutes, ["0m", "5m", "10m", "15m", "20m", "30m"], [0, 5, 10, 15, 20, 30],
                   (value) => AlarmSettings().lowMinutes = value),
             ),
           ]),

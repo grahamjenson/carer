@@ -98,12 +98,7 @@ class Bar extends StatelessWidget {
           onPointerDown: (e) {
             diss = showOverlay(
               (context, t) {
-                return CustomAnimationToast(
-                    value: t,
-                    str: AlarmsService()
-                        .triggeredAlarms
-                        .map((alarm) => alarm.name)
-                        .join('\n'));
+                return CustomAnimationToast(value: t, str: AlarmsService().triggeredAlarms.map((alarm) => alarm.name).join('\n'));
               },
               duration: const Duration(seconds: 10),
             );
@@ -133,8 +128,7 @@ class IosStyleToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style:
-          Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+      style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
       child: SafeArea(
         child: Align(
           alignment: const Alignment(-0.7, 0.7),
@@ -156,12 +150,10 @@ class IosStyleToast extends StatelessWidget {
 class CustomAnimationToast extends StatelessWidget {
   final double value;
 
-  static final Tween<Offset> tweenOffset =
-      Tween<Offset>(begin: const Offset(-400, 0), end: const Offset(0, 0));
+  static final Tween<Offset> tweenOffset = Tween<Offset>(begin: const Offset(-400, 0), end: const Offset(0, 0));
 
   final String str;
-  const CustomAnimationToast(
-      {super.key, required this.value, required this.str});
+  const CustomAnimationToast({super.key, required this.value, required this.str});
 
   double logTransform(double value, {double base = 20}) {
     return log((base - 1) * value + 1) / log(base);
