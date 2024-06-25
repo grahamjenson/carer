@@ -101,7 +101,7 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> treatments,
     LineChartBarData bglLineData,
   ) {
-    double maxY = TargetSettings().urgentHigh + 36;
+    double maxY = 306;
     double minY = 0;
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now

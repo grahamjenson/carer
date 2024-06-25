@@ -1,4 +1,5 @@
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/nightscout_settings.dart';
@@ -28,6 +29,7 @@ class SettingsPage extends StatelessWidget {
             const T1DSettingsWidget(),
             const UISettingsWidget(),
             const AlarmsSettingsWidget(),
+            const AlarmsAlertSettingsWidget(),
             const DebugSettingsWidget(),
           ],
         ),
