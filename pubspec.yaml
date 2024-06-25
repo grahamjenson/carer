@@ -41,7 +41,6 @@ dependencies:
   flutter_settings_ui: ^3.0.0
   shared_preferences: ^2.2.2
   slide_to_act: ^2.0.2
-  provider: ^6.1.1
   unicons: ^2.1.1
   flutter_svg: ^2.0.10+1
   wakelock_plus: ^1.1.4

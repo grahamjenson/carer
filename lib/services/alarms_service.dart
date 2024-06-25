@@ -59,7 +59,8 @@ class AlarmsService {
     return (AlarmSettings().alarmAsset).asset;
   }
 
-  final Signal<Set<Alarm>> _triggeredAlarmsSignal = Signal(<Alarm>{});
+  final Signal<Set<Alarm>> _triggeredAlarmsSignal =
+      Signal(<Alarm>{}, debugLabel: "triggeredAlarms");
   Set<Alarm> get triggeredAlarms => _triggeredAlarmsSignal.value;
   set triggeredAlarms(Set<Alarm> value) {
     if (se.equals(value, _triggeredAlarmsSignal.value)) {
@@ -68,7 +69,8 @@ class AlarmsService {
     _triggeredAlarmsSignal.value = value;
   }
 
-  final Signal<Set<Alarm>> _activeAlarmsSignal = Signal(<Alarm>{});
+  final Signal<Set<Alarm>> _activeAlarmsSignal =
+      Signal(<Alarm>{}, debugLabel: "activeAlarms");
   Set<Alarm> get activeAlarms => _activeAlarmsSignal.value;
   set activeAlarms(Set<Alarm> value) {
     if (se.equals(value, _activeAlarmsSignal.value)) {
@@ -78,7 +80,8 @@ class AlarmsService {
   }
 
   // Minutes of sleep time
-  final Signal<DateTime> _sleepUntilSignal = Signal(clock.daysAgo(1));
+  final Signal<DateTime> _sleepUntilSignal =
+      Signal(clock.daysAgo(1), debugLabel: "sleepUntil");
 
   bool get notSleeping {
     return sleepDuration.inSeconds <= 0;
