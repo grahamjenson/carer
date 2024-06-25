@@ -17,7 +17,7 @@ abstract class Alarm {
   }
 
   Range5 get targetRange5 {
-    var lastSGV = SGV.lastSGV.value.value;
+    var lastSGV = SGV.lastSGV().value;
     if (lastSGV == null) {
       return Range5.mid;
     }

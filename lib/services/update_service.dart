@@ -63,7 +63,7 @@ class UpdateService {
       _summaryToBeUpdated = true;
       _updateReason = "Age older than 15 ${summaryAgeInSeconds()}s";
     }
-    var lastSGV = SGV.lastSGV.value.value;
+    var lastSGV = SGV.lastSGV().value;
     if (lastSGV == null) {
       _summaryToBeUpdated = true;
       _updateReason = "Last SGV is null";

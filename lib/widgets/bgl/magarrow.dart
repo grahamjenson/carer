@@ -104,7 +104,7 @@ int? findMagnitude() {
 }
 
 Range7 diffRange7() {
-  var lastSGV = SGV.lastSGV.value.value;
+  var lastSGV = SGV.lastSGV().value;
   if (lastSGV == null) {
     return Range7.mid;
   }

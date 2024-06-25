@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/settings.dart';
-import 'package:carer/services/timer_service.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
+import 'package:carer/widgets/bgl/time_ago_reading.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -34,10 +34,9 @@ class _BGLState extends State<BGL> {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      var _ = TimerService().secondSignal.value;
       const loader = Center(child: CircularProgressIndicator());
 
-      var sgv = SGV.lastSGV.value.value;
+      var sgv = SGV.lastSGV().value;
       if (sgv == null) {
         return loader;
       }
@@ -46,14 +45,14 @@ class _BGLState extends State<BGL> {
           aspectRatio: 1.5,
           child: Stack(
             children: [
-              Align(
-                alignment: const Alignment(0, -0.9),
+              const Align(
+                alignment: Alignment(0, -0.9),
                 child: FractionallySizedBox(
                   widthFactor: 1,
                   heightFactor: 0.2,
                   child: FittedBox(
-                    alignment: const Alignment(0, 0),
-                    child: timeAgoText(sgv),
+                    alignment: Alignment(0, 0),
+                    child: TimeAgoReading(),
                   ),
                 ),
               ),
@@ -98,34 +97,5 @@ class _BGLState extends State<BGL> {
             ],
           ));
     });
-  }
-
-  Widget timeAgoText(SGV delta) {
-    if (delta.age.inMinutes == 0) {
-      return const Text(
-        "now",
-        style: TextStyle(
-          color: mainColor,
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    }
-    var seconds = delta.age.inSeconds % 300;
-    var additionalTX = const TextSpan(text: "");
-    if ((delta.age.inSeconds > 300 && seconds < 15)) {
-      additionalTX = TextSpan(text: " (~${seconds}s late)", style: const TextStyle(fontSize: 3));
-    }
-    return RichText(
-        text: TextSpan(
-      text: "${delta.age.inMinutes}",
-      style: const TextStyle(
-        color: mainColor,
-        fontWeight: FontWeight.bold,
-      ),
-      children: [
-        const TextSpan(text: "min", style: TextStyle(fontSize: 6)),
-        additionalTX,
-      ],
-    ));
   }
 }

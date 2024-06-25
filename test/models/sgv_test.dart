@@ -34,13 +34,13 @@ void main() {
     });
 
     test("lastSGV", () async {
-      var sgv = SGV.lastSGV.value.value;
+      var sgv = SGV.lastSGV().value;
       expect(sgv, null);
       expect(await SGV.count(), 0);
 
       expect(await SGV(value: 2, date: now.subtract(min5)).save(), true);
       expect(await SGV.count(), 1);
-      sgv = SGV.lastSGV.value.value;
+      sgv = SGV.lastSGV().value;
       expect(sgv!.value, 2);
       expect(sgv.rate5m, null);
 
@@ -48,15 +48,14 @@ void main() {
 
       expect(await SGV(value: 1, date: now).save(), true);
       expect(await SGV.count(), 2);
-      sgv = SGV.lastSGV.value.value;
+      sgv = SGV.lastSGV().value;
       expect(sgv!.value, 1);
       expect(sgv.rate5m, -1);
     });
 
     test("percents", () async {
       expect(await SGV(value: 100, date: now.subtract(hour48)).save(), true);
-      expect(
-          await SGV(value: 100, date: now.subtract(min5 + min5)).save(), true);
+      expect(await SGV(value: 100, date: now.subtract(min5 + min5)).save(), true);
       expect(await SGV(value: 100, date: now.subtract(min5)).save(), true);
 
       await withClock(Clock.fixed(now), () async {
@@ -91,8 +90,7 @@ void main() {
 
       ret = await Future.wait([
         SGV.fromMap({'value': 2, 'timestamp': minTime(5)}).save(),
-        SGV.fromMap(
-            {'value': 1, 'timestamp': minTime(5)}).save(), // new at same date
+        SGV.fromMap({'value': 1, 'timestamp': minTime(5)}).save(), // new at same date
       ]);
 
       expect(ret.where((b) => b).length, 1); // only one new value
@@ -138,10 +136,7 @@ void main() {
       expect(await SGV.count(low: 2), 3); // inclusive
       expect(await SGV.count(high: 4), 3); // exclusive
 
-      expect(
-          await SGV.count(
-              after: minTime(10), before: minTime(15), low: 2, high: 3),
-          1);
+      expect(await SGV.count(after: minTime(10), before: minTime(15), low: 2, high: 3), 1);
     });
 
     test("sgvs", () async {
