@@ -207,8 +207,8 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> highTargets = [];
 
     for (var t in targets) {
-      lowTargets.add(FlSpot(-t.age.inMinutes.toDouble(), t.targetLow.toDouble()));
-      highTargets.add(FlSpot(-t.age.inMinutes.toDouble(), t.targetHigh.toDouble()));
+      lowTargets.add(FlSpot(-t.age.inMinutes.toDouble(), t.lowTarget.toDouble()));
+      highTargets.add(FlSpot(-t.age.inMinutes.toDouble(), t.highTarget.toDouble()));
     }
 
     return (lowTargets, highTargets);
@@ -301,13 +301,13 @@ class BGLChart extends StatelessWidget {
     return RangeAnnotations(
       horizontalRangeAnnotations: [
         HorizontalRangeAnnotation(
-          y1: TargetSettings().urgentHigh.toDouble(),
-          y2: TargetSettings().urgentLow.toDouble(),
+          y1: TargetSettings().highUrgent.toDouble(),
+          y2: TargetSettings().lowUrgent.toDouble(),
           color: mainColor.withAlpha(35),
         ),
         HorizontalRangeAnnotation(
-          y1: TargetSettings().targetHigh.toDouble(),
-          y2: TargetSettings().targetLow.toDouble(),
+          y1: TargetSettings().highTarget.toDouble(),
+          y2: TargetSettings().lowTarget.toDouble(),
           color: mainColor.withAlpha(35),
         ),
       ],
@@ -367,10 +367,10 @@ class BGLChart extends StatelessWidget {
       getTitlesWidget: (double value, TitleMeta meta) {
         const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
 
-        if (value.toInt() == TargetSettings().urgentHigh ||
-            value.toInt() == TargetSettings().urgentLow ||
-            value.toInt() == TargetSettings().targetHigh ||
-            value.toInt() == TargetSettings().targetLow) {
+        if (value.toInt() == TargetSettings().highUrgent ||
+            value.toInt() == TargetSettings().lowUrgent ||
+            value.toInt() == TargetSettings().highTarget ||
+            value.toInt() == TargetSettings().lowTarget) {
           return Watch((context) {
             return Text(Settings().unit.str(value), style: style, textAlign: TextAlign.right);
           });

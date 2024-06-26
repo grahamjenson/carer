@@ -10,8 +10,8 @@ class ProfileRepository extends ModelRepository<Profile> {
     List<int> carbratio = crKeys.map((key) => map[key] as int).toList();
     List<int> sens = isfKeys.map((key) => map[key] as int).toList();
     List<double> basal = basalKeys.map((key) => map[key] as double).toList();
-    List<int> targetLow = targetLowKeys.map((key) => map[key] as int).toList();
-    List<int> targetHigh = targetHighKeys.map((key) => map[key] as int).toList();
+    List<int> lowTarget = lowTargetKeys.map((key) => map[key] as int).toList();
+    List<int> highTarget = highTargetKeys.map((key) => map[key] as int).toList();
 
     {
       return Profile(
@@ -23,8 +23,8 @@ class ProfileRepository extends ModelRepository<Profile> {
         carbratio: carbratio,
         sens: sens,
         basal: basal,
-        targetLow: targetLow,
-        targetHigh: targetHigh,
+        lowTarget: lowTarget,
+        highTarget: highTarget,
       );
     }
   }
@@ -46,11 +46,11 @@ class ProfileRepository extends ModelRepository<Profile> {
     model.basal.asMap().forEach((index, value) {
       map[basalKeys[index]] = value;
     });
-    model.targetLow.asMap().forEach((index, value) {
-      map[targetLowKeys[index]] = value;
+    model.lowTarget.asMap().forEach((index, value) {
+      map[lowTargetKeys[index]] = value;
     });
-    model.targetHigh.asMap().forEach((index, value) {
-      map[targetHighKeys[index]] = value;
+    model.highTarget.asMap().forEach((index, value) {
+      map[highTargetKeys[index]] = value;
     });
 
     return map;
@@ -75,8 +75,8 @@ class Profile extends Model {
   final List<int> carbratio;
   final List<int> sens;
   final List<double> basal;
-  final List<int> targetLow;
-  final List<int> targetHigh;
+  final List<int> lowTarget;
+  final List<int> highTarget;
 
   Profile({
     this.id,
@@ -87,8 +87,8 @@ class Profile extends Model {
     required this.carbratio,
     required this.sens,
     required this.basal,
-    required this.targetLow,
-    required this.targetHigh,
+    required this.lowTarget,
+    required this.highTarget,
   });
 
   factory Profile.fromMap(Map<String, Object?> map) {
@@ -187,7 +187,7 @@ const basalKeys = [
   "basal23"
 ];
 
-const targetLowKeys = [
+const lowTargetKeys = [
   "tlow0",
   "tlow1",
   "tlow2",
@@ -214,7 +214,7 @@ const targetLowKeys = [
   "tlow23"
 ];
 
-const targetHighKeys = [
+const highTargetKeys = [
   "thigh0",
   "thigh1",
   "thigh2",

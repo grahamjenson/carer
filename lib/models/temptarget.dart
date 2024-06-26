@@ -9,7 +9,7 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
 
   @override
   TempTarget fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "targetHigh", "targetLow"];
+    var requiredKeys = ["start", "duration", "highTarget", "lowTarget"];
     if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
@@ -18,8 +18,8 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
       id: map["id"] as int?,
       startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
       duration: map["duration"] as int,
-      targetHigh: map["targetHigh"] as int,
-      targetLow: map["targetLow"] as int,
+      highTarget: map["highTarget"] as int,
+      lowTarget: map["lowTarget"] as int,
     );
   }
 
@@ -28,8 +28,8 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
     return {
       "start": model.startDate.millisecondsSinceEpoch,
       "duration": model.duration,
-      "targetHigh": model.targetHigh,
-      "targetLow": model.targetLow,
+      "highTarget": model.highTarget,
+      "lowTarget": model.lowTarget,
     };
   }
 }
@@ -48,15 +48,15 @@ class TempTarget extends Model {
 
   final DateTime startDate;
   final int duration;
-  final int targetLow;
-  final int targetHigh;
+  final int lowTarget;
+  final int highTarget;
 
   TempTarget({
     this.id,
     required this.startDate,
     required this.duration,
-    required this.targetLow,
-    required this.targetHigh,
+    required this.lowTarget,
+    required this.highTarget,
   });
 
   @override

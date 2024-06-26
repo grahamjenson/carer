@@ -20,8 +20,7 @@ void main() async {
     testWidgets('BGLWidget displays correct data', (WidgetTester tester) async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame
-
-        await SGV(value: 140, date: clock.now()).save();
+        expect(await SGV(value: 140, date: clock.now()).save(), true);
         await SGV.lastSGV.future;
         expect(SGV.lastSGV().value!.value, 140);
 

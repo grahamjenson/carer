@@ -7,22 +7,45 @@ import 'package:carer/utils/math.dart';
 abstract class Alarm {
   const Alarm();
 
-  String get name;
-  String get description;
-
   bool trigger();
   bool active();
   bool smartSnooze() {
     return false;
   }
 
+  List<String> properties() {
+    return [];
+  }
+
+  String status() {
+    var (t, a, s) = alarmStatus();
+    var name = runtimeType.toString();
+    var statuses = properties();
+    if (t) {
+      statuses.add('T');
+    }
+    if (a) {
+      statuses.add('A');
+    }
+    if (s) {
+      statuses.add('S');
+    }
+    return '$name: (${statuses.join(",")})';
+  }
+
+  (bool, bool, bool) alarmStatus() {
+    return (trigger(), active(), smartSnooze());
+  }
+
   Range5 get targetRange5 {
     var lastSGV = SGV.lastSGV().value;
+
     if (lastSGV == null) {
       return Range5.mid;
     }
     // Calculating Target Range
     var (tr, _) = targetRange(lastSGV.value);
+
     return tr;
   }
 
@@ -50,15 +73,23 @@ class PredictiveLowAlarm extends Alarm {
   const PredictiveLowAlarm();
 
   @override
-  String get name => 'PredictiveLowAlarm Low Alarm';
+  List<String> properties() {
+    return [
+      "mins($mins)",
+      "pRange($range)",
+    ];
+  }
 
-  @override
-  String get description => 'Triggers when it predicts a low in ${AlarmSettings().lowPredictionMinutes}m';
+  int get mins => AlarmSettings().lowPredictionMinutes;
+
+  Range5? get range {
+    return PredictionService().atPredictedTime(mins);
+  }
 
   @override
   bool trigger() {
-    var range = PredictionService().atPredictedTime(AlarmSettings().lowPredictionMinutes);
-    return range == Range5.veryLow || range == Range5.low;
+    var r = range;
+    return r == Range5.veryLow || r == Range5.low;
   }
 
   @override
@@ -69,12 +100,6 @@ class PredictiveLowAlarm extends Alarm {
 
 class UrgentLowAlarm extends Alarm {
   const UrgentLowAlarm();
-
-  @override
-  String get name => 'Urgent Low Alarm';
-
-  @override
-  String get description => 'Triggers when BGL is below the urgent low target';
 
   @override
   bool trigger() {
@@ -91,10 +116,13 @@ class LowAlarm extends Alarm {
   const LowAlarm();
 
   @override
-  String get name => 'Low Alarm ${AlarmSettings().lowMinutes}m ${smartSnooze()}';
+  List<String> properties() {
+    return [
+      "mins($mins)",
+    ];
+  }
 
-  @override
-  String get description => 'Triggers when all BGLs for a time period are below the low target';
+  int get mins => AlarmSettings().lowMinutes;
 
   @override
   bool trigger() {
@@ -125,10 +153,13 @@ class HighAlarm extends Alarm {
   const HighAlarm();
 
   @override
-  String get name => 'High Alarm ${AlarmSettings().highMinutes}m ${smartSnooze()}';
+  List<String> properties() {
+    return [
+      "mins($mins)",
+    ];
+  }
 
-  @override
-  String get description => 'Triggers when all BGLs for a time period are above the high target';
+  int get mins => AlarmSettings().highMinutes;
 
   @override
   bool trigger() {
@@ -161,12 +192,6 @@ class UrgentHighAlarm extends Alarm {
   const UrgentHighAlarm();
 
   @override
-  String get name => 'Urgent High Alarm';
-
-  @override
-  String get description => 'Triggers when BGL is above the urgent high target';
-
-  @override
   bool trigger() {
     return targetRange5 == Range5.veryHigh;
   }
@@ -181,10 +206,16 @@ class FastRiseAlarm extends Alarm {
   const FastRiseAlarm();
 
   @override
-  String get name => 'Fast Rise Alarm ${AlarmSettings().fastRiseAlarmMinutes}';
+  List<String> properties() {
+    return [
+      "delta(${TargetSettings().fastRiseDelta})"
+          "mins($mins)",
+      "diffs($diffs)",
+    ];
+  }
 
-  @override
-  String get description => 'Triggers when BGL is rising quickly';
+  int get mins => AlarmSettings().fastRiseAlarmMinutes;
+  List<int> get diffs => diffPer5Minute(AlarmSettings().fastRiseAlarmMinutes);
 
   @override
   bool trigger() {
@@ -194,11 +225,11 @@ class FastRiseAlarm extends Alarm {
     }
 
     // Get the diffs for the last n minutes and make sure they are all above the set delta
-    var diffs = diffPer5Minute(AlarmSettings().fastRiseAlarmMinutes);
-    if (diffs.isEmpty) {
+    var d = diffs;
+    if (d.isEmpty) {
       return false;
     }
-    if (diffs.every((element) => element > TargetSettings().fastRiseDelta)) {
+    if (d.every((element) => element > TargetSettings().fastRiseDelta)) {
       return true;
     }
     return false;
@@ -214,25 +245,32 @@ class FastDropAlarm extends Alarm {
   const FastDropAlarm();
 
   @override
-  String get name => 'Fast Drop Alarm ${AlarmSettings().fastDropAlarmMinutes}';
+  List<String> properties() {
+    return [
+      "delta(${TargetSettings().fastDropDelta})"
+          "mins($mins)",
+      "diffs($diffs)",
+    ];
+  }
 
-  @override
-  String get description => 'Triggers when BGL is dropping quickly';
+  int get mins => AlarmSettings().fastDropAlarmMinutes;
+  List<int> get diffs => diffPer5Minute(mins);
 
   @override
   bool trigger() {
+    var tr = targetRange5;
     // Dont trigger if High or Very High, fast drop when high is what we want
-    if (targetRange5 == Range5.high || targetRange5 == Range5.veryHigh) {
+    if (tr == Range5.high || tr == Range5.veryHigh) {
       return false;
     }
 
     // Get the diffs for the last n minutes and make sure they are all below the set delta
-    var diffs = diffPer5Minute(AlarmSettings().fastDropAlarmMinutes);
-    if (diffs.isEmpty) {
+    var d = diffs;
+    if (d.isEmpty) {
       return false;
     }
 
-    if (diffs.every((element) => element < TargetSettings().fastDropDelta)) {
+    if (d.every((element) => element < TargetSettings().fastDropDelta)) {
       return true;
     }
     return false;
@@ -248,10 +286,13 @@ class NoDataAlarm extends Alarm {
   const NoDataAlarm();
 
   @override
-  String get name => 'No Data Alarm ${AlarmSettings().noDataAlarmMinutes}';
+  List<String> properties() {
+    return [
+      "mins(${alarmMinutes()})",
+    ];
+  }
 
-  @override
-  String get description => 'Triggers when no data is received';
+  int get mins => AlarmSettings().fastDropAlarmMinutes;
 
   // This allows the alarm to still trigger with "default" even when not active
   int alarmMinutes() {
@@ -271,6 +312,7 @@ class NoDataAlarm extends Alarm {
     if (lastSGV == null) {
       return false;
     }
+
     return lastSGV.age.inMinutes > alarmMinutes();
   }
 

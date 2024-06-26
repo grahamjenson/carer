@@ -35,8 +35,8 @@ class Stats extends StatelessWidget {
         var profileHighTarget = 0;
         if (valuesAtTime.isNotEmpty) {
           currentBasal = valuesAtTime.first.basal;
-          profileLowTarget = valuesAtTime.first.targetLow;
-          profileHighTarget = valuesAtTime.first.targetHigh;
+          profileLowTarget = valuesAtTime.first.lowTarget;
+          profileHighTarget = valuesAtTime.first.highTarget;
         }
 
         var iobNow = StateData().iob();
@@ -169,7 +169,7 @@ class Stats extends StatelessWidget {
       cells: [
         const DataCell(Text("cage", style: heading)),
         DataCell(
-          SmartText(texts: ["$cage}", "h"], styles: const [row, small]),
+          SmartText(texts: ["$cage", "h"], styles: const [row, small]),
         ),
       ],
     );

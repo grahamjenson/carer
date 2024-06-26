@@ -38,8 +38,8 @@ void main() async {
         carbratio: List<int>.filled(24, 1),
         sens: List<int>.filled(24, 1),
         basal: List<double>.filled(24, 1),
-        targetLow: List<int>.filled(24, 1),
-        targetHigh: List<int>.filled(24, 1),
+        lowTarget: List<int>.filled(24, 1),
+        highTarget: List<int>.filled(24, 1),
       );
       expect(await p.save(), true);
 

@@ -9,10 +9,10 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
 (Range5, double) targetRange(num sgv) {
-  var low = TargetSettings().targetLow.toDouble();
-  var high = TargetSettings().targetHigh.toDouble();
-  var veryHigh = TargetSettings().urgentHigh.toDouble();
-  var veryLow = TargetSettings().urgentLow.toDouble();
+  var low = TargetSettings().lowTarget.toDouble();
+  var high = TargetSettings().highTarget.toDouble();
+  var veryHigh = TargetSettings().highUrgent.toDouble();
+  var veryLow = TargetSettings().lowUrgent.toDouble();
 
   return range5(veryLow, low, high, veryHigh, sgv);
 }

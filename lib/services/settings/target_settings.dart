@@ -5,10 +5,10 @@ import 'package:signals/signals.dart';
 // returns a tuple of (Targets, proportion)
 
 enum _TNames {
-  targetHigh,
-  targetLow,
-  urgentHigh,
-  urgentLow,
+  highTarget,
+  lowTarget,
+  highUrgent,
+  lowUrgent,
   fastDropDelta,
   fastRiseDelta,
 }
@@ -18,10 +18,10 @@ class TargetSettings {
   factory TargetSettings() => _singleton;
 
   final Map<_TNames, Signal<int>> _signals = {
-    _TNames.targetHigh: Signal<int>(180, debugLabel: 'targetHigh'),
-    _TNames.targetLow: Signal<int>(72, debugLabel: 'targetLow'),
-    _TNames.urgentHigh: Signal<int>(270, debugLabel: 'urgentHigh'),
-    _TNames.urgentLow: Signal<int>(55, debugLabel: 'urgentLow'),
+    _TNames.highTarget: Signal<int>(180, debugLabel: 'highTarget'),
+    _TNames.lowTarget: Signal<int>(72, debugLabel: 'lowTarget'),
+    _TNames.highUrgent: Signal<int>(270, debugLabel: 'highUrgent'),
+    _TNames.lowUrgent: Signal<int>(55, debugLabel: 'lowUrgent'),
     _TNames.fastDropDelta: Signal<int>(9, debugLabel: 'fastDropDelta'),
     _TNames.fastRiseDelta: Signal<int>(-9, debugLabel: 'fastRiseDelta'),
   };
@@ -34,41 +34,41 @@ class TargetSettings {
     }
   }
 
-  int get targetHigh => _signals[_TNames.targetHigh]!.value;
-  int get targetHighPeek => _signals[_TNames.targetHigh]!.peek();
-  set targetHigh(int value) {
-    if (!validTargets(urgentLow, targetLow, value, urgentHigh)) {
+  int get highTarget => _signals[_TNames.highTarget]!.value;
+  int get highTargetPeek => _signals[_TNames.highTarget]!.peek();
+  set highTarget(int value) {
+    if (!validTargets(lowUrgent, lowTarget, value, highUrgent)) {
       return;
     }
-    _signals[_TNames.targetHigh]!.value = value;
+    _signals[_TNames.highTarget]!.value = value;
   }
 
-  int get targetLow => _signals[_TNames.targetLow]!.value;
-  int get targetLowPeek => _signals[_TNames.targetLow]!.peek();
+  int get lowTarget => _signals[_TNames.lowTarget]!.value;
+  int get lowTargetPeek => _signals[_TNames.lowTarget]!.peek();
 
-  set targetLow(int value) {
-    if (!validTargets(urgentLow, value, targetHigh, urgentHigh)) {
+  set lowTarget(int value) {
+    if (!validTargets(lowUrgent, value, highTarget, highUrgent)) {
       return;
     }
-    _signals[_TNames.targetLow]!.value = value;
+    _signals[_TNames.lowTarget]!.value = value;
   }
 
-  int get urgentHigh => _signals[_TNames.urgentHigh]!.value;
-  int get urgentHighPeek => _signals[_TNames.urgentHigh]!.peek();
-  set urgentHigh(int value) {
-    if (!validTargets(urgentLow, targetLow, targetHigh, value)) {
+  int get highUrgent => _signals[_TNames.highUrgent]!.value;
+  int get highUrgentPeek => _signals[_TNames.highUrgent]!.peek();
+  set highUrgent(int value) {
+    if (!validTargets(lowUrgent, lowTarget, highTarget, value)) {
       return;
     }
-    _signals[_TNames.urgentHigh]!.value = value;
+    _signals[_TNames.highUrgent]!.value = value;
   }
 
-  int get urgentLow => _signals[_TNames.urgentLow]!.value;
-  int get urgentLowPeek => _signals[_TNames.urgentLow]!.peek();
-  set urgentLow(int value) {
-    if (!validTargets(value, targetLow, targetHigh, urgentHigh)) {
+  int get lowUrgent => _signals[_TNames.lowUrgent]!.value;
+  int get lowUrgentPeek => _signals[_TNames.lowUrgent]!.peek();
+  set lowUrgent(int value) {
+    if (!validTargets(value, lowTarget, highTarget, highUrgent)) {
       return;
     }
-    _signals[_TNames.urgentLow]!.value = value;
+    _signals[_TNames.lowUrgent]!.value = value;
   }
 
   int get fastDropDelta => _signals[_TNames.fastDropDelta]!.value;
@@ -81,8 +81,8 @@ class TargetSettings {
 
   set fastRiseDelta(int value) => fastRiseDeltaSet(_signals[_TNames.fastRiseDelta]!, value);
 
-  bool validTargets(int urgentLow, int targetLow, int targetHigh, int urgentHigh) {
-    return 9 <= urgentLow && urgentLow <= targetLow && targetLow <= targetHigh && targetHigh <= urgentHigh && urgentHigh <= 360;
+  bool validTargets(int lowUrgent, int lowTarget, int highTarget, int highUrgent) {
+    return 9 <= lowUrgent && lowUrgent <= lowTarget && lowTarget <= highTarget && highTarget <= highUrgent && highUrgent <= 360;
   }
 
   fastDropDeltaSet(Signal<int> signal, value) {
@@ -101,10 +101,10 @@ class TargetSettings {
 
   setupDBPropagation() async {
     var prefs = await KeyValueStore.instance;
-    targetHigh = prefs.getInt(_TNames.targetHigh.name) ?? 180;
-    targetLow = prefs.getInt(_TNames.targetLow.name) ?? 72;
-    urgentHigh = prefs.getInt(_TNames.urgentHigh.name) ?? 270;
-    urgentLow = prefs.getInt(_TNames.urgentLow.name) ?? 55;
+    highTarget = prefs.getInt(_TNames.highTarget.name) ?? 180;
+    lowTarget = prefs.getInt(_TNames.lowTarget.name) ?? 72;
+    highUrgent = prefs.getInt(_TNames.highUrgent.name) ?? 270;
+    lowUrgent = prefs.getInt(_TNames.lowUrgent.name) ?? 55;
     fastDropDelta = prefs.getInt(_TNames.fastDropDelta.name, defaultValue: -20)!;
     fastRiseDelta = prefs.getInt(_TNames.fastRiseDelta.name, defaultValue: 20)!;
 
@@ -112,12 +112,12 @@ class TargetSettings {
 
     effect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta));
 
-    effect(() => prefs.setInt(_TNames.targetHigh.name, targetHigh));
+    effect(() => prefs.setInt(_TNames.highTarget.name, highTarget));
 
-    effect(() => prefs.setInt(_TNames.targetLow.name, targetLow));
+    effect(() => prefs.setInt(_TNames.lowTarget.name, lowTarget));
 
-    effect(() => prefs.setInt(_TNames.urgentHigh.name, urgentHigh));
+    effect(() => prefs.setInt(_TNames.highUrgent.name, highUrgent));
 
-    effect(() => prefs.setInt(_TNames.urgentLow.name, urgentLow));
+    effect(() => prefs.setInt(_TNames.lowUrgent.name, lowUrgent));
   }
 }

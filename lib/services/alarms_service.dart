@@ -126,19 +126,17 @@ class AlarmsService {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
     var disabledAllAlarms = AlarmSettings().disableAlarms;
-    var smartSnooze = AlarmAlertSettings().smartSnooze;
+    var smartSnoozeOn = AlarmAlertSettings().smartSnooze;
     for (var alarm in allAlarms) {
-      var triggered = alarm.trigger();
-      var active = alarm.active();
-      var alarmSmartSnooze = alarm.smartSnooze();
+      var (triggered, active, smartSnooze) = alarm.alarmStatus();
 
       // Build the lists
-
       if (triggered) {
         newTriggeredAlarms.add(alarm);
       }
+
       // If Sleeping do not add
-      if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnooze && alarmSmartSnooze)) {
+      if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze)) {
         newActiveAlarms.add(alarm);
       }
     }

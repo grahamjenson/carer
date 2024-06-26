@@ -122,7 +122,7 @@ class UpdateService {
     List<TempTarget> tempTargets = [];
     for (var tempTarget in summary.targets.targets) {
       tempTargets.add(TempTarget(
-          startDate: tempTarget.start, duration: tempTarget.duration, targetHigh: tempTarget.targetTop, targetLow: tempTarget.targetBottom));
+          startDate: tempTarget.start, duration: tempTarget.duration, highTarget: tempTarget.targetTop, lowTarget: tempTarget.targetBottom));
     }
     int tempTargetUpdates = await TempTarget.saveAll(tempTargets);
 
@@ -136,8 +136,8 @@ class UpdateService {
       carbratio: summaryProfile.expandedCarbratio(),
       sens: summaryProfile.expandedSens(),
       basal: summaryProfile.expandedBasal(),
-      targetLow: summaryProfile.expandedTargetLow(),
-      targetHigh: summaryProfile.expandedTargetHigh(),
+      lowTarget: summaryProfile.expandedTargetLow(),
+      highTarget: summaryProfile.expandedTargetHigh(),
     );
     var profileUpdate = await profile.save();
 

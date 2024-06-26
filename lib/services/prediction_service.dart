@@ -11,19 +11,20 @@ class PredictionService {
 
   factory PredictionService() => _singleton;
 
-  PredictionService._() {
-    effect(() {
-      try {
-        var _ = TimerService().minuteSignal.value;
-        _updatePrediction();
-      } catch (e) {
-        print("Error in _updatePrediction PredictionService effect: $e");
-      }
-    }, debugLabel: "PredictionService");
-  }
+  PredictionService._();
 
-  final Signal<List<SGV>> _predictionsSignal = Signal([]);
-  List<SGV> get predictions => _predictionsSignal.value;
+  final Computed<List<SGV>> predictionsSignal = computed(() {
+    var _ = TimerService().minuteSignal.value;
+    Exp2Predictor exp2predictor = Exp2Predictor();
+    exp2predictor.init();
+    if (exp2predictor.regression.runtimeType == NoopRegression) {
+      return [];
+    }
+
+    return exp2predictor.predictNextHour();
+  }, debugLabel: "PredictionService");
+
+  List<SGV> get predictions => predictionsSignal.value;
 
   List<Range5> get predictionRanges {
     return predictions.map((e) {
@@ -39,17 +40,7 @@ class PredictionService {
       return null;
     }
     var (range, _) = targetRange(sgv.value);
+
     return range;
-  }
-
-  _updatePrediction() {
-    Exp2Predictor exp2predictor = Exp2Predictor();
-    exp2predictor.init();
-    if (exp2predictor.regression.runtimeType == NoopRegression) {
-      print("Regression noop");
-      return Range5.mid;
-    }
-
-    _predictionsSignal.value = exp2predictor.predictNextHour();
   }
 }

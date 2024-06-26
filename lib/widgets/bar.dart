@@ -87,7 +87,7 @@ class Bar extends StatelessWidget {
           onPointerDown: (e) {
             diss = showOverlay(
               (context, t) {
-                return CustomAnimationToast(value: t, str: AlarmsService().triggeredAlarms.map((alarm) => alarm.name).join('\n\n'));
+                return CustomAnimationToast(value: t, str: AlarmsService().triggeredAlarms.map((alarm) => alarm.status()).join('\n'));
               },
               duration: const Duration(seconds: 10),
             );
@@ -124,7 +124,7 @@ class IosStyleToast extends StatelessWidget {
           child: Container(
             color: Colors.black,
             height: 150,
-            width: 150,
+            width: 300,
             child: Window(
               title: "Alarms",
               child: Text(str),

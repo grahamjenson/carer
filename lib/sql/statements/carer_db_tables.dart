@@ -87,8 +87,8 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
 
-      targetHigh INTEGER,
-      targetLow INTEGER,
+      highTarget INTEGER,
+      lowTarget INTEGER,
       UNIQUE(start)
     )
   ''');
@@ -372,12 +372,12 @@ ltemptargets as (select * from temptargets where datetime(end/1000, 'unixepoch')
 SELECT 
   timestamp, 
   datetime, 
-  COALESCE(ltemptargets.targetLow, profile_low) AS targetLow, 
-  COALESCE(ltemptargets.targetHigh, profile_high) AS targetHigh, 
+  COALESCE(ltemptargets.lowTarget, profile_low) AS lowTarget, 
+  COALESCE(ltemptargets.highTarget, profile_high) AS highTarget, 
   COALESCE(ltempbasal.value, profile_basal) AS basal,
   profile_isf as isf,
   profile_cr as cr,
-  ltemptargets.targetHigh is not NULL AS isTempTarget,
+  ltemptargets.highTarget is not NULL AS isTempTarget,
   ltempbasal.value is not NULL AS isTempBasal 
 FROM 
   profile_targets 

@@ -23,23 +23,23 @@ void main() async {
       var tt1 = TempTarget(
         startDate: now.add(min5),
         duration: 60,
-        targetLow: 100,
-        targetHigh: 120,
+        lowTarget: 100,
+        highTarget: 120,
       );
       expect(await tt1.upsert(), true);
 
       var ttl1 = await TempTarget.query();
       expect(ttl1.length, 1);
       expect(ttl1[0].startDate, now.add(min5));
-      expect(ttl1[0].targetLow, 100);
-      expect(ttl1[0].targetHigh, 120);
+      expect(ttl1[0].lowTarget, 100);
+      expect(ttl1[0].highTarget, 120);
       expect(ttl1[0].duration, 60);
 
       var tt2 = TempTarget(
         startDate: now.add(min5),
         duration: 30,
-        targetLow: 100,
-        targetHigh: 120,
+        lowTarget: 100,
+        highTarget: 120,
       );
       expect(await tt2.upsert(), true);
 
@@ -47,15 +47,15 @@ void main() async {
       expect(ttl2.length, 1);
       expect(ttl2[0].id, ttl1[0].id); // They should be the same
       expect(ttl2[0].startDate, now.add(min5));
-      expect(ttl2[0].targetLow, 100);
-      expect(ttl2[0].targetHigh, 120);
+      expect(ttl2[0].lowTarget, 100);
+      expect(ttl2[0].highTarget, 120);
       expect(ttl2[0].duration, 30); // Duration should be the only thing updated
 
       var tt3 = TempTarget(
         startDate: now.add(min5),
         duration: 30,
-        targetLow: 100,
-        targetHigh: 120,
+        lowTarget: 100,
+        highTarget: 120,
       );
       expect(await tt3.upsert(), false);
     });
@@ -64,24 +64,24 @@ void main() async {
       var tt1 = TempTarget(
         startDate: now,
         duration: 120,
-        targetLow: 10,
-        targetHigh: 100,
+        lowTarget: 10,
+        highTarget: 100,
       );
       expect(await tt1.upsert(), true);
 
       var tt2 = TempTarget(
         startDate: now.add(min1),
         duration: 120,
-        targetLow: 20,
-        targetHigh: 200,
+        lowTarget: 20,
+        highTarget: 200,
       );
       expect(await tt2.upsert(), true);
 
       var all = await TempTarget.query();
 
       expect(all.length, 2);
-      expect(all[0].targetLow, 20);
-      expect(all[1].targetLow, 10);
+      expect(all[0].lowTarget, 20);
+      expect(all[1].lowTarget, 10);
 
       expect(all[0].duration, 120);
       expect(all[1].duration, 120); // This is the error that needs fixing
@@ -92,8 +92,8 @@ void main() async {
       all = await TempTarget.query();
 
       expect(all.length, 2);
-      expect(all[0].targetLow, 20);
-      expect(all[1].targetLow, 10);
+      expect(all[0].lowTarget, 20);
+      expect(all[1].lowTarget, 10);
 
       expect(all[0].duration, 120);
       expect(all[1].duration, 60);
@@ -106,33 +106,33 @@ void main() async {
       var a = TempTarget(
         startDate: now,
         duration: 3000,
-        targetLow: 10,
-        targetHigh: 100,
+        lowTarget: 10,
+        highTarget: 100,
       );
       expect(await a.upsert(), true);
 
       var b1 = TempTarget(
         startDate: now.add(min1),
         duration: 20,
-        targetLow: 20,
-        targetHigh: 200,
+        lowTarget: 20,
+        highTarget: 200,
       );
       expect(await b1.upsert(), true);
 
       var b2 = TempTarget(
         startDate: now.add(min1).add(min1),
         duration: 30,
-        targetLow: 30,
-        targetHigh: 300,
+        lowTarget: 30,
+        highTarget: 300,
       );
       expect(await b2.upsert(), true);
 
       var all = await TempTarget.query();
 
       expect(all.length, 3);
-      expect(all[0].targetLow, 30);
-      expect(all[1].targetLow, 20);
-      expect(all[2].targetLow, 10);
+      expect(all[0].lowTarget, 30);
+      expect(all[1].lowTarget, 20);
+      expect(all[2].lowTarget, 10);
 
       expect(all[0].duration, 30);
       expect(all[1].duration, 20); // This is the error that needs fixing
@@ -144,9 +144,9 @@ void main() async {
       all = await TempTarget.query();
 
       expect(all.length, 3);
-      expect(all[0].targetLow, 30);
-      expect(all[1].targetLow, 20);
-      expect(all[2].targetLow, 10);
+      expect(all[0].lowTarget, 30);
+      expect(all[1].lowTarget, 20);
+      expect(all[2].lowTarget, 10);
 
       expect(all[0].duration, 30);
       expect(all[1].duration, 20);
@@ -160,31 +160,31 @@ void main() async {
       var tt1 = TempTarget(
         startDate: now.add(min5),
         duration: 60,
-        targetLow: 100,
-        targetHigh: 120,
+        lowTarget: 100,
+        highTarget: 120,
       );
       expect(await tt1.upsert(), true);
 
       var ttl1 = await TempTarget.query();
       expect(ttl1.length, 1);
       expect(ttl1[0].startDate, now.add(min5));
-      expect(ttl1[0].targetLow, 100);
-      expect(ttl1[0].targetHigh, 120);
+      expect(ttl1[0].lowTarget, 100);
+      expect(ttl1[0].highTarget, 120);
       expect(ttl1[0].duration, 60);
 
       var tt2 = TempTarget(
         startDate: now.add(min5),
         duration: 0,
-        targetLow: 100,
-        targetHigh: 120,
+        lowTarget: 100,
+        highTarget: 120,
       );
       expect(await tt2.upsert(), true);
 
       var ttl2 = await TempTarget.query();
       expect(ttl2.length, 1);
       expect(ttl2[0].startDate, now.add(min5));
-      expect(ttl2[0].targetLow, 100);
-      expect(ttl2[0].targetHigh, 120);
+      expect(ttl2[0].lowTarget, 100);
+      expect(ttl2[0].highTarget, 120);
       expect(ttl2[0].duration, 0);
     });
   });

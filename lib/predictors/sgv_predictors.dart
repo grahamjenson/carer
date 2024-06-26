@@ -57,9 +57,8 @@ abstract class RegressionPredictor extends Predictor {
 
   final double mimnutesFromEpochToLastWeek = clock.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch / 60000;
 
-  int get pastReadings => 5;
+  int get pastReadings => 2;
 
-  // Based on some hacky stats, 5 readings in the past seems best
   RegressionPredictor();
 
   late Regression regression;
@@ -87,6 +86,7 @@ abstract class RegressionPredictor extends Predictor {
 
     var x = sgvs.map((s) => fnX(s.date.millisecondsSinceEpoch)).toList();
     var y = sgvs.map((s) => s.value * 1.0).toList();
+
     regression = createRegression(x, y);
   }
 
@@ -110,36 +110,6 @@ class Linear2Predictor extends RegressionPredictor {
   @override
   Regression createRegression(List<double> x, List<double> y) {
     return LinearRegression(x, y);
-  }
-
-  @override
-  String toString() => 'LinearRegression';
-}
-
-class Linear7Predictor extends RegressionPredictor {
-  Linear7Predictor() : super();
-
-  @override
-  int get pastReadings => 7;
-
-  @override
-  Regression createRegression(List<double> x, List<double> y) {
-    return LinearRegression(x, y);
-  }
-
-  @override
-  String toString() => 'LinearRegression';
-}
-
-class Quadratic3Predictor extends RegressionPredictor {
-  Quadratic3Predictor() : super();
-
-  @override
-  int get pastReadings => 3;
-
-  @override
-  Regression createRegression(List<double> x, List<double> y) {
-    return QuadraticRegression(x, y);
   }
 
   @override

@@ -39,7 +39,7 @@ class AlarmSettings {
     _AlarmNames.fastDropAlarmMinutes: Signal<int>(5, debugLabel: 'fastDropAlarmMinutes'),
     _AlarmNames.fastRiseAlarm: Signal<bool>(false, debugLabel: 'fastRiseAlarm'),
     _AlarmNames.fastRiseAlarmMinutes: Signal<int>(5, debugLabel: 'fastRiseAlarmMinutes'),
-    _AlarmNames.noDataAlarmMinutes: Signal<int>(5, debugLabel: 'noDataAlarmMinutes'),
+    _AlarmNames.noDataAlarmMinutes: Signal<int>(-1, debugLabel: 'noDataAlarmMinutes'),
     _AlarmNames.lowPredictionAlarm: Signal<bool>(false, debugLabel: 'lowPredictionAlarm'),
     _AlarmNames.lowPredictionMinutes: Signal<int>(5, debugLabel: 'lowPredictionMinutes'),
   };

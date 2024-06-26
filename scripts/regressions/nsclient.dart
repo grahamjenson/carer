@@ -85,7 +85,7 @@ class NSEntries {
       List<NSEntry> entries =
           jsonList.map((json) => NSEntry.fromJson(json)).toList();
       return NSEntries(entries: entries);
-    } catch (e, stackTrace) {
+    } catch (e) {
       return NSEntries(entries: []);
     }
   }
@@ -121,7 +121,7 @@ class NSClient {
       }
 
       return NSEntries.fromJson(response.body);
-    } catch (e, stackTrace) {
+    } catch (e) {
       // TODO rewrite to friendly error class
       return Future.error(e);
     }

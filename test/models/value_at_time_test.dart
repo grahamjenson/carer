@@ -34,8 +34,8 @@ void main() async {
         carbratio: List<int>.filled(24, 1),
         sens: List<int>.filled(24, 1),
         basal: List<double>.filled(24, 1),
-        targetLow: List<int>.filled(24, 1),
-        targetHigh: List<int>.filled(24, 2),
+        lowTarget: List<int>.filled(24, 1),
+        highTarget: List<int>.filled(24, 2),
       );
       expect(await p.save(), true);
 
@@ -43,11 +43,11 @@ void main() async {
 
       expect(targets.length, 360); // 5 hours
 
-      valueAssertion(targets[0], targetLow: 1, targetHigh: 2, isTempTarget: false, date: nowMin);
+      valueAssertion(targets[0], lowTarget: 1, highTarget: 2, isTempTarget: false, date: nowMin);
 
-      valueAssertion(targets[1], targetLow: 1, targetHigh: 2, isTempTarget: false, date: now1Min);
+      valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
 
-      var s = await TempTarget(startDate: now.subtract(const Duration(seconds: 50)), duration: 300, targetHigh: 10, targetLow: 5).save();
+      var s = await TempTarget(startDate: now.subtract(const Duration(seconds: 50)), duration: 300, highTarget: 10, lowTarget: 5).save();
       expect(s, true);
 
       targets = await ValueAtTime.query();
@@ -56,17 +56,17 @@ void main() async {
       print("${targets[0]} ${targets[1]}");
 
       // beginning will be 1 hour ahead
-      valueAssertion(targets[0], targetLow: 5, targetHigh: 10, isTempTarget: true, date: nowMin);
+      valueAssertion(targets[0], lowTarget: 5, highTarget: 10, isTempTarget: true, date: nowMin);
 
       // 3 days of profile targets + 1 temp target
-      valueAssertion(targets[1], targetLow: 1, targetHigh: 2, isTempTarget: false, date: now1Min);
+      valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
     });
   });
 }
 
-void valueAssertion(ValueAtTime v, {int? targetLow, int? targetHigh, bool? isTempTarget, DateTime? date}) {
-  if (targetLow != null) expect(v.targetLow, targetLow);
-  if (targetHigh != null) expect(v.targetHigh, targetHigh);
+void valueAssertion(ValueAtTime v, {int? lowTarget, int? highTarget, bool? isTempTarget, DateTime? date}) {
+  if (lowTarget != null) expect(v.lowTarget, lowTarget);
+  if (highTarget != null) expect(v.highTarget, highTarget);
   if (isTempTarget != null) expect(v.isTempTarget, isTempTarget);
   if (date != null) expect(v.date, date);
 }
