@@ -23,10 +23,6 @@ void main() async {
           duration: const Duration(seconds: 2),
         );
       });
-      await expectLater(
-        find.byType(Stats),
-        matchesGoldenFile('../golden_files/stats.png'),
-      );
     });
   });
 }

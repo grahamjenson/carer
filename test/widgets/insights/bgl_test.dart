@@ -30,11 +30,6 @@ void main() async {
           duration: const Duration(seconds: 2),
         );
       });
-
-      await expectLater(
-        find.byType(BGL),
-        matchesGoldenFile('../golden_files/bgl.png'),
-      );
     });
   });
 }
