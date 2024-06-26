@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
@@ -10,26 +8,8 @@ import 'package:signals/signals_flutter.dart';
 
 //copied from https://xdrip.readthedocs.io/en/latest/use/mainUI/#trend-arrow
 
-class BGL extends StatefulWidget {
+class BGL extends StatelessWidget {
   const BGL({super.key});
-
-  @override
-  State<BGL> createState() => _BGLState();
-}
-
-class _BGLState extends State<BGL> {
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

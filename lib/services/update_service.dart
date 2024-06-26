@@ -129,7 +129,7 @@ class UpdateService {
     SummaryProfile summaryProfile = summary.profile;
 
     Profile profile = Profile(
-      date: DateTime.now(),
+      date: clock.now(),
       dia: summaryProfile.dia,
       units: summaryProfile.units,
       timezone: summaryProfile.timezone,

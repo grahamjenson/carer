@@ -7,8 +7,8 @@ import '../test_utils.dart';
 
 /// Initialize sqflite for test.
 
-void main() {
-  sqfliteTestInit();
+void main() async {
+  await sqfliteTestInit();
 
   group('KeyValueStore', () {
     late KeyValueStore store;

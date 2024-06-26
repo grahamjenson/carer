@@ -10,17 +10,17 @@ void main() {
     final file = File(files["summary"]!);
     final jsonString = await file.readAsString();
 
-    Summary summary = Summary.fromJson(jsonString);
+    Summary? summary = Summary.fromJson(jsonString);
 
-    expect(summary.sgvs.sgvs.length, equals(13));
+    expect(summary!.sgvs.sgvs.length, equals(13));
   });
 
   test('parsing bad summary return enmpty Summary object', () async {
     final file = File(files["summary_bad"]!);
     final jsonString = await file.readAsString();
 
-    Summary summary = Summary.fromJson(jsonString);
+    Summary? summary = Summary.fromJson(jsonString);
 
-    expect(summary.sgvs.sgvs.length, equals(0));
+    expect(summary, equals(null));
   });
 }

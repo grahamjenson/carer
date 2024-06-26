@@ -344,7 +344,7 @@ class Summary {
     required this.profile,
   });
 
-  factory Summary.fromJson(String jsonString) {
+  static Summary? fromJson(String jsonString) {
     try {
       var json = jsonDecode(jsonString);
       return Summary(
@@ -358,7 +358,7 @@ class Summary {
       );
     } catch (e, stackTrace) {
       Errors.captureException(e, stackTrace: stackTrace);
-      throw ArgumentError("Invalid Summary JSON: $jsonString");
+      return null;
     }
   }
 }

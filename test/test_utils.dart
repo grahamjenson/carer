@@ -1,10 +1,13 @@
+import 'package:carer/sql/carer_db.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void sqfliteTestInit() {
+Future<void> sqfliteTestInit() async {
   // Initialize ffi implementation
   sqfliteFfiInit();
   // Set global factory
   databaseFactory = databaseFactoryFfi;
+  var db = await CarerDB.instance;
+  print("VERSION ${await db.db.getVersion()}");
 }
 
 double dp4(double x) {

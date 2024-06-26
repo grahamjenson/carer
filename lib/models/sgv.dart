@@ -172,11 +172,11 @@ class SGV extends Model {
   ////
 
   static FutureSignal<double?> todaysPercentage = computedAsync(() async {
-    print("updating Future Signal todaysPercentage Signal");
+    print("updating todaysPercentage");
     var _ = _q.writeSignal.value; // force update on save
     try {
       var value = await _percentInRangeToday(TargetSettings().targetLow, TargetSettings().targetHigh);
-
+      print("updated todaysPercentage");
       return value * 100.0;
     } catch (e, s) {
       print("Error todaysPercentage: $e");
@@ -186,10 +186,11 @@ class SGV extends Model {
   }, initialValue: 0.0, debugLabel: 'todaysPercentage');
 
   static FutureSignal<double?> yesterdaysPercentage = computedAsync(() async {
-    print("updating Future Signal yesterdaysPercentage Signal");
+    print("updating yesterdaysPercentage");
     var _ = _q.writeSignal.value; // force update on save
     try {
       var value = await _percentInRangeYesterday(TargetSettings().targetLow, TargetSettings().targetHigh);
+      print("updated yesterdaysPercentage Signal");
       return value * 100.0;
     } catch (e, s) {
       print("Error yesterdaysPercentage: $e");
@@ -199,16 +200,20 @@ class SGV extends Model {
   }, initialValue: 0.0, debugLabel: 'yesterdaysPercentage');
 
   static FutureSignal<SGV?> lastSGV = computedAsync(() async {
-    print("updating LastSGV Signal");
+    print("updating LastSGV");
     var _ = _q.writeSignal.value; // force update on save
 
-    return _q.query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
+    var ret = await _q.query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
+    print("updated LastSGV Signal");
+    return ret;
   }, debugLabel: 'LastSGV');
 
   static FutureSignal<List<SGV>> last3Hours = computedAsync(() async {
-    print("updating last2Hours Signal");
+    print("updating last3Hours");
     var _ = _q.writeSignal.value; // force update on save
 
-    return SGV.lastMins(60 * 3);
+    var ret = await SGV.lastMins(60 * 3);
+    print("updated last3Hours Signal");
+    return ret;
   }, initialValue: [], debugLabel: 'last3Hours');
 }

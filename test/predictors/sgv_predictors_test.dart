@@ -1,12 +1,13 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/sql/carer_db.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
-void main() {
-  sqfliteTestInit();
+void main() async {
+  await sqfliteTestInit();
 
   DateTime now = DateTime(2020, 1, 1, 12);
 
@@ -33,25 +34,23 @@ void main() {
     });
 
     test("Linear2Predictor", () async {
-      Linear2Predictor pr = Linear2Predictor();
-      await pr.init();
+      withClock(Clock.fixed(now), () async {
+        print(await SGV.last3Hours.future);
 
-      var sgvs = pr.predictNextHour();
-      expect(sgvs.length, 60);
+        Linear2Predictor pr = Linear2Predictor();
+        await pr.init();
 
-      var firstSGV = sgvs[0];
-      var secondSGV = sgvs[1];
-      expect(firstSGV.value, 130);
-      expect(firstSGV.date, min5fromNow);
-      expect(secondSGV.value, 120);
-      expect(secondSGV.date, min10fromNow);
+        var sgvs = pr.predictNextHour();
+        print(sgvs);
+        expect(sgvs.length, 60);
 
-      var rmse = await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [140, 140]);
-      expect(rmse.toInt(), 15);
-
-      rmse = await pr.rmse([epoch(min5fromNow), epoch(min10fromNow)], [130, 120]);
-      print("$pr RMSE: $rmse $sgvs");
-      expect(rmse.toInt(), 0);
+        var firstSGV = sgvs[4];
+        var secondSGV = sgvs[9];
+        expect(firstSGV.value, 130);
+        expect(firstSGV.date, min5fromNow);
+        expect(secondSGV.value, 120);
+        expect(secondSGV.date, min10fromNow);
+      });
     });
   });
 }

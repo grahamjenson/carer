@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../sql/utils.dart';
 import '../test_utils.dart';
 
-void main() {
-  sqfliteTestInit();
+void main() async {
+  await sqfliteTestInit();
 
   group('SGV', () {
     DateTime now = DateTime(2020, 1, 1, 12);

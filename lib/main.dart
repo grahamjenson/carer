@@ -1,14 +1,16 @@
-import 'dart:async';
+import 'dart:io';
 
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
@@ -39,7 +41,12 @@ void runCarer() async {
   await StateData().setupDBPropagation();
 
   // For some reason screens forget to stay awake
-  Timer.periodic(const Duration(seconds: 15), (Timer t) => WakelockPlus.toggle(enable: UISettings().screenActive));
+  effect(() {
+    var _ = TimerService().fifteenSecondSignal.value;
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      WakelockPlus.toggle(enable: UISettings().screenActive);
+    }
+  }, debugLabel: "WakelockPlus");
 
   UpdateService();
   AlarmsService();

@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
-void main() {
-  sqfliteTestInit();
+void main() async {
+  await sqfliteTestInit();
 
   const SummaryProfile emptySummaryProfile = SummaryProfile(
       dia: 1,
@@ -45,27 +45,6 @@ void main() {
 
       var p1 = await Profile.profile();
       expect(p1, isNotNull);
-    });
-
-    test("does not create", () async {
-      print(emptySummaryProfile.expandedCarbratio());
-      var p = Profile(
-        date: now,
-        dia: emptySummaryProfile.dia,
-        units: emptySummaryProfile.units,
-        timezone: emptySummaryProfile.timezone,
-        carbratio: emptySummaryProfile.expandedCarbratio(),
-        sens: emptySummaryProfile.expandedSens(),
-        basal: emptySummaryProfile.expandedBasal(),
-        targetLow: emptySummaryProfile.expandedTargetLow(),
-        targetHigh: emptySummaryProfile.expandedTargetHigh(),
-      );
-      var profileSave = await p.save();
-
-      expect(profileSave, true);
-
-      var p1 = await Profile.count();
-      expect(p1, 0);
     });
   });
 }

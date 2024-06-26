@@ -88,7 +88,7 @@ class AlarmsService {
     return _sleepUntilSignal.value == null;
   }
 
-  Timer sleepTimer = Timer(const Duration(seconds: 0), () {});
+  Timer? sleepTimer;
   Duration? get sleepDuration {
     if (_sleepUntilSignal.value == null) {
       return null;
@@ -97,7 +97,9 @@ class AlarmsService {
   }
 
   set sleepDurationSeconds(int? value) {
-    sleepTimer.cancel(); // Always cancel
+    if (sleepTimer != null) {
+      sleepTimer!.cancel(); // Always cancel
+    }
 
     if (value == null) {
       _sleepUntilSignal.value = null;

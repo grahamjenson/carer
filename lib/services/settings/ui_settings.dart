@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:carer/sql/key_value_store.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 enum _UINames { screenActive, uiLayoutVertical, uiLayoutHorizontal, uiTheme }
 
@@ -47,9 +44,6 @@ class UISettings {
 
     effect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);
-      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
-        WakelockPlus.toggle(enable: screenActive);
-      }
     });
 
     effect(() {

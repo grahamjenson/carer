@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
-void main() {
-  sqfliteTestInit();
+void main() async {
+  await sqfliteTestInit();
 
   group('Temptargets', () {
     DateTime now = DateTime(2020, 1, 1, 12);

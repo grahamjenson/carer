@@ -7,7 +7,7 @@ abstract class Predictor {
   Predictor();
 
   // set this to get the cadence of sgv predictinos correct
-  final DateTime _lastReadingDate = DateTime.now();
+  final DateTime _lastReadingDate = clock.now();
 
   // Get all the expencive calls done here, and can be repedtly called when new data arrives
   init();
