@@ -145,9 +145,6 @@ class AlarmsService {
     triggeredAlarms = newTriggeredAlarms;
     activeAlarms = newActiveAlarms;
 
-    print(newActiveAlarms);
-    print(newTriggeredAlarms);
-
     // Set alarms
     if (activeAlarms.isEmpty) {
       stopAlarm(alarmPlayer);

@@ -1,6 +1,5 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/timer_service.dart';
-import 'package:carer/widgets/bgl/time_grid.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -50,16 +49,17 @@ class TimeAgoReading extends StatelessWidget {
         );
       }
 
-      return SizedBox(
-        width: 350,
-        height: 110,
-        child: Row(
-          children: [
-            Container(padding: const EdgeInsets.only(top: 35, right: 20), child: const Expanded(flex: 1, child: TimeGrid())), // Wrapped in Expanded
-            Expanded(flex: 3, child: text), // Wrapped in Expanded
-          ],
-        ),
-      );
+      return text;
+      //   return SizedBox(
+      //     width: 350,
+      //     height: 110,
+      //     child: Row(
+      //       children: [
+      //         Container(padding: const EdgeInsets.only(top: 26, right: 10), child: const Expanded(flex: 1, child: TimeGrid())), // Wrapped in Expanded
+      //         Expanded(flex: 3, child: text), // Wrapped in Expanded
+      //       ],
+      //     ),
+      //   );
     });
   }
 }

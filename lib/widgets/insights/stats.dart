@@ -43,9 +43,16 @@ class Stats extends StatelessWidget {
         var cobNow = StateData().cob();
         var cageNow = StateData().cage();
         var powerNow = StateData().battery();
-        var exp2preds = PredictionService().predictions;
-        exp2preds = exp2preds.where((e) => e.minsFromNow != 0 && e.minsFromNow % 5 == 0).toList();
         var sgvs = SGV.last3Hours().value!;
+        var exp2preds = PredictionService().predictions;
+
+        if (sgvs.isNotEmpty) {
+          var minsAgo = sgvs.first.minsAgo;
+          var first = 5 - minsAgo;
+          exp2preds = exp2preds.where((e) => [5 - minsAgo, first, first + 5, first + 10, first + 15].contains(e.minsFromNow)).toList();
+        } else {
+          exp2preds = exp2preds.where((e) => [5, 10, 15, 20].contains(e.minsFromNow)).toList();
+        }
 
         return Window(
           title: "Stats",

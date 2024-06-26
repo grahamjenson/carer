@@ -50,12 +50,7 @@ class TimeGrid extends StatelessWidget {
 
   Widget minGrid(List<int> minu) {
     List<Widget> w = [];
-    var lastOne = 0;
     for (var i = 0; i < 6; i++) {
-      if (minu[i] == 0) {
-        lastOne++;
-      }
-
       w.add(Container(
         decoration: BoxDecoration(
           color: mainColor.withAlpha(min(255, 80 * minu[i] + 70)),
