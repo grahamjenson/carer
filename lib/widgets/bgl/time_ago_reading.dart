@@ -20,7 +20,7 @@ class TimeAgoReading extends StatelessWidget {
       var seconds = sgv.age.inSeconds % 300;
       var additionalTX = const TextSpan(text: "");
       if ((sgv.age.inSeconds > 300 && seconds < 15)) {
-        additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 3));
+        additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 10));
       }
 
       Widget text;
@@ -30,6 +30,7 @@ class TimeAgoReading extends StatelessWidget {
           style: TextStyle(
             color: mainColor,
             fontWeight: FontWeight.bold,
+            fontSize: 100,
           ),
         );
       } else {
@@ -39,9 +40,10 @@ class TimeAgoReading extends StatelessWidget {
             style: const TextStyle(
               color: mainColor,
               fontWeight: FontWeight.bold,
+              fontSize: 110,
             ),
             children: [
-              const TextSpan(text: "min", style: TextStyle(fontSize: 6)),
+              const TextSpan(text: "min", style: TextStyle(fontSize: 40)),
               additionalTX,
             ],
           ),
@@ -49,26 +51,15 @@ class TimeAgoReading extends StatelessWidget {
       }
 
       return SizedBox(
-          height: 25,
-          width: 120,
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: FittedBox(
-                  child: text,
-                ),
-              ),
-              const Align(
-                alignment: Alignment(0, 1),
-                child: FractionallySizedBox(
-                  child: FittedBox(
-                    child: TimeGrid(),
-                  ),
-                ),
-              ),
-            ],
-          ));
+        width: 350,
+        height: 110,
+        child: Row(
+          children: [
+            Container(padding: const EdgeInsets.only(top: 35, right: 20), child: const Expanded(flex: 1, child: TimeGrid())), // Wrapped in Expanded
+            Expanded(flex: 3, child: text), // Wrapped in Expanded
+          ],
+        ),
+      );
     });
   }
 }

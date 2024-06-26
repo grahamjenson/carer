@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/widgets/colours.dart';
@@ -11,6 +13,7 @@ class TimeGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Watch((context) {
       var _ = TimerService().secondSignal.value;
+
       List<int> decaSeconds = List.filled(30, 0);
       var sgv = SGV.lastSGV().value;
       if (sgv == null) {
@@ -38,41 +41,32 @@ class TimeGrid extends StatelessWidget {
         minGrid(min4),
         minGrid(min5),
       ];
-      return SizedBox(
-        height: 8,
-        width: 160,
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            crossAxisSpacing: 2,
-            mainAxisSpacing: 1,
-          ),
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return grids[index];
-          },
-        ),
+
+      return Column(
+        children: grids,
       );
     });
   }
 
-  Widget minGrid(List<int> min) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6,
-      ),
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: mainColor.withAlpha(80 * min[index] + 40),
-            borderRadius: BorderRadius.circular(1), // Adjust the radius as needed
-          ),
-          margin: const EdgeInsets.all(1),
-          width: 4,
-          height: 4,
-        );
-      },
-    );
+  Widget minGrid(List<int> minu) {
+    List<Widget> w = [];
+    var lastOne = 0;
+    for (var i = 0; i < 6; i++) {
+      if (minu[i] == 0) {
+        lastOne++;
+      }
+
+      w.add(Container(
+        decoration: BoxDecoration(
+          color: mainColor.withAlpha(min(255, 80 * minu[i] + 70)),
+          borderRadius: BorderRadius.circular(5), // Adjust the radius as needed
+        ),
+        margin: const EdgeInsets.all(2),
+        width: 10,
+        height: 10,
+      ));
+    }
+
+    return Row(children: w);
   }
 }
