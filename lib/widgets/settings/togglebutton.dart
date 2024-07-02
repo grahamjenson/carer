@@ -78,7 +78,7 @@ class ToggleButton extends StatelessWidget {
       renderBorder: true,
       borderRadius: BorderRadius.circular(10),
       borderWidth: 0,
-      isSelected: List<bool>.generate(6, (int index) => values[index] == value),
+      isSelected: List<bool>.generate(titles.length, (int index) => values[index] == value),
       onPressed: (int index) {
         onSelected(values[index]);
       },

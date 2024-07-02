@@ -2,6 +2,7 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -172,31 +173,28 @@ class SGV extends Model {
   ////
 
   static FutureSignal<double?> todaysPercentage = computedAsync(() async {
-    print("updating todaysPercentage");
     var _ = writeSignal.value; // force update on save
-    try {
-      var value = await _percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget);
-      print("updated todaysPercentage");
-      return value * 100.0;
-    } catch (e, s) {
-      print("Error todaysPercentage: $e");
-      print("Stack todaysPercentage: $s");
+    var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
+    if (err != null || value == null) {
+      print("Error todaysPercentage: $err");
       return 0.0;
     }
+    print("updated todaysPercentage");
+    return value * 100.0;
   }, initialValue: 0.0, debugLabel: 'todaysPercentage');
 
   static FutureSignal<double?> yesterdaysPercentage = computedAsync(() async {
     print("updating yesterdaysPercentage");
     var _ = writeSignal.value; // force update on save
-    try {
-      var value = await _percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget);
-      print("updated yesterdaysPercentage Signal");
-      return value * 100.0;
-    } catch (e, s) {
-      print("Error yesterdaysPercentage: $e");
-      print("Stack yesterdaysPercentage: $s");
+
+    var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget));
+
+    if (err != null || value == null) {
+      print("Error yesterdaysPercentage: $err");
       return 0.0;
     }
+    print("updated yesterdaysPercentage Signal");
+    return value * 100.0;
   }, initialValue: 0.0, debugLabel: 'yesterdaysPercentage');
 
   static FutureSignal<SGV?> lastSGV = computedAsync(() async {

@@ -1,8 +1,8 @@
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:signals/signals_flutter.dart';
 
 class HighAlarmPage extends StatelessWidget {
   const HighAlarmPage({super.key});
@@ -18,7 +18,7 @@ class HighAlarmPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('High Alarm'),
       ),
-      body: Watch((_) {
+      body: WatchWE((_) {
         return SettingsList(sections: [
           SettingsSection(tiles: [
             SettingsTile.switchTile(
@@ -40,8 +40,8 @@ class HighAlarmPage extends StatelessWidget {
                 "Alarm after",
                 style: description,
               ),
-              trailing: ToggleButton.selectOne<int>(AlarmSettings().highMinutes, ["0m", "5m", "10m", "15m", "20m", "30m"], [0, 5, 10, 15, 20, 30],
-                  (value) => AlarmSettings().highMinutes = value),
+              trailing: ToggleButton.selectOne<int>(
+                  AlarmSettings().highMinutes, ["0m", "20m", "40m", "60m"], [0, 20, 40, 60], (value) => AlarmSettings().highMinutes = value),
             ),
           ]),
         ]);
