@@ -1,4 +1,5 @@
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bar.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/current_time.dart';
@@ -6,7 +7,6 @@ import 'package:carer/widgets/insights/bgl_chart.dart';
 import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/stats.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(8),
-            child: Watch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
+            child: WatchWE((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
           ),
           const Positioned(
             top: 10, // Adjust these values as needed

@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:signals/signals_flutter.dart';
 
 Future<T> futureProfile<T>(String name, Future<T> toMeasure) {
@@ -48,9 +50,27 @@ class WatchWE<T extends Widget> extends StatelessWidget {
       try {
         return builder(context);
       } catch (e, stackTrace) {
-        print(e);
-        print(stackTrace);
-        return const SizedBox.shrink();
+        // Only report stack for internal lines
+        var internalLines = stackTrace.toString().split("\n").where((element) => element.contains("package:carer")).toList();
+        if (internalLines.isNotEmpty) {
+          print("ERROR\n$e\n${internalLines.join("\n")}");
+        } else {
+          print("ERROR\n$e\n$stackTrace");
+        }
+
+        if (kDebugMode) {
+          return ErrorWidget(e);
+        }
+
+        // If not debug
+
+        // Report to Sentry
+        Sentry.captureException(
+          e,
+          stackTrace: stackTrace,
+        );
+        // Return instructinos on reporting
+        return const Text("Error. Please restart the app. If continues, please contact support.");
       }
     });
   }

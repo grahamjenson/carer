@@ -3,16 +3,16 @@ import 'dart:math';
 import 'package:carer/models/constants.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:signals/signals_flutter.dart';
 
 class T1DSettingsWidget extends AbstractSettingsSection {
   const T1DSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       var unit = Settings().unit;
       var high = TargetSettings().highTarget.toDouble();
       var low = TargetSettings().lowTarget.toDouble();

@@ -1,10 +1,10 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 //copied from https://xdrip.readthedocs.io/en/latest/use/mainUI/#trend-arrow
 
@@ -13,7 +13,7 @@ class BGL extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       const loader = Center(child: CircularProgressIndicator());
 
       var sgv = SGV.lastSGV().value;
@@ -40,7 +40,7 @@ class BGL extends StatelessWidget {
                 widthFactor: 1,
                 heightFactor: 1,
                 child: FittedBox(
-                  child: Watch((_) {
+                  child: WatchWE((_) {
                     var unit = Settings().unit;
                     return Text(sgv.sgvStr(unit),
                         style: const TextStyle(
@@ -58,7 +58,7 @@ class BGL extends StatelessWidget {
                   child: Row(children: [
                     Expanded(
                       child: FittedBox(
-                        child: Watch((_) {
+                        child: WatchWE((_) {
                           var unit = Settings().unit;
                           return Text(
                             sgv.rate5mWithSign(unit),

@@ -1,8 +1,8 @@
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:signals/signals_flutter.dart';
 
 class LowAlarmPage extends StatelessWidget {
   const LowAlarmPage({super.key});
@@ -18,7 +18,7 @@ class LowAlarmPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Low Alarm'),
       ),
-      body: Watch((_) {
+      body: WatchWE((_) {
         return SettingsList(sections: [
           SettingsSection(tiles: [
             SettingsTile.switchTile(

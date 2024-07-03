@@ -1,9 +1,9 @@
 import 'package:carer/sql/carer_db.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 class DebugSettingsWidget extends AbstractSettingsSection {
@@ -11,7 +11,7 @@ class DebugSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       return SettingsSection(
         title: const Text('Debug'),
         tiles: [

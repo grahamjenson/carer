@@ -1,15 +1,15 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 class TimeAgoReading extends StatelessWidget {
   const TimeAgoReading({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       var _ = TimerService().secondSignal.value;
       var sgv = SGV.lastSGV().value;
       if (sgv == null) {

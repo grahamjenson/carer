@@ -1,5 +1,6 @@
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class SleepButton extends StatelessWidget {
     var width = 150.0;
     var height = 35.0;
 
-    return Watch((context) {
+    return WatchWE((context) {
       try {
         // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
         stopSleep() {

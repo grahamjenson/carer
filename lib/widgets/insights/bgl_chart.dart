@@ -5,12 +5,12 @@ import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 class TreatmentSpot extends FlSpot {
   final Treatment treatment;
@@ -53,7 +53,7 @@ class BGLChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       int minsAgo = 120;
 
       List<ValueAtTime> targets = ValueAtTime.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
@@ -81,7 +81,7 @@ class BGLChart extends StatelessWidget {
                   right: 10,
                   top: 5,
                 ),
-                child: Watch((context) {
+                child: WatchWE((context) {
                   return LineChart(
                     buildlineChartData(minsAgo, maxBasal, bglSpotData, basalSpotData, lowTargets, highTargets, treatments, bglLineData),
                     duration: Duration.zero,
@@ -371,7 +371,7 @@ class BGLChart extends StatelessWidget {
             value.toInt() == TargetSettings().lowUrgent ||
             value.toInt() == TargetSettings().highTarget ||
             value.toInt() == TargetSettings().lowTarget) {
-          return Watch((context) {
+          return WatchWE((context) {
             return Text(Settings().unit.str(value), style: style, textAlign: TextAlign.right);
           });
         }

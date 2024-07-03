@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:signals/signals_flutter.dart';
 
 class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
   const AlarmsAlertSettingsWidget({super.key});
@@ -19,7 +19,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       double width = min(820, MediaQuery.of(context).size.width);
 
       try {

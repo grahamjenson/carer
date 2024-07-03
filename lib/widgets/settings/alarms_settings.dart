@@ -1,10 +1,10 @@
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:signals/signals_flutter.dart';
 
 class AlarmsSettingsWidget extends AbstractSettingsSection {
   const AlarmsSettingsWidget({super.key});
@@ -17,7 +17,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       try {
         var tiles = [
           disableAlarms(context),

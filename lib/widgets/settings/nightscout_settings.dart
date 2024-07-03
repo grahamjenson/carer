@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:carer/services/settings/settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:signals/signals_flutter.dart';
 
 class NightscoutSettingsWidget extends AbstractSettingsSection {
   NightscoutSettingsWidget({super.key});
@@ -21,7 +21,7 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
           value: Container(
             alignment: Alignment.centerRight,
             width: maxWidth,
-            child: Watch((context) => Text(
+            child: WatchWE((context) => Text(
                   Settings().nightscoutURL ?? "Not Set",
                   overflow: TextOverflow.ellipsis,
                 )),

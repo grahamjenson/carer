@@ -3,10 +3,10 @@ import 'dart:math';
 
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 class MagArrow extends StatefulWidget {
   const MagArrow({super.key});
@@ -43,7 +43,7 @@ class _MagArrowState extends State<MagArrow> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       try {
         var mag = findMagnitude();
         int? value = mag;

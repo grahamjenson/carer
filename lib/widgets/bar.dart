@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:carer/widgets/sleepbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 class Bar extends StatelessWidget {
@@ -16,7 +16,7 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       try {
         var tiles = [
           const Expanded(

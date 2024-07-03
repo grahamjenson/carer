@@ -2,16 +2,16 @@ import 'dart:math';
 
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 class TimeGrid extends StatelessWidget {
   const TimeGrid({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return WatchWE((context) {
       var _ = TimerService().secondSignal.value;
 
       List<int> decaSeconds = List.filled(30, 0);
