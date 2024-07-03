@@ -18,7 +18,7 @@ class HighAlarmPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('High Alarm'),
       ),
-      body: WatchWE((_) {
+      body: AWatch((_) {
         return SettingsList(sections: [
           SettingsSection(tiles: [
             SettingsTile.switchTile(

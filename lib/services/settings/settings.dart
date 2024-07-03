@@ -4,6 +4,7 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum _SNames {
@@ -28,7 +29,7 @@ class Settings {
   late final Computed<(String, String)> _nightscoutURLAndTokenSignal;
 
   Settings._() {
-    _nightscoutURLAndTokenSignal = computed(() {
+    _nightscoutURLAndTokenSignal = acomputed(() {
       if (nightscoutURL == null || nightscoutURL!.isEmpty) {
         return ('', '');
       }
@@ -38,7 +39,7 @@ class Settings {
       token ??= '';
       var base = '${uri.scheme}://${uri.host}';
       return (base.toString(), token);
-    }, debugLabel: 'nightscoutURLAndToken');
+    }, ('', ''), debugLabel: 'nightscoutURLAndToken');
   }
 
   String? get nightscoutURL => _signals[_SNames.nightscoutUrl]!.value as String?;
@@ -54,14 +55,14 @@ class Settings {
     nightscoutURL = prefs.getString(_SNames.nightscoutUrl.name);
     unit = Unit.fromBool(prefs.getBool(_SNames.unit.name, defaultValue: true)!);
 
-    effect(() {
+    aeffect(() {
       if (nightscoutURL == null) {
         return;
       }
       prefs.setString(_SNames.nightscoutUrl.name, nightscoutURL!);
     });
 
-    effect(() => prefs.setBool(_SNames.unit.name, unit.toBool()));
+    aeffect(() => prefs.setBool(_SNames.unit.name, unit.toBool()));
 
     await uiSettings.setupDBPropagation();
     await targetSettings.setupDBPropagation();

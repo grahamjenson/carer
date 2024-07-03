@@ -43,7 +43,7 @@ class _MagArrowState extends State<MagArrow> {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       try {
         var mag = findMagnitude();
         int? value = mag;

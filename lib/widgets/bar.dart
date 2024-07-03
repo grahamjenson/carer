@@ -16,7 +16,7 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       try {
         var tiles = [
           const Expanded(

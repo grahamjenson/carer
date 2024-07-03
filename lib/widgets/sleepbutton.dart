@@ -6,13 +6,13 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
-Computed<String> sleepStringSignal = computed(() {
+Computed<String> sleepStringSignal = acomputed(() {
   var duration = AlarmsService().sleepDuration;
   if (duration == null) {
     return "";
   }
   return Dates.shortSecondsLeft(duration);
-});
+}, "");
 
 class SleepButton extends StatelessWidget {
   ///Change it to gave a label on a widget of your choice.
@@ -34,7 +34,7 @@ class SleepButton extends StatelessWidget {
     var width = 150.0;
     var height = 35.0;
 
-    return WatchWE((context) {
+    return AWatch((context) {
       try {
         // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
         stopSleep() {

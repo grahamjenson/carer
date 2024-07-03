@@ -1,10 +1,11 @@
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals.dart';
 
 Signal<Set<int>> a = Signal({});
 
 void main() {
   a.value = {1, 2, 3};
-  effect(() {
+  aeffect(() {
     print("hsdgiudsgihu ${a.value}");
   });
 

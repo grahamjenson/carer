@@ -12,7 +12,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       var unit = Settings().unit;
       var high = TargetSettings().highTarget.toDouble();
       var low = TargetSettings().lowTarget.toDouble();

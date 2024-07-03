@@ -11,7 +11,7 @@ class TimeGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       var _ = TimerService().secondSignal.value;
 
       List<int> decaSeconds = List.filled(30, 0);

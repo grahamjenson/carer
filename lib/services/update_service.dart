@@ -12,8 +12,8 @@ import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/services/settings/settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
-import 'package:signals/signals_flutter.dart';
 
 class UpdateService {
   // When this updates lots of things will change
@@ -33,7 +33,7 @@ class UpdateService {
     update();
 
     // If settings update grab latest summary
-    effect(() {
+    aeffect(() {
       // Check signal to register
       var _ = Settings().nightscoutURL;
       _summaryToBeUpdated = true;

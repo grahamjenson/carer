@@ -19,7 +19,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       double width = min(820, MediaQuery.of(context).size.width);
 
       try {

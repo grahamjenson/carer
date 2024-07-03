@@ -21,7 +21,7 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
           value: Container(
             alignment: Alignment.centerRight,
             width: maxWidth,
-            child: WatchWE((context) => Text(
+            child: AWatch((context) => Text(
                   Settings().nightscoutURL ?? "Not Set",
                   overflow: TextOverflow.ellipsis,
                 )),

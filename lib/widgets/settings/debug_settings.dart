@@ -11,7 +11,7 @@ class DebugSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       return SettingsSection(
         title: const Text('Debug'),
         tiles: [

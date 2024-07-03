@@ -17,7 +17,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       try {
         var tiles = [
           disableAlarms(context),

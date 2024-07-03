@@ -5,6 +5,7 @@ import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
@@ -35,7 +36,7 @@ class AlarmsService {
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
   AlarmsService._() {
-    effect(() {
+    aeffect(() {
       try {
         // When an alarm settings
         var sigs = AlarmSettings().allValues();
@@ -49,7 +50,7 @@ class AlarmsService {
       }
     }, debugLabel: "StopTestAlarm");
 
-    effect(() {
+    aeffect(() {
       try {
         checkAlarms();
         print("checking alarms");

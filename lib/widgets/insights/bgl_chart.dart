@@ -53,7 +53,7 @@ class BGLChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       int minsAgo = 120;
 
       List<ValueAtTime> targets = ValueAtTime.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
@@ -81,7 +81,7 @@ class BGLChart extends StatelessWidget {
                   right: 10,
                   top: 5,
                 ),
-                child: WatchWE((context) {
+                child: AWatch((context) {
                   return LineChart(
                     buildlineChartData(minsAgo, maxBasal, bglSpotData, basalSpotData, lowTargets, highTargets, treatments, bglLineData),
                     duration: Duration.zero,
@@ -371,7 +371,7 @@ class BGLChart extends StatelessWidget {
             value.toInt() == TargetSettings().lowUrgent ||
             value.toInt() == TargetSettings().highTarget ||
             value.toInt() == TargetSettings().lowTarget) {
-          return WatchWE((context) {
+          return AWatch((context) {
             return Text(Settings().unit.str(value), style: style, textAlign: TextAlign.right);
           });
         }

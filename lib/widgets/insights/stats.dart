@@ -27,7 +27,7 @@ class Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       try {
         var valuesAtTime = ValueAtTime.lastSixHours().value!;
         var currentBasal = 0.0;
@@ -60,7 +60,7 @@ class Stats extends StatelessWidget {
             child: SingleChildScrollView(
                 child: Container(
               alignment: Alignment.center,
-              child: WatchWE((_) {
+              child: AWatch((_) {
                 return DataTable(
                   border: const TableBorder(
                     verticalInside: BorderSide(color: mainColor),

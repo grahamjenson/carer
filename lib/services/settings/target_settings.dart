@@ -1,4 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals.dart';
 
 // find where in the target range and by what proportion a number is
@@ -108,16 +109,16 @@ class TargetSettings {
     fastDropDelta = prefs.getInt(_TNames.fastDropDelta.name, defaultValue: -20)!;
     fastRiseDelta = prefs.getInt(_TNames.fastRiseDelta.name, defaultValue: 20)!;
 
-    effect(() => prefs.setInt(_TNames.fastDropDelta.name, fastDropDelta));
+    aeffect(() => prefs.setInt(_TNames.fastDropDelta.name, fastDropDelta));
 
-    effect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta));
+    aeffect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta));
 
-    effect(() => prefs.setInt(_TNames.highTarget.name, highTarget));
+    aeffect(() => prefs.setInt(_TNames.highTarget.name, highTarget));
 
-    effect(() => prefs.setInt(_TNames.lowTarget.name, lowTarget));
+    aeffect(() => prefs.setInt(_TNames.lowTarget.name, lowTarget));
 
-    effect(() => prefs.setInt(_TNames.highUrgent.name, highUrgent));
+    aeffect(() => prefs.setInt(_TNames.highUrgent.name, highUrgent));
 
-    effect(() => prefs.setInt(_TNames.lowUrgent.name, lowUrgent));
+    aeffect(() => prefs.setInt(_TNames.lowUrgent.name, lowUrgent));
   }
 }

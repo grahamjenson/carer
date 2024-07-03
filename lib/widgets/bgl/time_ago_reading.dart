@@ -9,7 +9,7 @@ class TimeAgoReading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       var _ = TimerService().secondSignal.value;
       var sgv = SGV.lastSGV().value;
       if (sgv == null) {

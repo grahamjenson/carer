@@ -1,4 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum _AANames {
@@ -91,15 +92,15 @@ class AlarmAlertSettings {
     var prefsAlarmAsset = prefs.getString(_AANames.alarmAsset.name, defaultValue: AlarmSounds.nightguard.name)!;
     alarmAsset = AlarmSounds.values.firstWhere((e) => e.name == prefsAlarmAsset, orElse: () => AlarmSounds.nightguard);
 
-    effect(() => prefs.setBool(_AANames.smartSnooze.name, smartSnooze));
+    aeffect(() => prefs.setBool(_AANames.smartSnooze.name, smartSnooze));
 
-    effect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride));
+    aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride));
 
-    effect(() => prefs.setInt(_AANames.volumeOverrideValue.name, volumeOverrideValue));
+    aeffect(() => prefs.setInt(_AANames.volumeOverrideValue.name, volumeOverrideValue));
 
-    effect(() => prefs.setInt(_AANames.volumeProgressionSeconds.name, volumeProgressionSeconds));
+    aeffect(() => prefs.setInt(_AANames.volumeProgressionSeconds.name, volumeProgressionSeconds));
 
-    effect(() {
+    aeffect(() {
       var value = (alarmAsset).name;
       prefs.setString(_AANames.alarmAsset.name, value);
     });

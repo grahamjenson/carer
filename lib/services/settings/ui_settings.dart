@@ -1,4 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum _UINames { screenActive, uiLayoutVertical, uiLayoutHorizontal, uiTheme }
@@ -42,19 +43,19 @@ class UISettings {
 
     // Setup DB sync for when signalls change
 
-    effect(() {
+    aeffect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);
     });
 
-    effect(() {
+    aeffect(() {
       prefs.setString(_UINames.uiLayoutVertical.name, uiLayoutVertical.name);
     });
 
-    effect(() {
+    aeffect(() {
       prefs.setString(_UINames.uiLayoutHorizontal.name, uiLayoutHorizontal.name);
     });
 
-    effect(() {
+    aeffect(() {
       prefs.setString(_UINames.uiTheme.name, uiTheme.name);
     });
   }

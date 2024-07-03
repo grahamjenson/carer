@@ -2,6 +2,7 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/regressions.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
@@ -13,7 +14,7 @@ class PredictionService {
 
   PredictionService._();
 
-  final Computed<List<SGV>> predictionsSignal = computed(() {
+  final Computed<List<SGV>> predictionsSignal = acomputed(() {
     var _ = TimerService().minuteSignal.value;
     Exp2Predictor exp2predictor = Exp2Predictor();
     exp2predictor.init();
@@ -22,7 +23,7 @@ class PredictionService {
     }
 
     return exp2predictor.predictNextHour();
-  }, debugLabel: "PredictionService");
+  }, [], debugLabel: "PredictionService");
 
   List<SGV> get predictions => predictionsSignal.value;
 

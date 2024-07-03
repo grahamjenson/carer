@@ -31,7 +31,7 @@ class History extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute
 
       var loader = const CircularProgressIndicator();

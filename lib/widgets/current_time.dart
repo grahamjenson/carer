@@ -14,7 +14,7 @@ class CurrentTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       var _ = TimerService().secondSignal.value;
       final String formattedDateTime = _formatDateTime(clock.now());
       return Text(formattedDateTime, style: const TextStyle(height: 0.5, fontSize: 32, fontWeight: FontWeight.bold, color: mainColor));

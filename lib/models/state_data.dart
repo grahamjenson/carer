@@ -1,5 +1,6 @@
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum StateDataName {
@@ -28,19 +29,19 @@ class StateData {
     var kvdb = KeyValueStore(db);
     await kvdb.internalPopulate();
 
-    effect(() {
+    aeffect(() {
       kvdb.setDouble(StateDataName.summaryBattery.name, _signals[StateDataName.summaryBattery]!.value);
     });
 
-    effect(() {
+    aeffect(() {
       kvdb.setDouble(StateDataName.summaryCOB.name, _signals[StateDataName.summaryCOB]!.value);
     });
 
-    effect(() {
+    aeffect(() {
       kvdb.setDouble(StateDataName.summaryIOB.name, _signals[StateDataName.summaryIOB]!.value);
     });
 
-    effect(() {
+    aeffect(() {
       kvdb.setDouble(StateDataName.summaryCAge.name, _signals[StateDataName.summaryCAge]!.value);
     });
   }

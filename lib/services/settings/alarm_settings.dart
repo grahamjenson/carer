@@ -1,4 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum _AlarmNames {
@@ -150,32 +151,32 @@ class AlarmSettings {
 
     noDataAlarmMinutes = prefs.getInt(_AlarmNames.noDataAlarmMinutes.name, defaultValue: 30)!;
 
-    effect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms));
+    aeffect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms));
 
-    effect(() => prefs.setBool(_AlarmNames.urgentLowAlarm.name, urgentLowAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.urgentLowAlarm.name, urgentLowAlarm));
 
-    effect(() => prefs.setBool(_AlarmNames.lowAlarm.name, lowAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.lowAlarm.name, lowAlarm));
 
-    effect(() => prefs.setInt(_AlarmNames.lowMinutes.name, lowMinutes));
+    aeffect(() => prefs.setInt(_AlarmNames.lowMinutes.name, lowMinutes));
 
-    effect(() => prefs.setBool(_AlarmNames.highAlarm.name, highAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.highAlarm.name, highAlarm));
 
-    effect(() => prefs.setInt(_AlarmNames.highMinutes.name, highMinutes));
+    aeffect(() => prefs.setInt(_AlarmNames.highMinutes.name, highMinutes));
 
-    effect(() => prefs.setBool(_AlarmNames.urgentHighAlarm.name, urgentHighAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.urgentHighAlarm.name, urgentHighAlarm));
 
-    effect(() => prefs.setBool(_AlarmNames.fastDropAlarm.name, fastDropAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.fastDropAlarm.name, fastDropAlarm));
 
-    effect(() => prefs.setInt(_AlarmNames.fastDropAlarmMinutes.name, fastDropAlarmMinutes));
+    aeffect(() => prefs.setInt(_AlarmNames.fastDropAlarmMinutes.name, fastDropAlarmMinutes));
 
-    effect(() => prefs.setBool(_AlarmNames.fastRiseAlarm.name, fastRiseAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.fastRiseAlarm.name, fastRiseAlarm));
 
-    effect(() => prefs.setInt(_AlarmNames.fastRiseAlarmMinutes.name, fastRiseAlarmMinutes));
+    aeffect(() => prefs.setInt(_AlarmNames.fastRiseAlarmMinutes.name, fastRiseAlarmMinutes));
 
-    effect(() => prefs.setInt(_AlarmNames.noDataAlarmMinutes.name, noDataAlarmMinutes));
+    aeffect(() => prefs.setInt(_AlarmNames.noDataAlarmMinutes.name, noDataAlarmMinutes));
 
-    effect(() => prefs.setBool(_AlarmNames.lowPredictionAlarm.name, lowPredictionAlarm));
+    aeffect(() => prefs.setBool(_AlarmNames.lowPredictionAlarm.name, lowPredictionAlarm));
 
-    effect(() => prefs.setInt(_AlarmNames.lowPredictionMinutes.name, lowPredictionMinutes));
+    aeffect(() => prefs.setInt(_AlarmNames.lowPredictionMinutes.name, lowPredictionMinutes));
   }
 }

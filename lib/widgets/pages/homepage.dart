@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(8),
-            child: WatchWE((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
+            child: AWatch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
           ),
           const Positioned(
             top: 10, // Adjust these values as needed

@@ -172,7 +172,7 @@ class SGV extends Model {
   // SIGNALS
   ////
 
-  static FutureSignal<double?> todaysPercentage = computedAsync(() async {
+  static FutureSignal<double?> todaysPercentage = acomputedAsync(() async {
     var _ = writeSignal.value; // force update on save
     var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
     if (err != null || value == null) {
@@ -181,9 +181,9 @@ class SGV extends Model {
     }
     print("updated todaysPercentage");
     return value * 100.0;
-  }, initialValue: 0.0, debugLabel: 'todaysPercentage');
+  }, 0.0, debugLabel: 'todaysPercentage');
 
-  static FutureSignal<double?> yesterdaysPercentage = computedAsync(() async {
+  static FutureSignal<double?> yesterdaysPercentage = acomputedAsync(() async {
     print("updating yesterdaysPercentage");
     var _ = writeSignal.value; // force update on save
 
@@ -195,25 +195,25 @@ class SGV extends Model {
     }
     print("updated yesterdaysPercentage Signal");
     return value * 100.0;
-  }, initialValue: 0.0, debugLabel: 'yesterdaysPercentage');
+  }, 0.0, debugLabel: 'yesterdaysPercentage');
 
-  static FutureSignal<SGV?> lastSGV = computedAsync(() async {
+  static FutureSignal<SGV?> lastSGV = acomputedAsync(() async {
     print("updating LastSGV");
     var _ = writeSignal.value; // force update on save
 
     var ret = await _q.query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
     print("updated LastSGV Signal");
     return ret;
-  }, debugLabel: 'LastSGV');
+  }, null, debugLabel: 'LastSGV');
 
-  static FutureSignal<List<SGV>> last3Hours = computedAsync(() async {
+  static FutureSignal<List<SGV>> last3Hours = acomputedAsync(() async {
     print("updating last3Hours");
     var _ = writeSignal.value; // force update on save
 
     var ret = await SGV.lastMins(60 * 3);
     print("updated last3Hours Signal");
     return ret;
-  }, initialValue: [], debugLabel: 'last3Hours');
+  }, [], debugLabel: 'last3Hours');
 
   static Signal<int> get writeSignal => _q.writeSignal;
 }

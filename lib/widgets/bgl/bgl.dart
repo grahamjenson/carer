@@ -13,7 +13,7 @@ class BGL extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatchWE((context) {
+    return AWatch((context) {
       const loader = Center(child: CircularProgressIndicator());
 
       var sgv = SGV.lastSGV().value;
@@ -40,7 +40,7 @@ class BGL extends StatelessWidget {
                 widthFactor: 1,
                 heightFactor: 1,
                 child: FittedBox(
-                  child: WatchWE((_) {
+                  child: AWatch((_) {
                     var unit = Settings().unit;
                     return Text(sgv.sgvStr(unit),
                         style: const TextStyle(
@@ -58,7 +58,7 @@ class BGL extends StatelessWidget {
                   child: Row(children: [
                     Expanded(
                       child: FittedBox(
-                        child: WatchWE((_) {
+                        child: AWatch((_) {
                           var unit = Settings().unit;
                           return Text(
                             sgv.rate5mWithSign(unit),
