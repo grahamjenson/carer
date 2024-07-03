@@ -84,7 +84,7 @@ class NSEntries {
       List<NSEntry> entries = jsonList.map((json) => NSEntry.fromJson(json)).toList();
       return NSEntries(entries: entries);
     } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
+      Errors.captureError(e, stackTrace);
       return NSEntries(entries: []);
     }
   }

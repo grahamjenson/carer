@@ -1,38 +1,40 @@
-import 'dart:io';
-
+import 'package:carer/utils/env.dart';
+import 'package:carer/utils/errors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:signals/signals_flutter.dart';
 
-Future<T> futureProfile<T>(String name, Future<T> toMeasure) {
-  // Dont profile on tests
-  if (Platform.environment.containsKey('FLUTTER_TEST')) {
-    return toMeasure;
+////
+// ASYNC wrapper
+////
+
+Future<(T?, Object?)> go<T>(Future<T> ft, {String? name, bool? profile}) async {
+  Stopwatch? stopwatch;
+
+  if (profile == true && Env.profileOn) {
+    stopwatch = Stopwatch()..start();
   }
-  Future<T> x = Future(() {
-    var stopwatch = Stopwatch()..start();
-    return stopwatch;
-  }).then((sw) async => (sw, await toMeasure)).then((d) {
-    var (sw, r) = d;
-    print('$name executed in ${sw.elapsed.inMilliseconds}ms');
-    //
-    return r;
-    //
-  });
 
-  return x;
-}
-
-Future<(T?, Object?)> go<T>(Future<T> ft) async {
-  try {
-    var x = await ft;
-    return (x, null);
-  } catch (e, stackTrace) {
-    logError(e, stackTrace);
+  return ft.then((value) {
+    _closeOutProfile(stopwatch, name, "success");
+    return (value as T?, null as Object?);
+  }).catchError((e, StackTrace stackTrace) {
+    Errors.captureError(e, stackTrace, name: name);
+    _closeOutProfile(stopwatch, name, "error");
     return (null, e);
+  });
+}
+
+_closeOutProfile(Stopwatch? stopwatch, String? name, String msg) {
+  if (stopwatch != null) {
+    stopwatch.stop();
+    print('$name($msg) executed in ${stopwatch.elapsed.inMilliseconds}ms');
   }
 }
+
+////
+// Signals Wrappers
+////
 
 class AWatch<T extends Widget> extends StatelessWidget {
   const AWatch(this.builder, {super.key});
@@ -47,7 +49,7 @@ class AWatch<T extends Widget> extends StatelessWidget {
         return builder(context);
       } catch (e, stackTrace) {
         // Only report stack for internal lines
-        logError(e, stackTrace);
+        Errors.captureError(e, stackTrace);
 
         if (kDebugMode) {
           return ErrorWidget(e);
@@ -68,7 +70,7 @@ EffectCleanup aeffect(
     try {
       return compute();
     } catch (e, stackTrace) {
-      logError(e, stackTrace);
+      Errors.captureError(e, stackTrace);
     }
   }, debugLabel: debugLabel, onDispose: onDispose);
 }
@@ -83,7 +85,7 @@ Computed<T> acomputed<T>(
     try {
       return compute();
     } catch (e, stackTrace) {
-      logError(e, stackTrace);
+      Errors.captureError(e, stackTrace);
       return onError;
     }
   }, debugLabel: debugLabel, autoDispose: autoDispose);
@@ -101,24 +103,8 @@ FutureSignal<T> acomputedAsync<T>(
     try {
       return await callback();
     } catch (e, stackTrace) {
-      logError(e, stackTrace);
+      Errors.captureError(e, stackTrace);
       return initialValue;
     }
   }, initialValue: initialValue, debugLabel: debugLabel, autoDispose: autoDispose, dependencies: dependencies, lazy: lazy);
-}
-
-logError(e, stacktrace) {
-  var internalLines = stacktrace.toString().split("\n").where((element) => element.contains("package:carer")).toList();
-  if (internalLines.isNotEmpty) {
-    print("ERROR\n$e\n${internalLines.join("\n")}");
-  } else {
-    print("ERROR\n$e\n$stacktrace");
-  }
-
-  if (!kDebugMode) {
-    Sentry.captureException(
-      e,
-      stackTrace: stacktrace,
-    );
-  }
 }

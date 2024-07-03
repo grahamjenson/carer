@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
+import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +42,7 @@ void runCarer() async {
   // For some reason screens forget to stay awake
   aeffect(() {
     var _ = TimerService().fifteenSecondSignal.value;
-    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!Env.isTest) {
       WakelockPlus.toggle(enable: UISettings().screenActive);
     }
   }, debugLabel: "WakelockPlus");

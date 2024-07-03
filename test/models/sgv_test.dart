@@ -82,6 +82,7 @@ void main() async {
         SGV.fromMap({'value': 1, 'timestamp': minTime(0)}).save(),
         SGV.fromMap({'value': 2, 'timestamp': minTime(5)}).save(),
       ]);
+
       expect(ret.where((b) => b).length, 0); // Nothing was changed
 
       sgvs = await SGV.query();

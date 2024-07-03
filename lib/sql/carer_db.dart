@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:carer/utils/env.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -22,7 +22,7 @@ class CarerDB {
   static Future<String> getPath() async {
     final databasePath = await getDatabasesPath();
     var name = 'carer.db';
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (Env.isTest) {
       // TODO make database in memory for tests
       name = 'test_carer_${Random().nextInt(999999999)}.db';
     }

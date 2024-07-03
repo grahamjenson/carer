@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:carer/utils/env.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TimerService {
@@ -11,7 +10,7 @@ class TimerService {
   late Signal minuteSignal;
 
   TimerService._() {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (Env.isTest) {
       // Dont create timers in tests. These can be manually triggered if needed
       minuteSignal = Signal(0, debugLabel: "MinuteSignal");
       secondSignal = Signal(0, debugLabel: "SecondsSignal");

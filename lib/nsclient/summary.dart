@@ -357,7 +357,7 @@ class Summary {
         profile: SummaryProfile.fromJson(json['profile']),
       );
     } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
+      Errors.captureError(e, stackTrace);
       return null;
     }
   }

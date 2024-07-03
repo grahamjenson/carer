@@ -67,7 +67,7 @@ class NSTreatments {
 
       return NSTreatments(treatments: treatmentsList);
     } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
+      Errors.captureError(e, stackTrace);
       return NSTreatments(treatments: []);
     }
   }

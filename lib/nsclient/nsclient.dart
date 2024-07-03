@@ -31,7 +31,7 @@ class NSClient {
 
       return NSEntries.fromJson(response.body);
     } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
+      Errors.captureError(e, stackTrace);
       // TODO rewrite to friendly error class
       return NSEntries.empty();
     }
@@ -51,7 +51,7 @@ class NSClient {
 
       return NSTreatments.fromJson(response.body);
     } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
+      Errors.captureError(e, stackTrace);
       // TODO rewrite to friendly error class
       return Future.error(e);
     }
@@ -71,7 +71,7 @@ class NSClient {
       }
       return Summary.fromJson(response.body);
     } catch (e, stackTrace) {
-      Errors.captureException(e, stackTrace: stackTrace);
+      Errors.captureError(e, stackTrace);
       // TODO rewrite to friendly error class
       return null;
     }

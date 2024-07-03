@@ -22,11 +22,23 @@ abstract class Model {
   }
 
   Future<bool> save() {
-    return futureProfile("$runtimeType save", repository.save(this));
+    return go(repository.save(this), name: "$runtimeType save", profile: true).then((value) {
+      var (res, err) = value;
+      if (err != null || res == null) {
+        return false;
+      }
+      return res;
+    });
   }
 
   Future<bool> upsert() {
-    return futureProfile("$runtimeType upsert", repository.upsert(this, uniqueValues()));
+    return go(repository.upsert(this, uniqueValues()), name: "$runtimeType upsert", profile: true).then((value) {
+      var (res, err) = value;
+      if (err != null || res == null) {
+        return false;
+      }
+      return res;
+    });
   }
 
   List<String> uniqueValues() {
@@ -79,26 +91,37 @@ abstract class ModelRepository<T extends Model> {
   }) async {
     var cdb = await CarerDB.instance;
     var (where, whereArgs) = _buildWhereStatement(after: after, before: before, conditions: conditions);
-    var res = await futureProfile(
-        "$runtimeType ${name ?? "q"}", cdb.db.query(tableName, where: where, whereArgs: whereArgs, limit: limit, orderBy: "$timestampField DESC"));
+    var (res, err) = await go(
+      cdb.db.query(tableName, where: where, whereArgs: whereArgs, limit: limit, orderBy: "$timestampField DESC"),
+      name: "$runtimeType ${name ?? "q"}",
+      profile: true,
+    );
+    if (err != null || res == null) {
+      return [];
+    }
     return res.map((e) => fromMap(e)).toList();
   }
 
-  Future<List<T>> lastMins(int minsAgo) async {
-    return (await query(name: "lastMins", after: clock.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch));
+  Future<List<T>> lastMins(int minsAgo) {
+    return query(name: "lastMins", after: clock.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch);
   }
 
   Future<bool> save(T model) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
 
-    var id = 0;
+    var id;
+    var err;
     if (model.id == null) {
-      id = await cdb.db.insert(tb, toSQLMap(model), conflictAlgorithm: ConflictAlgorithm.ignore);
+      (id, err) = await go(cdb.db.insert(tb, toSQLMap(model), conflictAlgorithm: ConflictAlgorithm.ignore));
     } else {
-      id = await cdb.db.update(tb, toSQLMap(model), where: '$idField = ?', whereArgs: [model.id]);
+      (id, err) = await go(cdb.db.update(tb, toSQLMap(model), where: '$idField = ?', whereArgs: [model.id]));
     }
-    var ret = id != 0;
+    if (err != null) {
+      return false;
+    }
+
+    var ret = id != null && id != 0;
     if (ret) {
       model.id = id;
       writeSignal.value = clock.now().millisecondsSinceEpoch;
@@ -118,7 +141,14 @@ abstract class ModelRepository<T extends Model> {
         batch.update(tb, toSQLMap(model), where: '$idField = ?', whereArgs: [model.id]);
       }
     }
-    var ids = await futureProfile("$T saveAll", batch.commit());
+    var (ids, err) = await go(
+      batch.commit(),
+      name: "$T saveAll",
+      profile: true,
+    );
+    if (err != null || ids == null) {
+      return 0;
+    }
     // assign the ids
     var saves = 0;
     for (var i = 0; i < models.length; i++) {
@@ -145,7 +175,10 @@ abstract class ModelRepository<T extends Model> {
     var whereArgs = uniqueValues.map((e) => map[e]).toList();
 
     // Get current value
-    var oldModel = await cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1);
+    var (oldModel, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));
+    if (err != null || oldModel == null) {
+      return false;
+    }
 
     if (oldModel.isNotEmpty) {
       // check if there is need for any changes

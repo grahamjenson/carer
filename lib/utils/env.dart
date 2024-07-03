@@ -1,10 +1,11 @@
-abstract class Env {
-  static const String env = String.fromEnvironment(
-    'ENV',
-    defaultValue: 'DEVELOPMENT',
-  );
+import 'dart:io';
 
-  static const bool isDev = env == "DEVELOPMENT";
-  static const bool isProd = env == "PRODUCTION";
-  static const bool isTest = env == "TEST";
+import 'package:flutter/foundation.dart';
+
+abstract class Env {
+  static const bool isDev = kDebugMode;
+  static bool isTest = Platform.environment.containsKey('FLUTTER_TEST');
+  static bool isProd = !isTest && !isDev;
+
+  static bool profileOn = isDev;
 }
