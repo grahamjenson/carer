@@ -12,6 +12,7 @@ import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 class UpdateService {
@@ -83,7 +84,7 @@ class UpdateService {
     var (summary, err) = await go(NSClient().getSummary(nsURL, nsToken));
 
     if (err != null || summary == null) {
-      print("Err OR Summary is empty");
+      alog("Err OR Summary is empty");
       _summaryToBeUpdated = true;
       return;
     }
@@ -157,7 +158,7 @@ class UpdateService {
     var badTempBasals = await TempBasal.fixData();
     var badTempTargets = await TempTarget.fixData();
 
-    print('''
+    alog('''
 updateSummary $sgvUpdates, $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates, $profileUpdate
 Bad data $badTempBasals, $badTempTargets
           ''');
@@ -168,7 +169,7 @@ Bad data $badTempBasals, $badTempTargets
 
     var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, 12 * 48));
     if (err != null || entries == null) {
-      print("Err OR Entries is empty");
+      alog("Err OR Entries is empty");
       _entriesToBeUpdated = true;
       return;
     }
@@ -183,6 +184,6 @@ Bad data $badTempBasals, $badTempTargets
 
     var total = await SGV.saveAll(sgvs);
 
-    print("updateEntries $total");
+    alog("updateEntries $total");
   }
 }

@@ -1,3 +1,4 @@
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 class Dates {
@@ -64,7 +65,7 @@ class Dates {
       nextTime = DateTime(now.year, now.month, now.day + 1, timeAsHour);
     }
 
-    print("timeAsHour $timeAsHour, $now $nextTime ${now.timeZoneName}");
+    alog("timeAsHour $timeAsHour, $now $nextTime ${now.timeZoneName}");
 
     Duration difference = nextTime.difference(now);
     return difference.inSeconds;

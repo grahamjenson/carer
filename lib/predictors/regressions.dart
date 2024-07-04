@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:carer/predictors/matrix.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/math.dart';
 
 //  Converted From NightGuard codebase
@@ -278,7 +279,7 @@ class BestMatchRegression extends Regression {
       // Check the root mean squared error fot
       var rootMeanSquaredError = model.rmse;
 
-      print("$model RMSE: $rootMeanSquaredError");
+      alog("$model RMSE: $rootMeanSquaredError");
       if (rootMeanSquaredError.isNaN) {
         continue;
       }

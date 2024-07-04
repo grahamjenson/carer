@@ -2,6 +2,8 @@
 
 import 'dart:math';
 
+import 'package:carer/utils/logs.dart';
+
 class Matrix {
   List<List<double>> matrix = [[]];
 
@@ -58,8 +60,7 @@ class Matrix {
 
   @override
   String toString() {
-    String matrixToString =
-        'Matrix: ${(matrix[0].isEmpty) ? 0 : matrix.length}x${matrix[0].length}\n';
+    String matrixToString = 'Matrix: ${(matrix[0].isEmpty) ? 0 : matrix.length}x${matrix[0].length}\n';
     for (var list in matrix) {
       matrixToString += '$list\n';
     }
@@ -122,7 +123,7 @@ class Matrix {
     if (matrix[row].length == list.length) {
       matrix[row] = list;
     } else {
-      print('Failed: Length of list is not match. ');
+      alog('Failed: Length of list is not match. ');
     }
   }
 
@@ -132,7 +133,7 @@ class Matrix {
         matrix[i][column] = list[i];
       }
     } else {
-      print('Failed: Length of list is not match. ');
+      alog('Failed: Length of list is not match. ');
     }
   }
 
@@ -269,8 +270,7 @@ class Matrix {
     } else if (index == '' || index == ' ') {
       return column(0);
     } else {
-      throw Exception(
-          'Unable to get a value from this index. You can use an integer or an empty string. ');
+      throw Exception('Unable to get a value from this index. You can use an integer or an empty string. ');
     }
     return [];
   }
@@ -285,8 +285,7 @@ class Matrix {
     } else if (index == '' || index == ' ') {
       setColumn(value, 0);
     } else {
-      throw Exception(
-          'Unable to assign a value to this index. You can use an integer or an empty string. ');
+      throw Exception('Unable to assign a value to this index. You can use an integer or an empty string. ');
     }
   }
 }
@@ -295,10 +294,7 @@ List<List<double>> listsTranspose(List<List<double>> lists) {
   List<List<double>> temp = [];
   int rows = lists.length;
   int columns = lists[0].length;
-  temp = List.generate(
-      columns,
-      (indexRow) =>
-          List.generate(rows, (indexColumn) => lists[indexColumn][indexRow]));
+  temp = List.generate(columns, (indexRow) => List.generate(rows, (indexColumn) => lists[indexColumn][indexRow]));
   return temp;
 }
 
@@ -315,13 +311,11 @@ double dotProduct(List<double> firstVector, List<double> secondVector) {
 List<List<double>> generateLists(double seed, int row, int column) {
   List<List<double>> matrix = [];
 
-  matrix = List.generate(
-      row, (indexRow) => List.generate(column, (indexColumn) => seed));
+  matrix = List.generate(row, (indexRow) => List.generate(column, (indexColumn) => seed));
   return matrix;
 }
 
-(List<List<double>>, List<List<double>>) luDecomposition(
-    List<List<double>> matrix) {
+(List<List<double>>, List<List<double>>) luDecomposition(List<List<double>> matrix) {
   List<List<double>> L = generateLists(0, matrix.length, matrix.length);
 
   for (int i = 0; i < L.length; i++) {
@@ -391,20 +385,15 @@ List<double> backSub(List<List<double>> u, List<double> b) {
   return x;
 }
 
-List<double> luSolve(
-    List<List<double>> l, List<List<double>> u, List<double> b) {
+List<double> luSolve(List<List<double>> l, List<List<double>> u, List<double> b) {
   List<double> y = forwardSub(l, b);
   List<double> x = backSub(u, y);
   return x;
 }
 
 class Math {
-  static double rootMeanSquaredError(
-      List<double> xValues, List<double> yValues, List<double> predictions) {
-    assert(
-        xValues.length == yValues.length &&
-            xValues.length == predictions.length,
-        'x should have the same length as y');
+  static double rootMeanSquaredError(List<double> xValues, List<double> yValues, List<double> predictions) {
+    assert(xValues.length == yValues.length && xValues.length == predictions.length, 'x should have the same length as y');
 
     int count = xValues.length;
 

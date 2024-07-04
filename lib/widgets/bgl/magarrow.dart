@@ -44,33 +44,28 @@ class _MagArrowState extends State<MagArrow> {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      try {
-        var mag = findMagnitude();
-        int? value = mag;
-        if (mag == null) {
-          value = mag;
-        } else if (mag == 0) {
-          value = 0;
-          diff = 0;
-          limit = 1;
-        } else if (mag > 0) {
-          value = diff;
-          limit = mag.abs() + 1;
-        } else if (mag < 0) {
-          value = -diff;
-          limit = mag.abs() + 1;
-        }
-
-        return AspectRatio(
-          aspectRatio: 0.3,
-          child: CustomPaint(
-            painter: MyPainter(value),
-          ),
-        );
-      } catch (e) {
-        print("Error in mag arrow: $e");
-        return const SizedBox();
+      var mag = findMagnitude();
+      int? value = mag;
+      if (mag == null) {
+        value = mag;
+      } else if (mag == 0) {
+        value = 0;
+        diff = 0;
+        limit = 1;
+      } else if (mag > 0) {
+        value = diff;
+        limit = mag.abs() + 1;
+      } else if (mag < 0) {
+        value = -diff;
+        limit = mag.abs() + 1;
       }
+
+      return AspectRatio(
+        aspectRatio: 0.3,
+        child: CustomPaint(
+          painter: MyPainter(value),
+        ),
+      );
     });
   }
 }

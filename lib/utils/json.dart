@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:carer/utils/errors.dart';
+
 JsonDecoder decoder = const JsonDecoder();
 JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -10,7 +12,8 @@ String prettyPrintJson(String input) {
     var str = "";
     prettyString.split('\n').forEach((element) => str += "$element\n");
     return str;
-  } catch (e) {
+  } catch (e, stackTrace) {
+    Errors.captureError(e, stackTrace, name: "prettyPrintJson");
     return input;
   }
 }

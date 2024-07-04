@@ -35,77 +35,70 @@ class SleepButton extends StatelessWidget {
     var height = 35.0;
 
     return AWatch((context) {
-      try {
-        // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
-        stopSleep() {
-          AlarmsService().sleepDurationSeconds = null;
-        }
-
-        openSleepDialog() async {
-          var sleepTime = await _openSleepDialog(context);
-          sleepTime ??= 0;
-          AlarmsService().sleepDurationSeconds = sleepTime;
-        }
-
-        var sleepDuration = AlarmsService().sleepDuration;
-        Widget child;
-        // There is currently a sleep value
-        if (sleepDuration != null) {
-          child = TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: mainColor.withAlpha(20),
-              ),
-              onPressed: stopSleep,
-              child: SizedBox(
-                width: width,
-                child: Text(
-                  textAlign: TextAlign.center,
-                  sleepStringSignal.value,
-                  style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
-                ),
-              ));
-        } else {
-          child = Dismissible(
-            key: UniqueKey(),
-            direction: DismissDirection.startToEnd,
-            dismissThresholds: const {DismissDirection.startToEnd: 0.75},
-            confirmDismiss: (_) async {
-              bool result;
-              try {
-                result = (await openSleepDialog()) ?? true;
-              } catch (e) {
-                result = false;
-              }
-
-              ///break the action
-              if (!result) return false;
-
-              return true;
-            },
-            child: Container(
-              width: width - height,
-              height: height,
-              alignment: Alignment.centerLeft,
-              child: Container(
-                height: height,
-                width: height,
-                decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(100)),
-                child: Center(child: icon),
-              ),
-            ),
-          );
-        }
-        return Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
-          alignment: Alignment.centerLeft,
-          child: child,
-        );
-      } catch (e) {
-        print("Error in sleep button: $e");
-        return Container();
+      // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
+      stopSleep() {
+        AlarmsService().sleepDurationSeconds = null;
       }
+
+      openSleepDialog() async {
+        var sleepTime = await _openSleepDialog(context);
+        sleepTime ??= 0;
+        AlarmsService().sleepDurationSeconds = sleepTime;
+      }
+
+      var sleepDuration = AlarmsService().sleepDuration;
+      Widget child;
+      // There is currently a sleep value
+      if (sleepDuration != null) {
+        child = TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: mainColor.withAlpha(20),
+            ),
+            onPressed: stopSleep,
+            child: SizedBox(
+              width: width,
+              child: Text(
+                textAlign: TextAlign.center,
+                sleepStringSignal.value,
+                style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
+              ),
+            ));
+      } else {
+        child = Dismissible(
+          key: UniqueKey(),
+          direction: DismissDirection.startToEnd,
+          dismissThresholds: const {DismissDirection.startToEnd: 0.75},
+          confirmDismiss: (_) async {
+            var (result, err) = await go(openSleepDialog());
+            if (err != null && result == null) {
+              result = true;
+            }
+
+            ///break the action
+            if (!result) return false;
+
+            return true;
+          },
+          child: Container(
+            width: width - height,
+            height: height,
+            alignment: Alignment.centerLeft,
+            child: Container(
+              height: height,
+              width: height,
+              decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(100)),
+              child: Center(child: icon),
+            ),
+          ),
+        );
+      }
+      return Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+        alignment: Alignment.centerLeft,
+        child: child,
+      );
     });
   }
 }

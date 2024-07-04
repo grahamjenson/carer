@@ -5,6 +5,7 @@ import 'package:carer/models/temptarget.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -85,7 +86,7 @@ class ValueAtTime extends Model {
   static Future<List<ValueAtTime>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
 
   static FutureSignal<List<ValueAtTime>> lastSixHours = acomputedAsync(() async {
-    print("updating Treatments lastSixHours");
+    alog("updating Treatments lastSixHours");
     var _ = TimerService().minuteSignal; // Update eevry minute
     var b = TempTarget.writeSignal.value;
     var c = TempBasal.writeSignal.value;

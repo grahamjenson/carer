@@ -17,38 +17,31 @@ class Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      try {
-        var tiles = [
+      var tiles = [
+        const Expanded(
+          child: SizedBox.shrink(),
+        ),
+        getSettingsButton(context),
+      ];
+      if (!AlarmSettings().disableAlarms) {
+        tiles = [
+          getSleepButton(context),
+          getActiveAlarms(context),
           const Expanded(
             child: SizedBox.shrink(),
           ),
           getSettingsButton(context),
         ];
-        if (!AlarmSettings().disableAlarms) {
-          tiles = [
-            getSleepButton(context),
-            getActiveAlarms(context),
-            const Expanded(
-              child: SizedBox.shrink(),
-            ),
-            getSettingsButton(context),
-          ];
-        }
-        return BottomAppBar(
-          color: Colors.transparent,
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          height: 40,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: tiles,
-          ),
-        );
-      } catch (e) {
-        print("Error in Bar: $e");
-        return BottomAppBar(
-          child: Text(e.toString()),
-        );
       }
+      return BottomAppBar(
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        height: 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: tiles,
+        ),
+      );
     });
   }
 

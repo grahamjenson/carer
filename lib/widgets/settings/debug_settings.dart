@@ -1,5 +1,6 @@
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -21,11 +22,11 @@ class DebugSettingsWidget extends AbstractSettingsSection {
             leading: const Icon(UniconsLine.bug),
             onPressed: (context) async {
               var path = await CarerDB.getPath();
-              print("Sharing DB at $path");
+              alog("Sharing DB at $path");
               final result = await Share.shareXFiles([XFile(path)], text: 'DB');
 
               if (result.status == ShareResultStatus.success) {
-                print('Thank you for sharing the DB');
+                alog('Thank you for sharing the DB');
               }
             },
           ),

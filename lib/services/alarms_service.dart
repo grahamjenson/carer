@@ -6,6 +6,7 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
@@ -37,26 +38,18 @@ class AlarmsService {
 
   AlarmsService._() {
     aeffect(() {
-      try {
-        // When an alarm settings
-        var sigs = AlarmSettings().allValues();
-        var aas = AlarmAlertSettings().allValues();
-        // When a Target setting changes
-        var tigs = TargetSettings().allValues();
-        // Stop test alarm
-        stopTestAlarm();
-      } catch (e) {
-        print("Error in StopTestAlarm AlarmsService effect: $e");
-      }
+      // When an alarm settings
+      var sigs = AlarmSettings().allValues();
+      var aas = AlarmAlertSettings().allValues();
+      // When a Target setting changes
+      var tigs = TargetSettings().allValues();
+      // Stop test alarm
+      stopTestAlarm();
     }, debugLabel: "StopTestAlarm");
 
     aeffect(() {
-      try {
-        checkAlarms();
-        print("checking alarms");
-      } catch (e) {
-        print("Error in CheckAlarms AlarmsService effect: $e");
-      }
+      checkAlarms();
+      alog("checking alarms");
     }, debugLabel: "CheckAlarms");
   }
 

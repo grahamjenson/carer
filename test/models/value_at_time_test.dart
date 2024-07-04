@@ -53,8 +53,6 @@ void main() async {
       targets = await ValueAtTime.query();
       expect(targets.length, 360);
 
-      print("${targets[0]} ${targets[1]}");
-
       // beginning will be 1 hour ahead
       valueAssertion(targets[0], lowTarget: 5, highTarget: 10, isTempTarget: true, date: nowMin);
 

@@ -1,5 +1,7 @@
 // borrowed from matricies package
 
+import 'package:carer/utils/logs.dart';
+
 class Matrix {
   List<List<double>> matrix = [[]];
 
@@ -116,7 +118,7 @@ class Matrix {
     if (matrix[row].length == list.length) {
       matrix[row] = list;
     } else {
-      print('Failed: Length of list is not match. ');
+      alog('Failed: Length of list is not match. ');
     }
   }
 
@@ -126,7 +128,7 @@ class Matrix {
         matrix[i][column] = list[i];
       }
     } else {
-      print('Failed: Length of list is not match. ');
+      alog('Failed: Length of list is not match. ');
     }
   }
 

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/env.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -35,23 +36,23 @@ class CarerDB {
     // TODO hash all database table code to single value to set version for
     var version = 25;
 
-    print("Opening database at $path");
+    alog("Opening database at $path");
     var db = await openDatabase(
       path,
       version: version, // TODO: replace this eventually with a version number
       onCreate: (db, version) async {
-        print("Creating database at version $version");
+        alog("Creating database at version $version");
         await dropAll(db);
         await createAll(db);
       },
       // I am assuming these values will destroy and recreate the database on any version change.
       onDowngrade: (db, oldVersion, newVersion) async {
-        print("DOWNGRADING database at version $newVersion");
+        alog("DOWNGRADING database at version $newVersion");
         await dropAll(db);
         await createAll(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        print("UPGRADING database at version $newVersion");
+        alog("UPGRADING database at version $newVersion");
         await dropAll(db);
         await createAll(db);
       },

@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart' as http;
 
 Uri entryEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
@@ -19,7 +18,7 @@ Uri basalEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/basal.jso
 class NSClient {
   Future<NSEntries> getEntries(String nsURL, String token, int count) async {
     if (nsURL == "" || token == "") {
-      print("No NS URL or token");
+      alog("No NS URL or token");
       return NSEntries.empty();
     }
 
@@ -29,7 +28,7 @@ class NSClient {
     }
 
     if (response.statusCode != 200) {
-      log("NON 200 responce code ${response.statusCode}");
+      alog("NON 200 responce code ${response.statusCode}");
       return NSEntries.empty();
     }
 
@@ -45,7 +44,7 @@ class NSClient {
       return NSTreatments.empty();
     }
     if (response.statusCode != 200) {
-      log("NON 200 responce code ${response.statusCode}");
+      alog("NON 200 responce code ${response.statusCode}");
       return NSTreatments.empty();
     }
 
@@ -61,9 +60,9 @@ class NSClient {
     if (err != null || response == null) {
       return null;
     }
-    log("FETCHED ${ep.toString()}");
+    alog("FETCHED ${ep.toString()}");
     if (response.statusCode != 200) {
-      print("NON 200 responce code ${response.statusCode}");
+      alog("NON 200 responce code ${response.statusCode}");
       return null;
     }
     return Summary.fromJson(response.body);

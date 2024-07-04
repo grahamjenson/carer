@@ -22,24 +22,19 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
     return AWatch((context) {
       double width = min(820, MediaQuery.of(context).size.width);
 
-      try {
-        var tiles = [
-          smartSnooze(),
-          volumeOverride(context),
-          volumeSettings(context, width),
-          progressiveVolume(context),
-          alarmFileSelect(),
-          testAlert(context, width),
-        ];
+      var tiles = [
+        smartSnooze(),
+        volumeOverride(context),
+        volumeSettings(context, width),
+        progressiveVolume(context),
+        alarmFileSelect(),
+        testAlert(context, width),
+      ];
 
-        return SettingsSection(
-          title: const Text('Alarm Alert'),
-          tiles: tiles,
-        );
-      } catch (e) {
-        print("Error in AlarmsAlertSettingsWidget: $e");
-        return const SizedBox();
-      }
+      return SettingsSection(
+        title: const Text('Alarm Alert'),
+        tiles: tiles,
+      );
     });
   }
 

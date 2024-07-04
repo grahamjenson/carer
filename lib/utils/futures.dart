@@ -1,5 +1,6 @@
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/errors.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -28,7 +29,7 @@ Future<(T?, Object?)> go<T>(Future<T> ft, {String? name, bool? profile}) async {
 _closeOutProfile(Stopwatch? stopwatch, String? name, String msg) {
   if (stopwatch != null) {
     stopwatch.stop();
-    print('$name($msg) executed in ${stopwatch.elapsed.inMilliseconds}ms');
+    alog('$name($msg) executed in ${stopwatch.elapsed.inMilliseconds}ms');
   }
 }
 

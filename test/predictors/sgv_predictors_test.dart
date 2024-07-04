@@ -35,13 +35,13 @@ void main() async {
 
     test("Linear2Predictor", () async {
       withClock(Clock.fixed(now), () async {
-        print(await SGV.last3Hours.future);
+        await SGV.last3Hours.future;
 
         Linear2Predictor pr = Linear2Predictor();
         await pr.init();
 
         var sgvs = pr.predictNextHour();
-        print(sgvs);
+
         expect(sgvs.length, 60);
 
         var firstSGV = sgvs[4];

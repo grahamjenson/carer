@@ -3,6 +3,7 @@ import 'package:carer/models/model.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -176,42 +177,42 @@ class SGV extends Model {
     var _ = writeSignal.value; // force update on save
     var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
     if (err != null || value == null) {
-      print("Error todaysPercentage: $err");
+      alog("Error todaysPercentage: $err");
       return 0.0;
     }
-    print("updated todaysPercentage");
+    alog("updated todaysPercentage");
     return value * 100.0;
   }, 0.0, debugLabel: 'todaysPercentage');
 
   static FutureSignal<double?> yesterdaysPercentage = acomputedAsync(() async {
-    print("updating yesterdaysPercentage");
+    alog("updating yesterdaysPercentage");
     var _ = writeSignal.value; // force update on save
 
     var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget));
 
     if (err != null || value == null) {
-      print("Error yesterdaysPercentage: $err");
+      alog("Error yesterdaysPercentage: $err");
       return 0.0;
     }
-    print("updated yesterdaysPercentage Signal");
+    alog("updated yesterdaysPercentage Signal");
     return value * 100.0;
   }, 0.0, debugLabel: 'yesterdaysPercentage');
 
   static FutureSignal<SGV?> lastSGV = acomputedAsync(() async {
-    print("updating LastSGV");
+    alog("updating LastSGV");
     var _ = writeSignal.value; // force update on save
 
     var ret = await _q.query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
-    print("updated LastSGV Signal");
+    alog("updated LastSGV Signal");
     return ret;
   }, null, debugLabel: 'LastSGV');
 
   static FutureSignal<List<SGV>> last3Hours = acomputedAsync(() async {
-    print("updating last3Hours");
+    alog("updating last3Hours");
     var _ = writeSignal.value; // force update on save
 
     var ret = await SGV.lastMins(60 * 3);
-    print("updated last3Hours Signal");
+    alog("updated last3Hours Signal");
     return ret;
   }, [], debugLabel: 'last3Hours');
 

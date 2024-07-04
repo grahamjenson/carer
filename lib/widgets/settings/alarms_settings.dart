@@ -18,28 +18,23 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      try {
-        var tiles = [
-          disableAlarms(context),
-        ];
+      var tiles = [
+        disableAlarms(context),
+      ];
 
-        if (!AlarmSettings().disableAlarms) {
-          tiles = [
-            disableAlarms(context),
-            rangeAlarms(context),
-            predictionAlarms(context),
-            diffSettings(context),
-            noDataAlarmSettings(),
-          ];
-        }
-        return SettingsSection(
-          title: const Text('Alarms'),
-          tiles: tiles,
-        );
-      } catch (e) {
-        print("Error in AlarmsSettingsWidget: $e");
-        return const SizedBox();
+      if (!AlarmSettings().disableAlarms) {
+        tiles = [
+          disableAlarms(context),
+          rangeAlarms(context),
+          predictionAlarms(context),
+          diffSettings(context),
+          noDataAlarmSettings(),
+        ];
       }
+      return SettingsSection(
+        title: const Text('Alarms'),
+        tiles: tiles,
+      );
     });
   }
 

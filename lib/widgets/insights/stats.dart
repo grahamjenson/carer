@@ -28,81 +28,75 @@ class Stats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      try {
-        var valuesAtTime = ValueAtTime.lastSixHours().value!;
-        var currentBasal = 0.0;
-        var profileLowTarget = 0;
-        var profileHighTarget = 0;
-        if (valuesAtTime.isNotEmpty) {
-          currentBasal = valuesAtTime.first.basal;
-          profileLowTarget = valuesAtTime.first.lowTarget;
-          profileHighTarget = valuesAtTime.first.highTarget;
-        }
-
-        var iobNow = StateData().iob();
-        var cobNow = StateData().cob();
-        var cageNow = StateData().cage();
-        var powerNow = StateData().battery();
-        var sgvs = SGV.last3Hours().value!;
-        var exp2preds = PredictionService().predictions;
-
-        if (sgvs.isNotEmpty) {
-          var minsAgo = sgvs.first.minsAgo;
-          var first = 5 - minsAgo;
-          exp2preds = exp2preds.where((e) => [5 - minsAgo, first, first + 5, first + 10, first + 15].contains(e.minsFromNow)).toList();
-        } else {
-          exp2preds = exp2preds.where((e) => [5, 10, 15, 20].contains(e.minsFromNow)).toList();
-        }
-
-        return Window(
-          title: "Stats",
-          child: Expanded(
-            child: SingleChildScrollView(
-                child: Container(
-              alignment: Alignment.center,
-              child: AWatch((_) {
-                return DataTable(
-                  border: const TableBorder(
-                    verticalInside: BorderSide(color: mainColor),
-                  ),
-                  columnSpacing: 10,
-                  dividerThickness: 0.01,
-                  headingRowHeight: 0,
-                  dataRowMinHeight: 14,
-                  dataRowMaxHeight: 20,
-                  horizontalMargin: 0,
-                  columns: const [
-                    DataColumn(
-                      numeric: true,
-                      label: SizedBox(
-                        width: 50,
-                        child: Text('name', style: heading),
-                      ),
-                    ),
-                    DataColumn(label: SizedBox(width: 50, child: Text('stat', style: heading))),
-                  ],
-                  rows: [
-                    iob(iobNow),
-                    cob(cobNow),
-                    power(powerNow),
-                    cage(cageNow),
-                    basal(currentBasal),
-                    target(Settings().unit, profileLowTarget, profileHighTarget),
-                    fifteenMinDiff(Settings().unit, sgvs),
-                    todaysInRange(),
-                    yesterdayInRange(),
-                    predictions("Exp2", exp2preds, Settings().unit),
-                  ],
-                );
-              }),
-            )),
-          ),
-        );
-      } catch (e, s) {
-        print("Error in Stats: $e");
-        print("Stack in Stats: $s");
-        return const SizedBox();
+      var valuesAtTime = ValueAtTime.lastSixHours().value!;
+      var currentBasal = 0.0;
+      var profileLowTarget = 0;
+      var profileHighTarget = 0;
+      if (valuesAtTime.isNotEmpty) {
+        currentBasal = valuesAtTime.first.basal;
+        profileLowTarget = valuesAtTime.first.lowTarget;
+        profileHighTarget = valuesAtTime.first.highTarget;
       }
+
+      var iobNow = StateData().iob();
+      var cobNow = StateData().cob();
+      var cageNow = StateData().cage();
+      var powerNow = StateData().battery();
+      var sgvs = SGV.last3Hours().value!;
+      var exp2preds = PredictionService().predictions;
+
+      if (sgvs.isNotEmpty) {
+        var minsAgo = sgvs.first.minsAgo;
+        var first = 5 - minsAgo;
+        exp2preds = exp2preds.where((e) => [5 - minsAgo, first, first + 5, first + 10, first + 15].contains(e.minsFromNow)).toList();
+      } else {
+        exp2preds = exp2preds.where((e) => [5, 10, 15, 20].contains(e.minsFromNow)).toList();
+      }
+
+      return Window(
+        title: "Stats",
+        child: Expanded(
+          child: SingleChildScrollView(
+              child: Container(
+            alignment: Alignment.center,
+            child: AWatch((_) {
+              return DataTable(
+                border: const TableBorder(
+                  verticalInside: BorderSide(color: mainColor),
+                ),
+                columnSpacing: 10,
+                dividerThickness: 0.01,
+                headingRowHeight: 0,
+                dataRowMinHeight: 14,
+                dataRowMaxHeight: 20,
+                horizontalMargin: 0,
+                columns: const [
+                  DataColumn(
+                    numeric: true,
+                    label: SizedBox(
+                      width: 50,
+                      child: Text('name', style: heading),
+                    ),
+                  ),
+                  DataColumn(label: SizedBox(width: 50, child: Text('stat', style: heading))),
+                ],
+                rows: [
+                  iob(iobNow),
+                  cob(cobNow),
+                  power(powerNow),
+                  cage(cageNow),
+                  basal(currentBasal),
+                  target(Settings().unit, profileLowTarget, profileHighTarget),
+                  fifteenMinDiff(Settings().unit, sgvs),
+                  todaysInRange(),
+                  yesterdayInRange(),
+                  predictions("Exp2", exp2preds, Settings().unit),
+                ],
+              );
+            }),
+          )),
+        ),
+      );
     });
   }
 
