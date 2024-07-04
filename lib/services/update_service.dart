@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
@@ -45,7 +44,7 @@ class UpdateService {
     checkUpdateSummary();
 
     if (_summaryToBeUpdated) {
-      log("UPDATING SUMMARY: $_updateReason");
+      alog("UPDATING SUMMARY: $_updateReason");
       _updateReason = "";
       _summaryToBeUpdated = false;
       updateSummary();

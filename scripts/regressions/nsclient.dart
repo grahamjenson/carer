@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:carer/utils/errors.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart' as http;
 
 class NSEntry {
@@ -111,7 +111,7 @@ class NSClient {
       final response = await http.get(entryEndpoint(nsURL, token, count));
 
       if (response.statusCode != 200) {
-        log("NON 200 responce code ${response.statusCode}");
+        alog("NON 200 responce code ${response.statusCode}");
         throw Exception("Bad HTTP");
       }
 

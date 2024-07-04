@@ -88,6 +88,4 @@ class NSEntries {
       return NSEntries(entries: []);
     }
   }
-
-  // Add any additional methods or properties as needed
 }
