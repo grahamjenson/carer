@@ -60,6 +60,10 @@ class NSTreatments {
 
   NSTreatments({required this.treatments});
 
+  factory NSTreatments.empty() {
+    return NSTreatments(treatments: []);
+  }
+
   factory NSTreatments.fromJson(String jsonString) {
     try {
       final List<dynamic> jsonList = json.decode(jsonString);

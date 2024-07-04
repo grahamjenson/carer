@@ -81,9 +81,7 @@ class AlarmAlertSettings {
     signal.value = value;
   }
 
-  setupDBPropagation() async {
-    var prefs = await KeyValueStore.instance;
-
+  setupDBPropagation(KeyValueStore prefs) {
     smartSnooze = prefs.getBool(_AANames.smartSnooze.name, defaultValue: false)!;
     volumeOveride = prefs.getBool(_AANames.volumeOveride.name, defaultValue: false)!;
     volumeOverrideValue = prefs.getInt(_AANames.volumeOverrideValue.name, defaultValue: 50)!;

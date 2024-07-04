@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:carer/utils/errors.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:http/http.dart' as http;
 
 Uri entryEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
@@ -18,63 +18,55 @@ Uri basalEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/basal.jso
 // Singleton
 class NSClient {
   Future<NSEntries> getEntries(String nsURL, String token, int count) async {
-    try {
-      if (nsURL == "" || token == "") {
-        throw Exception("No URL");
-      }
-      final response = await http.get(entryEndpoint(nsURL, token, count));
-
-      if (response.statusCode != 200) {
-        log("NON 200 responce code ${response.statusCode}");
-        return NSEntries.empty();
-      }
-
-      return NSEntries.fromJson(response.body);
-    } catch (e, stackTrace) {
-      Errors.captureError(e, stackTrace);
-      // TODO rewrite to friendly error class
+    if (nsURL == "" || token == "") {
+      print("No NS URL or token");
       return NSEntries.empty();
     }
+
+    final (response, err) = await go(http.get(entryEndpoint(nsURL, token, count)));
+    if (err != null || response == null) {
+      return NSEntries.empty();
+    }
+
+    if (response.statusCode != 200) {
+      log("NON 200 responce code ${response.statusCode}");
+      return NSEntries.empty();
+    }
+
+    return NSEntries.fromJson(response.body);
   }
 
   Future<NSTreatments> getTreatments(String nsURL, String token) async {
-    try {
-      if (nsURL == "" || token == "") {
-        throw Exception("No URL");
-      }
-      final response = await http.get(treatmentsEndpoint(nsURL, token));
-
-      if (response.statusCode != 200) {
-        log("NON 200 responce code ${response.statusCode}");
-        throw Exception("Bad HTTP");
-      }
-
-      return NSTreatments.fromJson(response.body);
-    } catch (e, stackTrace) {
-      Errors.captureError(e, stackTrace);
-      // TODO rewrite to friendly error class
-      return Future.error(e);
+    if (nsURL == "" || token == "") {
+      return NSTreatments.empty();
     }
+    final (response, err) = await go(http.get(treatmentsEndpoint(nsURL, token)));
+    if (err != null || response == null) {
+      return NSTreatments.empty();
+    }
+    if (response.statusCode != 200) {
+      log("NON 200 responce code ${response.statusCode}");
+      return NSTreatments.empty();
+    }
+
+    return NSTreatments.fromJson(response.body);
   }
 
   Future<Summary?> getSummary(String nsURL, String token) async {
-    try {
-      if (nsURL == "" || token == "") {
-        throw Exception("No URL");
-      }
-      var ep = summaryEndpoint(nsURL, token);
-      final response = await http.get(ep);
-      log("FETCHED ${ep.toString()}");
-      if (response.statusCode != 200) {
-        print("NON 200 responce code ${response.statusCode}");
-        return null;
-      }
-      return Summary.fromJson(response.body);
-    } catch (e, stackTrace) {
-      Errors.captureError(e, stackTrace);
-      // TODO rewrite to friendly error class
+    if (nsURL == "" || token == "") {
+      throw Exception("No URL");
+    }
+    var ep = summaryEndpoint(nsURL, token);
+    final (response, err) = await go(http.get(ep));
+    if (err != null || response == null) {
       return null;
     }
+    log("FETCHED ${ep.toString()}");
+    if (response.statusCode != 200) {
+      print("NON 200 responce code ${response.statusCode}");
+      return null;
+    }
+    return Summary.fromJson(response.body);
   }
 }
 

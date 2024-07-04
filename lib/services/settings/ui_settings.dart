@@ -29,9 +29,7 @@ class UISettings {
   UITheme get uiTheme => _signals[_UINames.uiTheme]!.value as UITheme;
   set uiTheme(UITheme value) => _signals[_UINames.uiTheme]!.value = value;
 
-  setupDBPropagation() async {
-    var prefs = await KeyValueStore.instance;
-
+  setupDBPropagation(KeyValueStore prefs) {
     // Assign the values from the DB
     screenActive = prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
 

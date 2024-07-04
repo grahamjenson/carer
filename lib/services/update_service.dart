@@ -8,7 +8,6 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
-import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/services/settings/settings.dart';
@@ -81,17 +80,14 @@ class UpdateService {
 
   updateSummary() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
-    Summary? summary = await NSClient().getSummary(nsURL, nsToken).catchError((e) {
-      log("GETTING SUMMARY ERROR: $e, $nsURL");
-      _summaryToBeUpdated = true;
-      return null;
-    });
+    var (summary, err) = await go(NSClient().getSummary(nsURL, nsToken));
 
-    if (summary == null) {
-      print("Summary is empty, not updating.");
+    if (err != null || summary == null) {
+      print("Err OR Summary is empty");
       _summaryToBeUpdated = true;
       return;
     }
+
     summaryLastUpdatedMS = clock.now().millisecondsSinceEpoch;
 
     // convert the summary to models
@@ -169,11 +165,13 @@ Bad data $badTempBasals, $badTempTargets
 
   void updateEntries() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
-    var entries = await NSClient().getEntries(nsURL, nsToken, 12 * 48).catchError((e) {
-      log("GETTING ENTRIES ERROR: $e, $nsURL");
 
-      return NSEntries.empty();
-    });
+    var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, 12 * 48));
+    if (err != null || entries == null) {
+      print("Err OR Entries is empty");
+      _entriesToBeUpdated = true;
+      return;
+    }
 
     List<SGV> sgvs = [];
     for (var entry in entries.entries) {

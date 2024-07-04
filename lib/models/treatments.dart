@@ -3,6 +3,7 @@ import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
@@ -94,10 +95,10 @@ class Treatment extends Model {
   // Future Signals
   ////
 
-  static FutureSignal<List<Treatment>> lastSixHours = computedAsync(() async {
+  static FutureSignal<List<Treatment>> lastSixHours = acomputedAsync(() async {
     print("updating Treatments lastSixHours");
     var b = Bolus.writeSignal.value;
     var c = Carbs.writeSignal.value;
-    return await Treatment.lastMins(60 * 6);
-  }, initialValue: [], debugLabel: 'treatmentsLastSixHours');
+    return Treatment.lastMins(60 * 6);
+  }, [], debugLabel: 'treatmentsLastSixHours');
 }

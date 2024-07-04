@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:carer/sql/statements/kv.dart';
 import 'package:carer/utils/env.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -57,7 +58,10 @@ class KeyValueStore {
 
   // populate the cache
   Future<bool> internalPopulate() async {
-    var results = await _db.query(KVTables.kvTableName);
+    var (results, err) = await go(_db.query(KVTables.kvTableName));
+    if (err != null || results == null) {
+      return false;
+    }
     for (var result in results) {
       if (result['k'] == null || result['v'] == null || result['t'] == null) {
         continue;
@@ -99,13 +103,19 @@ class KeyValueStore {
 
   Future<int> deleteAll() async {
     _cache.clear();
-    int ret = await _db.delete(KVTables.kvTableName);
+    var (ret, err) = await go(_db.delete(KVTables.kvTableName));
+    if (err != null || ret == null) {
+      return 0;
+    }
     return ret;
   }
 
   Future<bool> delete(String key) async {
     _cache.remove(key);
-    int ret = await _db.rawDelete(KVQueries.delete, [key]);
+    var (ret, err) = await go(_db.rawDelete(KVQueries.delete, [key]));
+    if (err != null || ret == null) {
+      return false;
+    }
     return ret == 1;
   }
 
@@ -160,7 +170,10 @@ class KeyValueStore {
       value = (value as bool) ? '1' : '0';
     }
 
-    int ret = await _db.rawInsert(KVQueries.upsert, [key, value, valueType, value, valueType]);
+    var (ret, err) = await go(_db.rawInsert(KVQueries.upsert, [key, value, valueType, value, valueType]));
+    if (err != null || ret == null) {
+      return false;
+    }
     return ret == 1;
   }
 }

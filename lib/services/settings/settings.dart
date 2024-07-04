@@ -64,9 +64,9 @@ class Settings {
 
     aeffect(() => prefs.setBool(_SNames.unit.name, unit.toBool()));
 
-    await uiSettings.setupDBPropagation();
-    await targetSettings.setupDBPropagation();
-    await alarmSettings.setupDBPropagation();
-    await alarmAlertSettings.setupDBPropagation();
+    uiSettings.setupDBPropagation(prefs);
+    targetSettings.setupDBPropagation(prefs);
+    alarmSettings.setupDBPropagation(prefs);
+    alarmAlertSettings.setupDBPropagation(prefs);
   }
 }

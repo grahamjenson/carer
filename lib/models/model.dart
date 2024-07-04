@@ -191,14 +191,16 @@ abstract class ModelRepository<T extends Model> {
       }
 
       if (update) {
-        var id = await cdb.db.update(
+        var (id, err) = await go(cdb.db.update(
           tb,
           map,
           where: where,
           whereArgs: whereArgs,
-        );
-
-        var ret = id != 0;
+        ));
+        if (err != null) {
+          return false;
+        }
+        var ret = id != null && id != 0;
         if (ret) {
           writeSignal.value = clock.now().millisecondsSinceEpoch;
         }
@@ -212,7 +214,10 @@ abstract class ModelRepository<T extends Model> {
     var cdb = await CarerDB.instance;
     var (where, whereArgs) = _buildWhereStatement(after: after, before: before, conditions: conditions);
 
-    var res = await cdb.db.query(tableName, columns: ['COUNT(*)'], where: where, whereArgs: whereArgs);
+    var (res, err) = await go(cdb.db.query(tableName, columns: ['COUNT(*)'], where: where, whereArgs: whereArgs));
+    if (err != null || res == null) {
+      return null;
+    }
     return res.first.values.first as int?;
   }
 

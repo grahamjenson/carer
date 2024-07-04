@@ -63,8 +63,8 @@ class Carbs extends Model {
   }
 
   // return the last sgvs for minutes
-  static Future<List<Carbs>> lastMins(int minsAgo) async {
-    return (await _q.lastMins(minsAgo));
+  static Future<List<Carbs>> lastMins(int minsAgo) {
+    return _q.lastMins(minsAgo);
   }
 
   static Signal<int> get writeSignal => _q.writeSignal;

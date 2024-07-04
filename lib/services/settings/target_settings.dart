@@ -100,8 +100,7 @@ class TargetSettings {
     signal.value = value;
   }
 
-  setupDBPropagation() async {
-    var prefs = await KeyValueStore.instance;
+  setupDBPropagation(KeyValueStore prefs) {
     highTarget = prefs.getInt(_TNames.highTarget.name) ?? 180;
     lowTarget = prefs.getInt(_TNames.lowTarget.name) ?? 72;
     highUrgent = prefs.getInt(_TNames.highUrgent.name) ?? 270;

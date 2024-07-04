@@ -131,9 +131,7 @@ class AlarmSettings {
     signal.value = value;
   }
 
-  setupDBPropagation() async {
-    var prefs = await KeyValueStore.instance;
-
+  setupDBPropagation(KeyValueStore prefs) {
     disableAlarms = prefs.getBool(_AlarmNames.disableAlarms.name, defaultValue: false)!;
     urgentLowAlarm = prefs.getBool(_AlarmNames.urgentLowAlarm.name, defaultValue: false)!;
     lowAlarm = prefs.getBool(_AlarmNames.lowAlarm.name, defaultValue: false)!;
