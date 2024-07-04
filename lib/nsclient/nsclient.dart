@@ -6,7 +6,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart' as http;
 
 Uri entryEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
-Uri treatmentsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
+Uri treatmentsEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token&count=$count');
 
 Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
 
@@ -21,12 +21,12 @@ class NSClient {
       alog("No NS URL or token");
       return NSEntries.empty();
     }
-
-    final (response, err) = await go(http.get(entryEndpoint(nsURL, token, count)));
+    var ep = entryEndpoint(nsURL, token, count);
+    final (response, err) = await go(http.get(ep));
     if (err != null || response == null) {
       return NSEntries.empty();
     }
-
+    alog("FETCHED ${ep.toString()}");
     if (response.statusCode != 200) {
       alog("NON 200 responce code ${response.statusCode}");
       return NSEntries.empty();
@@ -35,14 +35,16 @@ class NSClient {
     return NSEntries.fromJson(response.body);
   }
 
-  Future<NSTreatments> getTreatments(String nsURL, String token) async {
+  Future<NSTreatments> getTreatments(String nsURL, String token, int count) async {
     if (nsURL == "" || token == "") {
       return NSTreatments.empty();
     }
-    final (response, err) = await go(http.get(treatmentsEndpoint(nsURL, token)));
+    var ep = treatmentsEndpoint(nsURL, token, count);
+    final (response, err) = await go(http.get(ep));
     if (err != null || response == null) {
       return NSTreatments.empty();
     }
+    alog("FETCHED ${ep.toString()}");
     if (response.statusCode != 200) {
       alog("NON 200 responce code ${response.statusCode}");
       return NSTreatments.empty();
