@@ -12,7 +12,7 @@ class NSTreatmentsUpdater extends Updater {
   // On first call backfill last two days
   bool _backfill = true;
 
-  NSTreatmentsUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 2)) {
+  NSTreatmentsUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 10)) {
     aeffect(() {
       // Check signal to register
       var _ = Settings().nightscoutURL;
