@@ -1,5 +1,4 @@
 import 'package:carer/utils/env.dart';
-import 'package:carer/utils/errors.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

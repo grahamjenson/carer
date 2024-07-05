@@ -1,7 +1,7 @@
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/utils/json.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class LogErrorPage extends StatelessWidget {
   LogErrorPage({super.key});
@@ -11,23 +11,15 @@ class LogErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var settingsString = prettyPrintJson(Settings().toString());
-    var summaryString = "TODO: dump the db here";
+    var logString = ALogger().getPrettyLogs();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Log Error'),
+        title: const Text('Search'),
         actions: [
           TextButton(
-            child: const Text("Log"),
-            onPressed: () async {
-              await Sentry.captureMessage(
-                "ContextError: ${controller.text}",
-                withScope: (scope) {
-                  scope.setContexts('settings', settingsString);
-                  scope.setContexts('summary', summaryString);
-                },
-              ).then((value) => Navigator.pop(context));
-            },
+            child: const Text("Search"),
+            onPressed: () async {},
           ),
         ],
       ),
@@ -44,7 +36,7 @@ class LogErrorPage extends StatelessWidget {
             Expanded(
                 child: SingleChildScrollView(
               child: SelectableText(
-                '$settingsString\n\n$summaryString',
+                '$settingsString\n\n$logString',
                 style: const TextStyle(fontSize: 8),
               ),
             )),

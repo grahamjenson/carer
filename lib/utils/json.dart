@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:carer/utils/errors.dart';
+import 'package:carer/utils/logs.dart';
 
 JsonDecoder decoder = const JsonDecoder();
 JsonEncoder encoder = const JsonEncoder.withIndent('  ');

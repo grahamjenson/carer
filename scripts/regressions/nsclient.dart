@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:carer/utils/errors.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart' as http;
 

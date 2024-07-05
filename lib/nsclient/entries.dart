@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:carer/utils/errors.dart';
+import 'package:carer/utils/logs.dart';
 
 class NSEntry {
   String id;
