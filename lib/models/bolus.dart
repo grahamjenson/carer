@@ -8,18 +8,17 @@ class BolusRepository extends ModelRepository<Bolus> {
 
   @override
   Bolus fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["value", "timestamp"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [double, int]))) {
+    var requiredKeys = ["value", "timestamp", "nsid"];
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [double, int, String]))) {
       throw ArgumentError("Invalid Bolus Map: $map");
     }
 
-    {
-      return Bolus(
-        id: map["id"] as int?,
-        value: map["value"] as double,
-        date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
-      );
-    }
+    return Bolus(
+      id: map["id"] as int?,
+      nsid: map["nsid"] as String,
+      value: map["value"] as double,
+      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
+    );
   }
 
   @override
@@ -27,6 +26,7 @@ class BolusRepository extends ModelRepository<Bolus> {
     return {
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
+      "nsid": model.nsid,
     };
   }
 }
@@ -39,6 +39,7 @@ class Bolus extends Model {
 
   @override
   int? id;
+  String nsid;
 
   final double value;
   @override
@@ -46,6 +47,7 @@ class Bolus extends Model {
 
   Bolus({
     this.id,
+    required this.nsid,
     required this.value,
     required this.date,
   });

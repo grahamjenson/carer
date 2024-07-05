@@ -12,21 +12,20 @@ class SGVRepository extends ModelRepository<SGV> {
 
   @override
   SGV fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["value", "timestamp"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int]))) {
+    var requiredKeys = ["value", "timestamp", "nsid"];
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, String]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 
-    {
-      return SGV(
-        id: map["id"] as int?,
-        value: map["value"] as int,
-        date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
-        rate5m: map["rate5m"] as int?,
-        diff: map["diff"] as int?,
-        idBefore: map["id_before"] as int?,
-      );
-    }
+    return SGV(
+      id: map["id"] as int?,
+      nsid: map["nsid"] as String,
+      value: map["value"] as int,
+      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
+      rate5m: map["rate5m"] as int?,
+      diff: map["diff"] as int?,
+      idBefore: map["id_before"] as int?,
+    );
   }
 
   @override
@@ -34,6 +33,7 @@ class SGVRepository extends ModelRepository<SGV> {
     return {
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
+      "nsid": model.nsid,
     };
   }
 }
@@ -46,6 +46,7 @@ class SGV extends Model {
 
   @override
   int? id;
+  String nsid;
   final int value;
 
   @override
@@ -57,6 +58,7 @@ class SGV extends Model {
   SGV({
     required this.value,
     required this.date,
+    required this.nsid,
     this.id,
     this.rate5m,
     this.diff,

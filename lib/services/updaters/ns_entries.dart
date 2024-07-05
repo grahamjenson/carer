@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/settings.dart';
@@ -7,7 +9,6 @@ import 'package:carer/utils/logs.dart';
 
 class NSEntriesUpdater extends Updater {
   // On first call backfill last two days
-  bool _backfill = true;
 
   NSEntriesUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(minutes: 1)) {
     aeffect(() {
@@ -40,10 +41,10 @@ class NSEntriesUpdater extends Updater {
   @override
   Future<bool> update() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
-    var count = 6; // last 30 mins
-    if (_backfill) {
-      count = 12 * 48;
-    }
+
+    // Get the last amount of readings with a few extra for certainty
+    var readingsOut = ((super.timeSinceLastSuccessfulUpdate().inMinutes / 5) + 4) * 2;
+    var count = min(readingsOut, 12 * 48).toInt();
 
     var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, count));
     if (err != null || entries == null) {
@@ -55,13 +56,13 @@ class NSEntriesUpdater extends Updater {
       if (entry.sgv == null) {
         continue;
       }
-      sgvs.add(SGV(value: entry.sgv!, date: entry.date));
+      sgvs.add(SGV(value: entry.sgv!, date: entry.date, nsid: entry.id));
     }
 
     var total = await SGV.saveAll(sgvs);
 
     alog("Updated  Entries $total");
-    _backfill = false;
+
     return true;
   }
 }

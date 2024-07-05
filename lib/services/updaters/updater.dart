@@ -5,6 +5,13 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 
 abstract class Updater {
+  Duration intervalToCheck;
+  Duration maxAgeBeforeChecking;
+  DateTime lastUpdated = DateTime(1970);
+  DateTime lastSuccessfulUpdate = DateTime(1970);
+
+  Updater({required this.intervalToCheck, required this.maxAgeBeforeChecking});
+
   Future<bool> update();
 
   void start() {
@@ -26,6 +33,10 @@ abstract class Updater {
     });
   }
 
+  Duration timeSinceLastSuccessfulUpdate() {
+    return DateTime.now().difference(lastSuccessfulUpdate);
+  }
+
   final List<String> _externalReasons = [];
   addExternalReason(String reason) => _externalReasons.add(reason);
 
@@ -43,12 +54,4 @@ abstract class Updater {
 
     return reasons;
   }
-
-  Duration intervalToCheck;
-  Duration maxAgeBeforeChecking;
-
-  Updater({required this.intervalToCheck, required this.maxAgeBeforeChecking});
-
-  DateTime lastUpdated = DateTime(1970);
-  DateTime lastSuccessfulUpdate = DateTime(1970);
 }

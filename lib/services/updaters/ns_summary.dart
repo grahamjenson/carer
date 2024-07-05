@@ -28,38 +28,6 @@ class NSSummaryUpdater extends Updater {
       return false;
     }
 
-    // convert the summary to models
-    // List<SGV> sgvs = [];
-    // for (var sgv in summary.sgvs.sgvs) {
-    //   sgvs.add(SGV(value: sgv.sgv, date: sgv.mills));
-    // }
-    // var sgvUpdates = await SGV.saveAll(sgvs);
-
-    // List<Bolus> boluses = [];
-    // for (var bolus in summary.treatments.boluses()) {
-    //   boluses.add(Bolus(value: bolus.insulin!, date: bolus.date));
-    // }
-    // int bolusUpdates = await Bolus.saveAll(boluses);
-
-    // List<Carbs> carbs = [];
-    // for (var carb in summary.treatments.carbs()) {
-    //   carbs.add(Carbs(value: carb.carbs!.round(), date: carb.date));
-    // }
-    // int carbUpdates = await Carbs.saveAll(carbs);
-
-    // List<TempBasal> tempBasals = [];
-    // for (var tempBasal in summary.tempBasals.tempBasals) {
-    //   tempBasals.add(TempBasal(startDate: tempBasal.start, duration: tempBasal.duration.toInt(), value: tempBasal.absolute));
-    // }
-    // int tempBasalUpdates = await TempBasal.saveAll(tempBasals);
-
-    // List<TempTarget> tempTargets = [];
-    // for (var tempTarget in summary.targets.targets) {
-    //   tempTargets.add(TempTarget(
-    //       startDate: tempTarget.start, duration: tempTarget.duration, highTarget: tempTarget.targetTop, lowTarget: tempTarget.targetBottom));
-    // }
-    // int tempTargetUpdates = await TempTarget.saveAll(tempTargets);
-
     SummaryProfile summaryProfile = summary.profile;
 
     Profile profile = Profile(
@@ -90,10 +58,7 @@ class NSSummaryUpdater extends Updater {
       StateData().setCAge(state.cage!.toDouble());
     }
 
-    alog('''
-updateSummary $profileUpdate
-
-          ''');
+    alog('''updateSummary $profileUpdate''');
 
     return true;
   }

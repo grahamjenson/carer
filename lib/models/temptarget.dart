@@ -1,5 +1,4 @@
 import 'package:carer/models/model.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
@@ -9,13 +8,14 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
 
   @override
   TempTarget fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "highTarget", "lowTarget"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int]))) {
+    var requiredKeys = ["start", "duration", "highTarget", "lowTarget", "nsid"];
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int, String]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 
     return TempTarget(
       id: map["id"] as int?,
+      nsid: map["nsid"] as String,
       startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
       duration: map["duration"] as int,
       highTarget: map["highTarget"] as int,
@@ -30,6 +30,7 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
       "duration": model.duration,
       "highTarget": model.highTarget,
       "lowTarget": model.lowTarget,
+      "nsid": model.nsid,
     };
   }
 }
@@ -42,7 +43,7 @@ class TempTarget extends Model {
 
   @override
   int? id;
-
+  String nsid;
   @override
   get date => startDate;
 
@@ -53,6 +54,7 @@ class TempTarget extends Model {
 
   TempTarget({
     this.id,
+    required this.nsid,
     required this.startDate,
     required this.duration,
     required this.lowTarget,
@@ -61,7 +63,7 @@ class TempTarget extends Model {
 
   @override
   List<String> uniqueValues() {
-    return ["start"];
+    return ["nsid"];
   }
 
   DateTime get dateEnd {
@@ -83,11 +85,6 @@ class TempTarget extends Model {
   static Future<TempTarget?> atTime(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
     return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
-  }
-
-  static Future<int> fixData() async {
-    var cdb = await CarerDB.instance;
-    return cdb.fixBadTempTargets();
   }
 
   static Future<int> saveAll(List<TempTarget> models) => _q.saveAll(models);

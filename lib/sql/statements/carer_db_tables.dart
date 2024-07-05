@@ -32,11 +32,12 @@ const String sgvsTableName = 'sgvs';
 const sgvTable = DBTable(sgvsTableName, '''
     CREATE TABLE sgvs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nsid TEXT,
       value INTEGER,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
       minute_timestamp INTEGER GENERATED ALWAYS AS (timestamp / 60000) VIRTUAL,
-      UNIQUE(value, timestamp)
+      UNIQUE(nsid)
     )
   ''');
 
@@ -44,10 +45,11 @@ const String bolusTableName = 'bolus';
 const bolusTable = DBTable(bolusTableName, '''
     CREATE TABLE bolus (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nsid TEXT,
       value REAL,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
-      UNIQUE(value, timestamp)
+      UNIQUE(nsid)
     )
   ''');
 
@@ -55,10 +57,11 @@ const String carbsTableName = 'carbs';
 const carbsTable = DBTable(carbsTableName, '''
     CREATE TABLE carbs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nsid TEXT,
       value INTEGER,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
-      UNIQUE(value, timestamp)
+      UNIQUE(nsid)
     )
   ''');
 
@@ -66,14 +69,14 @@ const String tempbasalTableName = 'tempbasal';
 const tempbasalTable = DBTable(tempbasalTableName, '''
     CREATE TABLE tempbasal (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nsid TEXT,
       start INTEGER,
       duration INTEGER,
       end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
-
       value REAL,
-      UNIQUE(start)
+      UNIQUE(nsid)
     )
   ''');
 
@@ -81,6 +84,7 @@ const String temptargetsTableName = 'temptargets';
 const temptargetsTable = DBTable(temptargetsTableName, '''
     CREATE TABLE temptargets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nsid TEXT,
       start INTEGER,
       duration INTEGER,
       end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
@@ -89,7 +93,7 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
 
       highTarget INTEGER,
       lowTarget INTEGER,
-      UNIQUE(start)
+      UNIQUE(nsid)
     )
   ''');
 
@@ -157,6 +161,7 @@ const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
     CREATE VIEW sgvsClean AS
     SELECT 
       safter.id AS id,
+      safter.nsid AS nsid,
       safter.value AS value, 
       safter.timestamp timestamp, 
       safter.datetime datetime,
