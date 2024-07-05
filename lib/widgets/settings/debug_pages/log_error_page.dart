@@ -1,5 +1,3 @@
-import 'package:carer/services/settings/settings.dart';
-import 'package:carer/utils/json.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
 
@@ -10,9 +8,8 @@ class LogErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var settingsString = prettyPrintJson(Settings().toString());
     var logString = ALogger().getPrettyLogs();
-
+    // TODO signal to watch logs and update
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search'),
@@ -36,8 +33,11 @@ class LogErrorPage extends StatelessWidget {
             Expanded(
                 child: SingleChildScrollView(
               child: SelectableText(
-                '$settingsString\n\n$logString',
-                style: const TextStyle(fontSize: 8),
+                logString,
+                style: const TextStyle(
+                  fontSize: 8,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
               ),
             )),
           ],

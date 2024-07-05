@@ -30,7 +30,11 @@ class ALogger {
     String name = '',
   }) {
     var now = clock.now();
-    logLines.add((now, level, message));
+    logLines.insert(0, (now, level, message));
+
+    if (logLines.length > 10000) {
+      logLines = logLines.sublist(0, 10000);
+    }
 
     developer.log(
       message,
@@ -40,7 +44,7 @@ class ALogger {
   }
 
   getPrettyLogs() {
-    return logLines.map((e) => "${e.$1}\t${e.$2.name}\t${e.$3}").join("\n");
+    return logLines.map((e) => "${e.$1}\t  ${e.$2.name}  \t${e.$3}").join("\n");
   }
 }
 
