@@ -8,14 +8,14 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
 
   @override
   TempTarget fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "highTarget", "lowTarget", "nsid"];
+    var requiredKeys = ["start", "duration", "highTarget", "lowTarget", "eid"];
     if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int, String]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 
     return TempTarget(
       id: map["id"] as int?,
-      nsid: map["nsid"] as String,
+      eid: map["eid"] as String,
       startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
       duration: map["duration"] as int,
       highTarget: map["highTarget"] as int,
@@ -30,7 +30,7 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
       "duration": model.duration,
       "highTarget": model.highTarget,
       "lowTarget": model.lowTarget,
-      "nsid": model.nsid,
+      "eid": model.eid!,
     };
   }
 }
@@ -42,9 +42,6 @@ class TempTarget extends Model {
   ModelRepository get repository => _q;
 
   @override
-  int? id;
-  String nsid;
-  @override
   get date => startDate;
 
   final DateTime startDate;
@@ -53,18 +50,13 @@ class TempTarget extends Model {
   final int highTarget;
 
   TempTarget({
-    this.id,
-    required this.nsid,
+    super.id,
+    required super.eid,
     required this.startDate,
     required this.duration,
     required this.lowTarget,
     required this.highTarget,
   });
-
-  @override
-  List<String> uniqueValues() {
-    return ["nsid"];
-  }
 
   DateTime get dateEnd {
     return startDate.add(Duration(seconds: duration));
@@ -88,5 +80,7 @@ class TempTarget extends Model {
   }
 
   static Future<int> saveAll(List<TempTarget> models) => _q.saveAll(models);
+  static Future<int> upsertAll(List<TempTarget> models) => _q.upsertAll(models);
+
   static Signal<int> get writeSignal => _q.writeSignal;
 }

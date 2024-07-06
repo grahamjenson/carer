@@ -41,9 +41,9 @@ void main() async {
 
       expect(
           await SGV.saveAll([
-            SGV(value: 185, date: clock.now()),
-            SGV(value: 200, date: clock.minutesAgo(5)),
-            SGV(value: 220, date: clock.minutesAgo(10)),
+            SGV(value: 185, date: clock.now(), eid: "1"),
+            SGV(value: 200, date: clock.minutesAgo(5), eid: "2"),
+            SGV(value: 220, date: clock.minutesAgo(10), eid: "3"),
           ]),
           3);
 
@@ -69,9 +69,9 @@ void main() async {
       AlarmSettings().lowMinutes = 10;
       TargetSettings().lowTarget = 72;
 
-      expect(await SGV(value: 70, date: clock.now()).save(), true);
-      expect(await SGV(value: 60, date: clock.minutesAgo(5)).save(), true);
-      expect(await SGV(value: 50, date: clock.minutesAgo(10)).save(), true);
+      expect(await SGV(value: 70, date: clock.now(), eid: "1").save(), true);
+      expect(await SGV(value: 60, date: clock.minutesAgo(5), eid: "2").save(), true);
+      expect(await SGV(value: 50, date: clock.minutesAgo(10), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
       await SGV.last3Hours.future;
@@ -93,9 +93,9 @@ void main() async {
       AlarmSettings().urgentHighAlarm = true;
       TargetSettings().highUrgent = 180;
 
-      expect(await SGV(value: 185, date: clock.now()).save(), true);
-      expect(await SGV(value: 200, date: clock.minutesAgo(5)).save(), true);
-      expect(await SGV(value: 220, date: clock.minutesAgo(10)).save(), true);
+      expect(await SGV(value: 185, date: clock.now(), eid: "1").save(), true);
+      expect(await SGV(value: 200, date: clock.minutesAgo(5), eid: "2").save(), true);
+      expect(await SGV(value: 220, date: clock.minutesAgo(10), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
       await SGV.last3Hours.future;
@@ -117,9 +117,9 @@ void main() async {
       AlarmSettings().urgentLowAlarm = true;
       TargetSettings().lowUrgent = 72;
 
-      expect(await SGV(value: 70, date: clock.now()).save(), true);
-      expect(await SGV(value: 60, date: clock.minutesAgo(5)).save(), true);
-      expect(await SGV(value: 50, date: clock.minutesAgo(10)).save(), true);
+      expect(await SGV(value: 70, date: clock.now(), eid: "1").save(), true);
+      expect(await SGV(value: 60, date: clock.minutesAgo(5), eid: "2").save(), true);
+      expect(await SGV(value: 50, date: clock.minutesAgo(10), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
       await SGV.last3Hours.future;
@@ -142,9 +142,9 @@ void main() async {
       AlarmSettings().fastRiseAlarmMinutes = 10;
       TargetSettings().fastRiseDelta = 10;
 
-      expect(await SGV(value: 192, date: clock.now()).save(), true);
-      expect(await SGV(value: 181, date: clock.minutesAgo(5)).save(), true);
-      expect(await SGV(value: 170, date: clock.minutesAgo(10)).save(), true);
+      expect(await SGV(value: 192, date: clock.now(), eid: "1").save(), true);
+      expect(await SGV(value: 181, date: clock.minutesAgo(5), eid: "2").save(), true);
+      expect(await SGV(value: 170, date: clock.minutesAgo(10), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
       await SGV.last3Hours.future;
@@ -167,9 +167,9 @@ void main() async {
       AlarmSettings().fastDropAlarmMinutes = 10;
       TargetSettings().fastDropDelta = -10;
 
-      expect(await SGV(value: 110, date: clock.now()).save(), true);
-      expect(await SGV(value: 130, date: clock.minutesAgo(5)).save(), true);
-      expect(await SGV(value: 150, date: clock.minutesAgo(10)).save(), true);
+      expect(await SGV(value: 110, date: clock.now(), eid: "1").save(), true);
+      expect(await SGV(value: 130, date: clock.minutesAgo(5), eid: "2").save(), true);
+      expect(await SGV(value: 150, date: clock.minutesAgo(10), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
       await SGV.last3Hours.future;
@@ -190,9 +190,9 @@ void main() async {
 
       AlarmSettings().noDataAlarmMinutes = 20;
 
-      expect(await SGV(value: 187, date: clock.minutesAgo(30)).save(), true);
-      expect(await SGV(value: 200, date: clock.minutesAgo(35)).save(), true);
-      expect(await SGV(value: 220, date: clock.minutesAgo(40)).save(), true);
+      expect(await SGV(value: 187, date: clock.minutesAgo(30), eid: "1").save(), true);
+      expect(await SGV(value: 200, date: clock.minutesAgo(35), eid: "2").save(), true);
+      expect(await SGV(value: 220, date: clock.minutesAgo(40), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
 
@@ -214,9 +214,9 @@ void main() async {
       AlarmSettings().lowMinutes = 10;
       TargetSettings().lowTarget = 72;
 
-      expect(await SGV(value: 80, date: clock.now()).save(), true);
-      expect(await SGV(value: 100, date: clock.minutesAgo(5)).save(), true);
-      expect(await SGV(value: 120, date: clock.minutesAgo(10)).save(), true);
+      expect(await SGV(value: 80, date: clock.now(), eid: "1").save(), true);
+      expect(await SGV(value: 100, date: clock.minutesAgo(5), eid: "2").save(), true);
+      expect(await SGV(value: 120, date: clock.minutesAgo(10), eid: "3").save(), true);
 
       await SGV.lastSGV.future;
       await SGV.last3Hours.future;

@@ -47,11 +47,6 @@ class ValueAtTime extends Model {
   ModelRepository get repository => _q;
 
   @override
-  get id => null; // This is a view
-  @override
-  set id(_) {}
-
-  @override
   final DateTime date;
 
   final int lowTarget;

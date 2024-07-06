@@ -94,10 +94,10 @@ abstract class RegressionPredictor extends Predictor {
   SGV predictAt(double timestamp) {
     var pred = regression.predict(fnX(timestamp));
     if (pred.isNaN || pred.isInfinite) {
-      return SGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), nsid: 'predictor');
+      return SGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
     }
     int limitedValue = pred.toInt().clamp(20, 500);
-    return SGV(value: limitedValue, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), nsid: 'predictor');
+    return SGV(value: limitedValue, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
   }
 }
 

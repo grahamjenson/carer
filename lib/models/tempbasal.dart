@@ -8,14 +8,14 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
 
   @override
   TempBasal fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "value", "nsid"];
+    var requiredKeys = ["start", "duration", "value", "eid"];
     if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, double, String]))) {
       throw ArgumentError("Invalid TempBasal Map: $map");
     }
 
     return TempBasal(
       id: map["id"] as int?,
-      nsid: map["nsid"] as String,
+      eid: map["eid"] as String,
       startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
       duration: map["duration"] as int,
       value: map["value"] as double,
@@ -28,7 +28,7 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
       "start": model.startDate.millisecondsSinceEpoch,
       "duration": model.duration,
       "value": model.value,
-      "nsid": model.nsid,
+      "eid": model.eid!,
     };
   }
 }
@@ -40,10 +40,6 @@ class TempBasal extends Model {
   ModelRepository get repository => _q;
 
   @override
-  int? id;
-  String nsid;
-
-  @override
   get date => startDate;
 
   final DateTime startDate;
@@ -51,17 +47,12 @@ class TempBasal extends Model {
   final double value;
 
   TempBasal({
-    this.id,
-    required this.nsid,
+    super.id,
+    required super.eid,
     required this.startDate,
     required this.duration,
     required this.value,
   });
-
-  @override
-  List<String> uniqueValues() {
-    return ["nsid"];
-  }
 
   DateTime get dateEnd {
     return startDate.add(Duration(seconds: duration));
@@ -85,5 +76,7 @@ class TempBasal extends Model {
   }
 
   static Future<int> saveAll(List<TempBasal> models) => _q.saveAll(models);
+  static Future<int> upsertAll(List<TempBasal> models) => _q.upsertAll(models);
+
   static Signal<int> get writeSignal => _q.writeSignal;
 }

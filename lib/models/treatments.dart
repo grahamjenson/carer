@@ -53,11 +53,6 @@ class Treatment extends Model {
   ModelRepository get repository => _q;
 
   @override
-  get id => null; // This is a view
-  @override
-  set id(_) {}
-
-  @override
   DateTime date;
   double? insulin;
   int? carbs;

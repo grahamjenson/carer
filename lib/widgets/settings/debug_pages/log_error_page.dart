@@ -1,3 +1,4 @@
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
 
@@ -8,41 +9,43 @@ class LogErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var logString = ALogger().getPrettyLogs();
-    // TODO signal to watch logs and update
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search'),
-        actions: [
-          TextButton(
-            child: const Text("Search"),
-            onPressed: () async {},
-          ),
-        ],
-      ),
-      body: Container(
-        margin: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Enter error message',
-              ),
+    return AWatch((_) {
+      var _ = ALogger().signal.value;
+      var logString = ALogger().getPrettyLogs();
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Search'),
+          actions: [
+            TextButton(
+              child: const Text("Search"),
+              onPressed: () async {},
             ),
-            Expanded(
-                child: SingleChildScrollView(
-              child: SelectableText(
-                logString,
-                style: const TextStyle(
-                  fontSize: 8,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-            )),
           ],
         ),
-      ),
-    );
+        body: Container(
+          margin: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: 'Enter error message',
+                ),
+              ),
+              Expanded(
+                  child: SingleChildScrollView(
+                child: SelectableText(
+                  logString,
+                  style: const TextStyle(
+                    fontSize: 8,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
+              )),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

@@ -16,9 +16,10 @@ void main() {
     expect(treatments.treatments.length, equals(1));
 
     NSTreatment firstNSTreatment = treatments.treatments[0];
-    expect(firstNSTreatment.id, equals("65a83a1c4b474038e0900cf"));
-    expect(firstNSTreatment.app, equals("AAPS"));
-    expect(firstNSTreatment.carbs, equals(15));
+    expect(firstNSTreatment, isA<NSTreatmentCarbs>());
+    var ccc = firstNSTreatment as NSTreatmentCarbs;
+    expect(ccc.id, equals("65a83a1c4b474038e0900cf"));
+    expect(ccc.carbs, equals(15));
     // Add more assertions as needed for other properties
   });
 
@@ -29,11 +30,10 @@ void main() {
     NSTreatments treatments = NSTreatments.fromJson(jsonString);
 
     expect(treatments.treatments, isA<List<NSTreatment>>());
-    expect(treatments.treatments.length, equals(552));
+    expect(treatments.treatments.length, equals(517));
   });
 
-  test('treatments paring bad data will return empty NSTreatments object',
-      () async {
+  test('treatments paring bad data will return empty NSTreatments object', () async {
     final file = File(files["treatments_bad"]!);
     final jsonString = await file.readAsString();
 

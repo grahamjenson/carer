@@ -47,7 +47,15 @@ void main() async {
 
       valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
 
-      var s = await TempTarget(startDate: now.subtract(const Duration(seconds: 50)), duration: 300, highTarget: 10, lowTarget: 5).save();
+      var s = await TempTarget(
+        startDate: now.subtract(
+          const Duration(seconds: 50),
+        ),
+        duration: 300,
+        highTarget: 10,
+        lowTarget: 5,
+        eid: "1",
+      ).save();
       expect(s, true);
 
       targets = await ValueAtTime.query();

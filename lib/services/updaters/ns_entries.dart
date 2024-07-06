@@ -56,7 +56,7 @@ class NSEntriesUpdater extends Updater {
       if (entry.sgv == null) {
         continue;
       }
-      sgvs.add(SGV(value: entry.sgv!, date: entry.date, nsid: entry.id));
+      sgvs.add(SGV(value: entry.sgv!, date: entry.date, eid: entry.id));
     }
 
     var total = await SGV.saveAll(sgvs);

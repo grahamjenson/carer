@@ -40,7 +40,7 @@ class NSTreatmentsUpdater extends Updater {
       boluses.add(Bolus(
         value: bolus.insulin,
         date: bolus.date,
-        nsid: bolus.id,
+        eid: bolus.id,
       ));
     }
     int bolusUpdates = await Bolus.saveAll(boluses);
@@ -50,7 +50,7 @@ class NSTreatmentsUpdater extends Updater {
       carbs.add(Carbs(
         value: carb.carbs.round(),
         date: carb.date,
-        nsid: carb.id,
+        eid: carb.id,
       ));
     }
     int carbUpdates = await Carbs.saveAll(carbs);
@@ -61,24 +61,22 @@ class NSTreatmentsUpdater extends Updater {
         startDate: tempBasal.date,
         duration: tempBasal.durationInMilliseconds ~/ 1000,
         value: tempBasal.absolute,
-        nsid: tempBasal.id,
+        eid: tempBasal.id,
       ));
     }
-    List<bool> tbupserts = await Future.wait(tempBasals.map((e) => e.upsert()));
-    int tempBasalUpdates = tbupserts.where((e) => e).length;
+    int tempBasalUpdates = await TempBasal.upsertAll(tempBasals);
 
     List<TempTarget> tempTargets = [];
     for (var tempTarget in entries.tempTargets) {
       tempTargets.add(TempTarget(
-          nsid: tempTarget.id,
+          eid: tempTarget.id,
           startDate: tempTarget.date,
           duration: tempTarget.durationInMilliseconds ~/ 1000,
           highTarget: tempTarget.targetTop.toInt(),
           lowTarget: tempTarget.targetBottom.toInt()));
     }
-    // TODO need an upsertALL statement because this is nuts
-    List<bool> ttupserts = await Future.wait(tempTargets.map((e) => e.upsert()));
-    int tempTargetUpdates = ttupserts.where((e) => e).length;
+
+    int tempTargetUpdates = await TempTarget.upsertAll(tempTargets);
 
     // summary is not trustworthy source of information
     // TODO replace summary as the source of information

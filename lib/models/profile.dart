@@ -64,9 +64,6 @@ class Profile extends Model {
   ModelRepository get repository => _q;
 
   @override
-  int? id;
-
-  @override
   final DateTime date;
   final int dia;
   final String units;
@@ -79,7 +76,7 @@ class Profile extends Model {
   final List<int> highTarget;
 
   Profile({
-    this.id,
+    super.id,
     required this.date,
     required this.dia,
     required this.units,

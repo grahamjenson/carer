@@ -21,8 +21,8 @@ void main() async {
     });
 
     test('lastMins', () async {
-      expect(await SGV(value: 2, date: now.subtract(min5)).save(), true);
-      expect(await SGV(value: 1, date: now).save(), true);
+      expect(await SGV(value: 2, date: now.subtract(min5), eid: "1").save(), true);
+      expect(await SGV(value: 1, date: now, eid: "2").save(), true);
       expect(await SGV.count(), 2);
 
       await withClock(Clock.fixed(now), () async {
@@ -38,7 +38,7 @@ void main() async {
       expect(sgv, null);
       expect(await SGV.count(), 0);
 
-      expect(await SGV(value: 2, date: now.subtract(min5)).save(), true);
+      expect(await SGV(value: 2, date: now.subtract(min5), eid: "1").save(), true);
       expect(await SGV.count(), 1);
       sgv = SGV.lastSGV().value;
       expect(sgv!.value, 2);
@@ -46,7 +46,7 @@ void main() async {
 
       // Add more recent number
 
-      expect(await SGV(value: 1, date: now).save(), true);
+      expect(await SGV(value: 1, date: now, eid: "2").save(), true);
       expect(await SGV.count(), 2);
       sgv = SGV.lastSGV().value;
       expect(sgv!.value, 1);
@@ -54,9 +54,9 @@ void main() async {
     });
 
     test("percents", () async {
-      expect(await SGV(value: 100, date: now.subtract(hour48)).save(), true);
-      expect(await SGV(value: 100, date: now.subtract(min5 + min5)).save(), true);
-      expect(await SGV(value: 100, date: now.subtract(min5)).save(), true);
+      expect(await SGV(value: 100, date: now.subtract(hour48), eid: "1").save(), true);
+      expect(await SGV(value: 100, date: now.subtract(min5 + min5), eid: "2").save(), true);
+      expect(await SGV(value: 100, date: now.subtract(min5), eid: "3").save(), true);
 
       await withClock(Clock.fixed(now), () async {
         var percent = await SGV.todaysPercentage.future;
@@ -67,8 +67,8 @@ void main() async {
     test('batchCreateOrUpdateSGVs', () async {
       // create SGVs
       var ret = await Future.wait([
-        SGV.fromMap({'value': 1, 'timestamp': minTime(0)}).save(),
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5)}).save(),
+        SGV.fromMap({'value': 1, 'timestamp': minTime(0), "eid": "1"}).save(),
+        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "2"}).save(),
       ]);
       expect(ret.where((b) => b).length, 2);
 
@@ -79,8 +79,8 @@ void main() async {
 
       // fetch SGVs
       ret = await Future.wait([
-        SGV.fromMap({'value': 1, 'timestamp': minTime(0)}).save(),
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5)}).save(),
+        SGV.fromMap({'value': 1, 'timestamp': minTime(0), "eid": "1"}).save(),
+        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "2"}).save(),
       ]);
 
       expect(ret.where((b) => b).length, 0); // Nothing was changed
@@ -90,8 +90,8 @@ void main() async {
       expect(sgvs.first.value, 2);
 
       ret = await Future.wait([
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5)}).save(),
-        SGV.fromMap({'value': 1, 'timestamp': minTime(5)}).save(), // new at same date
+        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "3"}).save(),
+        SGV.fromMap({'value': 1, 'timestamp': minTime(5), "eid": "1"}).save(), // new at same date
       ]);
 
       expect(ret.where((b) => b).length, 1); // only one new value
@@ -124,10 +124,10 @@ void main() async {
 
     test("countSGVs", () async {
       var ret = await Future.wait([
-        SGV.fromMap({'timestamp': minTime(0), 'value': 4}).save(),
-        SGV.fromMap({'timestamp': minTime(5), 'value': 3}).save(),
-        SGV.fromMap({'timestamp': minTime(10), 'value': 2}).save(),
-        SGV.fromMap({'timestamp': minTime(15), 'value': 1}).save(),
+        SGV.fromMap({'timestamp': minTime(0), 'value': 4, "eid": "1"}).save(),
+        SGV.fromMap({'timestamp': minTime(5), 'value': 3, "eid": "2"}).save(),
+        SGV.fromMap({'timestamp': minTime(10), 'value': 2, "eid": "3"}).save(),
+        SGV.fromMap({'timestamp': minTime(15), 'value': 1, "eid": "4"}).save(),
       ]);
       expect(ret.where((b) => b).length, 4);
 
@@ -143,10 +143,10 @@ void main() async {
     test("sgvs", () async {
       // create SGVs
       var ret = await Future.wait([
-        SGV.fromMap({'timestamp': minTime(0), 'value': 4}).save(),
-        SGV.fromMap({'timestamp': minTime(5), 'value': 3}).save(),
-        SGV.fromMap({'timestamp': minTime(10), 'value': 2}).save(),
-        SGV.fromMap({'timestamp': minTime(15), 'value': 1}).save(),
+        SGV.fromMap({'timestamp': minTime(0), 'value': 4, "eid": "1"}).save(),
+        SGV.fromMap({'timestamp': minTime(5), 'value': 3, "eid": "2"}).save(),
+        SGV.fromMap({'timestamp': minTime(10), 'value': 2, "eid": "3"}).save(),
+        SGV.fromMap({'timestamp': minTime(15), 'value': 1, "eid": "4"}).save(),
       ]);
       expect(ret.where((b) => b).length, 4);
 
@@ -180,11 +180,11 @@ void main() async {
     group("clean sgvs", () {
       test("close sgvs", () async {
         var ret = await Future.wait([
-          SGV.fromMap({'timestamp': minTime(0), 'value': 4}).save(),
-          SGV.fromMap({'timestamp': minTime(5), 'value': 3}).save(),
-          SGV.fromMap({'timestamp': minTime(10), 'value': 5}).save(),
-          SGV.fromMap({'timestamp': minTime(15), 'value': 1}).save(),
-          SGV.fromMap({'timestamp': minTime(16), 'value': 2}).save(),
+          SGV.fromMap({'timestamp': minTime(0), 'value': 4, "eid": "1"}).save(),
+          SGV.fromMap({'timestamp': minTime(5), 'value': 3, "eid": "2"}).save(),
+          SGV.fromMap({'timestamp': minTime(10), 'value': 5, "eid": "3"}).save(),
+          SGV.fromMap({'timestamp': minTime(15), 'value': 1, "eid": "4"}).save(),
+          SGV.fromMap({'timestamp': minTime(16), 'value': 2, "eid": "5"}).save(),
         ]);
         expect(ret.where((b) => b).length, 5);
 
@@ -207,9 +207,9 @@ void main() async {
 
       test("close sgvs", () async {
         var ret = await Future.wait([
-          SGV.fromMap({'timestamp': minTime(0), 'value': 1}).save(),
-          SGV.fromMap({'timestamp': minTime(15), 'value': 5}).save(),
-          SGV.fromMap({'timestamp': minTime(30), 'value': 20}).save(),
+          SGV.fromMap({'timestamp': minTime(0), 'value': 1, "eid": "1"}).save(),
+          SGV.fromMap({'timestamp': minTime(15), 'value': 5, "eid": "2"}).save(),
+          SGV.fromMap({'timestamp': minTime(30), 'value': 20, "eid": "3"}).save(),
         ]);
         expect(ret.where((b) => b).length, 3);
 

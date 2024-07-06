@@ -22,11 +22,11 @@ void main() async {
   group('Linear Prediction', () {
     setUp(() async {
       // Will make a linear drop
-      expect(await SGV(value: 140, date: now).save(), true);
-      expect(await SGV(value: 150, date: min5ago).save(), true);
-      expect(await SGV(value: 160, date: min10ago).save(), true);
-      expect(await SGV(value: 170, date: min15ago).save(), true);
-      expect(await SGV(value: 180, date: min20ago).save(), true);
+      expect(await SGV(value: 140, date: now, eid: "1").save(), true);
+      expect(await SGV(value: 150, date: min5ago, eid: "2").save(), true);
+      expect(await SGV(value: 160, date: min10ago, eid: "3").save(), true);
+      expect(await SGV(value: 170, date: min15ago, eid: "4").save(), true);
+      expect(await SGV(value: 180, date: min20ago, eid: "5").save(), true);
     });
 
     tearDown(() async {

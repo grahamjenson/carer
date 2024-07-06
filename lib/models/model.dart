@@ -11,9 +11,10 @@ import 'package:signals/signals_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class Model {
-  int? get id;
-  set id(int? id);
+  int? id;
+  String? eid;
 
+  Model({this.id, this.eid});
   DateTime get date;
   ModelRepository get repository;
 
@@ -32,17 +33,13 @@ abstract class Model {
   }
 
   Future<bool> upsert() {
-    return go(repository.upsert(this, uniqueValues()), name: "$runtimeType upsert", profile: true).then((value) {
+    return go(repository.upsert(this), name: "$runtimeType upsert", profile: true).then((value) {
       var (res, err) = value;
       if (err != null || res == null) {
         return false;
       }
       return res;
     });
-  }
-
-  List<String> uniqueValues() {
-    return [];
   }
 
   @override
@@ -165,14 +162,21 @@ abstract class ModelRepository<T extends Model> {
     return saves;
   }
 
-  Future<bool> upsert(T model, List<String> uniqueValues) async {
+  Future<int> upsertAll(List<T> models) async {
+    // TODO: Actually implement properly
+    List<bool> modelsss = await Future.wait(models.map((e) => e.upsert()));
+    return modelsss.where((e) => e).length;
+  }
+
+  Future<bool> upsert(T model) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
 
+    // We look for the model using the id, or eid
     var map = toSQLMap(model);
     var keys = map.keys.toList();
-    var where = uniqueValues.map((e) => '$e = ?').join(' AND ');
-    var whereArgs = uniqueValues.map((e) => map[e]).toList();
+    var where = 'eid = ?';
+    var whereArgs = [model.eid!];
 
     // Get current value
     var (oldModel, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));

@@ -8,14 +8,14 @@ class CarbsRepository extends ModelRepository<Carbs> {
 
   @override
   Carbs fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["value", "timestamp", "nsid"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, String]))) {
+    var requiredKeys = ["value", "timestamp", "eid"];
+    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int]))) {
       throw ArgumentError("Invalid Carbs Map: $map");
     }
 
     return Carbs(
       id: map["id"] as int?,
-      nsid: map["nsid"] as String,
+      eid: map["eid"] as String,
       value: map["value"] as int,
       date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
     );
@@ -26,7 +26,7 @@ class CarbsRepository extends ModelRepository<Carbs> {
     return {
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
-      "nsid": model.nsid,
+      "eid": model.eid!,
     };
   }
 }
@@ -37,17 +37,13 @@ class Carbs extends Model {
   @override
   ModelRepository get repository => _q;
 
-  @override
-  int? id;
-  String nsid;
-
   final int value;
   @override
   final DateTime date;
 
   Carbs({
-    this.id,
-    required this.nsid,
+    super.id,
+    required super.eid,
     required this.value,
     required this.date,
   });

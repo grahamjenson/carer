@@ -3,6 +3,7 @@ import "dart:developer" as developer;
 import "package:carer/utils/env.dart";
 import "package:clock/clock.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
+import "package:signals/signals_flutter.dart";
 
 enum LogLevel {
   info(1),
@@ -15,6 +16,7 @@ enum LogLevel {
 }
 
 class ALogger {
+  final signal = Signal(0, debugLabel: "ALoggerSignal");
   //singleton
   ALogger._internal();
   static final ALogger _instance = ALogger._internal();
@@ -30,6 +32,7 @@ class ALogger {
     String name = '',
   }) {
     var now = clock.now();
+    signal.value = now.millisecondsSinceEpoch;
     logLines.insert(0, (now, level, message));
 
     if (logLines.length > 10000) {

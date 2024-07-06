@@ -25,6 +25,7 @@ void main() async {
         duration: 60,
         lowTarget: 100,
         highTarget: 120,
+        eid: "1",
       );
       expect(await tt1.upsert(), true);
 
@@ -40,6 +41,7 @@ void main() async {
         duration: 30,
         lowTarget: 100,
         highTarget: 120,
+        eid: "1",
       );
       expect(await tt2.upsert(), true);
 
@@ -56,104 +58,9 @@ void main() async {
         duration: 30,
         lowTarget: 100,
         highTarget: 120,
+        eid: "1",
       );
       expect(await tt3.upsert(), false);
-    });
-
-    test(" fix bad data", () async {
-      var tt1 = TempTarget(
-        startDate: now,
-        duration: 120,
-        lowTarget: 10,
-        highTarget: 100,
-      );
-      expect(await tt1.upsert(), true);
-
-      var tt2 = TempTarget(
-        startDate: now.add(min1),
-        duration: 120,
-        lowTarget: 20,
-        highTarget: 200,
-      );
-      expect(await tt2.upsert(), true);
-
-      var all = await TempTarget.query();
-
-      expect(all.length, 2);
-      expect(all[0].lowTarget, 20);
-      expect(all[1].lowTarget, 10);
-
-      expect(all[0].duration, 120);
-      expect(all[1].duration, 120); // This is the error that needs fixing
-
-      // Fix the temp targets
-      var ret = await TempTarget.fixData();
-      expect(ret, 1);
-      all = await TempTarget.query();
-
-      expect(all.length, 2);
-      expect(all[0].lowTarget, 20);
-      expect(all[1].lowTarget, 10);
-
-      expect(all[0].duration, 120);
-      expect(all[1].duration, 60);
-
-      ret = await TempTarget.fixData();
-      expect(ret, 0);
-    });
-
-    test(" fix multiple bad datas", () async {
-      var a = TempTarget(
-        startDate: now,
-        duration: 3000,
-        lowTarget: 10,
-        highTarget: 100,
-      );
-      expect(await a.upsert(), true);
-
-      var b1 = TempTarget(
-        startDate: now.add(min1),
-        duration: 20,
-        lowTarget: 20,
-        highTarget: 200,
-      );
-      expect(await b1.upsert(), true);
-
-      var b2 = TempTarget(
-        startDate: now.add(min1).add(min1),
-        duration: 30,
-        lowTarget: 30,
-        highTarget: 300,
-      );
-      expect(await b2.upsert(), true);
-
-      var all = await TempTarget.query();
-
-      expect(all.length, 3);
-      expect(all[0].lowTarget, 30);
-      expect(all[1].lowTarget, 20);
-      expect(all[2].lowTarget, 10);
-
-      expect(all[0].duration, 30);
-      expect(all[1].duration, 20); // This is the error that needs fixing
-      expect(all[2].duration, 3000); // This is the error that needs fixing
-
-      // Fix the temp targets
-      var ret = await TempTarget.fixData();
-      expect(ret, 1);
-      all = await TempTarget.query();
-
-      expect(all.length, 3);
-      expect(all[0].lowTarget, 30);
-      expect(all[1].lowTarget, 20);
-      expect(all[2].lowTarget, 10);
-
-      expect(all[0].duration, 30);
-      expect(all[1].duration, 20);
-      expect(all[2].duration, 60);
-
-      ret = await TempTarget.fixData();
-      expect(ret, 0);
     });
 
     test('update duration to 0', () async {
@@ -162,6 +69,7 @@ void main() async {
         duration: 60,
         lowTarget: 100,
         highTarget: 120,
+        eid: "1",
       );
       expect(await tt1.upsert(), true);
 
@@ -177,6 +85,7 @@ void main() async {
         duration: 0,
         lowTarget: 100,
         highTarget: 120,
+        eid: "1",
       );
       expect(await tt2.upsert(), true);
 
