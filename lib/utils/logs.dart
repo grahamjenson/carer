@@ -76,6 +76,9 @@ class Errors {
       alog("ERROR $name\n$e\n$stacktrace", level: LogLevel.error);
     }
 
+    if (Env.isTest) {
+      throw e;
+    }
     if (Env.isProd) {
       Sentry.captureException(
         e,

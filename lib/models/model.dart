@@ -47,6 +47,18 @@ abstract class Model {
     return repository.toSQLMap(this).toString();
   }
 
+  // wrapper around SQLMap
+  Map<String, Object> toSQLMap() {
+    return repository.toSQLMap(this);
+  }
+
+  //check if this model is equal to another sql map
+  bool equalsSQLMap(Map<String, Object?> map) {
+    return toSQLMap().entries.every((e) {
+      return map[e.key] == e.value;
+    });
+  }
+
   List<String> validate() {
     return [];
   }
@@ -105,7 +117,7 @@ abstract class ModelRepository<T extends Model> {
     return query(name: "lastMins", after: clock.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch);
   }
 
-  Future<bool> save(T model) async {
+  Future<bool> save(T model, {bool withSignal = true}) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
 
@@ -123,7 +135,9 @@ abstract class ModelRepository<T extends Model> {
     var ret = id != null && id != 0;
     if (ret) {
       model.id = id;
-      writeSignal.value = clock.now().millisecondsSinceEpoch;
+      if (withSignal) {
+        writeSignal.value = clock.now().millisecondsSinceEpoch;
+      }
     }
     return ret;
   }
@@ -165,26 +179,26 @@ abstract class ModelRepository<T extends Model> {
   }
 
   Future<int> upsertAll(List<T> models) async {
-    // var cdb = await CarerDB.instance;
-    // var tb = writeTableName ?? tableName;
-
-    // var (oldModel, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));
-    // if (err != null || oldModel == null) {
-    //   return false;
-    // }
-
-    List<bool> modelsss = await Future.wait(models.map((e) => e.upsert()));
-    return modelsss.where((e) => e).length;
+    List<bool> modelsss = [];
+    for (var m in models) {
+      modelsss.add(await upsert(m, withSignal: false));
+    }
+    var total = modelsss.where((e) => e).length;
+    if (total > 0) {
+      writeSignal.value = clock.now().millisecondsSinceEpoch;
+    }
+    return total;
   }
 
-  Future<bool> upsert(T model) async {
+  Future<bool> upsert(T model, {bool withSignal = true}) async {
     var cdb = await CarerDB.instance;
     var tb = writeTableName ?? tableName;
 
     // We look for the model using the id, or eid
-    var map = toSQLMap(model);
-    var keys = map.keys.toList();
+    var modelSQL = toSQLMap(model);
+    var keys = modelSQL.keys.toList();
     var where = "";
+
     List whereArgs = [];
     if (model.id != null) {
       where = 'id = ?';
@@ -193,43 +207,43 @@ abstract class ModelRepository<T extends Model> {
       where = 'eid = ?';
       whereArgs = [model.eid!];
     } else {
-      return save(model);
+      return save(model, withSignal: withSignal);
     }
 
     // Get current value
-    var (oldModel, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));
-    if (err != null || oldModel == null) {
+    var (oldModels, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));
+    if (err != null || oldModels == null) {
       return false;
     }
 
-    if (oldModel.isNotEmpty) {
-      // check if there is need for any changes
-      var update = false;
-      for (var k in keys) {
-        if (oldModel.first[k] != map[k]) {
-          update = true;
-          break;
-        }
-      }
+    // The model doesn exist, insert
+    if (oldModels.isEmpty) {
+      return save(model, withSignal: withSignal);
+    }
 
-      if (update) {
-        var (id, err) = await go(cdb.db.update(
-          tb,
-          map,
-          where: where,
-          whereArgs: whereArgs,
-        ));
-        if (err != null) {
-          return false;
-        }
-        var ret = id != null && id != 0;
-        if (ret) {
-          writeSignal.value = clock.now().millisecondsSinceEpoch;
-        }
-        return ret;
+    var oldModel = oldModels.first;
+    // If current model and old model equal do nothing
+    if (model.equalsSQLMap(oldModel)) {
+      return false;
+    }
+
+    var (id, err2) = await go(cdb.db.update(
+      tb,
+      modelSQL,
+      where: where,
+      whereArgs: whereArgs,
+    ));
+    if (err2 != null) {
+      return false;
+    }
+    var ret = id != null && id != 0;
+    if (ret) {
+      if (withSignal) {
+        writeSignal.value = clock.now().millisecondsSinceEpoch;
       }
     }
-    return save(model);
+
+    return ret;
   }
 
   Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {

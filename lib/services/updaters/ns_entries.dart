@@ -4,7 +4,6 @@ import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:clock/clock.dart';
 
 class NSEntriesUpdater extends Updater {
   // On first call backfill last two days
@@ -36,8 +35,6 @@ class NSEntriesUpdater extends Updater {
     }
     return reasons;
   }
-
-  var threeDaysAgo = clock.daysAgo(3);
 
   @override
   Future<bool> update() async {

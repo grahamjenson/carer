@@ -7,12 +7,14 @@ import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 
 class NSTreatmentsUpdater extends Updater {
   // On first call backfill last two days
   bool _backfill = true;
 
   NSTreatmentsUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 10)) {
+    lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
       // Check signal to register
       var _ = Settings().nightscoutURL;
