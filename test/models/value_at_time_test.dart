@@ -25,7 +25,7 @@ void main() async {
       await (await CarerDB.instance).deleteAll();
     });
 
-    test("get values at time ", () async {
+    test("getvaluesattime", () async {
       var p = Profile(
         dia: 5,
         timezone: "asad",
@@ -49,7 +49,7 @@ void main() async {
 
       var s = await TempTarget(
         startDate: now.subtract(
-          const Duration(seconds: 50),
+          const Duration(minutes: 1),
         ),
         duration: 300,
         highTarget: 10,
@@ -59,6 +59,7 @@ void main() async {
       expect(s, true);
 
       targets = await ValueAtTime.query();
+      //print(targets.sublist(0, 5));
       expect(targets.length, 360);
 
       // beginning will be 1 hour ahead
@@ -71,8 +72,9 @@ void main() async {
 }
 
 void valueAssertion(ValueAtTime v, {int? lowTarget, int? highTarget, bool? isTempTarget, DateTime? date}) {
+  if (isTempTarget != null) expect(v.isTempTarget, isTempTarget);
   if (lowTarget != null) expect(v.lowTarget, lowTarget);
   if (highTarget != null) expect(v.highTarget, highTarget);
-  if (isTempTarget != null) expect(v.isTempTarget, isTempTarget);
+
   if (date != null) expect(v.date, date);
 }

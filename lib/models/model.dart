@@ -85,11 +85,13 @@ abstract class ModelRepository<T extends Model> {
     Map<String, Object>? conditions,
     int? limit,
     String? name, // Optional for debugging
+    String? orderBy,
   }) async {
     var cdb = await CarerDB.instance;
+    orderBy ??= "$timestampField DESC";
     var (where, whereArgs) = _buildWhereStatement(after: after, before: before, conditions: conditions);
     var (res, err) = await go(
-      cdb.db.query(tableName, where: where, whereArgs: whereArgs, limit: limit, orderBy: "$timestampField DESC"),
+      cdb.db.query(tableName, where: where, whereArgs: whereArgs, limit: limit, orderBy: orderBy),
       name: "$runtimeType ${name ?? "q"}",
       profile: true,
     );
@@ -163,7 +165,14 @@ abstract class ModelRepository<T extends Model> {
   }
 
   Future<int> upsertAll(List<T> models) async {
-    // TODO: Actually implement properly
+    // var cdb = await CarerDB.instance;
+    // var tb = writeTableName ?? tableName;
+
+    // var (oldModel, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));
+    // if (err != null || oldModel == null) {
+    //   return false;
+    // }
+
     List<bool> modelsss = await Future.wait(models.map((e) => e.upsert()));
     return modelsss.where((e) => e).length;
   }
@@ -175,8 +184,17 @@ abstract class ModelRepository<T extends Model> {
     // We look for the model using the id, or eid
     var map = toSQLMap(model);
     var keys = map.keys.toList();
-    var where = 'eid = ?';
-    var whereArgs = [model.eid!];
+    var where = "";
+    List whereArgs = [];
+    if (model.id != null) {
+      where = 'id = ?';
+      whereArgs = [model.id!];
+    } else if (model.eid != null) {
+      where = 'eid = ?';
+      whereArgs = [model.eid!];
+    } else {
+      return save(model);
+    }
 
     // Get current value
     var (oldModel, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));

@@ -64,7 +64,7 @@ void main() async {
       });
     });
 
-    test('batchCreateOrUpdateSGVs', () async {
+    test('orderOFSVGs', () async {
       // create SGVs
       var ret = await Future.wait([
         SGV.fromMap({'value': 1, 'timestamp': minTime(0), "eid": "1"}).save(),
@@ -90,8 +90,8 @@ void main() async {
       expect(sgvs.first.value, 2);
 
       ret = await Future.wait([
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "3"}).save(),
-        SGV.fromMap({'value': 1, 'timestamp': minTime(5), "eid": "1"}).save(), // new at same date
+        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "2"}).save(),
+        SGV.fromMap({'value': 1, 'timestamp': minTime(5), "eid": "3"}).save(), // new at same date
       ]);
 
       expect(ret.where((b) => b).length, 1); // only one new value

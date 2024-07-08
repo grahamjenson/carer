@@ -3,12 +3,13 @@ import 'dart:async';
 
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 
 abstract class Updater {
   Duration intervalToCheck;
   Duration maxAgeBeforeChecking;
-  DateTime lastUpdated = DateTime(1970);
-  DateTime lastSuccessfulUpdate = DateTime(1970);
+  DateTime lastUpdated = clock.daysAgo(3);
+  DateTime lastSuccessfulUpdate = clock.daysAgo(3);
 
   Updater({required this.intervalToCheck, required this.maxAgeBeforeChecking});
 

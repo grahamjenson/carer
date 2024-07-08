@@ -120,7 +120,7 @@ class SGV extends Model {
       conditions["value < ?"] = high;
     }
 
-    return _q.query(after: after, before: before, conditions: conditions, limit: limit, name: name);
+    return _q.query(after: after, before: before, conditions: conditions, limit: limit, name: name, orderBy: "timestamp DESC, value");
   }
 
   static Future<List<SGV>> lastMins(int minsAgo) => _q.lastMins(minsAgo);

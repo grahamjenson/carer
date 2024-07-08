@@ -23,12 +23,9 @@ class NSTreatmentsUpdater extends Updater {
   @override
   Future<bool> update() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
-    var count = 12; // last hour
-    if (_backfill) {
-      count = 500;
-    }
 
-    var (entries, err) = await go(NSClient().getTreatments(nsURL, nsToken, count));
+    var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 10));
+    var (entries, err) = await go(NSClient().getTreatments(nsURL, nsToken, gteCreatedAt));
     if (err != null || entries == null) {
       return false;
     }

@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 
 class NSEntriesUpdater extends Updater {
   // On first call backfill last two days
@@ -38,15 +37,15 @@ class NSEntriesUpdater extends Updater {
     return reasons;
   }
 
+  var threeDaysAgo = clock.daysAgo(3);
+
   @override
   Future<bool> update() async {
     var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
 
     // Get the last amount of readings with a few extra for certainty
-    var readingsOut = ((super.timeSinceLastSuccessfulUpdate().inMinutes / 5) + 4) * 2;
-    var count = min(readingsOut, 12 * 48).toInt();
-
-    var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, count));
+    var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 10));
+    var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, gteCreatedAt));
     if (err != null || entries == null) {
       return false;
     }

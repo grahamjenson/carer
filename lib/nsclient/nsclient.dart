@@ -5,8 +5,21 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart' as http;
 
-Uri entryEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/entries.json?token=$token&count=$count');
-Uri treatmentsEndpoint(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token&count=$count');
+String toNSDateString(DateTime dt) {
+  dt = dt.toUtc();
+  var year = dt.year;
+  var month = dt.month.toString().padLeft(2, '0');
+  var day = dt.day.toString().padLeft(2, '0');
+  var hour = dt.hour.toString().padLeft(2, '0');
+  var minute = dt.minute.toString().padLeft(2, '0');
+  return "$year-$month-${day}T$hour:$minute";
+}
+
+Uri entryEndpoint(nsURL, token, DateTime gteCreatedAt) =>
+    Uri.parse('$nsURL/api/v1/entries.json?token=$token&find[created_at][\$gte]=${toNSDateString(gteCreatedAt)}&count=1000');
+
+Uri treatmentsEndpoint(nsURL, token, DateTime gteCreatedAt) =>
+    Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[created_at][\$gte]=${toNSDateString(gteCreatedAt)}&count=1000');
 
 Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
 
@@ -16,12 +29,12 @@ Uri basalEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/basal.jso
 
 // Singleton
 class NSClient {
-  Future<NSEntries> getEntries(String nsURL, String token, int count) async {
+  Future<NSEntries> getEntries(String nsURL, String token, DateTime gteCreateAt) async {
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
       return NSEntries.empty();
     }
-    var ep = entryEndpoint(nsURL, token, count);
+    var ep = entryEndpoint(nsURL, token, gteCreateAt);
     final (response, err) = await go(http.get(ep));
     if (err != null || response == null) {
       return NSEntries.empty();
@@ -35,11 +48,11 @@ class NSClient {
     return NSEntries.fromJson(response.body);
   }
 
-  Future<NSTreatments> getTreatments(String nsURL, String token, int count) async {
+  Future<NSTreatments> getTreatments(String nsURL, String token, DateTime gteCreateAt) async {
     if (nsURL == "" || token == "") {
       return NSTreatments.empty();
     }
-    var ep = treatmentsEndpoint(nsURL, token, count);
+    var ep = treatmentsEndpoint(nsURL, token, gteCreateAt);
     final (response, err) = await go(http.get(ep));
     if (err != null || response == null) {
       return NSTreatments.empty();
