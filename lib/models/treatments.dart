@@ -2,6 +2,7 @@
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/model.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -93,6 +94,8 @@ class Treatment extends Model {
 
   static FutureSignal<List<Treatment>> lastSixHours = acomputedAsync(() async {
     alog("updating Treatments lastSixHours");
+    // Needs to update every minute to get latest results.
+    var t = TimerService().minuteSignal.value;
     var b = Bolus.writeSignal.value;
     var c = Carbs.writeSignal.value;
     return Treatment.lastMins(60 * 6);
