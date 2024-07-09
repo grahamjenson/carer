@@ -30,25 +30,21 @@ class HomePage extends StatelessWidget {
           displacement: 10,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            child: Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.all(0),
-              child: Stack(
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    padding: const EdgeInsets.all(8),
-                    child: AWatch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
-                  ),
-                  const Positioned(
-                    top: 10, // Adjust these values as needed
-                    left: 10,
-                    child: FittedBox(child: CurrentTimeWidget()),
-                  ),
-                ],
-              ),
+            padding: EdgeInsets.zero,
+            child: Stack(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height - 40,
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.all(8),
+                  child: AWatch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
+                ),
+                const Positioned(
+                  top: 10, // Adjust these values as needed
+                  left: 10,
+                  child: FittedBox(child: CurrentTimeWidget()),
+                ),
+              ],
             ),
           ),
         ),

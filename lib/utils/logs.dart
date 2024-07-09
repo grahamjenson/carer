@@ -57,7 +57,7 @@ class ALogger {
     return msg;
   }
 
-  getPrettyLogs() {
+  String getPrettyLogs() {
     return logLines.map((e) => "${e.$1}\t  ${e.$2.name}  \t${e.$3}").join("\n");
   }
 }
