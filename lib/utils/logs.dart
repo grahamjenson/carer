@@ -1,5 +1,6 @@
 import "dart:developer" as developer;
 
+import "package:carer/services/settings/secure_settings.dart";
 import "package:carer/utils/env.dart";
 import "package:clock/clock.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
@@ -17,7 +18,7 @@ enum LogLevel {
 
 class ALogger {
   final signal = Signal(0, debugLabel: "ALoggerSignal");
-  //singleton
+
   ALogger._internal();
   static final ALogger _instance = ALogger._internal();
   factory ALogger() => _instance;
@@ -31,6 +32,8 @@ class ALogger {
     LogLevel level = LogLevel.debug,
     String name = '',
   }) {
+    message = censorLogs(message);
+
     var now = clock.now();
     signal.value = now.millisecondsSinceEpoch;
     logLines.insert(0, (now, level, message));
@@ -44,6 +47,14 @@ class ALogger {
       level: level.level,
       time: now,
     );
+  }
+
+  String censorLogs(String msg) {
+    var (nsurl, token) = SecureSettings().nightscoutURLAndToken;
+    if (nsurl.isNotEmpty) {
+      msg = msg.replaceAll(nsurl, "NS_URL").replaceAll(token, "NS_TOKEN");
+    }
+    return msg;
   }
 
   getPrettyLogs() {
