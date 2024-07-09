@@ -10,10 +10,14 @@ abstract class Updater {
   Duration maxAgeBeforeChecking;
   DateTime lastUpdated = clock.daysAgo(3);
   DateTime lastSuccessfulUpdate = clock.daysAgo(3);
-
+  bool _forceUpdate = false;
   Updater({required this.intervalToCheck, required this.maxAgeBeforeChecking});
 
   Future<bool> update();
+
+  forceUpdate() {
+    _forceUpdate = true;
+  }
 
   void start() {
     Timer.periodic(intervalToCheck, (Timer t) async {
@@ -43,6 +47,12 @@ abstract class Updater {
 
   List<String> shouldUpdate() {
     List<String> reasons = [];
+
+    if (_forceUpdate) {
+      reasons.add("Forced update");
+      _forceUpdate = false;
+    }
+
     reasons.addAll(_externalReasons);
     _externalReasons.clear();
 

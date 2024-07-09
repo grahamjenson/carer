@@ -1,5 +1,7 @@
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/bar.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/current_time.dart';
@@ -16,21 +18,41 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-          child: Stack(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.all(8),
-            child: AWatch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            alog("Forcing Update");
+            for (var element in UpdateService().updaters) {
+              element.forceUpdate();
+            }
+            // just to see something is happening
+            await Future.delayed(const Duration(seconds: 1));
+          },
+          displacement: 10,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(0),
+              child: Stack(
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.all(8),
+                    child: AWatch((context) => getLayout(context, UISettings().uiLayoutVertical, UISettings().uiLayoutHorizontal)),
+                  ),
+                  const Positioned(
+                    top: 10, // Adjust these values as needed
+                    left: 10,
+                    child: FittedBox(child: CurrentTimeWidget()),
+                  ),
+                ],
+              ),
+            ),
           ),
-          const Positioned(
-            top: 10, // Adjust these values as needed
-            left: 10,
-            child: FittedBox(child: CurrentTimeWidget()),
-          ),
-        ],
-      )),
+        ),
+      ),
       bottomNavigationBar: const Bar(),
     );
   }

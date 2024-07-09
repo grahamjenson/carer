@@ -17,6 +17,7 @@ const se = SetEquality();
 class AlarmsService {
   static final AlarmsService _singleton = AlarmsService._();
   factory AlarmsService() => _singleton;
+
   late final Set<Alarm> allAlarms = {
     // Target Alarms
     const UrgentLowAlarm(),
