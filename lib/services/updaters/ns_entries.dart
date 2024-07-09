@@ -1,6 +1,6 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
-import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -11,7 +11,7 @@ class NSEntriesUpdater extends Updater {
   NSEntriesUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(minutes: 1)) {
     aeffect(() {
       // Check signal to register
-      var _ = Settings().nightscoutURL;
+      var _ = SecureSettings().nightscoutURL;
       addExternalReason("NS URL updated");
     });
   }
@@ -38,7 +38,7 @@ class NSEntriesUpdater extends Updater {
 
   @override
   Future<bool> update() async {
-    var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
+    var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
     // Get the last amount of readings with a few extra for certainty
     var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 10));

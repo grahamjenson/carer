@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:carer/models/constants.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -13,7 +14,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      var unit = Settings().unit;
+      var unit = UISettings().unit;
       var high = TargetSettings().highTarget.toDouble();
       var low = TargetSettings().lowTarget.toDouble();
       var highStr = unit.str(high);
@@ -45,7 +46,7 @@ class T1DSettingsWidget extends AbstractSettingsSection {
             initialValue: unit.toBool(),
             onToggle: (value) async {
               var unitP = Unit.fromBool(value);
-              Settings().unit = unitP;
+              UISettings().unit = unitP;
             },
           ),
           SettingsTile(

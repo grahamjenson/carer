@@ -4,7 +4,7 @@ import 'package:carer/models/profile.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/summary.dart';
-import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -14,14 +14,14 @@ class NSSummaryUpdater extends Updater {
   NSSummaryUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 15)) {
     aeffect(() {
       // Check signal to register
-      var _ = Settings().nightscoutURL;
+      var _ = SecureSettings().nightscoutURL;
       addExternalReason("NS URL updated");
     });
   }
 
   @override
   Future<bool> update() async {
-    var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
+    var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
     var (summary, err) = await go(NSClient().getSummary(nsURL, nsToken));
 
     if (err != null || summary == null) {

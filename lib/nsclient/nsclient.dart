@@ -68,7 +68,8 @@ class NSClient {
 
   Future<Summary?> getSummary(String nsURL, String token) async {
     if (nsURL == "" || token == "") {
-      throw Exception("No URL");
+      alog("getSummary No NS URL");
+      return null;
     }
     var ep = summaryEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));

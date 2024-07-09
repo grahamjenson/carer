@@ -3,7 +3,7 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/prediction_service.dart';
-import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
@@ -86,11 +86,11 @@ class Stats extends StatelessWidget {
                   power(powerNow),
                   cage(cageNow),
                   basal(currentBasal),
-                  target(Settings().unit, profileLowTarget, profileHighTarget),
-                  fifteenMinDiff(Settings().unit, sgvs),
+                  target(UISettings().unit, profileLowTarget, profileHighTarget),
+                  fifteenMinDiff(UISettings().unit, sgvs),
                   todaysInRange(),
                   yesterdayInRange(),
-                  predictions("Exp2", exp2preds, Settings().unit),
+                  predictions("Exp2", exp2preds, UISettings().unit),
                 ],
               );
             }),

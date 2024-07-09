@@ -2,8 +2,8 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
-import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
@@ -141,7 +141,7 @@ class BGLChart extends StatelessWidget {
           dotData: const FlDotData(show: false),
         ),
       ],
-      lineTouchData: lineTouchData(Settings().unit),
+      lineTouchData: lineTouchData(UISettings().unit),
       betweenBarsData: [
         BetweenBarsData(fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
       ],
@@ -372,7 +372,7 @@ class BGLChart extends StatelessWidget {
             value.toInt() == TargetSettings().highTarget ||
             value.toInt() == TargetSettings().lowTarget) {
           return AWatch((context) {
-            return Text(Settings().unit.str(value), style: style, textAlign: TextAlign.right);
+            return Text(UISettings().unit.str(value), style: style, textAlign: TextAlign.right);
           });
         }
         return const SizedBox();

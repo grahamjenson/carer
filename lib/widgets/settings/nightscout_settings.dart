@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -22,15 +22,15 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
             alignment: Alignment.centerRight,
             width: maxWidth,
             child: AWatch((context) => Text(
-                  Settings().nightscoutURL ?? "Not Set",
+                  SecureSettings().nightscoutURL ?? "Not Set",
                   overflow: TextOverflow.ellipsis,
                 )),
           ),
           leading: const Icon(Icons.language),
           onPressed: (context) async {
-            final url = await openTextDialog(context, "Nightscout URL", hint: "URL", value: Settings().nightscoutURL ?? "");
+            final url = await openTextDialog(context, "Nightscout URL", hint: "URL", value: SecureSettings().nightscoutURL ?? "");
             if (url == null || url.isEmpty) return;
-            Settings().nightscoutURL = url;
+            SecureSettings().nightscoutURL = url;
           },
         ),
       ],

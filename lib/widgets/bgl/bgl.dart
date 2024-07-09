@@ -1,5 +1,5 @@
 import 'package:carer/models/sgv.dart';
-import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
@@ -41,7 +41,7 @@ class BGL extends StatelessWidget {
                 heightFactor: 1,
                 child: FittedBox(
                   child: AWatch((_) {
-                    var unit = Settings().unit;
+                    var unit = UISettings().unit;
                     return Text(sgv.sgvStr(unit),
                         style: const TextStyle(
                           color: mainColor,
@@ -59,7 +59,7 @@ class BGL extends StatelessWidget {
                     Expanded(
                       child: FittedBox(
                         child: AWatch((_) {
-                          var unit = Settings().unit;
+                          var unit = UISettings().unit;
                           return Text(
                             sgv.rate5mWithSign(unit),
                             style: const TextStyle(

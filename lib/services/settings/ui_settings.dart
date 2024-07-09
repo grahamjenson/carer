@@ -1,8 +1,9 @@
+import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
-enum _UINames { screenActive, uiLayoutVertical, uiLayoutHorizontal, uiTheme }
+enum _UINames { screenActive, uiLayoutVertical, uiLayoutHorizontal, uiTheme, unit }
 
 class UISettings {
   static final UISettings _singleton = UISettings._();
@@ -13,6 +14,7 @@ class UISettings {
     _UINames.uiLayoutVertical: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutVertical'),
     _UINames.uiLayoutHorizontal: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutHorizontal'),
     _UINames.uiTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'uiTheme'),
+    _UINames.unit: Signal<Unit>(Unit.mg, debugLabel: 'unit'),
   };
 
   UISettings._();
@@ -29,6 +31,9 @@ class UISettings {
   UITheme get uiTheme => _signals[_UINames.uiTheme]!.value as UITheme;
   set uiTheme(UITheme value) => _signals[_UINames.uiTheme]!.value = value;
 
+  Unit get unit => _signals[_UINames.unit]!.value as Unit;
+  set unit(Unit value) => _signals[_UINames.unit]!.value = value;
+
   setupDBPropagation(KeyValueStore prefs) {
     // Assign the values from the DB
     screenActive = prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
@@ -39,7 +44,11 @@ class UISettings {
 
     uiTheme = UITheme.fromString(prefs.getString(_UINames.uiTheme.name));
 
+    unit = Unit.fromBool(prefs.getBool(_UINames.unit.name, defaultValue: true)!);
+
     // Setup DB sync for when signalls change
+
+    aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()));
 
     aeffect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);

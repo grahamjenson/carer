@@ -3,7 +3,7 @@ import 'package:carer/models/carbs.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
-import 'package:carer/services/settings/settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -17,14 +17,14 @@ class NSTreatmentsUpdater extends Updater {
     lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
       // Check signal to register
-      var _ = Settings().nightscoutURL;
+      var _ = SecureSettings().nightscoutURL;
       addExternalReason("NS URL updated");
     });
   }
 
   @override
   Future<bool> update() async {
-    var (nsURL, nsToken) = Settings().nightscoutURLAndToken;
+    var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
     // Update so far back because past treatments may need to be updated
     var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 80));
