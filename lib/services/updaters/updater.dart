@@ -14,6 +14,7 @@ abstract class Updater {
   Updater({required this.intervalToCheck, required this.maxAgeBeforeChecking});
 
   Future<bool> update();
+  String raw = "";
 
   forceUpdate() {
     _forceUpdate = true;

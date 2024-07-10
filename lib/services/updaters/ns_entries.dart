@@ -47,6 +47,7 @@ class NSEntriesUpdater extends Updater {
       return false;
     }
 
+    raw = entries.raw;
     List<SGV> sgvs = [];
     for (var entry in entries.entries) {
       if (entry.sgv == null) {

@@ -28,15 +28,18 @@ class NSTreatmentsUpdater extends Updater {
 
     // Update so far back because past treatments may need to be updated
     var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 80));
-    var (entries, err) = await go(NSClient().getTreatments(nsURL, nsToken, gteCreatedAt));
-    if (err != null || entries == null) {
+    var (treatments, err) = await go(NSClient().getTreatments(nsURL, nsToken, gteCreatedAt));
+
+    if (err != null || treatments == null) {
       return false;
     }
 
-    alog("Retrieved ${entries.treatments.length} treatments");
+    raw = treatments.raw;
+
+    alog("Retrieved ${treatments.treatments.length} treatments");
 
     List<Bolus> boluses = [];
-    for (var bolus in entries.boluses) {
+    for (var bolus in treatments.boluses) {
       boluses.add(Bolus(
         value: bolus.insulin,
         date: bolus.date,
@@ -46,7 +49,7 @@ class NSTreatmentsUpdater extends Updater {
     int bolusUpdates = await Bolus.saveAll(boluses);
 
     List<Carbs> carbs = [];
-    for (var carb in entries.carbs) {
+    for (var carb in treatments.carbs) {
       carbs.add(Carbs(
         value: carb.carbs.round(),
         date: carb.date,
@@ -56,7 +59,7 @@ class NSTreatmentsUpdater extends Updater {
     int carbUpdates = await Carbs.saveAll(carbs);
 
     List<TempBasal> tempBasals = [];
-    for (var tempBasal in entries.tempBasals) {
+    for (var tempBasal in treatments.tempBasals) {
       tempBasals.add(TempBasal(
         startDate: tempBasal.date,
         duration: tempBasal.durationInMilliseconds ~/ 1000,
@@ -67,7 +70,7 @@ class NSTreatmentsUpdater extends Updater {
     int tempBasalUpdates = await TempBasal.upsertAll(tempBasals);
 
     List<TempTarget> tempTargets = [];
-    for (var tempTarget in entries.tempTargets) {
+    for (var tempTarget in treatments.tempTargets) {
       tempTargets.add(TempTarget(
           eid: tempTarget.id,
           startDate: tempTarget.date,

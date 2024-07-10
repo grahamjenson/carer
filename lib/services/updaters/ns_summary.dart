@@ -28,6 +28,7 @@ class NSSummaryUpdater extends Updater {
       return false;
     }
 
+    raw = summary.raw;
     SummaryProfile summaryProfile = summary.profile;
 
     Profile profile = Profile(

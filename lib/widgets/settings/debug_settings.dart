@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
+import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
@@ -33,10 +34,10 @@ Future<void> zipAndShare(List<String> filePaths, String zipFileName) async {
   }
 }
 
-Future<String> writeLog() async {
+Future<String> writeFile(String contents, String name) async {
   final directory = await getTemporaryDirectory(); // Use getApplicationDocumentsDirectory() for persistent storage
-  final logFile = File('${directory.path}/app_logs.txt');
-  await logFile.writeAsString(ALogger().getPrettyLogs(), mode: FileMode.append);
+  final logFile = File('${directory.path}/$name');
+  await logFile.writeAsString(contents, mode: FileMode.append);
   return logFile.path;
 }
 
@@ -50,15 +51,25 @@ class DebugSettingsWidget extends AbstractSettingsSection {
         title: const Text('Debug'),
         tiles: [
           SettingsTile.navigation(
-            title: const Text("Share DB"),
+            title: const Text("Share Debug Files"),
             descriptionInlineIos: true,
             leading: const Icon(UniconsLine.bug),
             onPressed: (context) async {
-              var dbpath = await CarerDB.getPath();
-              var kvpath = await KeyValueStore.getPath();
-              var logPath = await writeLog();
+              List<String> paths = [];
 
-              await zipAndShare([dbpath, kvpath, logPath], "carer_debug_${clock.now().millisecondsSinceEpoch}");
+              // Add main DB and KV DB
+              paths.add(await CarerDB.getPath());
+              paths.add(await KeyValueStore.getPath());
+
+              // Add logs
+              paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));
+
+              // Add the last raw value from all updaters
+              for (var updater in UpdateService().updaters) {
+                paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));
+              }
+
+              zipAndShare(paths, "carer_debug_${clock.now().millisecondsSinceEpoch}");
             },
           ),
           SettingsTile.navigation(
@@ -68,7 +79,7 @@ class DebugSettingsWidget extends AbstractSettingsSection {
             onPressed: (context) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LogErrorPage()),
+                MaterialPageRoute(builder: (context) => const LogErrorPage()),
               );
             },
           ),

@@ -192,11 +192,11 @@ class NSTemporaryTarget extends NSTreatment {
 
 class NSTreatments {
   List<NSTreatment> treatments;
-
-  NSTreatments({required this.treatments});
+  String raw;
+  NSTreatments({required this.treatments, required this.raw});
 
   factory NSTreatments.empty() {
-    return NSTreatments(treatments: []);
+    return NSTreatments(treatments: [], raw: "");
   }
 
   factory NSTreatments.fromJson(String jsonString) {
@@ -208,10 +208,10 @@ class NSTreatments {
       for (var rt in rawTreatments) {
         treatments.addAll(rt.toTreatments());
       }
-      return NSTreatments(treatments: treatments);
+      return NSTreatments(treatments: treatments, raw: jsonString);
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
-      return NSTreatments(treatments: []);
+      return NSTreatments(treatments: [], raw: jsonString);
     }
   }
 

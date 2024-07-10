@@ -66,26 +66,27 @@ class NSEntry {
 
 class NSEntries {
   List<NSEntry> entries;
-
+  String raw;
   bool isEmpty() => entries.isEmpty;
   NSEntry? firstOrNull() => entries.firstOrNull;
 
   NSEntries({
     required this.entries,
+    required this.raw,
   });
 
   factory NSEntries.empty() {
-    return NSEntries(entries: []);
+    return NSEntries(entries: [], raw: "");
   }
 
   factory NSEntries.fromJson(String jsonStr) {
     try {
       final List<dynamic> jsonList = json.decode(jsonStr);
       List<NSEntry> entries = jsonList.map((json) => NSEntry.fromJson(json)).toList();
-      return NSEntries(entries: entries);
+      return NSEntries(entries: entries, raw: jsonStr);
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
-      return NSEntries(entries: []);
+      return NSEntries(entries: [], raw: jsonStr);
     }
   }
 }
