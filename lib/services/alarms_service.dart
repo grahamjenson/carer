@@ -33,7 +33,7 @@ class AlarmsService {
     const PredictiveLowAlarm(),
   };
 
-  Signal<bool> get _testAlarmPlayingSignal => Signal<bool>(false);
+  Signal<bool> get _testAlarmPlayingSignal => Signal<bool>(false, debugLabel: "TestAlarmPlaying");
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
@@ -255,6 +255,7 @@ class AlarmsService {
   }
 
   Future<bool> stopTestAlarm() async {
+    print("Stop Test Alarm");
     var stopped = await stopAlarm(testPlayer);
     if (stopped) {
       testAlarmPlaying = false;

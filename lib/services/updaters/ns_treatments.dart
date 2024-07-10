@@ -26,8 +26,11 @@ class NSTreatmentsUpdater extends Updater {
   Future<bool> update() async {
     var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
-    // Update so far back because past treatments may need to be updated
-    var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 80));
+    // We need to update at least the last 3 hours because:
+    // 1. We want a clean last 2 hours
+    // 2. assuming the longest temp target would be 1 hour long
+    // 3. -2 hours - 1 hour = 3 hours
+    var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 180));
     var (treatments, err) = await go(NSClient().getTreatments(nsURL, nsToken, gteCreatedAt));
 
     if (err != null || treatments == null) {
