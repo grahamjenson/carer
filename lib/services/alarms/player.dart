@@ -9,7 +9,7 @@ class AlarmPlayer {
   final testAudioPlayer = AudioPlayer();
 
   Future<bool> stopAlarm() async {
-    return await stopAudioPlayer(testAudioPlayer);
+    return await stopAudioPlayer(alarmAudioPlayer);
   }
 
   Future<bool> playAlarm() async {

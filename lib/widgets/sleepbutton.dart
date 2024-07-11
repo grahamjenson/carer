@@ -44,6 +44,7 @@ class SleepButton extends StatelessWidget {
         var sleepTime = await _openSleepDialog(context);
         sleepTime ??= 0;
         AlarmsService().sleepDurationSeconds = sleepTime;
+        return true;
       }
 
       var sleepDuration = AlarmsService().sleepDuration;
@@ -69,13 +70,7 @@ class SleepButton extends StatelessWidget {
           direction: DismissDirection.startToEnd,
           dismissThresholds: const {DismissDirection.startToEnd: 0.75},
           confirmDismiss: (_) async {
-            var (result, err) = await go(openSleepDialog());
-            if (err != null && result == null) {
-              result = true;
-            }
-
-            ///break the action
-            if (!result) return false;
+            await go(openSleepDialog());
 
             return true;
           },
