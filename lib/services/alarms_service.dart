@@ -148,6 +148,7 @@ class AlarmsService {
       alog("Error stopping test alarm: $err");
       return;
     }
+    alog("Stopped test alarm");
     testAlarmPlaying = false;
   }
 
@@ -157,6 +158,7 @@ class AlarmsService {
       alog("Error playing test alarm: $err");
       return;
     }
+    alog("Playing test alarm");
     testAlarmPlaying = true;
   }
 }

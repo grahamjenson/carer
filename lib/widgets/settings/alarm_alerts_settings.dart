@@ -245,22 +245,22 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
   }
 
   SettingsTile testAlert(BuildContext context, double width) {
-    String text = "Test Alarm";
+    var button = ElevatedButton(
+      onPressed: () async {
+        await AlarmsService().playTestAlarm();
+      },
+      child: const Text("Test Alarm"),
+    );
+
     if (AlarmsService().testAlarmPlaying) {
-      text = "Stop Test";
+      button = ElevatedButton(
+        onPressed: () async {
+          await AlarmsService().stopTestAlarm();
+        },
+        child: const Text("Stop Test Alarm"),
+      );
     }
 
-    return SettingsTile(
-        title: const Text(""),
-        trailing: SizedBox(
-            width: width - 100,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await AlarmsService().playTestAlarm();
-                },
-                child: Text(text),
-              ),
-            )));
+    return SettingsTile(title: const Text(""), trailing: SizedBox(width: width - 100, child: Center(child: button)));
   }
 }

@@ -27,11 +27,6 @@ class AlarmPlayer {
 
   // Return IF playing (regardless if call started to play)
   Future<bool> playTestAlarm() async {
-    // Dont start playing if already playing instead stop
-    if (testAlarmPlaying()) {
-      await stopTestAlarm();
-      return false;
-    }
     // We dont await because this will block until player stops
     playAudioPlayer(testAudioPlayer);
     return true;
