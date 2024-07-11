@@ -19,7 +19,7 @@ class TimeAgoReading extends StatelessWidget {
       var seconds = sgv.age.inSeconds % 300;
       var additionalTX = const TextSpan(text: "");
       if ((sgv.age.inSeconds > 300 && seconds < 15)) {
-        additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 10));
+        additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 30));
       }
 
       Widget text;
