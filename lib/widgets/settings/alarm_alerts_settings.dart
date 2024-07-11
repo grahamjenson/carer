@@ -250,7 +250,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
       text = "Stop Test";
     }
 
-    print("testAlarmPlaying: ${AlarmsService().testAlarmPlaying} ");
     return SettingsTile(
         title: const Text(""),
         trailing: SizedBox(
@@ -258,7 +257,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
             child: Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  await AlarmsService().testAlarm();
+                  await AlarmsService().playTestAlarm();
                 },
                 child: Text(text),
               ),

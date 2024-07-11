@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/services/alarms/alarms.dart';
+import 'package:carer/services/alarms/player.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -9,7 +9,6 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:signals/signals_flutter.dart';
 
 const se = SetEquality();
@@ -17,6 +16,9 @@ const se = SetEquality();
 class AlarmsService {
   static final AlarmsService _singleton = AlarmsService._();
   factory AlarmsService() => _singleton;
+  final AlarmPlayer player = AlarmPlayer();
+
+  final Signal<DateTime?> _sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
 
   late final Set<Alarm> allAlarms = {
     // Target Alarms
@@ -33,7 +35,7 @@ class AlarmsService {
     const PredictiveLowAlarm(),
   };
 
-  Signal<bool> get _testAlarmPlayingSignal => Signal<bool>(false, debugLabel: "TestAlarmPlaying");
+  final Signal<bool> _testAlarmPlayingSignal = Signal<bool>(false, debugLabel: "TestAlarmPlaying");
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
@@ -46,16 +48,12 @@ class AlarmsService {
       var tigs = TargetSettings().allValues();
       // Stop test alarm
       stopTestAlarm();
-    }, debugLabel: "StopTestAlarm");
+    }, debugLabel: "StopTestAlarmWhenSettingsChange");
 
     aeffect(() {
       checkAlarms();
       alog("checking alarms");
     }, debugLabel: "CheckAlarms");
-  }
-
-  String get alarmFile {
-    return (AlarmAlertSettings().alarmAsset).asset;
   }
 
   final Signal<Set<Alarm>> _triggeredAlarmsSignal = Signal(<Alarm>{}, debugLabel: "triggeredAlarms");
@@ -77,7 +75,6 @@ class AlarmsService {
   }
 
   // Sleep
-  final Signal<DateTime?> _sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
 
   bool get notSleeping {
     return _sleepUntilSignal.value == null;
@@ -108,15 +105,6 @@ class AlarmsService {
     _sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
   }
 
-  final alarmPlayer = AudioPlayer();
-  final testPlayer = AudioPlayer();
-  final audioContext = const AudioContext(
-    android: AudioContextAndroid(),
-    iOS: AudioContextIOS(),
-  );
-
-  double? originalVolume;
-
   void checkAlarms() async {
     var newTriggeredAlarms = <Alarm>{};
     var newActiveAlarms = <Alarm>{};
@@ -142,133 +130,33 @@ class AlarmsService {
 
     // Set alarms
     if (activeAlarms.isEmpty) {
-      stopAlarm(alarmPlayer);
+      var (playing, err) = await go(player.stopAlarm());
+      if (playing == null || err != null) {
+        alog("Error stopping alarm: $err");
+      }
     } else {
-      playAlarm(alarmPlayer);
+      var (playing, err) = await go(player.playAlarm());
+      if (playing == null || err != null) {
+        alog("Error playing alarm: $err");
+      }
     }
   }
 
-  Future<bool> stopAlarm(AudioPlayer player) async {
-    if (player.state == PlayerState.playing) {
-      await player.stop();
-      resetOriginalVolume();
-      return true;
-    }
-    return false;
-  }
-
-  Future<void> playAlarm(AudioPlayer player) async {
-    if (player.state == PlayerState.playing) {
+  Future<void> stopTestAlarm() async {
+    var (stopped, err) = await go(player.stopTestAlarm());
+    if (stopped == null || err != null) {
+      alog("Error stopping test alarm: $err");
       return;
     }
-
-    var override = AlarmAlertSettings().volumeOveride;
-    var progression = AlarmAlertSettings().volumeProgressionSeconds != -1;
-
-    // TODO: Check if the system supports override (e.g. web), if not set to false
-
-    // There are 4 possible states here:
-    // 1. No override, no progression, just play alarm
-    // 2. no override with Progression, play alarm but increase volume using the player (so we dont touch the system volume)
-    // 3. Override with no progression, in which we set the volume to override and then play alarm (when is stops we reset volume)
-    // 4. Override with progression, in which case we play the alarm and it progressivly get louder
-    if (!override && !progression) {
-      return playAlarmWithoutOverrideWithoutProgression(player);
-    } else if (!override && progression) {
-      return playAlarmWithoutOverrideWithProgression(player);
-    } else if (override && !progression) {
-      return playAlarmWithOverrideWithoutProgression(player);
-    } else if (override && progression) {
-      return playAlarmWithOverrideWithProgression(player);
-    }
+    testAlarmPlaying = false;
   }
 
-  Future<void> playerPlay(AudioPlayer player, {double? volume}) {
-    return player.play(
-      AssetSource(alarmFile),
-      ctx: audioContext,
-      volume: volume,
-    );
-  }
-
-  Future<void> playAlarmWithoutOverrideWithoutProgression(AudioPlayer player) async {
-    return playerPlay(player);
-  }
-
-  Future<void> playAlarmWithoutOverrideWithProgression(AudioPlayer player) async {
-    int progressionSeconds = AlarmAlertSettings().volumeProgressionSeconds;
-
-    await playerPlay(player, volume: 0);
-
-    for (var i = 1; i < 100; i++) {
-      if (player.state != PlayerState.playing) {
-        return;
-      }
-      var wait = (progressionSeconds * 1000) ~/ 100;
-
-      await Future.delayed(Duration(milliseconds: wait));
-      var volume = i / 99;
-      await player.setVolume(volume);
-    }
-  }
-
-  Future<void> playAlarmWithOverrideWithoutProgression(AudioPlayer player) async {
-    originalVolume = await FlutterVolumeController.getVolume();
-    var volumeOverride = AlarmAlertSettings().volumeOverrideValue;
-
-    await FlutterVolumeController.setVolume(volumeOverride / 100);
-
-    return playerPlay(player);
-  }
-
-  Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
-    var finalVolume = AlarmAlertSettings().volumeOverrideValue;
-    var progressionSeconds = AlarmAlertSettings().volumeProgressionSeconds;
-
-    originalVolume = await FlutterVolumeController.getVolume();
-
-    await FlutterVolumeController.setVolume(0);
-
-    await playerPlay(player);
-
-    for (var i = 1; i < 100; i++) {
-      if (player.state != PlayerState.playing) {
-        return;
-      }
-      var wait = (progressionSeconds * 1000) ~/ 100;
-
-      await Future.delayed(Duration(milliseconds: wait));
-      var volume = (i / 99) * (finalVolume / 100);
-      if (player.state != PlayerState.playing) {
-        return;
-      }
-
-      await FlutterVolumeController.setVolume(volume);
-    }
-  }
-
-  void resetOriginalVolume() {
-    if (originalVolume != null) {
-      FlutterVolumeController.setVolume(originalVolume!);
-    }
-    originalVolume = null;
-  }
-
-  Future<bool> stopTestAlarm() async {
-    print("Stop Test Alarm");
-    var stopped = await stopAlarm(testPlayer);
-    if (stopped) {
-      testAlarmPlaying = false;
-    }
-    return stopped;
-  }
-
-  Future<void> testAlarm() async {
-    if (await stopTestAlarm()) {
+  Future<void> playTestAlarm() async {
+    var (playing, err) = await go(player.playTestAlarm());
+    if (playing == null || err != null) {
+      alog("Error playing test alarm: $err");
       return;
     }
     testAlarmPlaying = true;
-    // This is to make sure that
-    await playAlarm(testPlayer);
   }
 }

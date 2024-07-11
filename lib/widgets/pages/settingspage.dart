@@ -1,4 +1,5 @@
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
@@ -16,6 +17,7 @@ class SettingsPage extends StatelessWidget {
     return PopScope(
       onPopInvoked: (bool didPop) {
         if (didPop) {
+          alog("Stop Test Alarm because POP");
           AlarmsService().stopTestAlarm();
         }
       },
