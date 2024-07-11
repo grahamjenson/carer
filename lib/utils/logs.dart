@@ -43,7 +43,7 @@ class ALogger {
     }
 
     developer.log(
-      message,
+      "$now $message",
       level: level.level,
       time: now,
     );

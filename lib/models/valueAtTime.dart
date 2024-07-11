@@ -81,11 +81,11 @@ class ValueAtTime extends Model {
   static Future<List<ValueAtTime>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
 
   static FutureSignal<List<ValueAtTime>> lastSixHours = acomputedAsync(() async {
-    alog("updating Treatments lastSixHours");
-    var _ = TimerService().minuteSignal; // Update eevry minute
+    alog("updating ValueAtTime lastSixHours");
+    var _ = TimerService().minuteSignal.value; // Update eevry minute
     var b = TempTarget.writeSignal.value;
     var c = TempBasal.writeSignal.value;
     var d = Profile.writeSignal.value;
     return await ValueAtTime.lastMins(60 * 6);
-  }, [], debugLabel: 'treatmentsLastSixHours');
+  }, [], debugLabel: 'valueAtTimeLastSixHours');
 }
