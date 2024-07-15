@@ -27,6 +27,8 @@ void main() async {
 
     test("getvaluesattime", () async {
       var p = Profile(
+        name: "Default",
+        eid: "EID",
         dia: 5,
         timezone: "asad",
         units: "mmol",

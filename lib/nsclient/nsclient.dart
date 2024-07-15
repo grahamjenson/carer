@@ -1,4 +1,5 @@
 import 'package:carer/nsclient/entries.dart';
+import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/utils/futures.dart';
@@ -21,7 +22,13 @@ Uri entryEndpoint(nsURL, token, DateTime gteCreatedAt) =>
 Uri treatmentsEndpoint(nsURL, token, DateTime gteCreatedAt) =>
     Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[created_at][\$gte]=${toNSDateString(gteCreatedAt)}&count=1000');
 
+Uri treatmentsProfileSwitch(nsURL, token, int count) =>
+    Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[eventType]=Profile+Switch&count=$count');
+Uri treatmentsNote(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[eventType]=Note&count=$count');
+
 Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
+
+Uri currentProfile(nsURL, token) => Uri.parse('$nsURL/api/v1/profile/current.json?token=$token');
 
 Uri iobEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/iob.json?token=$token');
 Uri cobEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/cob.json?token=$token');
@@ -83,24 +90,23 @@ class NSClient {
     }
     return Summary.fromJson(response.body);
   }
+
+  Future<NSProfile?> getCurrentProfile(String nsURL, String token) async {
+    if (nsURL == "" || token == "") {
+      alog("getCurrentProfile No NS URL");
+      return null;
+    }
+    var ep = currentProfile(nsURL, token);
+    final (response, err) = await go(http.get(ep));
+    if (err != null || response == null) {
+      return null;
+    }
+    alog("FETCHED ${ep.toString()}");
+    if (response.statusCode != 200) {
+      alog("NON 200 responce code ${response.statusCode}");
+      return null;
+    }
+
+    return NSProfile.fromCurrentJson(response.body);
+  }
 }
-
-//@GET("api/v1/entries.json")
-// suspend fun entries(
-//     @Query("find[dateString][\$gte]") date_from: String,
-//     @Query("find[dateString][\$lte]") date_to: String,
-//     @Query("count") count: Int
-// ): Response<List<Entry>>
-
-// @GET("api/v1/treatments.json")
-// suspend fun treatments(
-//     @Query("find[created_at][\$gte]") date_from: String,
-//     @Query("find[created_at][\$lte]") date_to: String,
-//     @Query("count") count: Int
-// ): Response<List<Treatment>>
-
-// @GET("api/v2/properties/iob.json")
-// suspend fun iob(): Response<IOB>
-
-// @GET("api/v2/properties/basal.json")
-// suspend fun basal(): Response<Basal>

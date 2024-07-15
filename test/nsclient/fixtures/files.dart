@@ -13,4 +13,6 @@ var files = {
   "status": 'test/nsclient/fixtures/status.json',
   "summary": 'test/nsclient/fixtures/summary.json',
   "summary_bad": 'test/nsclient/fixtures/summary_bad.json',
+
+  "current_profile": 'test/nsclient/fixtures/current_profile.json',
 };

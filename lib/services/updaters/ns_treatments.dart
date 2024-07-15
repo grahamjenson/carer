@@ -1,5 +1,6 @@
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
+import 'package:carer/models/profileSwitch.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
@@ -10,9 +11,6 @@ import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 class NSTreatmentsUpdater extends Updater {
-  // On first call backfill last two days
-  bool _backfill = true;
-
   NSTreatmentsUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 10)) {
     lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
@@ -84,16 +82,30 @@ class NSTreatmentsUpdater extends Updater {
 
     int tempTargetUpdates = await TempTarget.upsertAll(tempTargets);
 
-    // summary is not trustworthy source of information
-    // TODO replace summary as the source of information
-    // var badTempBasals = await TempBasal.fixData();
-    // var badTempTargets = await TempTarget.fixData();
+    // get the profileswitches
+    List<ProfileSwitch> profileSwitches = [];
+    for (var profileSwitch in treatments.profileSwitchs) {
+      profileSwitches.add(ProfileSwitch(
+        name: profileSwitch.name,
+        startDate: profileSwitch.date,
+        duration: profileSwitch.durationInMilliseconds ~/ 1000,
+        percentage: profileSwitch.percentage,
+        eid: profileSwitch.id,
+      ));
+    }
+    int profileSwitchUpdates = await ProfileSwitch.saveAll(profileSwitches);
+
+    // Get the profile, upsert the profile, update current percentage of profile in the KV store
 
     alog('''
-update Treatments $bolusUpdates, $carbUpdates, $tempBasalUpdates, $tempTargetUpdates
+  update Treatments 
+      bolus:$bolusUpdates
+      carb:$carbUpdates
+      TB: $tempBasalUpdates
+      TT: $tempTargetUpdates
+      profileSwitches:$profileSwitchUpdates
           ''');
 
-    _backfill = false;
     return true;
   }
 }

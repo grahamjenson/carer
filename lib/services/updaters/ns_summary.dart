@@ -1,14 +1,11 @@
 import 'dart:async';
 
-import 'package:carer/models/profile.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/nsclient/nsclient.dart';
-import 'package:carer/nsclient/summary.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:clock/clock.dart';
 
 class NSSummaryUpdater extends Updater {
   NSSummaryUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 15)) {
@@ -28,23 +25,8 @@ class NSSummaryUpdater extends Updater {
       return false;
     }
 
-    raw = summary.raw;
-    SummaryProfile summaryProfile = summary.profile;
-
-    Profile profile = Profile(
-      date: clock.now(),
-      dia: summaryProfile.dia,
-      units: summaryProfile.units,
-      timezone: summaryProfile.timezone,
-      carbratio: summaryProfile.expandedCarbratio(),
-      sens: summaryProfile.expandedSens(),
-      basal: summaryProfile.expandedBasal(),
-      lowTarget: summaryProfile.expandedTargetLow(),
-      highTarget: summaryProfile.expandedTargetHigh(),
-    );
-    var profileUpdate = await profile.save();
-
     var state = summary.state;
+    raw = summary.raw;
 
     if (state.iob != null) {
       StateData().setIOB(state.iob!.toDouble());
@@ -59,7 +41,12 @@ class NSSummaryUpdater extends Updater {
       StateData().setCAge(state.cage!.toDouble());
     }
 
-    alog('''updateSummary $profileUpdate''');
+    alog('''updateSummary:
+      iob: ${state.iob}
+      cob: ${state.cob}
+      battery: ${state.battery}
+      cage: ${state.cage}
+      ''');
 
     return true;
   }

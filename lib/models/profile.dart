@@ -16,6 +16,8 @@ class ProfileRepository extends ModelRepository<Profile> {
     {
       return Profile(
         id: map["id"] as int?,
+        name: map["name"] as String,
+        eid: map["eid"] as String,
         date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
         dia: map["dia"] as int,
         units: map["units"] as String,
@@ -32,6 +34,8 @@ class ProfileRepository extends ModelRepository<Profile> {
   @override
   Map<String, Object> toSQLMap(Profile model) {
     Map<String, Object> map = {
+      "name": model.name,
+      "eid": model.eid!,
       "dia": model.dia,
       "units": model.units,
       "timezone": model.timezone,
@@ -66,6 +70,7 @@ class Profile extends Model {
   @override
   final DateTime date;
   final int dia;
+  final String name;
   final String units;
   final String timezone;
 
@@ -77,6 +82,8 @@ class Profile extends Model {
 
   Profile({
     super.id,
+    required this.name,
+    required super.eid,
     required this.date,
     required this.dia,
     required this.units,

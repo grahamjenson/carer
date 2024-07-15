@@ -26,6 +26,13 @@ class NSRawTreatment {
   double? targetTop;
   String? reason;
 
+  // Profile Switch Specifics
+  int? originalDuration;
+  String? originalProfileName;
+  String? profile;
+  String? profileJson;
+  int? percentage;
+
   Map<String, dynamic> rawJson;
 
   NSRawTreatment({
@@ -49,6 +56,11 @@ class NSRawTreatment {
     required this.targetBottom,
     required this.targetTop,
     required this.reason,
+    required this.originalDuration,
+    required this.originalProfileName,
+    required this.profile,
+    required this.profileJson,
+    required this.percentage,
     required this.rawJson,
   });
 
@@ -89,6 +101,11 @@ class NSRawTreatment {
       targetBottom: json['targetBottom']?.toDouble(),
       targetTop: json['targetTop']?.toDouble(),
       reason: json['reason'],
+      originalDuration: json['originalDuration'],
+      originalProfileName: json['originalProfileName'],
+      profile: json['profile'],
+      percentage: json['percentage'],
+      profileJson: json['profileJson'],
       rawJson: json,
     );
   }
@@ -98,13 +115,23 @@ class NSRawTreatment {
     switch (eventType) {
       case "Temp Basal":
         if (absolute != null) {
-          treatments.add(NSTreatmentTempBasal(id: id, absolute: absolute ?? 0, date: date, durationInMilliseconds: durationInMilliseconds ?? 0));
+          treatments.add(NSTreatmentTempBasal(
+            id: id,
+            absolute: absolute ?? 0,
+            date: date,
+            durationInMilliseconds: durationInMilliseconds ?? 0,
+          ));
         }
         break;
       case "Temporary Target":
         if (targetBottom != null && targetTop != null) {
           treatments.add(NSTemporaryTarget(
-              id: id, targetBottom: targetBottom!, targetTop: targetTop!, date: date, durationInMilliseconds: durationInMilliseconds ?? 0));
+            id: id,
+            targetBottom: targetBottom!,
+            targetTop: targetTop!,
+            date: date,
+            durationInMilliseconds: durationInMilliseconds ?? 0,
+          ));
         }
         break;
       case "Meal Bolus" || "Correction Bolus":
@@ -122,10 +149,19 @@ class NSRawTreatment {
         }
         break;
       case "Profile Switch":
-        // TODO;
+        if (originalDuration != null && originalProfileName != null && percentage != null) {
+          treatments.add(NSProfileSwitch(
+            id: id,
+            name: originalProfileName!,
+            date: date,
+            durationInMilliseconds: originalDuration!,
+            percentage: percentage!,
+          ));
+        }
         break;
       case "Note":
-        // TODO;
+        // TODO:
+        // If the Note has these fields it is actually a profile switch BACK to the original profile
         break;
     }
 
@@ -190,6 +226,77 @@ class NSTemporaryTarget extends NSTreatment {
   }
 }
 
+//
+// {
+//   "_id": "6690a3535de9b827ea1daf8d",
+//   "app": "AAPS",
+//   "date": 1720755027430,
+//   "eventType": "Note",
+//   "isReadOnly": false,
+//   "isValid": true,
+//   "notes": "SamDash-2023-11SMB",
+//   "originalCustomizedName": "SamDash-2023-11SMB",
+//   "originalDuration": 0,
+//   "originalEnd": 1720695980000,
+//   "originalPercentage": 100,
+//   "originalProfileName": "SamDash-2023-11SMB",
+//   "originalTimeshift": 0,
+//   "profileJson": "{\"units\":\"mmol\",\"dia\":6,\"timezone\":\"Pacific\\/Kwajalein\",\"sens\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":20},{\"time\":\"06:00\",\"timeAsSeconds\":21600,\"value\":7},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":11.5},{\"time\":\"12:00\",\"timeAsSeconds\":43200,\"value\":12},{\"time\":\"22:00\",\"timeAsSeconds\":79200,\"value\":15}],\"carbratio\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":20},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":8},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":11},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":13},{\"time\":\"19:00\",\"timeAsSeconds\":68400,\"value\":14}],\"basal\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":0.2},{\"time\":\"01:00\",\"timeAsSeconds\":3600,\"value\":0.25},{\"time\":\"02:00\",\"timeAsSeconds\":7200,\"value\":0.23},{\"time\":\"03:00\",\"timeAsSeconds\":10800,\"value\":0.25},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":0.35},{\"time\":\"06:00\",\"timeAsSeconds\":21600,\"value\":0.65},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":0.55},{\"time\":\"10:00\",\"timeAsSeconds\":36000,\"value\":0.3},{\"time\":\"11:00\",\"timeAsSeconds\":39600,\"value\":0.25},{\"time\":\"15:00\",\"timeAsSeconds\":54000,\"value\":0.3},{\"time\":\"16:00\",\"timeAsSeconds\":57600,\"value\":0.25},{\"time\":\"18:00\",\"timeAsSeconds\":64800,\"value\":0.4},{\"time\":\"20:00\",\"timeAsSeconds\":72000,\"value\":0.3},{\"time\":\"21:00\",\"timeAsSeconds\":75600,\"value\":0.25},{\"time\":\"22:00\",\"timeAsSeconds\":79200,\"value\":0.2}],\"target_low\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":5.5},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":5.5},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":6},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":5.5},{\"time\":\"23:00\",\"timeAsSeconds\":82800,\"value\":6}],\"target_high\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":7},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":6},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":7},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":6.5},{\"time\":\"23:00\",\"timeAsSeconds\":82800,\"value\":6.5}]}",
+//   "utcOffset": 720,
+//   "created_at": "2024-07-12T03:30:27.430Z",
+//   "identifier": "6b37517b-0cd6-58fd-ba0e-be08097b2b3b",
+//   "srvModified": 1720755027798,
+//   "srvCreated": 1720755027798,
+//   "subject": "phone",
+//   "carbs": null,
+//   "insulin": null
+// },
+
+// {
+//   "_id": "6690a3585de9b81f2d1daf8e",
+//   "app": "AAPS",
+//   "date": 1720755031772,
+//   "duration": 54000000000,
+//   "eventType": "Profile Switch",
+//   "isReadOnly": false,
+//   "isValid": true,
+//   "originalDuration": 900000,
+//   "originalProfileName": "SamDash-2023-11SMB",
+//   "percentage": 120,
+//   "profile": "SamDash-2023-11SMB(120%)",
+//   "profileJson": "{\"units\":\"mmol\",\"dia\":6,\"timezone\":\"Pacific\\/Kwajalein\",\"sens\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":20},{\"time\":\"03:00\",\"timeAsSeconds\":10800,\"value\":20},{\"time\":\"06:00\",\"timeAsSeconds\":21600,\"value\":7},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":11.5},{\"time\":\"12:00\",\"timeAsSeconds\":43200,\"value\":12},{\"time\":\"22:00\",\"timeAsSeconds\":79200,\"value\":15}],\"carbratio\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":20},{\"time\":\"02:00\",\"timeAsSeconds\":7200,\"value\":20},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":8},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":11},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":13},{\"time\":\"19:00\",\"timeAsSeconds\":68400,\"value\":14}],\"basal\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":0.2},{\"time\":\"01:00\",\"timeAsSeconds\":3600,\"value\":0.25},{\"time\":\"02:00\",\"timeAsSeconds\":7200,\"value\":0.23},{\"time\":\"03:00\",\"timeAsSeconds\":10800,\"value\":0.25},{\"time\":\"04:00\",\"timeAsSeconds\":14400,\"value\":0.25},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":0.35},{\"time\":\"06:00\",\"timeAsSeconds\":21600,\"value\":0.65},{\"time\":\"07:00\",\"timeAsSeconds\":25200,\"value\":0.65},{\"time\":\"08:00\",\"timeAsSeconds\":28800,\"value\":0.65},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":0.55},{\"time\":\"10:00\",\"timeAsSeconds\":36000,\"value\":0.3},{\"time\":\"11:00\",\"timeAsSeconds\":39600,\"value\":0.25},{\"time\":\"12:00\",\"timeAsSeconds\":43200,\"value\":0.25},{\"time\":\"13:00\",\"timeAsSeconds\":46800,\"value\":0.25},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":0.25},{\"time\":\"15:00\",\"timeAsSeconds\":54000,\"value\":0.3},{\"time\":\"16:00\",\"timeAsSeconds\":57600,\"value\":0.25},{\"time\":\"17:00\",\"timeAsSeconds\":61200,\"value\":0.25},{\"time\":\"18:00\",\"timeAsSeconds\":64800,\"value\":0.4},{\"time\":\"19:00\",\"timeAsSeconds\":68400,\"value\":0.4},{\"time\":\"20:00\",\"timeAsSeconds\":72000,\"value\":0.3},{\"time\":\"21:00\",\"timeAsSeconds\":75600,\"value\":0.25},{\"time\":\"22:00\",\"timeAsSeconds\":79200,\"value\":0.2},{\"time\":\"23:00\",\"timeAsSeconds\":82800,\"value\":0.2}],\"target_low\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":5.5},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":5.5},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":6},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":5.5},{\"time\":\"23:00\",\"timeAsSeconds\":82800,\"value\":6}],\"target_high\":[{\"time\":\"00:00\",\"timeAsSeconds\":0,\"value\":7},{\"time\":\"05:00\",\"timeAsSeconds\":18000,\"value\":6},{\"time\":\"09:00\",\"timeAsSeconds\":32400,\"value\":7},{\"time\":\"14:00\",\"timeAsSeconds\":50400,\"value\":6.5},{\"time\":\"23:00\",\"timeAsSeconds\":82800,\"value\":6.5}]}",
+//   "timeshift": 0,
+//   "utcOffset": 720,
+//   "created_at": "2024-07-12T03:30:31.772Z",
+//   "identifier": "28cf6118-2346-5e0f-ab01-87ba52b22ad1",
+//   "srvModified": 1720755032137,
+//   "srvCreated": 1720755032137,
+//   "subject": "phone",
+//   "carbs": null,
+//   "insulin": null
+// },
+
+class NSProfileSwitch extends NSTreatment {
+  String id;
+  String name;
+  DateTime date;
+  int durationInMilliseconds;
+  int percentage;
+
+  NSProfileSwitch({
+    required this.name,
+    required this.date,
+    required this.durationInMilliseconds,
+    required this.percentage,
+    required this.id,
+  });
+
+  @override
+  String toString() {
+    return "ProfileSwitch: $name($percentage) at $date for ${durationInMilliseconds ~/ 60000} mins";
+  }
+}
+
 class NSTreatments {
   List<NSTreatment> treatments;
   String raw;
@@ -229,5 +336,9 @@ class NSTreatments {
 
   List<NSTemporaryTarget> get tempTargets {
     return treatments.whereType<NSTemporaryTarget>().toList();
+  }
+
+  List<NSProfileSwitch> get profileSwitchs {
+    return treatments.whereType<NSProfileSwitch>().toList();
   }
 }

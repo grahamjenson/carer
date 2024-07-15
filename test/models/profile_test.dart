@@ -1,6 +1,7 @@
 import 'package:carer/models/profile.dart';
-import 'package:carer/nsclient/summary.dart';
+import 'package:carer/nsclient/shared.dart';
 import 'package:carer/sql/carer_db.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
@@ -8,13 +9,16 @@ import '../test_utils.dart';
 void main() async {
   await sqfliteTestInit();
 
-  const SummaryProfile emptySummaryProfile = SummaryProfile(
+  NSProfile emptySummaryProfile = NSProfile(
+      id: "1",
+      name: "asd",
+      date: clock.now(),
       dia: 1,
-      carbratio: TimeValues(values: []),
-      sens: TimeValues(values: []),
-      basal: TimeValues(values: []),
-      targetLow: TimeValues(values: []),
-      targetHigh: TimeValues(values: []),
+      carbratio: const TimeValues(values: []),
+      sens: const TimeValues(values: []),
+      basal: const TimeValues(values: []),
+      targetLow: const TimeValues(values: []),
+      targetHigh: const TimeValues(values: []),
       units: "",
       timezone: "");
 
@@ -31,6 +35,8 @@ void main() async {
 
     test("create", () async {
       var p = Profile(
+        name: "Default",
+        eid: "EID",
         dia: 5,
         timezone: "asad",
         units: "mmol",

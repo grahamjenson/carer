@@ -6,8 +6,6 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 
 class NSEntriesUpdater extends Updater {
-  // On first call backfill last two days
-
   NSEntriesUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(minutes: 1)) {
     aeffect(() {
       // Check signal to register
