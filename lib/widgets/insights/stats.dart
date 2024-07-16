@@ -1,4 +1,5 @@
 import 'package:carer/models/constants.dart';
+import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/models/valueAtTime.dart';
@@ -84,13 +85,14 @@ class Stats extends StatelessWidget {
                   iob(iobNow),
                   cob(cobNow),
                   power(powerNow),
-                  cage(cageNow),
                   basal(currentBasal),
                   target(UISettings().unit, profileLowTarget, profileHighTarget),
+                  currentProfile(),
                   fifteenMinDiff(UISettings().unit, sgvs),
                   todaysInRange(),
                   yesterdayInRange(),
-                  predictions("Exp2", exp2preds, UISettings().unit),
+                  predictions("Forecast", exp2preds, UISettings().unit),
+                  cage(cageNow),
                 ],
               );
             }),
@@ -98,6 +100,27 @@ class Stats extends StatelessWidget {
         ),
       );
     });
+  }
+
+  DataRow currentProfile() {
+    var profile = Profile.currentProfile().value;
+    var name = "none";
+
+    if (profile != null) {
+      name = profile.name;
+      if (profile.percent != 100) {
+        name = "$name ${profile.percent}% for ${toMax2dp(profile.duration / 60)}h";
+      }
+    }
+
+    return DataRow(
+      cells: [
+        const DataCell(Text("Profile", style: heading)),
+        DataCell(
+          Text(name, style: small),
+        ),
+      ],
+    );
   }
 
   DataRow model(double rmse) {
@@ -266,7 +289,7 @@ class Stats extends StatelessWidget {
       );
     }
     var sgvs = bigsgvs.sublist(0, 3);
-    var diff = sgvs.last.value - sgvs.first.value;
+    var diff = sgvs.first.value - sgvs.last.value;
     return DataRow(
       cells: [
         const DataCell(Text("15m Δ", style: heading)),

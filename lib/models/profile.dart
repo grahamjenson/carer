@@ -1,5 +1,7 @@
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ProfileRepository extends ModelRepository<Profile> {
@@ -123,6 +125,15 @@ class Profile extends Model {
   static Future<int> saveAll(List<Profile> models) => _q.saveAll(models);
 
   static Signal<int> get writeSignal => _q.writeSignal;
+
+  static FutureSignal<Profile?> currentProfile = acomputedAsync(() async {
+    alog("updating currentProfile");
+    var _ = writeSignal.value; // force update on save
+
+    var ret = await _q.query(limit: 1, name: "currentProfile").then((value) => value.firstOrNull);
+    alog("updated currentProfile Signal");
+    return ret;
+  }, null, debugLabel: 'currentProfile');
 }
 
 const crKeys = [
