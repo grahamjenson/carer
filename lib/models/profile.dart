@@ -2,6 +2,7 @@ import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ProfileRepository extends ModelRepository<Profile> {
@@ -118,6 +119,20 @@ class Profile extends Model {
     return (await _q.query(limit: 1)).firstOrNull;
   }
 
+  DateTime get dateEnd {
+    if (duration == 0) {
+      return clock.daysFromNow(1);
+    }
+    return date.add(Duration(seconds: duration));
+  }
+
+  Duration get remaining {
+    if (duration == 0) {
+      return Duration.zero;
+    }
+    return dateEnd.difference(clock.now());
+  }
+
   static Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {
     return _q.count(after: after, before: before, conditions: conditions);
   }
@@ -130,9 +145,20 @@ class Profile extends Model {
     alog("updating currentProfile");
     var _ = writeSignal.value; // force update on save
 
-    var ret = await _q.query(limit: 1, name: "currentProfile").then((value) => value.firstOrNull);
+    // TODO need a clean View of this table
+    var lastProfile = await _q.query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
+    if (lastProfile == null) {
+      return null;
+    }
+
     alog("updated currentProfile Signal");
-    return ret;
+
+    if (lastProfile.dateEnd.isAfter(clock.now())) {
+      return lastProfile;
+    }
+
+    var currentProfile = await _q.query(limit: 1, conditions: {"duration = ?": 0}, name: "currentProfile").then((value) => value.firstOrNull);
+    return currentProfile;
   }, null, debugLabel: 'currentProfile');
 }
 

@@ -104,12 +104,19 @@ class Stats extends StatelessWidget {
 
   DataRow currentProfile() {
     var profile = Profile.currentProfile().value;
-    var name = "none";
+    var texts = ["none"];
+    var styles = [row];
 
     if (profile != null) {
-      name = profile.name;
-      if (profile.percent != 100) {
-        name = "$name ${profile.percent}% for ${toMax2dp(profile.duration / 60)}h";
+      texts = ["${profile.percent}", "%"];
+      styles = [row, small];
+
+      if (profile.duration != 0) {
+        texts = ["${profile.percent}", "% for "];
+        styles = [row, small];
+        var (daTexts, daStyles) = dateAgoShort(profile.remaining, lessthanString: "<1");
+        texts.addAll(daTexts);
+        styles.addAll(daStyles);
       }
     }
 
@@ -117,7 +124,7 @@ class Stats extends StatelessWidget {
       cells: [
         const DataCell(Text("Profile", style: heading)),
         DataCell(
-          Text(name, style: small),
+          SmartText(textAlign: TextAlign.center, texts: texts, styles: styles),
         ),
       ],
     );
@@ -208,9 +215,9 @@ class Stats extends StatelessWidget {
     );
   }
 
-  (List<String>, List<TextStyle>) dateAgoShort(Duration diff) {
+  (List<String>, List<TextStyle>) dateAgoShort(Duration diff, {String lessthanString = "now"}) {
     if (diff.inMinutes == 0) {
-      return (const ["now"], const [row]);
+      return ([lessthanString], const [row]);
     }
 
     List<String> texts = [];
