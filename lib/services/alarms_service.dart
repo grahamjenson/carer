@@ -51,8 +51,8 @@ class AlarmsService {
     }, debugLabel: "StopTestAlarmWhenSettingsChange");
 
     aeffect(() {
-      checkAlarms();
       alog("checking alarms");
+      checkAlarms();
     }, debugLabel: "CheckAlarms");
   }
 
@@ -124,6 +124,7 @@ class AlarmsService {
       }
     }
 
+    alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
     // Set alarms that have been triggered
     triggeredAlarms = newTriggeredAlarms;
     activeAlarms = newActiveAlarms;

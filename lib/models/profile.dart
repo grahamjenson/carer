@@ -27,6 +27,9 @@ class ProfileRepository extends ModelRepository<Profile> {
         basal: basal,
         lowTarget: lowTarget,
         highTarget: highTarget,
+        duration: map["duration"] as int,
+        source: map["source"] as String,
+        percent: map["percent"] as int,
       );
     }
   }
@@ -40,6 +43,9 @@ class ProfileRepository extends ModelRepository<Profile> {
       "units": model.units,
       "timezone": model.timezone,
       "timestamp": model.date.millisecondsSinceEpoch,
+      "duration": model.duration,
+      "source": model.source,
+      "percent": model.percent,
     };
     model.carbratio.asMap().forEach((index, value) {
       map[crKeys[index]] = value;
@@ -74,6 +80,10 @@ class Profile extends Model {
   final String units;
   final String timezone;
 
+  final String source;
+  final int duration;
+  final int percent;
+
   final List<int> carbratio;
   final List<int> sens;
   final List<double> basal;
@@ -93,6 +103,9 @@ class Profile extends Model {
     required this.basal,
     required this.lowTarget,
     required this.highTarget,
+    required this.duration,
+    required this.source,
+    required this.percent,
   });
 
   factory Profile.fromMap(Map<String, Object?> map) {
@@ -106,6 +119,8 @@ class Profile extends Model {
   static Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {
     return _q.count(after: after, before: before, conditions: conditions);
   }
+
+  static Future<int> saveAll(List<Profile> models) => _q.saveAll(models);
 
   static Signal<int> get writeSignal => _q.writeSignal;
 }

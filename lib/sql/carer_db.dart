@@ -33,10 +33,11 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
-    // TODO hash all database table code to single value to set version for
-    var version = 51;
+    // This will grab all the db code and hash it, if it changes it drops all past stuff and replaces
+    var hashCode = (dbTables + dbViews).join("").hashCode;
+    var version = hashCode;
 
-    alog("Opening database at $path");
+    alog("Opening database at $path for version $version");
     var db = await openDatabase(
       path,
       version: version, // TODO: replace this eventually with a version number
@@ -47,12 +48,12 @@ class CarerDB {
       },
       // I am assuming these values will destroy and recreate the database on any version change.
       onDowngrade: (db, oldVersion, newVersion) async {
-        alog("DOWNGRADING database at version $newVersion");
+        alog("DOWNGRADING database at version $newVersion (from version $oldVersion)");
         await dropAll(db);
         await createAll(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        alog("UPGRADING database at version $newVersion");
+        alog("UPGRADING database at version $newVersion (from version $oldVersion)");
         await dropAll(db);
         await createAll(db);
       },

@@ -14,7 +14,6 @@ const dbTables = [
   tempbasalTable,
   temptargetsTable,
   profileTable,
-  profileSwitchTable,
 ];
 
 const dbViews = [
@@ -31,6 +30,7 @@ const kvTable = DBTable(KVTables.kvTableName, KVTables.kvTable);
 
 const String sgvsTableName = 'sgvs';
 const sgvTable = DBTable(sgvsTableName, '''
+
     CREATE TABLE sgvs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
@@ -98,8 +98,9 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
     )
   ''');
 
-// TODO this doesnt work because you could have profile1 -> profile2 -> profile1 which would mean profile 1 has multiple start stop dates
-// TODO need to find real start and stop dates for profiles to properly find real start/stop dates ON them.
+// Profile includes the profile,
+// If duration is 0 then it is indefinite
+// This is constructed from various sources, the idea is to have a table which is queryable for the current profile given a time
 const String profileTableName = 'profile';
 const profileTable = DBTable(profileTableName, '''
     CREATE TABLE profile (
@@ -108,6 +109,10 @@ const profileTable = DBTable(profileTableName, '''
       name TEXT,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+
+      duration INTEGER,
+      source TEXT,
+      percent INTEGER,
 
       dia INTEGER,
       units TEXT,
@@ -120,22 +125,6 @@ const profileTable = DBTable(profileTableName, '''
       UNIQUE(eid)
     )
   ''');
-
-const String profileSwitchTableName = 'profileSwitch';
-const profileSwitchTable = DBTable(profileSwitchTableName, '''
-CREATE TABLE profileSwitch (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      eid TEXT,
-      name TEXT,
-      start INTEGER,
-      duration INTEGER,
-      percentage INTEGER,
-      end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
-      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
-      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
-      UNIQUE(eid)
-)
-''');
 
 const String treatmentsTableName = 'treatments';
 const treatmentsView = DBTable(treatmentsTableName, '''

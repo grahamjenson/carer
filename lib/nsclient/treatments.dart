@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:carer/nsclient/shared.dart';
 import 'package:carer/utils/logs.dart';
 
 class NSRawTreatment {
@@ -32,6 +33,7 @@ class NSRawTreatment {
   String? profile;
   String? profileJson;
   int? percentage;
+  int? originalPercentage;
 
   Map<String, dynamic> rawJson;
 
@@ -61,6 +63,7 @@ class NSRawTreatment {
     required this.profile,
     required this.profileJson,
     required this.percentage,
+    required this.originalPercentage,
     required this.rawJson,
   });
 
@@ -105,6 +108,7 @@ class NSRawTreatment {
       originalProfileName: json['originalProfileName'],
       profile: json['profile'],
       percentage: json['percentage'],
+      originalPercentage: json['originalPercentage'],
       profileJson: json['profileJson'],
       rawJson: json,
     );
@@ -149,24 +153,36 @@ class NSRawTreatment {
         }
         break;
       case "Profile Switch":
-        if (originalDuration != null && originalProfileName != null && percentage != null) {
+        if (originalDuration != null && originalProfileName != null && percentage != null && profileJson != null) {
+          var profileVariables = json.decode(profileJson!);
+          var profileModel = NSProfile.fromJson(originalProfileName!, id, date, profileVariables);
+
           treatments.add(NSProfileSwitch(
-            id: id,
-            name: originalProfileName!,
-            date: date,
             durationInMilliseconds: originalDuration!,
             percentage: percentage!,
+            source: "ProfileSwitch",
+            profile: profileModel,
           ));
         }
         break;
       case "Note":
-        // TODO:
-        // If the Note has these fields it is actually a profile switch BACK to the original profile
+        if (originalDuration != null && originalProfileName != null && originalPercentage != null && profileJson != null) {
+          var profileVariables = json.decode(profileJson!);
+          var profileModel = NSProfile.fromJson(originalProfileName!, id, date, profileVariables);
+          // If the Note has these fields it is actually a profile switch BACK to the original profile
+          treatments.add(NSProfileSwitch(
+            durationInMilliseconds: originalDuration!,
+            percentage: originalPercentage!,
+            source: "Note",
+            profile: profileModel,
+          ));
+        }
+
         break;
     }
 
     if (treatments.isEmpty) {
-      alog("No treatments found in $rawJson");
+      alog("No treatments found in $id $eventType");
     }
     return treatments;
   }
@@ -277,24 +293,27 @@ class NSTemporaryTarget extends NSTreatment {
 // },
 
 class NSProfileSwitch extends NSTreatment {
-  String id;
-  String name;
-  DateTime date;
   int durationInMilliseconds;
   int percentage;
+  String source;
+
+  NSProfile profile;
 
   NSProfileSwitch({
-    required this.name,
-    required this.date,
     required this.durationInMilliseconds,
     required this.percentage,
-    required this.id,
+    required this.source,
+    required this.profile,
   });
 
   @override
   String toString() {
     return "ProfileSwitch: $name($percentage) at $date for ${durationInMilliseconds ~/ 60000} mins";
   }
+
+  get name => profile.name;
+  get id => profile.id;
+  get date => profile.date;
 }
 
 class NSTreatments {
