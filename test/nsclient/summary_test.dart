@@ -19,8 +19,14 @@ void main() {
     final file = File(files["summary_bad"]!);
     final jsonString = await file.readAsString();
 
-    Summary? summary = Summary.fromJson(jsonString);
+    bool caught = false;
+    try {
+      Summary.fromJson(jsonString);
+    } catch (e) {
+      expect(e, isA<TypeError>());
+      caught = true;
+    }
 
-    expect(summary, equals(null));
+    expect(caught, isTrue);
   });
 }

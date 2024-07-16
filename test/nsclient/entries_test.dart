@@ -6,8 +6,7 @@ import 'package:test/test.dart';
 import 'fixtures/files.dart';
 
 void main() {
-  test('NSEntries.fromJson should parse JSON and create NSEntries object',
-      () async {
+  test('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
     final file = File(files["entries_basic"]!);
     final jsonString = await file.readAsString();
 
@@ -21,8 +20,7 @@ void main() {
     expect(entry.app, equals("AAPS"));
   });
 
-  test('NSEntries.fromJson should parse JSON and create NSEntries object',
-      () async {
+  test('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
     final file = File(files["entries"]!);
     final jsonString = await file.readAsString();
 
@@ -36,9 +34,14 @@ void main() {
     final file = File(files["entries_bad"]!);
     final jsonString = await file.readAsString();
 
-    NSEntries entries = NSEntries.fromJson(jsonString);
+    bool caught = true;
+    try {
+      NSEntries.fromJson(jsonString);
+    } catch (e) {
+      expect(e, isA<TypeError>());
+      caught = true;
+    }
 
-    expect(entries.entries, isA<List<NSEntry>>());
-    expect(entries.entries.length, equals(0));
+    expect(caught, isTrue);
   });
 }

@@ -8,4 +8,6 @@ abstract class Env {
   static bool isProd = !isTest && !isDev;
 
   static bool profileOn = isDev;
+
+  static bool catchErrors = isTest;
 }

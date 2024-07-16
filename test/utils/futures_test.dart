@@ -1,8 +1,17 @@
+import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() async {
   group("go", () {
+    setUp(() async {
+      Env.catchErrors = false;
+    });
+
+    tearDown() {
+      Env.catchErrors = true;
+    }
+
     test("go works", () async {
       var (x, err) = await go(Future.value(1), name: "t1");
       expect(x, 1);

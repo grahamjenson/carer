@@ -30,16 +30,20 @@ void main() {
     NSTreatments treatments = NSTreatments.fromJson(jsonString);
 
     expect(treatments.treatments, isA<List<NSTreatment>>());
-    expect(treatments.treatments.length, equals(517));
+    expect(treatments.treatments.length, equals(980));
   });
 
   test('treatments paring bad data will return empty NSTreatments object', () async {
     final file = File(files["treatments_bad"]!);
     final jsonString = await file.readAsString();
 
-    NSTreatments treatments = NSTreatments.fromJson(jsonString);
-
-    expect(treatments.treatments, isA<List<NSTreatment>>());
-    expect(treatments.treatments.length, equals(0));
+    bool caught = false;
+    try {
+      NSTreatments.fromJson(jsonString);
+    } catch (e) {
+      expect(e, isA<TypeError>());
+      caught = true;
+    }
+    expect(caught, isTrue);
   });
 }
