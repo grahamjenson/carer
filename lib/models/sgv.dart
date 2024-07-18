@@ -47,7 +47,7 @@ class SGV extends Model {
   static final SGVRepository _q = SGVRepository();
 
   @override
-  ModelRepository get repository => _q;
+  SGVRepository get repository => _q;
 
   final int value;
 
@@ -70,9 +70,6 @@ class SGV extends Model {
   factory SGV.fromMap(Map<String, Object?> map) {
     return _q.fromMap(map);
   }
-
-  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
-  int get minsFromNow => (date.millisecondsSinceEpoch - clock.now().millisecondsSinceEpoch) ~/ 60000;
 
   double sgvU(Unit unit) {
     return unit.val(value);

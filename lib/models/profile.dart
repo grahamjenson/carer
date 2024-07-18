@@ -23,7 +23,6 @@ class ProfileRepository extends ModelRepository<Profile> {
         name: map["name"] as String,
         eid: map["eid"] as String,
         startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
-        endDate: DateTime.fromMillisecondsSinceEpoch(map["end"] as int),
         dia: map["dia"] as int,
         units: map["units"] as String,
         timezone: map["timezone"] as String,
@@ -99,7 +98,6 @@ class Profile extends DateRangeModel {
     required super.eid,
     // Date Range
     required super.startDate,
-    required super.endDate,
     required super.duration,
     // Profile
     required this.dia,
@@ -119,6 +117,16 @@ class Profile extends DateRangeModel {
   }
 
   get isTempProfile => duration != 0;
+
+  @override
+  DateTime get endDate {
+    // A Profile with duration 0 means indefinite
+    if (duration == 0) {
+      return startDate.add(const Duration(days: 35600));
+    } else {
+      return startDate.add(Duration(seconds: duration));
+    }
+  }
 
   static Future<int> saveAll(List<Profile> models) => _q.saveAll(models);
 

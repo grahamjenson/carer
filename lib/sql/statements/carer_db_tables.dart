@@ -223,7 +223,8 @@ const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
       isTempBasal INTEGER,    -- 0 or 1 BOOL
 
       profileName TEXT,
-
+      profilePercent INTEGER,
+      
       UNIQUE(eid)
     )
   ''');

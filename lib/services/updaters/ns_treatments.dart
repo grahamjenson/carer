@@ -64,7 +64,6 @@ class NSTreatmentsUpdater extends Updater {
     for (var tempBasal in treatments.tempBasals) {
       tempBasals.add(TempBasal(
         startDate: tempBasal.date,
-        endDate: tempBasal.date.add(Duration(milliseconds: tempBasal.durationInMilliseconds)),
         duration: tempBasal.durationInMilliseconds ~/ 1000,
         value: tempBasal.absolute,
         eid: tempBasal.id,
@@ -77,7 +76,6 @@ class NSTreatmentsUpdater extends Updater {
       tempTargets.add(TempTarget(
           eid: tempTarget.id,
           startDate: tempTarget.date,
-          endDate: tempTarget.date.add(Duration(milliseconds: tempTarget.durationInMilliseconds)),
           duration: tempTarget.durationInMilliseconds ~/ 1000,
           highTarget: tempTarget.targetTop.toInt(),
           lowTarget: tempTarget.targetBottom.toInt()));

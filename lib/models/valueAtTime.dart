@@ -45,6 +45,7 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
       isTempBasal: map["isTempBasal"] == 1,
       isTempTarget: map["isTempTarget"] == 1,
       profileName: map["profileName"] as String,
+      profilePercent: map["profilePercent"] as int,
     );
   }
 
@@ -62,6 +63,7 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
       "cr": model.cr,
       //
       "profileName": model.profileName,
+      "profilePercent": model.profilePercent,
       //
       "isTempProfile": model.isTempProfile ? 1 : 0,
       "isTempBasal": model.isTempBasal ? 1 : 0,
@@ -87,6 +89,7 @@ class ValueAtTime extends Model {
   final int cr;
 
   final String profileName;
+  final int profilePercent;
 
   final bool isTempBasal;
   final bool isTempTarget;
@@ -103,6 +106,7 @@ class ValueAtTime extends Model {
     required this.isf,
     required this.cr,
     required this.profileName,
+    required this.profilePercent,
     required this.isTempProfile,
   });
 
@@ -110,7 +114,7 @@ class ValueAtTime extends Model {
     return _q.fromMap(map);
   }
 
-  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
+  static Signal<int> get writeSignal => _q.writeSignal;
 
   static Future<List<ValueAtTime>> query({
     int? after,
@@ -178,6 +182,7 @@ class ValueAtTime extends Model {
     int isf = profile?.sens[hourOfDay] ?? 0;
     int cr = profile?.carbratio[hourOfDay] ?? 0;
     String profileName = profile?.name ?? "";
+    int profilePercent = profile?.percent ?? 100;
 
     bool isTempProfile = profile?.isTempProfile ?? false;
     bool isTempBasal = tempBasal != null;
@@ -194,6 +199,7 @@ class ValueAtTime extends Model {
       isf: isf,
       cr: cr,
       profileName: profileName,
+      profilePercent: profilePercent,
       isTempProfile: isTempProfile,
     );
 

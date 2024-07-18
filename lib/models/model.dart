@@ -4,6 +4,7 @@ import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
+import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -11,7 +12,7 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class Model<T> {
+abstract class Model {
   int? id;
   String? eid;
 
@@ -64,6 +65,9 @@ abstract class Model<T> {
     return [];
   }
 
+  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
+  int get minsFromNow => (date.millisecondsSinceEpoch - clock.now().millisecondsSinceEpoch) ~/ 60000;
+
   static cleanSignals() {
     Bolus.writeSignal.value = 0;
     Carbs.writeSignal.value = 0;
@@ -71,6 +75,7 @@ abstract class Model<T> {
     SGV.writeSignal.value = 0;
     TempBasal.writeSignal.value = 0;
     TempTarget.writeSignal.value = 0;
+    ValueAtTime.writeSignal.value = 0;
   }
 }
 
@@ -310,14 +315,13 @@ abstract class DateRangeModel extends Model {
   @override
   get date => startDate;
   final DateTime startDate;
-  final DateTime endDate;
+
   final int duration;
 
   DateRangeModel({
     super.id,
     super.eid,
     required this.startDate,
-    required this.endDate,
     required this.duration,
   });
 
@@ -328,4 +332,6 @@ abstract class DateRangeModel extends Model {
   bool isAtTime(DateTime date) {
     return date.isAfter(startDate) && date.isBefore(endDate);
   }
+
+  DateTime get endDate => startDate.add(Duration(seconds: duration));
 }

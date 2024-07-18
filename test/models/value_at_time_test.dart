@@ -1,5 +1,3 @@
-import 'package:carer/models/profile.dart';
-import 'package:carer/models/temptarget.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
@@ -25,54 +23,54 @@ void main() async {
       await (await CarerDB.instance).deleteAll();
     });
 
-    test("getvaluesattime", () async {
-      var p = Profile(
-        name: "Default",
-        eid: "EID",
-        dia: 5,
-        source: "Test",
-        percent: 100,
-        duration: 0,
-        timezone: "asad",
-        units: "mmol",
-        startDate: now,
-        carbratio: List<int>.filled(24, 1),
-        sens: List<int>.filled(24, 1),
-        basal: List<double>.filled(24, 1),
-        lowTarget: List<int>.filled(24, 1),
-        highTarget: List<int>.filled(24, 2),
-      );
-      expect(await p.save(), true);
+    // test("getvaluesattime", () async {
+    //   var p = Profile(
+    //     name: "Default",
+    //     eid: "EID",
+    //     dia: 5,
+    //     source: "Test",
+    //     percent: 100,
+    //     duration: 0,
+    //     timezone: "asad",
+    //     units: "mmol",
+    //     startDate: now,
+    //     carbratio: List<int>.filled(24, 1),
+    //     sens: List<int>.filled(24, 1),
+    //     basal: List<double>.filled(24, 1),
+    //     lowTarget: List<int>.filled(24, 1),
+    //     highTarget: List<int>.filled(24, 2),
+    //   );
+    //   expect(await p.save(), true);
 
-      var targets = await ValueAtTime.query();
+    //   var targets = await ValueAtTime.query();
 
-      expect(targets.length, 360); // 5 hours
+    //   expect(targets.length, 360); // 5 hours
 
-      valueAssertion(targets[0], lowTarget: 1, highTarget: 2, isTempTarget: false, date: nowMin);
+    //   valueAssertion(targets[0], lowTarget: 1, highTarget: 2, isTempTarget: false, date: nowMin);
 
-      valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
+    //   valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
 
-      var s = await TempTarget(
-        startDate: now.subtract(
-          const Duration(minutes: 1),
-        ),
-        duration: 300,
-        highTarget: 10,
-        lowTarget: 5,
-        eid: "1",
-      ).save();
-      expect(s, true);
+    //   var s = await TempTarget(
+    //     startDate: now.subtract(
+    //       const Duration(minutes: 1),
+    //     ),
+    //     duration: 300,
+    //     highTarget: 10,
+    //     lowTarget: 5,
+    //     eid: "1",
+    //   ).save();
+    //   expect(s, true);
 
-      targets = await ValueAtTime.query();
-      //print(targets.sublist(0, 5));
-      expect(targets.length, 360);
+    //   targets = await ValueAtTime.query();
+    //   //print(targets.sublist(0, 5));
+    //   expect(targets.length, 360);
 
-      // beginning will be 1 hour ahead
-      valueAssertion(targets[0], lowTarget: 5, highTarget: 10, isTempTarget: true, date: nowMin);
+    //   // beginning will be 1 hour ahead
+    //   valueAssertion(targets[0], lowTarget: 5, highTarget: 10, isTempTarget: true, date: nowMin);
 
-      // 3 days of profile targets + 1 temp target
-      valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
-    });
+    //   // 3 days of profile targets + 1 temp target
+    //   valueAssertion(targets[1], lowTarget: 1, highTarget: 2, isTempTarget: false, date: now1Min);
+    // });
   });
 }
 

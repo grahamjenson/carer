@@ -7,7 +7,6 @@ import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/math.dart';
-import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TreatmentRepository extends ModelRepository<Treatment> {
@@ -67,13 +66,6 @@ class Treatment extends Model {
   Treatment({required this.date, this.insulin, this.carbs, this.count = 1});
 
   bool get isConcated => count > 1;
-
-  @override
-  Duration get age {
-    return clock.now().difference(date);
-  }
-
-  int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
 
   String get insulinStr {
     if (insulin != null && insulin != 0) {
