@@ -94,8 +94,6 @@ class CarerDB {
       "SELECT name, type FROM sqlite_master WHERE name NOT LIKE 'sqlite_%';",
     );
 
-    print(all);
-
     // Use a batch to execute multiple commands at once
     var batch = db.batch();
 

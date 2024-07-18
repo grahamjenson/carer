@@ -44,6 +44,7 @@ Profile fromNSProfile(NSProfile profile, String source, int percent, int duratio
     name: profile.name,
     eid: profile.id,
     startDate: profile.date,
+    endDate: profile.date.add(Duration(seconds: duration)),
     duration: duration,
     source: source,
     percent: percent,

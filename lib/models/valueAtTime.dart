@@ -144,7 +144,7 @@ class ValueAtTime extends Model {
 
     // go over the last 6 hours and for every minute generate a new ValueAtTime
     List<ValueAtTime> vats = [];
-    for (var i = 0; i < 360; i++) {
+    for (var i = 0; i < 120; i++) {
       var d = now.subtract(Duration(minutes: i));
       vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
     }
@@ -166,6 +166,7 @@ class ValueAtTime extends Model {
 
     // make date rounded to nearest minute
     fon(DateRangeModel element) => element.isAtTime(date);
+
     Profile? profile = profiles.firstWhereOrNull(fon);
     TempBasal? tempBasal = tempBasals.firstWhereOrNull(fon);
     TempTarget? tempTarget = tempTargets.firstWhereOrNull(fon);

@@ -7,10 +7,11 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
 
   @override
   TempTarget fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "highTarget", "lowTarget", "eid"];
+    var requiredKeys = ["start", "end", "duration", "highTarget", "lowTarget", "eid"];
     if (!(validateNotNull(map, requiredKeys) &&
         validateType(map, [
           ("start", int),
+          ("end", int),
           ("duration", int),
           ("highTarget", int),
           ("lowTarget", int),
@@ -23,6 +24,7 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
       id: map["id"] as int?,
       eid: map["eid"] as String,
       startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
+      endDate: DateTime.fromMillisecondsSinceEpoch(map["end"] as int),
       duration: map["duration"] as int,
       highTarget: map["highTarget"] as int,
       lowTarget: map["lowTarget"] as int,
@@ -54,6 +56,7 @@ class TempTarget extends DateRangeModel {
     super.id,
     required super.eid,
     required super.startDate,
+    required super.endDate,
     required super.duration,
     required this.lowTarget,
     required this.highTarget,

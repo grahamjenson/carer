@@ -7,10 +7,11 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
 
   @override
   TempBasal fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "value", "eid"];
+    var requiredKeys = ["start", "end", "duration", "value", "eid"];
     if (!(validateNotNull(map, requiredKeys) &&
         validateType(map, [
           ("start", int),
+          ("end", int),
           ("duration", int),
           ("value", double),
           ("eid", String),
@@ -22,6 +23,7 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
       id: map["id"] as int?,
       eid: map["eid"] as String,
       startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
+      endDate: DateTime.fromMillisecondsSinceEpoch(map["end"] as int),
       duration: map["duration"] as int,
       value: map["value"] as double,
     );
@@ -50,6 +52,7 @@ class TempBasal extends DateRangeModel {
     super.id,
     required super.eid,
     required super.startDate,
+    required super.endDate,
     required super.duration,
     required this.value,
   });

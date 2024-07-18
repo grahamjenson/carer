@@ -23,6 +23,7 @@ class ProfileRepository extends ModelRepository<Profile> {
         name: map["name"] as String,
         eid: map["eid"] as String,
         startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
+        endDate: DateTime.fromMillisecondsSinceEpoch(map["end"] as int),
         dia: map["dia"] as int,
         units: map["units"] as String,
         timezone: map["timezone"] as String,
@@ -46,7 +47,7 @@ class ProfileRepository extends ModelRepository<Profile> {
       "dia": model.dia,
       "units": model.units,
       "timezone": model.timezone,
-      "start": model.date.millisecondsSinceEpoch,
+      "start": model.startDate.millisecondsSinceEpoch,
       "duration": model.duration,
       "source": model.source,
       "percent": model.percent,
@@ -98,6 +99,7 @@ class Profile extends DateRangeModel {
     required super.eid,
     // Date Range
     required super.startDate,
+    required super.endDate,
     required super.duration,
     // Profile
     required this.dia,

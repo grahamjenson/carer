@@ -310,30 +310,22 @@ abstract class DateRangeModel extends Model {
   @override
   get date => startDate;
   final DateTime startDate;
+  final DateTime endDate;
   final int duration;
 
   DateRangeModel({
     super.id,
     super.eid,
     required this.startDate,
+    required this.endDate,
     required this.duration,
   });
 
-  DateTime get dateEnd {
-    if (duration == 0) {
-      return clock.daysFromNow(1);
-    }
-    return date.add(Duration(seconds: duration));
-  }
-
   Duration get remaining {
-    if (duration == 0) {
-      return Duration.zero;
-    }
-    return dateEnd.difference(clock.now());
+    return endDate.difference(clock.now());
   }
 
   bool isAtTime(DateTime date) {
-    return date.isAfter(startDate) && date.isBefore(dateEnd);
+    return date.isAfter(startDate) && date.isBefore(endDate);
   }
 }
