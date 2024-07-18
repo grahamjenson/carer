@@ -1,6 +1,5 @@
 import 'package:carer/models/model.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
-import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TempBasalRepository extends ModelRepository<TempBasal> {
@@ -39,34 +38,21 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
   }
 }
 
-class TempBasal extends Model {
+class TempBasal extends DateRangeModel {
   static final TempBasalRepository _q = TempBasalRepository();
 
   @override
   ModelRepository get repository => _q;
 
-  @override
-  get date => startDate;
-
-  final DateTime startDate;
-  final int duration;
   final double value;
 
   TempBasal({
     super.id,
     required super.eid,
-    required this.startDate,
-    required this.duration,
+    required super.startDate,
+    required super.duration,
     required this.value,
   });
-
-  DateTime get dateEnd {
-    return startDate.add(Duration(seconds: duration));
-  }
-
-  Duration get remaining {
-    return dateEnd.difference(clock.now());
-  }
 
   factory TempBasal.fromMap(Map<String, dynamic> map) {
     return _q.fromMap(map);
@@ -79,6 +65,12 @@ class TempBasal extends Model {
   static Future<TempBasal?> atTime(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
     return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
+  }
+
+  static Future<List<TempBasal>> after(DateTime date) async {
+    return _q.query(conditions: {
+      "end >= ?": date.millisecondsSinceEpoch,
+    });
   }
 
   static Future<int> saveAll(List<TempBasal> models) => _q.saveAll(models);

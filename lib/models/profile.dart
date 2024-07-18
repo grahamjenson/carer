@@ -1,4 +1,5 @@
 import 'package:carer/models/model.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -70,15 +71,11 @@ class ProfileRepository extends ModelRepository<Profile> {
   }
 }
 
-class Profile extends Model {
+class Profile extends DateRangeModel {
   static final ProfileRepository _q = ProfileRepository();
 
   @override
   ModelRepository get repository => _q;
-
-  @override
-  get date => startDate;
-  final DateTime startDate;
 
   final int dia;
   final String name;
@@ -86,7 +83,7 @@ class Profile extends Model {
   final String timezone;
 
   final String source;
-  final int duration;
+
   final int percent;
 
   final List<int> carbratio;
@@ -99,7 +96,10 @@ class Profile extends Model {
     super.id,
     required this.name,
     required super.eid,
-    required this.startDate,
+    // Date Range
+    required super.startDate,
+    required super.duration,
+    // Profile
     required this.dia,
     required this.units,
     required this.timezone,
@@ -108,7 +108,6 @@ class Profile extends Model {
     required this.basal,
     required this.lowTarget,
     required this.highTarget,
-    required this.duration,
     required this.source,
     required this.percent,
   });
@@ -117,58 +116,31 @@ class Profile extends Model {
     return _q.fromMap(map);
   }
 
-  static Future<Profile?> profile() async {
-    return (await _q.query(limit: 1)).firstOrNull;
-  }
-
   get isTempProfile => duration != 0;
 
-  DateTime get dateEnd {
-    if (duration == 0) {
-      return clock.daysFromNow(1);
-    }
-    return date.add(Duration(seconds: duration));
-  }
-
-  Duration get remaining {
-    if (duration == 0) {
-      return Duration.zero;
-    }
-    return dateEnd.difference(clock.now());
-  }
+  static Future<int> saveAll(List<Profile> models) => _q.saveAll(models);
 
   static Future<Profile?> atTime(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
     return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
   }
 
-  static Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {
-    return _q.count(after: after, before: before, conditions: conditions);
+  static Future<List<Profile>> after(DateTime date) async {
+    return _q.query(conditions: {
+      "end >= ?": date.millisecondsSinceEpoch,
+    });
   }
-
-  static Future<int> saveAll(List<Profile> models) => _q.saveAll(models);
 
   static Signal<int> get writeSignal => _q.writeSignal;
 
+  static Future<Profile?> profile() async {
+    return _q.query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
+  }
+
   static FutureSignal<Profile?> currentProfile = acomputedAsync(() async {
     alog("updating currentProfile");
-    var _ = writeSignal.value; // force update on save
-
-    // TODO need a clean View of this table
-    var lastProfile = await _q.query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
-    if (lastProfile == null) {
-      return null;
-    }
-
-    alog("updated currentProfile Signal");
-
-    if (lastProfile.dateEnd.isAfter(clock.now())) {
-      return lastProfile;
-    }
-
-    var currentProfile = await _q.query(limit: 1, conditions: {"duration = ?": 0}, name: "currentProfile").then((value) => value.firstOrNull);
-    return currentProfile;
-  }, null, debugLabel: 'currentProfile');
+    return await atTime(clock.now());
+  }, null, debugLabel: 'currentProfile', dependencies: [writeSignal, TimerService().fifteenSecondSignal]);
 }
 
 const crKeys = [

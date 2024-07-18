@@ -7,6 +7,7 @@ import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
+import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
@@ -121,6 +122,8 @@ class ValueAtTime extends Model {
   }
 
   static Future<List<ValueAtTime>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
+  static Future<int> saveAll(List<ValueAtTime> models) => _q.saveAll(models);
+  static Future<int> upsertAll(List<ValueAtTime> models) => _q.upsertAll(models);
 
   static FutureSignal<List<ValueAtTime>> lastSixHours = acomputedAsync(() async {
     alog("updating ValueAtTime lastSixHours");
@@ -133,13 +136,22 @@ class ValueAtTime extends Model {
     // rounded to nearest minute
     now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
 
+    var start = now.subtract(const Duration(hours: 6));
+
+    var profiles = await Profile.after(start);
+    var tempTargets = await TempTarget.after(start);
+    var tempBasals = await TempBasal.after(start);
+
     // go over the last 6 hours and for every minute generate a new ValueAtTime
-    List<bool> updated = [];
-    for (var i = 0; i < 120; i++) {
-      updated.add(await updateValueAtTime(now.subtract(Duration(minutes: i))));
+    List<ValueAtTime> vats = [];
+    for (var i = 0; i < 360; i++) {
+      var d = now.subtract(Duration(minutes: i));
+      vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
     }
-    var ret = updated.where((element) => element).length;
+    var ret = ValueAtTime.upsertAll(vats);
+
     alog("updated $ret ValueAtTime entries");
+
     return ret;
   }, 0, debugLabel: 'updateValueAtTime', dependencies: [
     TimerService().minuteSignal,
@@ -148,16 +160,17 @@ class ValueAtTime extends Model {
     TempTarget.writeSignal,
   ]);
 
-  static Future<bool> updateValueAtTime(DateTime date) async {
+  static ValueAtTime createValueAtTime(List<Profile> profiles, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {
     int hourOfDay = date.hour;
     int minutesSinceEpoch = date.millisecondsSinceEpoch ~/ 60000;
 
     // make date rounded to nearest minute
-    Profile? profile = await Profile.atTime(date);
-    TempBasal? tempBasal = await TempBasal.atTime(date);
-    TempTarget? tempTarget = await TempTarget.atTime(date);
+    fon(DateRangeModel element) => element.isAtTime(date);
+    Profile? profile = profiles.firstWhereOrNull(fon);
+    TempBasal? tempBasal = tempBasals.firstWhereOrNull(fon);
+    TempTarget? tempTarget = tempTargets.firstWhereOrNull(fon);
 
-    int lowTarget = (tempTarget?.lowTarget ?? profile?.lowTarget[hourOfDay]) ?? 0;
+    int lowTarget = tempTarget?.lowTarget ?? profile?.lowTarget[hourOfDay] ?? 0;
     int highTarget = tempTarget?.highTarget ?? profile?.highTarget[hourOfDay] ?? 0;
 
     double basal = tempBasal?.value ?? profile?.basal[hourOfDay] ?? 0;
@@ -183,6 +196,6 @@ class ValueAtTime extends Model {
       isTempProfile: isTempProfile,
     );
 
-    return v.upsert();
+    return v;
   }
 }

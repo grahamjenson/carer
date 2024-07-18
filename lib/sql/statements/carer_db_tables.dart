@@ -119,7 +119,6 @@ const profileTable = DBTable(profileTableName, '''
         END
       ) VIRTUAL,
 
-      datetime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       end INTEGER GENERATED ALWAYS AS (start + (actual_duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,

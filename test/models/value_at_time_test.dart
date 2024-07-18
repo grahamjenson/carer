@@ -35,7 +35,7 @@ void main() async {
         duration: 0,
         timezone: "asad",
         units: "mmol",
-        date: now,
+        startDate: now,
         carbratio: List<int>.filled(24, 1),
         sens: List<int>.filled(24, 1),
         basal: List<double>.filled(24, 1),

@@ -11,7 +11,7 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class Model {
+abstract class Model<T> {
   int? id;
   String? eid;
 
@@ -303,5 +303,37 @@ abstract class ModelRepository<T extends Model> {
       }
     }
     return true;
+  }
+}
+
+abstract class DateRangeModel extends Model {
+  @override
+  get date => startDate;
+  final DateTime startDate;
+  final int duration;
+
+  DateRangeModel({
+    super.id,
+    super.eid,
+    required this.startDate,
+    required this.duration,
+  });
+
+  DateTime get dateEnd {
+    if (duration == 0) {
+      return clock.daysFromNow(1);
+    }
+    return date.add(Duration(seconds: duration));
+  }
+
+  Duration get remaining {
+    if (duration == 0) {
+      return Duration.zero;
+    }
+    return dateEnd.difference(clock.now());
+  }
+
+  bool isAtTime(DateTime date) {
+    return date.isAfter(startDate) && date.isBefore(dateEnd);
   }
 }
