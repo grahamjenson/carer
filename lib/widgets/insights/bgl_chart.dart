@@ -226,6 +226,9 @@ class BGLChart extends StatelessWidget {
       getTouchedSpotIndicator: (LineChartBarData barData, List<int> indicators) {
         return indicators.map(
           (int index) {
+            if (barData.spots.length <= index) {
+              return null;
+            }
             var spot = barData.spots[index];
             if (spot is BGLSpot) {
               var line = FlLine(

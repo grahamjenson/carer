@@ -34,8 +34,8 @@ class CarerDB {
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
     // This will grab all the db code and hash it, if it changes it drops all past stuff and replaces
-    var hashCode = (dbTables + dbViews).join("").hashCode;
-    var version = hashCode;
+    var dbScript = (dbTables + dbViews).map((e) => e.create).join("\n");
+    var version = dbScript.hashCode;
 
     alog("Opening database at $path for version $version");
     var db = await openDatabase(

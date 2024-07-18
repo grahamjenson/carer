@@ -13,7 +13,7 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
         validateType(map, [
           ("start", int),
           ("duration", int),
-          ("value", int),
+          ("value", double),
           ("eid", String),
         ]))) {
       throw ArgumentError("Invalid TempBasal Map: $map");

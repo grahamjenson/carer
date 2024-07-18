@@ -17,27 +17,29 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
     var requiredKeys = ["timestamp", "lowTarget", "highTarget", "isTempTarget", "basal", "isTempBasal"];
     if (!(validateNotNull(map, requiredKeys) &&
         validateType(map, [
+          ("eid", String),
           ("timestamp", int),
           ("lowTarget", int),
           ("highTarget", int),
           ("basal", double),
-          ("isf", double),
-          ("cr", double),
+          ("isf", int),
+          ("cr", int),
           ("isTempProfile", int),
           ("isTempTarget", int),
           ("isTempBasal", int),
           ("profileName", String),
         ]))) {
-      throw ArgumentError("Invalid Target Map: $map");
+      throw ArgumentError("Invalid ValueAtTime Map: $map");
     }
 
     return ValueAtTime(
+      eid: "${map["eid"]}",
       date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
       lowTarget: map["lowTarget"] as int,
       highTarget: map["highTarget"] as int,
       basal: map["basal"] as double,
-      isf: map["isf"] as double,
-      cr: map["cr"] as double,
+      isf: map["isf"] as int,
+      cr: map["cr"] as int,
       isTempProfile: map["isTempProfile"] == 1,
       isTempBasal: map["isTempBasal"] == 1,
       isTempTarget: map["isTempTarget"] == 1,
@@ -48,6 +50,7 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
   @override
   Map<String, Object> toSQLMap(ValueAtTime model) {
     return {
+      "eid": model.eid!,
       "timestamp": model.date.millisecondsSinceEpoch,
       //
       "lowTarget": model.lowTarget,
@@ -79,8 +82,8 @@ class ValueAtTime extends Model {
   final int highTarget;
 
   final double basal;
-  final double isf;
-  final double cr;
+  final int isf;
+  final int cr;
 
   final String profileName;
 
@@ -89,6 +92,7 @@ class ValueAtTime extends Model {
   final bool isTempProfile;
 
   ValueAtTime({
+    required super.eid,
     required this.date,
     required this.lowTarget,
     required this.highTarget,
@@ -120,10 +124,65 @@ class ValueAtTime extends Model {
 
   static FutureSignal<List<ValueAtTime>> lastSixHours = acomputedAsync(() async {
     alog("updating ValueAtTime lastSixHours");
-    var _ = TimerService().minuteSignal.value; // Update eevry minute
-    var b = TempTarget.writeSignal.value;
-    var c = TempBasal.writeSignal.value;
-    var d = Profile.writeSignal.value;
+    var _ = updateValues.value; // Update every write to this table
     return await ValueAtTime.lastMins(60 * 6);
   }, [], debugLabel: 'valueAtTimeLastSixHours');
+
+  static FutureSignal<int> updateValues = acomputedAsync(() async {
+    var now = clock.now();
+    // rounded to nearest minute
+    now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+    // go over the last 6 hours and for every minute generate a new ValueAtTime
+    List<bool> updated = [];
+    for (var i = 0; i < 120; i++) {
+      updated.add(await updateValueAtTime(now.subtract(Duration(minutes: i))));
+    }
+    var ret = updated.where((element) => element).length;
+    alog("updated $ret ValueAtTime entries");
+    return ret;
+  }, 0, debugLabel: 'updateValueAtTime', dependencies: [
+    TimerService().minuteSignal,
+    Profile.writeSignal,
+    TempBasal.writeSignal,
+    TempTarget.writeSignal,
+  ]);
+
+  static Future<bool> updateValueAtTime(DateTime date) async {
+    int hourOfDay = date.hour;
+    int minutesSinceEpoch = date.millisecondsSinceEpoch ~/ 60000;
+
+    // make date rounded to nearest minute
+    Profile? profile = await Profile.atTime(date);
+    TempBasal? tempBasal = await TempBasal.atTime(date);
+    TempTarget? tempTarget = await TempTarget.atTime(date);
+
+    int lowTarget = (tempTarget?.lowTarget ?? profile?.lowTarget[hourOfDay]) ?? 0;
+    int highTarget = tempTarget?.highTarget ?? profile?.highTarget[hourOfDay] ?? 0;
+
+    double basal = tempBasal?.value ?? profile?.basal[hourOfDay] ?? 0;
+    int isf = profile?.sens[hourOfDay] ?? 0;
+    int cr = profile?.carbratio[hourOfDay] ?? 0;
+    String profileName = profile?.name ?? "";
+
+    bool isTempProfile = profile?.isTempProfile ?? false;
+    bool isTempBasal = tempBasal != null;
+    bool isTempTarget = tempTarget != null;
+
+    ValueAtTime v = ValueAtTime(
+      eid: "MSE-$minutesSinceEpoch",
+      date: date,
+      lowTarget: lowTarget,
+      highTarget: highTarget,
+      isTempTarget: isTempTarget,
+      basal: basal,
+      isTempBasal: isTempBasal,
+      isf: isf,
+      cr: cr,
+      profileName: profileName,
+      isTempProfile: isTempProfile,
+    );
+
+    return v.upsert();
+  }
 }

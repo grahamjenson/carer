@@ -208,6 +208,7 @@ const String valuesAtTimeTableName = "valuesAtTime";
 const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
     CREATE TABLE valuesAtTime (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      eid STRING,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
       minute_timestamp INTEGER GENERATED ALWAYS AS (timestamp / 60000) VIRTUAL, -- minutes since epoch
@@ -215,8 +216,8 @@ const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
       lowTarget INTEGER,
       highTarget INTEGER,
       basal REAL,
-      isf REAL,
-      cr REAL,
+      isf INTEGER,
+      cr INTEGER,
 
       isTempProfile INTEGER, -- 0 or 1 BOOL
       isTempTarget INTEGER,   -- 0 or 1 BOOL
@@ -224,6 +225,6 @@ const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
 
       profileName TEXT,
 
-      UNIQUE(minute_timestamp)
+      UNIQUE(eid)
     )
   ''');

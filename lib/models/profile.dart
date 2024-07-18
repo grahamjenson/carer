@@ -121,6 +121,8 @@ class Profile extends Model {
     return (await _q.query(limit: 1)).firstOrNull;
   }
 
+  get isTempProfile => duration != 0;
+
   DateTime get dateEnd {
     if (duration == 0) {
       return clock.daysFromNow(1);
@@ -133,6 +135,11 @@ class Profile extends Model {
       return Duration.zero;
     }
     return dateEnd.difference(clock.now());
+  }
+
+  static Future<Profile?> atTime(DateTime date) async {
+    var ms = date.millisecondsSinceEpoch;
+    return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
   }
 
   static Future<int?> count({int? after, int? before, Map<String, Object>? conditions}) async {

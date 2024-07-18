@@ -6,6 +6,7 @@ import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:sqflite/sqflite.dart';
@@ -297,6 +298,7 @@ abstract class ModelRepository<T extends Model> {
         continue; // Ignore if null
       }
       if (m[key].runtimeType != type) {
+        alog("BAD KEY TYPE $key ${m[key]} $type");
         return false;
       }
     }
