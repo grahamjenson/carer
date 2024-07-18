@@ -14,15 +14,13 @@ const dbTables = [
   tempbasalTable,
   temptargetsTable,
   profileTable,
+  valuesAtTimeTable,
 ];
 
 const dbViews = [
   treatmentsView,
   concatTreatmentsView,
   sgvsCleanView,
-  timestampMinutesView,
-  profileHourView,
-  valuesAtTimeView,
 ];
 
 // Used for key values like iob...
@@ -107,10 +105,26 @@ const profileTable = DBTable(profileTableName, '''
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
       name TEXT,
-      timestamp INTEGER,
-      datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
-
+      
+      -- Date stuff
+      start INTEGER,
       duration INTEGER,
+
+      -- If duration is 0, it means that it is actually indefinite
+      -- we use ~100 years (in seconds) as an aproximate value
+      actual_duration INTEGER GENERATED ALWAYS AS (
+        CASE 
+          WHEN duration = 0 THEN 3000000000
+          ELSE duration
+        END
+      ) VIRTUAL,
+
+      datetime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      end INTEGER GENERATED ALWAYS AS (start + (actual_duration * 1000)) VIRTUAL,
+      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
+
+      
       source TEXT,
       percent INTEGER,
 
@@ -188,206 +202,28 @@ const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
       timestamp DESC
   ''');
 
-// Profile hour table, each profile is exploded into the values they provide each hour
+// This table is a cache of minute-by-minute values
+// The goal is to be used for visualization, and basically the API I wish NS had
+const String valuesAtTimeTableName = "valuesAtTime";
+const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
+    CREATE TABLE valuesAtTime (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp INTEGER,
+      datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+      minute_timestamp INTEGER GENERATED ALWAYS AS (timestamp / 60000) VIRTUAL, -- minutes since epoch
 
-const String profileHourViewName = "profileHourView";
-const profileHourView = DBTable(profileHourViewName, '''
- CREATE VIEW profileHourView AS
-WITH hours(hour) AS (
-  values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23)
-)
-SELECT id, hour, timestamp, datetime, dia, units, timezone,
-CASE hour 
-	WHEN 0 THEN cr0
-  WHEN 1 THEN cr1
-  WHEN 2 THEN cr2
-  WHEN 3 THEN cr3
-	WHEN 4 THEN cr4
-  WHEN 5 THEN cr5
-  WHEN 6 THEN cr6
-  WHEN 7 THEN cr7
-	WHEN 8 THEN cr8
-  WHEN 9 THEN cr9
-  WHEN 10 THEN cr10
-  WHEN 11 THEN cr11
-	WHEN 12 THEN cr12
-  WHEN 13 THEN cr13
-  WHEN 14 THEN cr14
-  WHEN 15 THEN cr15
-	WHEN 16 THEN cr16
-  WHEN 17 THEN cr17
-  WHEN 18 THEN cr18
-  WHEN 19 THEN cr19
-	WHEN 20 THEN cr20
-  WHEN 21 THEN cr21
-  WHEN 22 THEN cr22
-  WHEN 23 THEN cr23
-END cr,
-CASE hour 
-	WHEN 0 THEN isf0
-  WHEN 1 THEN isf1
-  WHEN 2 THEN isf2
-  WHEN 3 THEN isf3
-	WHEN 4 THEN isf4
-  WHEN 5 THEN isf5
-  WHEN 6 THEN isf6
-  WHEN 7 THEN isf7
-	WHEN 8 THEN isf8
-  WHEN 9 THEN isf9
-  WHEN 10 THEN isf10
-  WHEN 11 THEN isf11
-	WHEN 12 THEN isf12
-  WHEN 13 THEN isf13
-  WHEN 14 THEN isf14
-  WHEN 15 THEN isf15
-	WHEN 16 THEN isf16
-  WHEN 17 THEN isf17
-  WHEN 18 THEN isf18
-  WHEN 19 THEN isf19
-	WHEN 20 THEN isf20
-  WHEN 21 THEN isf21
-  WHEN 22 THEN isf22
-  WHEN 23 THEN isf23
-END isf,
-CASE hour 
-	WHEN 0 THEN basal0
-  WHEN 1 THEN basal1
-  WHEN 2 THEN basal2
-  WHEN 3 THEN basal3
-	WHEN 4 THEN basal4
-  WHEN 5 THEN basal5
-  WHEN 6 THEN basal6
-  WHEN 7 THEN basal7
-	WHEN 8 THEN basal8
-  WHEN 9 THEN basal9
-  WHEN 10 THEN basal10
-  WHEN 11 THEN basal11
-	WHEN 12 THEN basal12
-  WHEN 13 THEN basal13
-  WHEN 14 THEN basal14
-  WHEN 15 THEN basal15
-	WHEN 16 THEN basal16
-  WHEN 17 THEN basal17
-  WHEN 18 THEN basal18
-  WHEN 19 THEN basal19
-	WHEN 20 THEN basal20
-  WHEN 21 THEN basal21
-  WHEN 22 THEN basal22
-  WHEN 23 THEN basal23
-END basal,
-CASE hour 
-	WHEN 0 THEN tlow0
-  WHEN 1 THEN tlow1
-  WHEN 2 THEN tlow2
-  WHEN 3 THEN tlow3
-	WHEN 4 THEN tlow4
-  WHEN 5 THEN tlow5
-  WHEN 6 THEN tlow6
-  WHEN 7 THEN tlow7
-	WHEN 8 THEN tlow8
-  WHEN 9 THEN tlow9
-  WHEN 10 THEN tlow10
-  WHEN 11 THEN tlow11
-	WHEN 12 THEN tlow12
-  WHEN 13 THEN tlow13
-  WHEN 14 THEN tlow14
-  WHEN 15 THEN tlow15
-	WHEN 16 THEN tlow16
-  WHEN 17 THEN tlow17
-  WHEN 18 THEN tlow18
-  WHEN 19 THEN tlow19
-	WHEN 20 THEN tlow20
-  WHEN 21 THEN tlow21
-  WHEN 22 THEN tlow22
-  WHEN 23 THEN tlow23
-END tlow,
-CASE hour 
-	WHEN 0 THEN thigh0
-  WHEN 1 THEN thigh1
-  WHEN 2 THEN thigh2
-  WHEN 3 THEN thigh3
-	WHEN 4 THEN thigh4
-  WHEN 5 THEN thigh5
-  WHEN 6 THEN thigh6
-  WHEN 7 THEN thigh7
-	WHEN 8 THEN thigh8
-  WHEN 9 THEN thigh9
-  WHEN 10 THEN thigh10
-  WHEN 11 THEN thigh11
-	WHEN 12 THEN thigh12
-  WHEN 13 THEN thigh13
-  WHEN 14 THEN thigh14
-  WHEN 15 THEN thigh15
-	WHEN 16 THEN thigh16
-  WHEN 17 THEN thigh17
-  WHEN 18 THEN thigh18
-  WHEN 19 THEN thigh19
-	WHEN 20 THEN thigh20
-  WHEN 21 THEN thigh21
-  WHEN 22 THEN thigh22
-  WHEN 23 THEN thigh23
-END thigh
-FROM 
-	hours JOIN profile;
-''');
+      lowTarget INTEGER,
+      highTarget INTEGER,
+      basal REAL,
+      isf REAL,
+      cr REAL,
 
-// This is a list of timestamps for a large amount of time.
-const String timestampMinutesViewName = "timestampMinutes";
-const timestampMinutesView = DBTable(timestampMinutesViewName, '''
-CREATE VIEW timestampMinutes AS
-WITH minutes(minute) AS (
-  values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28),(29),(30),(31),(32),(33),(34),(35),(36),(37),(38),(39),(40),(41),(42),(43),(44),(45),(46),(47),(48),(49),(50),(51),(52),(53),(54),(55),(56),(57),(58),(59)
-),
-hours(hour) AS (values (0), (1), (2), (3), (4), (5)),
-times AS (
-  SELECT (strftime('%s',datetime(strftime('%Y-%m-%d %H:%M:00', 'now') )) - (60 * minute) - (hour * 60*60)) * 1000 AS timestamp
-  FROM minutes join hours
-)
-SELECT 
-  timestamp,
-  datetime(timestamp / 1000, 'unixepoch') AS datetime,
-  CAST(strftime('%H',datetime(timestamp / 1000, 'unixepoch'),'localtime') as INT) as hour
-FROM times
-ORDER BY timestamp desc;
-''');
+      isTempProfile INTEGER, -- 0 or 1 BOOL
+      isTempTarget INTEGER,   -- 0 or 1 BOOL
+      isTempBasal INTEGER,    -- 0 or 1 BOOL
 
-// this takes all temptarget start and endtiems AS that is when things change.
-const String valuesAtTimeViewName = "valuesAtTime";
-const valuesAtTimeView = DBTable(valuesAtTimeViewName, '''
-CREATE VIEW valuesAtTime AS
-WITH
-  -- TODO get the latest profile should later get profile per time
-  current_profile AS (SELECT id FROM profile ORDER BY timestamp desc limit 1),
-  profile_hours AS (SELECT * FROM current_profile JOIN profileHourView ON current_profile.id = profileHourView.id),
-  profile_targets AS (
-    SELECT 
-      timestampMinutes.timestamp,
-      timestampMinutes.datetime, 
-      timestampMinutes.hour, 
-      profile_hours.tlow AS profile_low, 
-      profile_hours.thigh AS profile_high,
-      profile_hours.basal AS profile_basal,
-      profile_hours.isf AS profile_isf,
-      profile_hours.cr AS profile_cr
-    FROM 
-      timestampMinutes JOIN profile_hours ON timestampMinutes.hour = profile_hours.hour
-  ),
-ltempbasal as (select * from tempbasal where datetime(end/1000, 'unixepoch')  > datetime('now', '-2 hours')),
-ltemptargets as (select * from temptargets where datetime(end/1000, 'unixepoch')  > datetime('now', '-2 hours'))
-SELECT 
-  timestamp, 
-  datetime, 
-  COALESCE(ltemptargets.lowTarget, profile_low) AS lowTarget, 
-  COALESCE(ltemptargets.highTarget, profile_high) AS highTarget, 
-  COALESCE(ltempbasal.value, profile_basal) AS basal,
-  profile_isf as isf,
-  profile_cr as cr,
-  ltemptargets.highTarget is not NULL AS isTempTarget,
-  ltempbasal.value is not NULL AS isTempBasal 
-FROM 
-  profile_targets 
-  LEFT JOIN ltemptargets ON profile_targets.timestamp >= ltemptargets.start and profile_targets.timestamp < ltemptargets.end
-  LEFT JOIN ltempbasal ON profile_targets.timestamp >= ltempbasal.start and profile_targets.timestamp < ltempbasal.end
-ORDER BY 
-  timestamp desc;
+      profileName TEXT,
+
+      UNIQUE(minute_timestamp)
+    )
   ''');

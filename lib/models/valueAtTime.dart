@@ -10,12 +10,24 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
-  ValueAtTimeRepository() : super(valuesAtTimeViewName);
+  ValueAtTimeRepository() : super(valuesAtTimeTableName);
 
   @override
   ValueAtTime fromMap(Map<String, Object?> map) {
     var requiredKeys = ["timestamp", "lowTarget", "highTarget", "isTempTarget", "basal", "isTempBasal"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int, double, int]))) {
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, [
+          ("timestamp", int),
+          ("lowTarget", int),
+          ("highTarget", int),
+          ("basal", double),
+          ("isf", double),
+          ("cr", double),
+          ("isTempProfile", int),
+          ("isTempTarget", int),
+          ("isTempBasal", int),
+          ("profileName", String),
+        ]))) {
       throw ArgumentError("Invalid Target Map: $map");
     }
 
@@ -24,8 +36,12 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
       lowTarget: map["lowTarget"] as int,
       highTarget: map["highTarget"] as int,
       basal: map["basal"] as double,
+      isf: map["isf"] as double,
+      cr: map["cr"] as double,
+      isTempProfile: map["isTempProfile"] == 1,
       isTempBasal: map["isTempBasal"] == 1,
       isTempTarget: map["isTempTarget"] == 1,
+      profileName: map["profileName"] as String,
     );
   }
 
@@ -33,8 +49,18 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
   Map<String, Object> toSQLMap(ValueAtTime model) {
     return {
       "timestamp": model.date.millisecondsSinceEpoch,
+      //
       "lowTarget": model.lowTarget,
       "highTarget": model.highTarget,
+      //
+      "basal": model.basal,
+      "isf": model.isf,
+      "cr": model.cr,
+      //
+      "profileName": model.profileName,
+      //
+      "isTempProfile": model.isTempProfile ? 1 : 0,
+      "isTempBasal": model.isTempBasal ? 1 : 0,
       "isTempTarget": model.isTempTarget ? 1 : 0,
     };
   }
@@ -51,17 +77,29 @@ class ValueAtTime extends Model {
 
   final int lowTarget;
   final int highTarget;
-  final bool isTempTarget;
-  final double basal;
-  final bool isTempBasal;
 
-  ValueAtTime(
-      {required this.date,
-      required this.lowTarget,
-      required this.highTarget,
-      required this.isTempTarget,
-      required this.basal,
-      required this.isTempBasal});
+  final double basal;
+  final double isf;
+  final double cr;
+
+  final String profileName;
+
+  final bool isTempBasal;
+  final bool isTempTarget;
+  final bool isTempProfile;
+
+  ValueAtTime({
+    required this.date,
+    required this.lowTarget,
+    required this.highTarget,
+    required this.isTempTarget,
+    required this.basal,
+    required this.isTempBasal,
+    required this.isf,
+    required this.cr,
+    required this.profileName,
+    required this.isTempProfile,
+  });
 
   factory ValueAtTime.fromMap(Map<String, dynamic> map) {
     return _q.fromMap(map);

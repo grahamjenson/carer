@@ -9,7 +9,12 @@ class CarbsRepository extends ModelRepository<Carbs> {
   @override
   Carbs fromMap(Map<String, Object?> map) {
     var requiredKeys = ["value", "timestamp", "eid"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int]))) {
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, [
+          ("value", int),
+          ("timestamp", int),
+          ("eid", String),
+        ]))) {
       throw ArgumentError("Invalid Carbs Map: $map");
     }
 

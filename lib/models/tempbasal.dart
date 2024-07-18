@@ -9,7 +9,13 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
   @override
   TempBasal fromMap(Map<String, Object?> map) {
     var requiredKeys = ["start", "duration", "value", "eid"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, double, String]))) {
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, [
+          ("start", int),
+          ("duration", int),
+          ("value", int),
+          ("eid", String),
+        ]))) {
       throw ArgumentError("Invalid TempBasal Map: $map");
     }
 

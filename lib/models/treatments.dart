@@ -16,8 +16,13 @@ class TreatmentRepository extends ModelRepository<Treatment> {
   @override
   Treatment fromMap(Map<String, Object?> map) {
     var requiredKeys = ["count", "max_ts"];
-    var allKeys = ["count", "max_ts", "carbs", "insulin"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, allKeys, [int, int, int, double]))) {
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, [
+          ("count", int),
+          ("max_ts", int),
+          ("carbs", int),
+          ("insulin", double),
+        ]))) {
       throw ArgumentError("Invalid Treatment Map: $map");
     }
 

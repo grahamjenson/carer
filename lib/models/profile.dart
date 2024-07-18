@@ -6,7 +6,7 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ProfileRepository extends ModelRepository<Profile> {
-  ProfileRepository() : super(profileTableName);
+  ProfileRepository() : super(profileTableName, timestampField: "start");
 
   @override
   Profile fromMap(Map<String, Object?> map) {
@@ -21,7 +21,7 @@ class ProfileRepository extends ModelRepository<Profile> {
         id: map["id"] as int?,
         name: map["name"] as String,
         eid: map["eid"] as String,
-        date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
+        startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
         dia: map["dia"] as int,
         units: map["units"] as String,
         timezone: map["timezone"] as String,
@@ -45,7 +45,7 @@ class ProfileRepository extends ModelRepository<Profile> {
       "dia": model.dia,
       "units": model.units,
       "timezone": model.timezone,
-      "timestamp": model.date.millisecondsSinceEpoch,
+      "start": model.date.millisecondsSinceEpoch,
       "duration": model.duration,
       "source": model.source,
       "percent": model.percent,
@@ -77,7 +77,9 @@ class Profile extends Model {
   ModelRepository get repository => _q;
 
   @override
-  final DateTime date;
+  get date => startDate;
+  final DateTime startDate;
+
   final int dia;
   final String name;
   final String units;
@@ -97,7 +99,7 @@ class Profile extends Model {
     super.id,
     required this.name,
     required super.eid,
-    required this.date,
+    required this.startDate,
     required this.dia,
     required this.units,
     required this.timezone,

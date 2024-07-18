@@ -290,14 +290,13 @@ abstract class ModelRepository<T extends Model> {
     return true;
   }
 
-  bool validateType(Map<String, Object?> m, List<String> keys, List<Type> types) {
-    assert(keys.length == types.length);
-
-    for (var i = 0; i < keys.length; i++) {
-      if (m[keys[i]] == null) {
+  bool validateType(Map<String, Object?> m, List<(String, Type)> keysTypes) {
+    for (var i = 0; i < keysTypes.length; i++) {
+      var (key, type) = keysTypes[i];
+      if (m[key] == null) {
         continue; // Ignore if null
       }
-      if (m[keys[i]].runtimeType != types[i]) {
+      if (m[key].runtimeType != type) {
         return false;
       }
     }

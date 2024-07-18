@@ -13,7 +13,12 @@ class SGVRepository extends ModelRepository<SGV> {
   @override
   SGV fromMap(Map<String, Object?> map) {
     var requiredKeys = ["value", "timestamp", "eid"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, String]))) {
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, [
+          ("value", int),
+          ("timestamp", int),
+          ("eid", String),
+        ]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 

@@ -9,7 +9,14 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
   @override
   TempTarget fromMap(Map<String, Object?> map) {
     var requiredKeys = ["start", "duration", "highTarget", "lowTarget", "eid"];
-    if (!(validateNotNull(map, requiredKeys) && validateType(map, requiredKeys, [int, int, int, int, String]))) {
+    if (!(validateNotNull(map, requiredKeys) &&
+        validateType(map, [
+          ("start", int),
+          ("duration", int),
+          ("highTarget", int),
+          ("lowTarget", int),
+          ("eid", String),
+        ]))) {
       throw ArgumentError("Invalid SVG Map: $map");
     }
 

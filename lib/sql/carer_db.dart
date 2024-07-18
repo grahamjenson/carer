@@ -89,14 +89,24 @@ class CarerDB {
   ////
 
   static Future<void> dropAll(Database db) async {
+    // Get the list of all tables in the database
+    final List<Map<String, dynamic>> all = await db.rawQuery(
+      "SELECT name, type FROM sqlite_master WHERE name NOT LIKE 'sqlite_%';",
+    );
+
+    print(all);
+
+    // Use a batch to execute multiple commands at once
     var batch = db.batch();
 
-    for (var table in dbTables) {
-      batch.execute("DROP TABLE IF EXISTS ${table.name}");
+    for (var table in all) {
+      if (table['type'] != 'table') continue;
+      batch.execute("DROP TABLE IF EXISTS ${table['name']}");
     }
 
-    for (var view in dbViews) {
-      batch.execute("DROP VIEW IF EXISTS ${view.name}");
+    for (var view in all) {
+      if (view['type'] != 'view') continue;
+      batch.execute("DROP VIEW IF EXISTS ${view['name']}");
     }
 
     await batch.commit();
