@@ -1,4 +1,6 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -7,34 +9,12 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
 
   @override
   TempBasal fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "value", "eid"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("start", int),
-          ("duration", int),
-          ("value", double),
-          ("eid", String),
-        ]))) {
-      throw ArgumentError("Invalid TempBasal Map: $map");
-    }
-
-    return TempBasal(
-      id: map["id"] as int?,
-      eid: map["eid"] as String,
-      startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
-      duration: map["duration"] as int,
-      value: map["value"] as double,
-    );
+    return TempBasalToSQLRow().from(SQLRow(tempbasalTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(TempBasal model) {
-    return {
-      "start": model.startDate.millisecondsSinceEpoch,
-      "duration": model.duration,
-      "value": model.value,
-      "eid": model.eid!,
-    };
+    return SQLRowToTempBasal().from(model).toCleanMap();
   }
 }
 

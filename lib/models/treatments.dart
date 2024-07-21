@@ -1,8 +1,10 @@
 // Non persisted combined model of Bolus and Carbs
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -10,44 +12,16 @@ import 'package:carer/utils/math.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TreatmentRepository extends ModelRepository<Treatment> {
-  TreatmentRepository() : super(concatTreatmentsTableName, timestampField: "max_ts");
+  TreatmentRepository() : super(concatTreatmentsViewName, timestampField: "max_ts");
 
   @override
   Treatment fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["count", "max_ts"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("count", int),
-          ("max_ts", int),
-          ("carbs", int),
-          ("insulin", double),
-        ]))) {
-      throw ArgumentError("Invalid Treatment Map: $map");
-    }
-
-    {
-      return Treatment(
-        count: map["count"] as int,
-        date: DateTime.fromMillisecondsSinceEpoch(map["max_ts"] as int),
-        carbs: map["carbs"] as int?,
-        insulin: map["insulin"] as double?,
-      );
-    }
+    return TreatmentToSQLRow().from(SQLRow(concatTreatmentsViewName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(Treatment model) {
-    Map<String, Object> map = {
-      "count": model.count,
-      "max_ts": model.date.millisecondsSinceEpoch,
-    };
-    if (model.carbs != null) {
-      map["carbs"] = model.carbs!;
-    }
-    if (model.insulin != null) {
-      map["insulin"] = model.insulin!;
-    }
-    return map;
+    throw UnimplementedError();
   }
 }
 

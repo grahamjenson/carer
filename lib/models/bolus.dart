@@ -1,4 +1,6 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/math.dart';
 import 'package:signals/signals_flutter.dart';
@@ -8,31 +10,12 @@ class BolusRepository extends ModelRepository<Bolus> {
 
   @override
   Bolus fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["value", "timestamp", "eid"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("value", double),
-          ("timestamp", int),
-          ("eid", String),
-        ]))) {
-      throw ArgumentError("Invalid Bolus Map: $map");
-    }
-
-    return Bolus(
-      id: map["id"] as int?,
-      eid: map["eid"] as String,
-      value: map["value"] as double,
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
-    );
+    return BolusToSQLRow().from(SQLRow(bolusTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(Bolus model) {
-    return {
-      "value": model.value,
-      "timestamp": model.date.millisecondsSinceEpoch,
-      "eid": model.eid!,
-    };
+    return SQLRowToBolus().from(model).toCleanMap();
   }
 }
 
@@ -53,20 +36,12 @@ class Bolus extends Model {
     required this.date,
   });
 
-  factory Bolus.fromMap(Map<String, Object?> map) {
-    return _q.fromMap(map);
-  }
-
   String get str {
     if (value != 0) {
       return '${toMax2dp(value)}u';
     } else {
       return "";
     }
-  }
-
-  static Future<List<Bolus>> lastMins(int minsAgo) async {
-    return _q.lastMins(minsAgo);
   }
 
   static Signal<int> get writeSignal => _q.writeSignal;

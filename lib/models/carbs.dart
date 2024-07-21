@@ -1,4 +1,6 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/math.dart';
 import 'package:signals/signals_flutter.dart';
@@ -8,31 +10,12 @@ class CarbsRepository extends ModelRepository<Carbs> {
 
   @override
   Carbs fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["value", "timestamp", "eid"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("value", int),
-          ("timestamp", int),
-          ("eid", String),
-        ]))) {
-      throw ArgumentError("Invalid Carbs Map: $map");
-    }
-
-    return Carbs(
-      id: map["id"] as int?,
-      eid: map["eid"] as String,
-      value: map["value"] as int,
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
-    );
+    return CarbsToSQLRow().from(SQLRow(carbsTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(Carbs model) {
-    return {
-      "value": model.value,
-      "timestamp": model.date.millisecondsSinceEpoch,
-      "eid": model.eid!,
-    };
+    return SQLRowToCarbs().from(model).toCleanMap();
   }
 }
 

@@ -1,6 +1,8 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -12,34 +14,12 @@ class SGVRepository extends ModelRepository<SGV> {
 
   @override
   SGV fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["value", "timestamp", "eid"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("value", int),
-          ("timestamp", int),
-          ("eid", String),
-        ]))) {
-      throw ArgumentError("Invalid SVG Map: $map");
-    }
-
-    return SGV(
-      id: map["id"] as int?,
-      eid: map["eid"] as String,
-      value: map["value"] as int,
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
-      rate5m: map["rate5m"] as int?,
-      diff: map["diff"] as int?,
-      idBefore: map["id_before"] as int?,
-    );
+    return CleanSGVToSQLRow().from(SQLRow(sgvsCleanViewTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(SGV model) {
-    return {
-      "value": model.value,
-      "timestamp": model.date.millisecondsSinceEpoch,
-      "eid": model.eid!,
-    };
+    return SQLRowToSGV().from(model).toCleanMap();
   }
 }
 

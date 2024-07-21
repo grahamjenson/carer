@@ -1,8 +1,10 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -15,60 +17,12 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
 
   @override
   ValueAtTime fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["timestamp", "lowTarget", "highTarget", "isTempTarget", "basal", "isTempBasal"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("eid", String),
-          ("timestamp", int),
-          ("lowTarget", int),
-          ("highTarget", int),
-          ("basal", double),
-          ("isf", int),
-          ("cr", int),
-          ("isTempProfile", int),
-          ("isTempTarget", int),
-          ("isTempBasal", int),
-          ("profileName", String),
-        ]))) {
-      throw ArgumentError("Invalid ValueAtTime Map: $map");
-    }
-
-    return ValueAtTime(
-      eid: "${map["eid"]}",
-      date: DateTime.fromMillisecondsSinceEpoch(map["timestamp"] as int),
-      lowTarget: map["lowTarget"] as int,
-      highTarget: map["highTarget"] as int,
-      basal: map["basal"] as double,
-      isf: map["isf"] as int,
-      cr: map["cr"] as int,
-      isTempProfile: map["isTempProfile"] == 1,
-      isTempBasal: map["isTempBasal"] == 1,
-      isTempTarget: map["isTempTarget"] == 1,
-      profileName: map["profileName"] as String,
-      profilePercent: map["profilePercent"] as int,
-    );
+    return ValueAtTimeToSQLRow().from(SQLRow(valuesAtTimeTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(ValueAtTime model) {
-    return {
-      "eid": model.eid!,
-      "timestamp": model.date.millisecondsSinceEpoch,
-      //
-      "lowTarget": model.lowTarget,
-      "highTarget": model.highTarget,
-      //
-      "basal": model.basal,
-      "isf": model.isf,
-      "cr": model.cr,
-      //
-      "profileName": model.profileName,
-      "profilePercent": model.profilePercent,
-      //
-      "isTempProfile": model.isTempProfile ? 1 : 0,
-      "isTempBasal": model.isTempBasal ? 1 : 0,
-      "isTempTarget": model.isTempTarget ? 1 : 0,
-    };
+    return SQLRowToValueAtTime().from(model).toCleanMap();
   }
 }
 

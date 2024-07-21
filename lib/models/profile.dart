@@ -1,5 +1,7 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -11,63 +13,12 @@ class ProfileRepository extends ModelRepository<Profile> {
 
   @override
   Profile fromMap(Map<String, Object?> map) {
-    List<int> carbratio = crKeys.map((key) => map[key] as int).toList();
-    List<int> sens = isfKeys.map((key) => map[key] as int).toList();
-    List<double> basal = basalKeys.map((key) => map[key] as double).toList();
-    List<int> lowTarget = lowTargetKeys.map((key) => map[key] as int).toList();
-    List<int> highTarget = highTargetKeys.map((key) => map[key] as int).toList();
-
-    {
-      return Profile(
-        id: map["id"] as int?,
-        name: map["name"] as String,
-        eid: map["eid"] as String,
-        startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
-        dia: map["dia"] as int,
-        units: map["units"] as String,
-        timezone: map["timezone"] as String,
-        carbratio: carbratio,
-        sens: sens,
-        basal: basal,
-        lowTarget: lowTarget,
-        highTarget: highTarget,
-        duration: map["duration"] as int,
-        source: map["source"] as String,
-        percent: map["percent"] as int,
-      );
-    }
+    return ProfileToSQLRow().from(SQLRow(profileTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(Profile model) {
-    Map<String, Object> map = {
-      "name": model.name,
-      "eid": model.eid!,
-      "dia": model.dia,
-      "units": model.units,
-      "timezone": model.timezone,
-      "start": model.startDate.millisecondsSinceEpoch,
-      "duration": model.duration,
-      "source": model.source,
-      "percent": model.percent,
-    };
-    model.carbratio.asMap().forEach((index, value) {
-      map[crKeys[index]] = value;
-    });
-    model.sens.asMap().forEach((index, value) {
-      map[isfKeys[index]] = value;
-    });
-    model.basal.asMap().forEach((index, value) {
-      map[basalKeys[index]] = value;
-    });
-    model.lowTarget.asMap().forEach((index, value) {
-      map[lowTargetKeys[index]] = value;
-    });
-    model.highTarget.asMap().forEach((index, value) {
-      map[highTargetKeys[index]] = value;
-    });
-
-    return map;
+    return SQLRowToProfile().from(model).toCleanMap();
   }
 }
 

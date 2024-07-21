@@ -1,4 +1,6 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -7,37 +9,12 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
 
   @override
   TempTarget fromMap(Map<String, Object?> map) {
-    var requiredKeys = ["start", "duration", "highTarget", "lowTarget", "eid"];
-    if (!(validateNotNull(map, requiredKeys) &&
-        validateType(map, [
-          ("start", int),
-          ("duration", int),
-          ("highTarget", int),
-          ("lowTarget", int),
-          ("eid", String),
-        ]))) {
-      throw ArgumentError("Invalid SVG Map: $map");
-    }
-
-    return TempTarget(
-      id: map["id"] as int?,
-      eid: map["eid"] as String,
-      startDate: DateTime.fromMillisecondsSinceEpoch(map["start"] as int),
-      duration: map["duration"] as int,
-      highTarget: map["highTarget"] as int,
-      lowTarget: map["lowTarget"] as int,
-    );
+    return TempTargetToSQLRow().from(SQLRow(temptargetsTableName, map));
   }
 
   @override
   Map<String, Object> toSQLMap(TempTarget model) {
-    return {
-      "start": model.startDate.millisecondsSinceEpoch,
-      "duration": model.duration,
-      "highTarget": model.highTarget,
-      "lowTarget": model.lowTarget,
-      "eid": model.eid!,
-    };
+    return SQLRowToTempTarget().from(model).toCleanMap();
   }
 }
 

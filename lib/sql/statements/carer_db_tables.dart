@@ -149,8 +149,8 @@ const treatmentsView = DBTable(treatmentsTableName, '''
     SELECT * FROM x ORDER by timestamp desc
   ''');
 
-const String concatTreatmentsTableName = 'concatTreatments';
-const concatTreatmentsView = DBTable(concatTreatmentsTableName, '''
+const String concatTreatmentsViewName = 'concatTreatments';
+const concatTreatmentsView = DBTable(concatTreatmentsViewName, '''
     CREATE VIEW concatTreatments AS
       SELECT
         COUNT(*) AS count,
@@ -224,7 +224,7 @@ const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
 
       profileName TEXT,
       profilePercent INTEGER,
-      
+
       UNIQUE(eid)
     )
   ''');
