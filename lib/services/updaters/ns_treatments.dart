@@ -1,3 +1,4 @@
+import 'package:carer/mappers/ns_to_models.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
@@ -5,7 +6,6 @@ import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
-import 'package:carer/services/updaters/ns_profile.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -40,54 +40,26 @@ class NSTreatmentsUpdater extends Updater {
 
     alog("Retrieved ${treatments.treatments.length} treatments");
 
-    List<Bolus> boluses = [];
-    for (var bolus in treatments.boluses) {
-      boluses.add(Bolus(
-        value: bolus.insulin,
-        date: bolus.date,
-        eid: bolus.id,
-      ));
-    }
+    List<Bolus> boluses = const NSBolusToBolus().map(treatments.boluses);
     int bolusUpdates = await Bolus.saveAll(boluses);
 
-    List<Carbs> carbs = [];
-    for (var carb in treatments.carbs) {
-      carbs.add(Carbs(
-        value: carb.carbs.round(),
-        date: carb.date,
-        eid: carb.id,
-      ));
-    }
+    List<Carbs> carbs = const NSCarbstoCarbs().map(treatments.carbs);
     int carbUpdates = await Carbs.saveAll(carbs);
 
-    List<TempBasal> tempBasals = [];
-    for (var tempBasal in treatments.tempBasals) {
-      tempBasals.add(TempBasal(
-        startDate: tempBasal.date,
-        duration: tempBasal.durationInMilliseconds ~/ 1000,
-        value: tempBasal.absolute,
-        eid: tempBasal.id,
-      ));
-    }
+    List<TempBasal> tempBasals = const NSTempBasalToTempBasal().map(treatments.tempBasals);
     int tempBasalUpdates = await TempBasal.upsertAll(tempBasals);
 
-    List<TempTarget> tempTargets = [];
-    for (var tempTarget in treatments.tempTargets) {
-      tempTargets.add(TempTarget(
-          eid: tempTarget.id,
-          startDate: tempTarget.date,
-          duration: tempTarget.durationInMilliseconds ~/ 1000,
-          highTarget: tempTarget.targetTop.toInt(),
-          lowTarget: tempTarget.targetBottom.toInt()));
-    }
-
+    List<TempTarget> tempTargets = const NSTempTargettoTempTarget().map(treatments.tempTargets);
     int tempTargetUpdates = await TempTarget.upsertAll(tempTargets);
 
     // get the profileswitches
     List<Profile> profileSwitches = [];
     for (var profileSwitch in treatments.profileSwitchs) {
-      profileSwitches
-          .add(fromNSProfile(profileSwitch.profile, profileSwitch.source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000));
+      NSProfileToProfileExtras extras =
+          NSProfileToProfileExtras(profileSwitch.source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000);
+      Profile profileModel = const NSProfileToProfile().from((profileSwitch.profile, extras));
+
+      profileSwitches.add(profileModel);
     }
     int profileSwitchUpdates = await Profile.saveAll(profileSwitches);
 

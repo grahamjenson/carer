@@ -1,6 +1,6 @@
+import 'package:carer/mappers/ns_to_models.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/nsclient/nsclient.dart';
-import 'package:carer/nsclient/shared.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
@@ -29,7 +29,8 @@ class NSProfileUpdater extends Updater {
 
     raw = profile.raw ?? "";
 
-    Profile profileModel = fromNSProfile(profile, "CurrentProfile", 100, 0);
+    NSProfileToProfileExtras extras = const NSProfileToProfileExtras("CurrentProfile", 100, 0);
+    Profile profileModel = const NSProfileToProfile().from((profile, extras));
 
     // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await profileModel.save();
@@ -37,23 +38,4 @@ class NSProfileUpdater extends Updater {
 
     return true;
   }
-}
-
-Profile fromNSProfile(NSProfile profile, String source, int percent, int duration) {
-  return Profile(
-    name: profile.name,
-    eid: profile.id,
-    startDate: profile.date,
-    duration: duration,
-    source: source,
-    percent: percent,
-    dia: profile.dia,
-    units: profile.units,
-    timezone: profile.timezone,
-    carbratio: profile.expandedCarbratio(),
-    sens: profile.expandedSens(),
-    basal: profile.expandedBasal(),
-    lowTarget: profile.expandedTargetLow(),
-    highTarget: profile.expandedTargetHigh(),
-  );
 }
