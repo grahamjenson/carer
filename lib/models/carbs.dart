@@ -36,10 +36,6 @@ class Carbs extends Model {
     required this.date,
   });
 
-  factory Carbs.fromMap(Map<String, Object?> map) {
-    return _q.fromMap(map);
-  }
-
   String get str {
     if (value != 0) {
       return '${toMax2dp(value)}g';

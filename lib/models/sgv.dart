@@ -47,10 +47,6 @@ class SGV extends Model {
     this.idBefore,
   });
 
-  factory SGV.fromMap(Map<String, Object?> map) {
-    return _q.fromMap(map);
-  }
-
   double sgvU(Unit unit) {
     return unit.val(value);
   }

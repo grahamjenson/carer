@@ -2,8 +2,10 @@ import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
+import 'package:carer/models/sgv.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
+import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
 
@@ -92,5 +94,14 @@ class NSProfileToProfile extends DataMapper<(NSProfile, NSProfileToProfileExtras
       lowTarget: profile.expandedTargetLow(),
       highTarget: profile.expandedTargetHigh(),
     );
+  }
+}
+
+class NSEntryToSGV extends DataMapper<NSEntry, SGV> {
+  const NSEntryToSGV();
+
+  @override
+  SGV from(NSEntry model) {
+    return SGV(value: model.sgv!, date: model.date, eid: model.id);
   }
 }

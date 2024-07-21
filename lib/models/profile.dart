@@ -63,10 +63,6 @@ class Profile extends DateRangeModel {
     required this.percent,
   });
 
-  factory Profile.fromMap(Map<String, Object?> map) {
-    return _q.fromMap(map);
-  }
-
   get isTempProfile => duration != 0;
 
   @override

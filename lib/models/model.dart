@@ -61,10 +61,6 @@ abstract class Model {
     });
   }
 
-  List<String> validate() {
-    return [];
-  }
-
   int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
   int get minsFromNow => (date.millisecondsSinceEpoch - clock.now().millisecondsSinceEpoch) ~/ 60000;
 

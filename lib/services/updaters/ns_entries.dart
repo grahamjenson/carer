@@ -1,3 +1,4 @@
+import 'package:carer/mappers/ns_to_models.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
@@ -46,18 +47,10 @@ class NSEntriesUpdater extends Updater {
     }
 
     raw = entries.raw;
-    List<SGV> sgvs = [];
-    for (var entry in entries.entries) {
-      if (entry.sgv == null) {
-        continue;
-      }
-      sgvs.add(SGV(value: entry.sgv!, date: entry.date, eid: entry.id));
-    }
-
+    List<SGV> sgvs = const NSEntryToSGV().map(entries.entries);
     var total = await SGV.saveAll(sgvs);
 
-    alog("Updated  Entries $total");
-
+    alog("Updated Entries $total");
     return true;
   }
 }

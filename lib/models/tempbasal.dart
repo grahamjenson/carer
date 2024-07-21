@@ -34,10 +34,6 @@ class TempBasal extends DateRangeModel {
     required this.value,
   });
 
-  factory TempBasal.fromMap(Map<String, dynamic> map) {
-    return _q.fromMap(map);
-  }
-
   static Future<List<TempBasal>> query({int? after, int? before, int? limit}) async {
     return _q.query(after: after, before: before, limit: limit);
   }

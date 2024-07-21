@@ -1,6 +1,14 @@
-class SQLRow {
+import 'package:carer/models/model.dart';
+
+class SQLRow<T extends Model> {
   String table;
   final Map<String, Object?> _attributes;
+
+  int get id => _attributes["id"] as int;
+  set id(int id) => _attributes["id"] = id;
+
+  String get eid => _attributes["eid"] as String;
+  set eid(String eid) => _attributes["eid"] = eid;
 
   SQLRow(this.table, this._attributes);
 

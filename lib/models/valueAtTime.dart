@@ -64,10 +64,6 @@ class ValueAtTime extends Model {
     required this.isTempProfile,
   });
 
-  factory ValueAtTime.fromMap(Map<String, dynamic> map) {
-    return _q.fromMap(map);
-  }
-
   static Signal<int> get writeSignal => _q.writeSignal;
 
   static Future<List<ValueAtTime>> query({
