@@ -84,7 +84,8 @@ class AlarmsService {
     // Audio Alarms
     ////
     aeffect(() async {
-      // TODO, for some reason on restart this doesnt work, so just keep trying to see if we need alarms seems like a good idea
+      // For some reason on restart this doesnt work, so just keep trying to see if we need alarms seems like a good idea
+      // Also needs to restart playing if reaches end of song
       var _ = TimerService().fifteenSecondSignal.value;
       if (activeAlarms.isEmpty) {
         alog("Stopping AUDIO Alarms");
