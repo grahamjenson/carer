@@ -1,5 +1,7 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/alarms_pages/diff_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/prediction_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/range_alarm_page.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +89,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   }
 
   SettingsTile rangeAlarms(BuildContext context) {
-    return SettingsTile(
+    return SettingsTile.navigation(
       title: const Text("Range"),
       enabled: !AlarmSettings().disableAlarms,
       descriptionInlineIos: true,
@@ -95,6 +97,12 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         "Out of range",
         style: description,
       ),
+      onPressed: (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RangeAlarmPage()),
+        );
+      },
       trailing: ToggleButtons(
         constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
         renderBorder: true,
@@ -112,10 +120,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
               AlarmSettings().urgentLowAlarm = !AlarmSettings().urgentLowAlarm;
               break;
             case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const RangeAlarmPage()),
-              );
+              AlarmSettings().lowAlarm = !AlarmSettings().lowAlarm;
               break;
             case 2:
               AlarmSettings().highAlarm = !AlarmSettings().highAlarm;
@@ -135,13 +140,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             text: "Low\n${AlarmSettings().lowMinutes}m",
             height: _size,
             width: _size,
-            icon: Icons.more_vert,
           ),
           ToggleButton(
             text: "High\n${AlarmSettings().highMinutes}m",
             height: _size,
             width: _size,
-            icon: Icons.more_vert,
           ),
           const ToggleButton(
             text: "Urgent High",
@@ -154,8 +157,14 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   }
 
   SettingsTile diffSettings(BuildContext context) {
-    return SettingsTile(
+    return SettingsTile.navigation(
       title: const Text("Rise/Drop"),
+      onPressed: (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DiffAlarmPage()),
+        );
+      },
       descriptionInlineIos: true,
       description: const Text(
         "Rising or dropping quickly",
@@ -182,24 +191,14 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         },
         children: [
           ToggleButton(
-              height: _size,
-              width: _size,
-              text: "Fast Drop\n${AlarmSettings().fastDropAlarmMinutes}m",
-              icon: Icons.more_vert,
-              onLongPress: () async {
-                var minutes =
-                    await alertDialogOfButtons<int>(context, "Alert Dropping for:", ["5m", "10m", "15m", "20m", "30m"], [5, 10, 15, 20, 30]);
-                AlarmSettings().fastDropAlarmMinutes = minutes;
-              }),
-          ToggleButton(
-            text: "Fast Rise\n${AlarmSettings().fastRiseAlarmMinutes}m",
-            icon: Icons.more_vert,
             height: _size,
             width: _size,
-            onLongPress: () async {
-              var minutes = await alertDialogOfButtons<int>(context, "Alert Rising for:", ["5m", "10m", "15m", "20m", "30m"], [5, 10, 15, 20, 30]);
-              AlarmSettings().fastRiseAlarmMinutes = minutes;
-            },
+            text: "Fast Drop\n${AlarmSettings().fastDropAlarmMinutes}m",
+          ),
+          ToggleButton(
+            text: "Fast Rise\n${AlarmSettings().fastRiseAlarmMinutes}m",
+            height: _size,
+            width: _size,
           ),
         ],
       ),
@@ -259,9 +258,15 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   }
 
   SettingsTile predictionAlarms(BuildContext context) {
-    return SettingsTile(
+    return SettingsTile.navigation(
       title: const Text("Prediciton alarms"),
       descriptionInlineIos: true,
+      onPressed: (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PredictionAlarmPage()),
+        );
+      },
       trailing: ToggleButtons(
           constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
           renderBorder: true,
@@ -279,15 +284,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           },
           children: [
             ToggleButton(
-                text: "Low\n${AlarmSettings().lowPredictionMinutes}m",
-                height: _size,
-                width: _size,
-                icon: Icons.more_vert,
-                onLongPress: () async {
-                  var lowMinutes =
-                      await alertDialogOfButtons<int>(context, "Alert Low for:", ["0m", "5m", "10m", "15m", "20m", "30m"], [0, 5, 10, 15, 20, 30]);
-                  AlarmSettings().lowPredictionMinutes = lowMinutes;
-                }),
+              text: "Low\n${AlarmSettings().lowPredictionMinutes}m",
+              height: _size,
+              width: _size,
+            ),
           ]),
     );
   }
