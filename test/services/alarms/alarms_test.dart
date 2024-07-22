@@ -1,6 +1,9 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/model.dart';
+import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/models/tempbasal.dart';
+import 'package:carer/models/temptarget.dart';
+import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
@@ -11,19 +14,29 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../test_utils.dart';
 
+cleanSignals() {
+  SQLToBolus().writeSignal.value = 0;
+  SQLToCarbs().writeSignal.value = 0;
+  Profile.writeSignal.value = 0;
+  SQLToSGV().writeSignal.value = 0;
+  TempBasal.writeSignal.value = 0;
+  TempTarget.writeSignal.value = 0;
+  ValueAtTime.writeSignal.value = 0;
+}
+
 void main() async {
   await sqfliteTestInit();
 
   group("Alarms", () {
     setUp(() async {
-      Model.cleanSignals();
+      cleanSignals();
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
     });
 
     tearDown(() async {
       await (await CarerDB.instance).deleteAll();
-      Model.cleanSignals();
+      cleanSignals();
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
       PredictionService().predictionsSignal.recompute();

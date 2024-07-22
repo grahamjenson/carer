@@ -22,10 +22,6 @@ class SGV extends Model {
     required super.eid,
     super.id,
   });
-
-  ////
-  // SIGNALS
-  ////
 }
 
 class CleanSGV extends Model {

@@ -1,10 +1,3 @@
-import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/bolus.dart';
-import 'package:carer/models/carbs.dart';
-import 'package:carer/models/profile.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
-import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -63,16 +56,6 @@ abstract class Model {
 
   int get minsAgo => (clock.now().millisecondsSinceEpoch - date.millisecondsSinceEpoch) ~/ 60000;
   int get minsFromNow => (date.millisecondsSinceEpoch - clock.now().millisecondsSinceEpoch) ~/ 60000;
-
-  static cleanSignals() {
-    Bolus.writeSignal.value = 0;
-    Carbs.writeSignal.value = 0;
-    Profile.writeSignal.value = 0;
-    SQLToSGV().writeSignal.value = 0;
-    TempBasal.writeSignal.value = 0;
-    TempTarget.writeSignal.value = 0;
-    ValueAtTime.writeSignal.value = 0;
-  }
 }
 
 abstract class ModelRepository<T extends Model> {

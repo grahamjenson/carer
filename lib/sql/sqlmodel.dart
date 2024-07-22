@@ -52,4 +52,10 @@ class SQLRow {
   Map<String, Object?> toMap() {
     return _attributes;
   }
+
+  // orverride ToString
+  @override
+  String toString() {
+    return _attributes.toString();
+  }
 }

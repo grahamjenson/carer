@@ -157,7 +157,8 @@ const concatTreatmentsView = DBTable(concatTreatmentsViewName, '''
         SUM(carbs) AS carbs,
         SUM(insulin) AS insulin, 
         MIN(timestamp) AS min_ts, 
-        MAX(timestamp) AS max_ts, 
+        MAX(timestamp) AS max_ts,
+        MAX(timestamp) AS timestamp,
         datetime(MIN(timestamp) / 1000, 'unixepoch') AS min_datetime, 
         datetime(MAX(timestamp) / 1000, 'unixepoch') AS max_datetime, 
         strftime('%Y-%m-%d %H ', timestamp/1000, 'unixepoch')  ||  (Floor(strftime('%M', timestamp/1000, 'unixepoch')/5) * 5) AS window 

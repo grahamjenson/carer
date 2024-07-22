@@ -119,25 +119,23 @@ class SQLToProfile extends SQLMapper<Profile> {
     List<int> lowTarget = lowTargetKeys.map((key) => row[key] as int).toList();
     List<int> highTarget = highTargetKeys.map((key) => row[key] as int).toList();
 
-    {
-      return Profile(
-        id: row["id"] as int?,
-        name: row["name"] as String,
-        eid: row["eid"] as String,
-        startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
-        dia: row["dia"] as int,
-        units: row["units"] as String,
-        timezone: row["timezone"] as String,
-        carbratio: carbratio,
-        sens: sens,
-        basal: basal,
-        lowTarget: lowTarget,
-        highTarget: highTarget,
-        duration: row["duration"] as int,
-        source: row["source"] as String,
-        percent: row["percent"] as int,
-      );
-    }
+    return Profile(
+      id: row["id"] as int?,
+      name: row["name"] as String,
+      eid: row["eid"] as String,
+      startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
+      dia: row["dia"] as int,
+      units: row["units"] as String,
+      timezone: row["timezone"] as String,
+      carbratio: carbratio,
+      sens: sens,
+      basal: basal,
+      lowTarget: lowTarget,
+      highTarget: highTarget,
+      duration: row["duration"] as int,
+      source: row["source"] as String,
+      percent: row["percent"] as int,
+    );
   }
 
   @override
@@ -365,16 +363,17 @@ class SQLToTreatment extends SQLReadMapper<Treatment> {
   SQLToTreatment._();
 
   @override
-  String get tableName => treatmentsViewName;
+  String get tableName => concatTreatmentsViewName;
 
   @override
   Treatment aToB(SQLRow row) {
     List<String> errors = [];
 
-    errors.addAll(row.validateRequiredAttributes(["count", "max_ts"]));
+    errors.addAll(row.validateRequiredAttributes(["count", "max_ts", "timestamp"]));
     errors.addAll(row.validateTypes([
       ("count", int),
       ("max_ts", int),
+      ("timestamp", int),
       ("carbs", int),
       ("insulin", double),
     ]));

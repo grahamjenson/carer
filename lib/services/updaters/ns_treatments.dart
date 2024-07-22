@@ -1,4 +1,5 @@
 import 'package:carer/mappers/ns_to_models.dart';
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
@@ -41,10 +42,10 @@ class NSTreatmentsUpdater extends Updater {
     alog("Retrieved ${treatments.treatments.length} treatments");
 
     List<Bolus> boluses = const NSBolusToBolus().mapAToB(treatments.boluses);
-    int bolusUpdates = await Bolus.saveAll(boluses);
+    int bolusUpdates = await SQLToBolus().saveAll(boluses);
 
     List<Carbs> carbs = const NSCarbstoCarbs().mapAToB(treatments.carbs);
-    int carbUpdates = await Carbs.saveAll(carbs);
+    int carbUpdates = await SQLToCarbs().saveAll(carbs);
 
     List<TempBasal> tempBasals = const NSTempBasalToTempBasal().mapAToB(treatments.tempBasals);
     int tempBasalUpdates = await TempBasal.upsertAll(tempBasals);
