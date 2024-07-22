@@ -3,12 +3,17 @@ import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum _AANames {
+  // Predictions
   smartSnooze,
 
+  // AUDIO SETTINGS
   volumeOveride,
   volumeOverrideValue,
   volumeProgressionSeconds,
   alarmAsset,
+
+  // Other ALARM
+  brightnessAdjust,
 }
 
 class AlarmAlertSettings {
@@ -17,6 +22,7 @@ class AlarmAlertSettings {
 
   final Map<_AANames, Signal> _signals = {
     _AANames.smartSnooze: Signal<bool>(false, debugLabel: 'smartSnooze'),
+    _AANames.brightnessAdjust: Signal<bool>(false, debugLabel: 'brightnessAdjust'),
     _AANames.volumeOveride: Signal<bool>(false, debugLabel: 'volumeOveride'),
     _AANames.volumeOverrideValue: Signal<int>(10, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: Signal<int>(10, debugLabel: 'volumeProgressionSeconds'),
@@ -41,6 +47,9 @@ class AlarmAlertSettings {
 
   AlarmSounds get alarmAsset => _signals[_AANames.alarmAsset]!.value as AlarmSounds;
   set alarmAsset(AlarmSounds value) => _signals[_AANames.alarmAsset]!.value = value;
+
+  bool get brightnessAdjust => _signals[_AANames.brightnessAdjust]!.value as bool;
+  set brightnessAdjust(bool value) => _signals[_AANames.brightnessAdjust]!.value = value;
 
   allValues() {
     for (var signal in _signals.values) {
@@ -90,6 +99,8 @@ class AlarmAlertSettings {
     var prefsAlarmAsset = prefs.getString(_AANames.alarmAsset.name, defaultValue: AlarmSounds.nightguard.name)!;
     alarmAsset = AlarmSounds.values.firstWhere((e) => e.name == prefsAlarmAsset, orElse: () => AlarmSounds.nightguard);
 
+    brightnessAdjust = prefs.getBool(_AANames.brightnessAdjust.name, defaultValue: false)!;
+
     aeffect(() => prefs.setBool(_AANames.smartSnooze.name, smartSnooze));
 
     aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride));
@@ -101,6 +112,10 @@ class AlarmAlertSettings {
     aeffect(() {
       var value = (alarmAsset).name;
       prefs.setString(_AANames.alarmAsset.name, value);
+    });
+
+    aeffect(() {
+      prefs.setBool(_AANames.brightnessAdjust.name, brightnessAdjust);
     });
   }
 }

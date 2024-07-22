@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:carer/services/alarms/alarms.dart';
+import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
@@ -50,10 +52,74 @@ class AlarmsService {
       stopTestAlarm();
     }, debugLabel: "StopTestAlarmWhenSettingsChange");
 
-    aeffect(() {
+    aeffect(() async {
       alog("checking alarms");
-      checkAlarms();
+      var notSleeping = _sleepUntilSignal.value == null;
+
+      var newTriggeredAlarms = <Alarm>{};
+      var newActiveAlarms = <Alarm>{};
+      var disabledAllAlarms = AlarmSettings().disableAlarms;
+      var smartSnoozeOn = AlarmAlertSettings().smartSnooze;
+      for (var alarm in allAlarms) {
+        var (triggered, active, smartSnooze) = alarm.alarmStatus();
+
+        // Build the lists
+        if (triggered) {
+          newTriggeredAlarms.add(alarm);
+        }
+
+        // If Sleeping do not add
+        if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze)) {
+          newActiveAlarms.add(alarm);
+        }
+      }
+
+      alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
+      // Set alarms that have been triggered
+      triggeredAlarms = newTriggeredAlarms;
+      activeAlarms = newActiveAlarms;
     }, debugLabel: "CheckAlarms");
+
+    ////
+    // Audio Alarms
+    ////
+    aeffect(() async {
+      // TODO, for some reason on restart this doesnt work, so just keep trying to see if we need alarms seems like a good idea
+      var _ = TimerService().fifteenSecondSignal.value;
+      if (activeAlarms.isEmpty) {
+        alog("Stopping AUDIO Alarms");
+        var (playing, err) = await go(player.stopAlarm());
+        if (playing == null || err != null) {
+          alog("Error stopping alarm: $err");
+        }
+      } else {
+        alog("Playing AUDIO Alarms");
+        var (playing, err) = await go(player.playAlarm());
+        if (playing == null || err != null) {
+          alog("Error playing alarm: $err");
+        }
+      }
+    }, debugLabel: "PlayAUDIOAlarm");
+
+    ////
+    // Audio Alarms
+    ////
+    var brightness = BrightnessAlarm();
+    aeffect(() async {
+      if (!AlarmAlertSettings().brightnessAdjust) {
+        alog("Stopping Brightness Alarms Turned off");
+        brightness.stop();
+        return;
+      }
+
+      if (activeAlarms.isEmpty) {
+        alog("Stopping Brightness Alarms");
+        brightness.stop();
+      } else {
+        alog("Starting Brightness Alarms");
+        brightness.start();
+      }
+    }, debugLabel: "BrightnessAlarms");
   }
 
   final Signal<Set<Alarm>> _triggeredAlarmsSignal = Signal(<Alarm>{}, debugLabel: "triggeredAlarms");
@@ -75,10 +141,6 @@ class AlarmsService {
   }
 
   // Sleep
-
-  bool get notSleeping {
-    return _sleepUntilSignal.value == null;
-  }
 
   Timer? sleepTimer;
   Duration? get sleepDuration {
@@ -103,44 +165,6 @@ class AlarmsService {
     });
 
     _sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
-  }
-
-  void checkAlarms() async {
-    var newTriggeredAlarms = <Alarm>{};
-    var newActiveAlarms = <Alarm>{};
-    var disabledAllAlarms = AlarmSettings().disableAlarms;
-    var smartSnoozeOn = AlarmAlertSettings().smartSnooze;
-    for (var alarm in allAlarms) {
-      var (triggered, active, smartSnooze) = alarm.alarmStatus();
-
-      // Build the lists
-      if (triggered) {
-        newTriggeredAlarms.add(alarm);
-      }
-
-      // If Sleeping do not add
-      if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze)) {
-        newActiveAlarms.add(alarm);
-      }
-    }
-
-    alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
-    // Set alarms that have been triggered
-    triggeredAlarms = newTriggeredAlarms;
-    activeAlarms = newActiveAlarms;
-
-    // Set alarms
-    if (activeAlarms.isEmpty) {
-      var (playing, err) = await go(player.stopAlarm());
-      if (playing == null || err != null) {
-        alog("Error stopping alarm: $err");
-      }
-    } else {
-      var (playing, err) = await go(player.playAlarm());
-      if (playing == null || err != null) {
-        alog("Error playing alarm: $err");
-      }
-    }
   }
 
   Future<void> stopTestAlarm() async {

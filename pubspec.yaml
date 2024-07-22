@@ -63,6 +63,8 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   archive: ^3.6.1
   path_provider: ^2.1.3
+  screen_brightness: ^1.0.1
+  torch_light: ^1.1.0
 
   
 

@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
 class AlarmPlayer {
@@ -33,13 +34,20 @@ class AlarmPlayer {
   }
 
   // Return IF stopped
-  Future<bool> stopAudioPlayer(AudioPlayer player) async {
+  // Horrific fact that play takes a few seconds, so a play then stop, will result in a play
+  Future<bool> stopAudioPlayer(AudioPlayer player, {int tries = 5}) async {
     if (player.state == PlayerState.playing) {
       await player.stop();
       resetOriginalVolume();
+      alog("successfully stopped player after $tries");
       return true;
     }
-    return true;
+    if (tries == 0) {
+      alog("unsuccessfully stopped player");
+      return false;
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    return stopAudioPlayer(player, tries: tries - 1);
   }
 
   Future<void> playAudioPlayer(AudioPlayer player) async {

@@ -1,7 +1,6 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/range_alarm_page.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -115,14 +114,11 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LowAlarmPage()),
+                MaterialPageRoute(builder: (context) => const RangeAlarmPage()),
               );
               break;
             case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HighAlarmPage()),
-              );
+              AlarmSettings().highAlarm = !AlarmSettings().highAlarm;
               break;
             case 3:
               AlarmSettings().urgentHighAlarm = !AlarmSettings().urgentHighAlarm;

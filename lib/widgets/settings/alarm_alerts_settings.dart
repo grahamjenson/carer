@@ -24,6 +24,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
 
       var tiles = [
         smartSnooze(),
+        brightnessAdjust(),
         volumeOverride(context),
         volumeSettings(context, width),
         progressiveVolume(context),
@@ -36,6 +37,21 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
         tiles: tiles,
       );
     });
+  }
+
+  SettingsTile brightnessAdjust() {
+    return SettingsTile.switchTile(
+      title: const Text("Brightness Adjust"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Adjust Screen Brightness on Alarm",
+        style: description,
+      ),
+      initialValue: AlarmAlertSettings().brightnessAdjust,
+      onToggle: (bool value) {
+        AlarmAlertSettings().brightnessAdjust = value;
+      },
+    );
   }
 
   SettingsTile smartSnooze() {
