@@ -1,3 +1,4 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/sql/carer_db.dart';
@@ -50,7 +51,7 @@ void main() async {
         lowTarget: List<int>.filled(24, 1),
         highTarget: List<int>.filled(24, 1),
       );
-      expect(await p.save(), true);
+      expect(await SQLToProfile().save(p), true);
 
       var p1 = await Profile.profile();
       expect(p1, isNotNull);

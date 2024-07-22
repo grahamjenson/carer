@@ -8,9 +8,6 @@ import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
 class SGV extends Model {
-  @override
-  ModelRepository get repository => throw UnimplementedError();
-
   final int value;
 
   @override
@@ -25,9 +22,6 @@ class SGV extends Model {
 }
 
 class CleanSGV extends Model {
-  @override
-  ModelRepository get repository => throw UnimplementedError();
-
   final int value;
 
   @override

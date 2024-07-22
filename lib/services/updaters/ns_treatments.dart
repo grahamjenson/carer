@@ -48,10 +48,10 @@ class NSTreatmentsUpdater extends Updater {
     int carbUpdates = await SQLToCarbs().saveAll(carbs);
 
     List<TempBasal> tempBasals = const NSTempBasalToTempBasal().mapAToB(treatments.tempBasals);
-    int tempBasalUpdates = await TempBasal.upsertAll(tempBasals);
+    int tempBasalUpdates = await SQLToTempBasal().upsertAll(tempBasals);
 
     List<TempTarget> tempTargets = const NSTempTargettoTempTarget().mapAToB(treatments.tempTargets);
-    int tempTargetUpdates = await TempTarget.upsertAll(tempTargets);
+    int tempTargetUpdates = await SQLToTempTarget().upsertAll(tempTargets);
 
     // get the profileswitches
     List<Profile> profileSwitches = [];
@@ -62,7 +62,7 @@ class NSTreatmentsUpdater extends Updater {
 
       profileSwitches.add(profileModel);
     }
-    int profileSwitchUpdates = await Profile.saveAll(profileSwitches);
+    int profileSwitchUpdates = await SQLToProfile().saveAll(profileSwitches);
 
     // Get the profile, upsert the profile, update current percentage of profile in the KV store
 

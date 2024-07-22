@@ -70,6 +70,8 @@ const tempbasalTable = DBTable(tempbasalTableName, '''
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
       start INTEGER,
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
+      
       duration INTEGER,
       end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
@@ -85,6 +87,7 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
       start INTEGER,
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       duration INTEGER,
       end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
@@ -108,6 +111,7 @@ const profileTable = DBTable(profileTableName, '''
       
       -- Date stuff
       start INTEGER,
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       duration INTEGER,
 
       -- If duration is 0, it means that it is actually indefinite
@@ -122,7 +126,7 @@ const profileTable = DBTable(profileTableName, '''
       end INTEGER GENERATED ALWAYS AS (start + (actual_duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
-
+       
       
       source TEXT,
       percent INTEGER,

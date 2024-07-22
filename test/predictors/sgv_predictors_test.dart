@@ -1,3 +1,4 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/sql/carer_db.dart';
@@ -22,11 +23,11 @@ void main() async {
   group('Linear Prediction', () {
     setUp(() async {
       // Will make a linear drop
-      expect(await SGV(value: 140, date: now, eid: "1").save(), true);
-      expect(await SGV(value: 150, date: min5ago, eid: "2").save(), true);
-      expect(await SGV(value: 160, date: min10ago, eid: "3").save(), true);
-      expect(await SGV(value: 170, date: min15ago, eid: "4").save(), true);
-      expect(await SGV(value: 180, date: min20ago, eid: "5").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 140, date: now, eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 150, date: min5ago, eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 160, date: min10ago, eid: "3")), true);
+      expect(await SQLToSGV().save(SGV(value: 170, date: min15ago, eid: "4")), true);
+      expect(await SQLToSGV().save(SGV(value: 180, date: min20ago, eid: "5")), true);
     });
 
     tearDown(() async {

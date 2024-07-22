@@ -1,4 +1,5 @@
 import 'package:carer/mappers/ns_to_models.dart';
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/profile.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
@@ -33,7 +34,7 @@ class NSProfileUpdater extends Updater {
     Profile profileModel = const NSProfileToProfile().aToB((profile, extras));
 
     // TODO: Should this be upsert, profiles immutable in nightscout?
-    var saved = await profileModel.save();
+    var saved = await SQLToProfile().save(profileModel);
     alog("Updated Profile $saved");
 
     return true;

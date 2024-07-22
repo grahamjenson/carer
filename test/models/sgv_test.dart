@@ -23,8 +23,8 @@ void main() async {
     });
 
     test('lastMins', () async {
-      expect(await SGV(value: 2, date: now.subtract(min5), eid: "1").save(), true);
-      expect(await SGV(value: 1, date: now, eid: "2").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
       expect(await CleanSGV.count(), 2);
 
       await withClock(Clock.fixed(now), () async {
@@ -40,7 +40,7 @@ void main() async {
       expect(sgv, null);
       expect(await CleanSGV.count(), 0);
 
-      expect(await SGV(value: 2, date: now.subtract(min5), eid: "1").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
       expect(await CleanSGV.count(), 1);
       sgv = CleanSGV.lastSGV().value;
       expect(sgv!.value, 2);
@@ -48,7 +48,7 @@ void main() async {
 
       // Add more recent number
 
-      expect(await SGV(value: 1, date: now, eid: "2").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
       expect(await CleanSGV.count(), 2);
       sgv = CleanSGV.lastSGV().value;
       expect(sgv!.value, 1);
@@ -56,9 +56,9 @@ void main() async {
     });
 
     test("percents", () async {
-      expect(await SGV(value: 100, date: now.subtract(hour48), eid: "1").save(), true);
-      expect(await SGV(value: 100, date: now.subtract(min5 + min5), eid: "2").save(), true);
-      expect(await SGV(value: 100, date: now.subtract(min5), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(hour48), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5 + min5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5), eid: "3")), true);
 
       await withClock(Clock.fixed(now), () async {
         var percent = await CleanSGV.todaysPercentage.future;
@@ -69,8 +69,8 @@ void main() async {
     test('orderOFSVGs', () async {
       // create SGVs
       var ret = await Future.wait([
-        SQLToSGV().aToB(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})).save(),
-        SQLToSGV().aToB(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})).save(),
+        SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})),
+        SQLToSGV().saveRow(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})),
       ]);
       expect(ret.where((b) => b).length, 2);
 
@@ -81,8 +81,8 @@ void main() async {
 
       // fetch SGVs
       ret = await Future.wait([
-        SQLToSGV().aToB(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})).save(),
-        SQLToSGV().aToB(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})).save(),
+        SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})),
+        SQLToSGV().saveRow(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})),
       ]);
 
       expect(ret.where((b) => b).length, 0); // Nothing was changed
@@ -92,8 +92,8 @@ void main() async {
       expect(sgvs.first.value, 2);
 
       ret = await Future.wait([
-        SQLToSGV().aToB(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})).save(),
-        SQLToSGV().aToB(SQLRow({'value': 1, 'timestamp': minTime(5), "eid": "3"})).save(), // new at same date
+        SQLToSGV().saveRow(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})),
+        SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(5), "eid": "3"})), // new at same date
       ]);
 
       expect(ret.where((b) => b).length, 1); // only one new value
@@ -125,10 +125,10 @@ void main() async {
 
     test("countSGVs", () async {
       var ret = await Future.wait([
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})).save(),
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})).save(),
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(10), 'value': 2, "eid": "3"})).save(),
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})).save(),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(10), 'value': 2, "eid": "3"})),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})),
       ]);
       expect(ret.where((b) => b).length, 4);
 
@@ -144,10 +144,10 @@ void main() async {
     test("sgvs", () async {
       // create SGVs
       var ret = await Future.wait([
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})).save(),
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})).save(),
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(10), 'value': 2, "eid": "3"})).save(),
-        SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})).save(),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(10), 'value': 2, "eid": "3"})),
+        SQLToSGV().saveRow(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})),
       ]);
       expect(ret.where((b) => b).length, 4);
 
@@ -181,11 +181,11 @@ void main() async {
     group("clean sgvs", () {
       test("close sgvs", () async {
         var ret = await Future.wait([
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})).save(),
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})).save(),
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(10), 'value': 5, "eid": "3"})).save(),
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})).save(),
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(16), 'value': 2, "eid": "5"})).save(),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(10), 'value': 5, "eid": "3"})),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(16), 'value': 2, "eid": "5"})),
         ]);
         expect(ret.where((b) => b).length, 5);
 
@@ -208,9 +208,9 @@ void main() async {
 
       test("close sgvs", () async {
         var ret = await Future.wait([
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 1, "eid": "1"})).save(),
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 5, "eid": "2"})).save(),
-          SQLToSGV().aToB(SQLRow({'timestamp': minTime(30), 'value': 20, "eid": "3"})).save(),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(0), 'value': 1, "eid": "1"})),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(15), 'value': 5, "eid": "2"})),
+          SQLToSGV().saveRow(SQLRow({'timestamp': minTime(30), 'value': 20, "eid": "3"})),
         ]);
         expect(ret.where((b) => b).length, 3);
 

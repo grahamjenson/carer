@@ -9,9 +9,6 @@ import 'package:signals/signals_flutter.dart';
 
 class Treatment extends Model {
   @override
-  ModelRepository get repository => throw UnimplementedError();
-
-  @override
   DateTime date;
   double? insulin;
   int? carbs;

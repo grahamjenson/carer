@@ -1,33 +1,12 @@
 import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
-import 'package:carer/sql/sqlmodel.dart';
-import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
-class ProfileRepository extends ModelRepository<Profile> {
-  ProfileRepository() : super(profileTableName, timestampField: "start");
-
-  @override
-  Profile fromMap(Map<String, Object?> map) {
-    return SQLToProfile().aToB(SQLRow(map));
-  }
-
-  @override
-  Map<String, Object> toSQLMap(Profile model) {
-    return SQLToProfile().bToA(model).toCleanMap();
-  }
-}
-
 class Profile extends DateRangeModel {
-  static final ProfileRepository _q = ProfileRepository();
-
-  @override
-  ModelRepository get repository => _q;
-
   final int dia;
   final String name;
   final String units;
@@ -75,29 +54,25 @@ class Profile extends DateRangeModel {
     }
   }
 
-  static Future<int> saveAll(List<Profile> models) => _q.saveAll(models);
-
   static Future<Profile?> atTime(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
-    return (await _q.query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
+    return (await SQLToProfile().query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
   }
 
   static Future<List<Profile>> after(DateTime date) async {
-    return _q.query(conditions: {
+    return SQLToProfile().query(conditions: {
       "end >= ?": date.millisecondsSinceEpoch,
     });
   }
 
-  static Signal<int> get writeSignal => _q.writeSignal;
-
   static Future<Profile?> profile() async {
-    return _q.query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
+    return SQLToProfile().query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
   }
 
   static FutureSignal<Profile?> currentProfile = acomputedAsync(() async {
     alog("updating currentProfile");
     return await atTime(clock.now());
-  }, null, debugLabel: 'currentProfile', dependencies: [writeSignal, TimerService().fifteenSecondSignal]);
+  }, null, debugLabel: 'currentProfile', dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal]);
 }
 
 const crKeys = [

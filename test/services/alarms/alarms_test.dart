@@ -1,9 +1,5 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/profile.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
-import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
@@ -17,11 +13,11 @@ import '../../test_utils.dart';
 cleanSignals() {
   SQLToBolus().writeSignal.value = 0;
   SQLToCarbs().writeSignal.value = 0;
-  Profile.writeSignal.value = 0;
+  SQLToProfile().writeSignal.value = 0;
   SQLToSGV().writeSignal.value = 0;
-  TempBasal.writeSignal.value = 0;
-  TempTarget.writeSignal.value = 0;
-  ValueAtTime.writeSignal.value = 0;
+  SQLToTempBasal().writeSignal.value = 0;
+  SQLToTempTarget().writeSignal.value = 0;
+  SQLToValueAtTime().writeSignal.value = 0;
 }
 
 void main() async {
@@ -83,9 +79,9 @@ void main() async {
       AlarmSettings().lowMinutes = 10;
       TargetSettings().lowTarget = 72;
 
-      expect(await SGV(value: 70, date: clock.now(), eid: "1").save(), true);
-      expect(await SGV(value: 60, date: clock.minutesAgo(5), eid: "2").save(), true);
-      expect(await SGV(value: 50, date: clock.minutesAgo(10), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 70, date: clock.now(), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 60, date: clock.minutesAgo(5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 50, date: clock.minutesAgo(10), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
@@ -107,9 +103,9 @@ void main() async {
       AlarmSettings().urgentHighAlarm = true;
       TargetSettings().highUrgent = 180;
 
-      expect(await SGV(value: 185, date: clock.now(), eid: "1").save(), true);
-      expect(await SGV(value: 200, date: clock.minutesAgo(5), eid: "2").save(), true);
-      expect(await SGV(value: 220, date: clock.minutesAgo(10), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 185, date: clock.now(), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 200, date: clock.minutesAgo(5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 220, date: clock.minutesAgo(10), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
@@ -131,9 +127,9 @@ void main() async {
       AlarmSettings().urgentLowAlarm = true;
       TargetSettings().lowUrgent = 72;
 
-      expect(await SGV(value: 70, date: clock.now(), eid: "1").save(), true);
-      expect(await SGV(value: 60, date: clock.minutesAgo(5), eid: "2").save(), true);
-      expect(await SGV(value: 50, date: clock.minutesAgo(10), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 70, date: clock.now(), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 60, date: clock.minutesAgo(5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 50, date: clock.minutesAgo(10), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
@@ -156,9 +152,9 @@ void main() async {
       AlarmSettings().fastRiseAlarmMinutes = 10;
       TargetSettings().fastRiseDelta = 10;
 
-      expect(await SGV(value: 192, date: clock.now(), eid: "1").save(), true);
-      expect(await SGV(value: 181, date: clock.minutesAgo(5), eid: "2").save(), true);
-      expect(await SGV(value: 170, date: clock.minutesAgo(10), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 192, date: clock.now(), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 181, date: clock.minutesAgo(5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 170, date: clock.minutesAgo(10), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
@@ -181,9 +177,9 @@ void main() async {
       AlarmSettings().fastDropAlarmMinutes = 10;
       TargetSettings().fastDropDelta = -10;
 
-      expect(await SGV(value: 110, date: clock.now(), eid: "1").save(), true);
-      expect(await SGV(value: 130, date: clock.minutesAgo(5), eid: "2").save(), true);
-      expect(await SGV(value: 150, date: clock.minutesAgo(10), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 110, date: clock.now(), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 130, date: clock.minutesAgo(5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 150, date: clock.minutesAgo(10), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;
@@ -204,9 +200,9 @@ void main() async {
 
       AlarmSettings().noDataAlarmMinutes = 20;
 
-      expect(await SGV(value: 187, date: clock.minutesAgo(30), eid: "1").save(), true);
-      expect(await SGV(value: 200, date: clock.minutesAgo(35), eid: "2").save(), true);
-      expect(await SGV(value: 220, date: clock.minutesAgo(40), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 187, date: clock.minutesAgo(30), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 200, date: clock.minutesAgo(35), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 220, date: clock.minutesAgo(40), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
 
@@ -228,9 +224,9 @@ void main() async {
       AlarmSettings().lowMinutes = 10;
       TargetSettings().lowTarget = 72;
 
-      expect(await SGV(value: 80, date: clock.now(), eid: "1").save(), true);
-      expect(await SGV(value: 100, date: clock.minutesAgo(5), eid: "2").save(), true);
-      expect(await SGV(value: 120, date: clock.minutesAgo(10), eid: "3").save(), true);
+      expect(await SQLToSGV().save(SGV(value: 80, date: clock.now(), eid: "1")), true);
+      expect(await SQLToSGV().save(SGV(value: 100, date: clock.minutesAgo(5), eid: "2")), true);
+      expect(await SQLToSGV().save(SGV(value: 120, date: clock.minutesAgo(10), eid: "3")), true);
 
       await CleanSGV.lastSGV.future;
       await CleanSGV.last3Hours.future;

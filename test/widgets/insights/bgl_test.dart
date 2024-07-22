@@ -1,3 +1,4 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
@@ -20,7 +21,7 @@ void main() async {
     testWidgets('BGLWidget displays correct data', (WidgetTester tester) async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame
-        expect(await SGV(value: 140, date: clock.now(), eid: "1").save(), true);
+        expect(await SQLToSGV().save(SGV(value: 140, date: clock.now(), eid: "1")), true);
         await CleanSGV.lastSGV.future;
         expect(CleanSGV.lastSGV().value!.value, 140);
 

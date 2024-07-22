@@ -96,6 +96,10 @@ abstract class SQLReadMapper<T extends Model> extends DataMapper<SQLRow, T> {
 abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
   final Signal<int> writeSignal = Signal(0, debugLabel: "${T}Write");
 
+  Future<bool> saveRow(SQLRow row) {
+    return save(aToB(row));
+  }
+
   Future<bool> save(T model, {bool withSignal = true}) async {
     var cdb = await CarerDB.instance;
     var tb = tableName;
@@ -201,8 +205,9 @@ abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
     }
 
     var oldModel = oldModels.first;
+
     // If current model and old model equal do nothing
-    if (model.equalsSQLMap(oldModel)) {
+    if (bToA(model).equals(oldModel)) {
       return false;
     }
 

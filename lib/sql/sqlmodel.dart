@@ -53,6 +53,12 @@ class SQLRow {
     return _attributes;
   }
 
+  bool equals(Map<String, Object?> map) {
+    return _attributes.entries.every((e) {
+      return map[e.key] == e.value;
+    });
+  }
+
   // orverride ToString
   @override
   String toString() {

@@ -4,34 +4,13 @@ import 'package:carer/models/profile.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/services/timer_service.dart';
-import 'package:carer/sql/sqlmodel.dart';
-import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
 
-class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
-  ValueAtTimeRepository() : super(valuesAtTimeTableName);
-
-  @override
-  ValueAtTime fromMap(Map<String, Object?> map) {
-    return SQLToValueAtTime().aToB(SQLRow(map));
-  }
-
-  @override
-  Map<String, Object> toSQLMap(ValueAtTime model) {
-    return SQLToValueAtTime().bToA(model).toCleanMap();
-  }
-}
-
 class ValueAtTime extends Model {
-  static final ValueAtTimeRepository _q = ValueAtTimeRepository();
-
-  @override
-  ModelRepository get repository => _q;
-
   @override
   final DateTime date;
 
@@ -64,25 +43,19 @@ class ValueAtTime extends Model {
     required this.isTempProfile,
   });
 
-  static Signal<int> get writeSignal => _q.writeSignal;
-
   static Future<List<ValueAtTime>> query({
     int? after,
     int? before,
     Map<String, Object>? conditions,
     int? limit,
   }) {
-    return _q.query(before: before, after: after, limit: limit, conditions: conditions);
+    return SQLToValueAtTime().query(before: before, after: after, limit: limit, conditions: conditions);
   }
-
-  static Future<List<ValueAtTime>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
-  static Future<int> saveAll(List<ValueAtTime> models) => _q.saveAll(models);
-  static Future<int> upsertAll(List<ValueAtTime> models) => _q.upsertAll(models);
 
   static FutureSignal<List<ValueAtTime>> lastSixHours = acomputedAsync(() async {
     alog("updating ValueAtTime lastSixHours");
     var _ = updateValues.value; // Update every write to this table
-    return await ValueAtTime.lastMins(60 * 6);
+    return await SQLToValueAtTime().lastMins(60 * 6);
   }, [], debugLabel: 'valueAtTimeLastSixHours');
 
   static FutureSignal<int> updateValues = acomputedAsync(() async {
@@ -102,16 +75,16 @@ class ValueAtTime extends Model {
       var d = now.subtract(Duration(minutes: i));
       vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
     }
-    var ret = ValueAtTime.upsertAll(vats);
+    var ret = SQLToValueAtTime().upsertAll(vats);
 
     alog("updated $ret ValueAtTime entries");
 
     return ret;
   }, 0, debugLabel: 'updateValueAtTime', dependencies: [
     TimerService().minuteSignal,
-    Profile.writeSignal,
-    TempBasal.writeSignal,
-    TempTarget.writeSignal,
+    SQLToProfile().writeSignal,
+    SQLToTempBasal().writeSignal,
+    SQLToTempTarget().writeSignal,
   ]);
 
   static ValueAtTime createValueAtTime(List<Profile> profiles, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {

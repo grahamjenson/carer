@@ -1,3 +1,4 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +28,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await tt1.upsert(), true);
+      expect(await SQLToTempTarget().upsert(tt1), true);
 
       var ttl1 = await TempTarget.query();
       expect(ttl1.length, 1);
@@ -46,7 +47,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await tt2.upsert(), true);
+      expect(await SQLToTempTarget().upsert(tt2), true);
 
       var ttl2 = await TempTarget.query();
       expect(ttl2.length, 1);
@@ -63,7 +64,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await tt3.upsert(), false);
+      expect(await SQLToTempTarget().upsert(tt3), false);
 
       var tt4 = TempTarget(
         startDate: now.add(min5),
@@ -74,7 +75,7 @@ void main() async {
         eid: "1",
       );
 
-      expect(await tt4.upsert(), true);
+      expect(await SQLToTempTarget().upsert(tt4), true);
 
       var ttl4 = await TempTarget.query();
       expect(ttl4.length, 1);
@@ -93,7 +94,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await tt1.upsert(), true);
+      expect(await SQLToTempTarget().upsert(tt1), true);
 
       var ttl1 = await TempTarget.query();
       expect(ttl1.length, 1);
@@ -109,7 +110,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await tt4.upsert(), true);
+      expect(await SQLToTempTarget().upsert(tt4), true);
 
       var ttl2 = await TempTarget.query();
       expect(ttl2.length, 1);
