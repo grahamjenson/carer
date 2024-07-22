@@ -11,7 +11,7 @@ class TimeAgoReading extends StatelessWidget {
   Widget build(BuildContext context) {
     return AWatch((context) {
       var _ = TimerService().secondSignal.value;
-      var sgv = SGV.lastSGV().value;
+      var sgv = CleanSGV.lastSGV().value;
       if (sgv == null) {
         return const SizedBox.shrink();
       }

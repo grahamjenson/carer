@@ -43,7 +43,7 @@ class Stats extends StatelessWidget {
       var cobNow = StateData().cob();
       var cageNow = StateData().cage();
       var powerNow = StateData().battery();
-      var sgvs = SGV.last3Hours().value!;
+      var sgvs = CleanSGV.last3Hours().value!;
       var exp2preds = PredictionService().predictions;
 
       if (sgvs.isNotEmpty) {
@@ -141,7 +141,7 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow predictions(String name, List<SGV> preds, Unit unit) {
+  DataRow predictions(String name, List<CleanSGV> preds, Unit unit) {
     return DataRow(
       cells: [
         DataCell(Text(name, style: heading)),
@@ -284,7 +284,7 @@ class Stats extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  DataRow fifteenMinDiff(Unit unit, List<SGV> bigsgvs) {
+  DataRow fifteenMinDiff(Unit unit, List<CleanSGV> bigsgvs) {
     if (bigsgvs.length < 3) {
       return const DataRow(
         cells: [
@@ -308,7 +308,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow todaysInRange() {
-    var percent = SGV.todaysPercentage().value;
+    var percent = CleanSGV.todaysPercentage().value;
     if (percent == null || percent.isNaN || percent.isInfinite) {
       percent = 0.0;
     }
@@ -323,7 +323,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow yesterdayInRange() {
-    var percent = SGV.yesterdaysPercentage().value;
+    var percent = CleanSGV.yesterdaysPercentage().value;
     if (percent == null || percent.isNaN || percent.isInfinite) {
       percent = 0.0;
     }

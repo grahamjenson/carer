@@ -15,7 +15,7 @@ class TimeGrid extends StatelessWidget {
       var _ = TimerService().secondSignal.value;
 
       List<int> decaSeconds = List.filled(30, 0);
-      var sgv = SGV.lastSGV().value;
+      var sgv = CleanSGV.lastSGV().value;
       if (sgv == null) {
         return const SizedBox.shrink();
       }

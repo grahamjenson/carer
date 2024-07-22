@@ -13,9 +13,16 @@ import 'package:carer/sql/statements/carer_db_tables.dart';
 ////
 // Bolus
 ////
-class BolusToSQLRow extends DataMapper<SQLRow, Bolus> {
+class SQLToBolus extends SQLMapper<Bolus> {
+  static final SQLToBolus _singleton = SQLToBolus._();
+  factory SQLToBolus() => _singleton;
+  SQLToBolus._();
+
   @override
-  Bolus from(SQLRow row) {
+  String get tableName => bolusTableName;
+
+  @override
+  Bolus aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid"]));
@@ -36,12 +43,10 @@ class BolusToSQLRow extends DataMapper<SQLRow, Bolus> {
       date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
     );
   }
-}
 
-class SQLRowToBolus extends DataMapper<Bolus, SQLRow> {
   @override
-  SQLRow from(Bolus model) {
-    return SQLRow(bolusTableName, {
+  SQLRow bToA(Bolus model) {
+    return SQLRow({
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
       "eid": model.eid!,
@@ -53,9 +58,16 @@ class SQLRowToBolus extends DataMapper<Bolus, SQLRow> {
 // Carbs
 ////
 
-class CarbsToSQLRow extends DataMapper<SQLRow, Carbs> {
+class SQLToCarbs extends SQLMapper<Carbs> {
+  static final SQLToCarbs _singleton = SQLToCarbs._();
+  factory SQLToCarbs() => _singleton;
+  SQLToCarbs._();
+
   @override
-  Carbs from(SQLRow row) {
+  String get tableName => carbsTableName;
+
+  @override
+  Carbs aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid"]));
@@ -76,12 +88,10 @@ class CarbsToSQLRow extends DataMapper<SQLRow, Carbs> {
       date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
     );
   }
-}
 
-class SQLRowToCarbs extends DataMapper<Carbs, SQLRow> {
   @override
-  SQLRow from(Carbs model) {
-    return SQLRow(carbsTableName, {
+  SQLRow bToA(Carbs model) {
+    return SQLRow({
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
       "eid": model.eid!,
@@ -93,9 +103,16 @@ class SQLRowToCarbs extends DataMapper<Carbs, SQLRow> {
 // Profile
 ////
 
-class ProfileToSQLRow extends DataMapper<SQLRow, Profile> {
+class SQLToProfile extends SQLMapper<Profile> {
+  static final SQLToProfile _singleton = SQLToProfile._();
+  factory SQLToProfile() => _singleton;
+  SQLToProfile._();
+
   @override
-  Profile from(SQLRow row) {
+  String get tableName => profileTableName;
+
+  @override
+  Profile aToB(SQLRow row) {
     List<int> carbratio = crKeys.map((key) => row[key] as int).toList();
     List<int> sens = isfKeys.map((key) => row[key] as int).toList();
     List<double> basal = basalKeys.map((key) => row[key] as double).toList();
@@ -122,11 +139,9 @@ class ProfileToSQLRow extends DataMapper<SQLRow, Profile> {
       );
     }
   }
-}
 
-class SQLRowToProfile extends DataMapper<Profile, SQLRow> {
   @override
-  SQLRow from(Profile model) {
+  SQLRow bToA(Profile model) {
     Map<String, Object> map = {
       "name": model.name,
       "eid": model.eid!,
@@ -154,7 +169,7 @@ class SQLRowToProfile extends DataMapper<Profile, SQLRow> {
       map[highTargetKeys[index]] = value;
     });
 
-    return SQLRow(profileTableName, map);
+    return SQLRow(map);
   }
 }
 
@@ -162,9 +177,16 @@ class SQLRowToProfile extends DataMapper<Profile, SQLRow> {
 // SGV
 ////
 
-class CleanSGVToSQLRow extends DataMapper<SQLRow, SGV> {
+class SQLToSGV extends SQLMapper<SGV> {
+  static final SQLToSGV _singleton = SQLToSGV._();
+  factory SQLToSGV() => _singleton;
+  SQLToSGV._();
+
   @override
-  SGV from(SQLRow row) {
+  String get tableName => sgvsTableName; //TODO
+
+  @override
+  SGV aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid"]));
@@ -183,17 +205,12 @@ class CleanSGVToSQLRow extends DataMapper<SQLRow, SGV> {
       eid: row["eid"] as String,
       value: row["value"] as int,
       date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
-      rate5m: row["rate5m"] as int?,
-      diff: row["diff"] as int?,
-      idBefore: row["id_before"] as int?,
     );
   }
-}
 
-class SQLRowToSGV extends DataMapper<SGV, SQLRow> {
   @override
-  SQLRow from(SGV model) {
-    return SQLRow(sgvsTableName, {
+  SQLRow bToA(SGV model) {
+    return SQLRow({
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
       "eid": model.eid!,
@@ -201,13 +218,58 @@ class SQLRowToSGV extends DataMapper<SGV, SQLRow> {
   }
 }
 
+class SQLToCleanSGV extends SQLReadMapper<CleanSGV> {
+  static final SQLToCleanSGV _singleton = SQLToCleanSGV._();
+  factory SQLToCleanSGV() => _singleton;
+  SQLToCleanSGV._();
+
+  @override
+  String get tableName => sgvsCleanViewName;
+
+  @override
+  CleanSGV aToB(SQLRow row) {
+    List<String> errors = [];
+
+    errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid"]));
+    errors.addAll(row.validateTypes([
+      ("value", int),
+      ("timestamp", int),
+      ("eid", String),
+      ("rate5m", int),
+      ("diff", int),
+      ("id_before", int),
+    ]));
+
+    if (errors.isNotEmpty) {
+      throw ArgumentError("Invalid SVG Row: $row, Errors: $errors");
+    }
+
+    return CleanSGV(
+      id: row["id"] as int?,
+      eid: row["eid"] as String,
+      value: row["value"] as int,
+      date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
+      rate5m: row["rate5m"] as int?,
+      diff: row["diff"] as int?,
+      idBefore: row["id_before"] as int?,
+    );
+  }
+}
+
 ////
 // TempBasal
 ////
 
-class TempBasalToSQLRow extends DataMapper<SQLRow, TempBasal> {
+class SQLToTempBasal extends SQLMapper<TempBasal> {
+  static final SQLToTempBasal _singleton = SQLToTempBasal._();
+  factory SQLToTempBasal() => _singleton;
+  SQLToTempBasal._();
+
   @override
-  TempBasal from(SQLRow row) {
+  String get tableName => tempbasalTableName;
+
+  @override
+  TempBasal aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["value", "start", "duration", "eid"]));
@@ -230,12 +292,10 @@ class TempBasalToSQLRow extends DataMapper<SQLRow, TempBasal> {
       value: row["value"] as double,
     );
   }
-}
 
-class SQLRowToTempBasal extends DataMapper<TempBasal, SQLRow> {
   @override
-  SQLRow from(TempBasal model) {
-    return SQLRow(tempbasalTableName, {
+  SQLRow bToA(TempBasal model) {
+    return SQLRow({
       "start": model.startDate.millisecondsSinceEpoch,
       "duration": model.duration,
       "value": model.value,
@@ -248,9 +308,16 @@ class SQLRowToTempBasal extends DataMapper<TempBasal, SQLRow> {
 // TempTarget
 ////
 
-class TempTargetToSQLRow extends DataMapper<SQLRow, TempTarget> {
+class SQLToTempTarget extends SQLMapper<TempTarget> {
+  static final SQLToTempTarget _singleton = SQLToTempTarget._();
+  factory SQLToTempTarget() => _singleton;
+  SQLToTempTarget._();
+
   @override
-  TempTarget from(SQLRow row) {
+  String get tableName => temptargetsTableName;
+
+  @override
+  TempTarget aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["start", "duration", "highTarget", "lowTarget", "eid"]));
@@ -275,12 +342,10 @@ class TempTargetToSQLRow extends DataMapper<SQLRow, TempTarget> {
       lowTarget: row["lowTarget"] as int,
     );
   }
-}
 
-class SQLRowToTempTarget extends DataMapper<TempTarget, SQLRow> {
   @override
-  SQLRow from(TempTarget model) {
-    return SQLRow(temptargetsTableName, {
+  SQLRow bToA(TempTarget model) {
+    return SQLRow({
       "start": model.startDate.millisecondsSinceEpoch,
       "duration": model.duration,
       "highTarget": model.highTarget,
@@ -294,9 +359,16 @@ class SQLRowToTempTarget extends DataMapper<TempTarget, SQLRow> {
 // Treatments
 ////
 
-class TreatmentToSQLRow extends DataMapper<SQLRow, Treatment> {
+class SQLToTreatment extends SQLReadMapper<Treatment> {
+  static final SQLToTreatment _singleton = SQLToTreatment._();
+  factory SQLToTreatment() => _singleton;
+  SQLToTreatment._();
+
   @override
-  Treatment from(SQLRow row) {
+  String get tableName => treatmentsViewName;
+
+  @override
+  Treatment aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["count", "max_ts"]));
@@ -324,9 +396,16 @@ class TreatmentToSQLRow extends DataMapper<SQLRow, Treatment> {
 // ValueAtTime
 ////
 
-class ValueAtTimeToSQLRow extends DataMapper<SQLRow, ValueAtTime> {
+class SQLToValueAtTime extends SQLMapper<ValueAtTime> {
+  static final SQLToValueAtTime _singleton = SQLToValueAtTime._();
+  factory SQLToValueAtTime() => _singleton;
+  SQLToValueAtTime._();
+
   @override
-  ValueAtTime from(SQLRow row) {
+  String get tableName => valuesAtTimeTableName;
+
+  @override
+  ValueAtTime aToB(SQLRow row) {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes(["timestamp", "lowTarget", "highTarget", "isTempTarget", "basal", "isTempBasal"]));
@@ -364,12 +443,10 @@ class ValueAtTimeToSQLRow extends DataMapper<SQLRow, ValueAtTime> {
       profilePercent: row["profilePercent"] as int,
     );
   }
-}
 
-class SQLRowToValueAtTime extends DataMapper<ValueAtTime, SQLRow> {
   @override
-  SQLRow from(ValueAtTime model) {
-    return SQLRow(valuesAtTimeTableName, {
+  SQLRow bToA(ValueAtTime model) {
+    return SQLRow({
       "eid": model.eid!,
       "timestamp": model.date.millisecondsSinceEpoch,
       //

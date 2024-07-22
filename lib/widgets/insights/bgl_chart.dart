@@ -19,7 +19,7 @@ class TreatmentSpot extends FlSpot {
 }
 
 class BGLSpot extends FlSpot {
-  final SGV sgv;
+  final CleanSGV sgv;
   BGLSpot(super.x, super.y, this.sgv);
 }
 
@@ -59,7 +59,7 @@ class BGLChart extends StatelessWidget {
 
       alog("Redrawing BGL Chart");
       List<ValueAtTime> targets = ValueAtTime.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
-      List<SGV> sgvs = SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
+      List<CleanSGV> sgvs = CleanSGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
       List<Treatment> lastTreatments = Treatment.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
@@ -172,7 +172,7 @@ class BGLChart extends StatelessWidget {
     return spots;
   }
 
-  List<FlSpot> bglSpots(List<SGV> sgvs) {
+  List<FlSpot> bglSpots(List<CleanSGV> sgvs) {
     List<FlSpot> spots = [];
     for (var i = 0; i < sgvs.length; i++) {
       var sgv = sgvs[i];

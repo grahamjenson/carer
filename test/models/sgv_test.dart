@@ -1,5 +1,7 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/sql/carer_db.dart';
+import 'package:carer/sql/sqlmodel.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -23,32 +25,32 @@ void main() async {
     test('lastMins', () async {
       expect(await SGV(value: 2, date: now.subtract(min5), eid: "1").save(), true);
       expect(await SGV(value: 1, date: now, eid: "2").save(), true);
-      expect(await SGV.count(), 2);
+      expect(await CleanSGV.count(), 2);
 
       await withClock(Clock.fixed(now), () async {
-        var sgvs = await SGV.lastMins(1);
+        var sgvs = await CleanSGV.lastMins(1);
         expect(sgvs.length, 1);
-        sgvs = await SGV.lastMins(10);
+        sgvs = await CleanSGV.lastMins(10);
         expect(sgvs.length, 2);
       });
     });
 
     test("lastSGV", () async {
-      var sgv = SGV.lastSGV().value;
+      var sgv = CleanSGV.lastSGV().value;
       expect(sgv, null);
-      expect(await SGV.count(), 0);
+      expect(await CleanSGV.count(), 0);
 
       expect(await SGV(value: 2, date: now.subtract(min5), eid: "1").save(), true);
-      expect(await SGV.count(), 1);
-      sgv = SGV.lastSGV().value;
+      expect(await CleanSGV.count(), 1);
+      sgv = CleanSGV.lastSGV().value;
       expect(sgv!.value, 2);
       expect(sgv.rate5m, null);
 
       // Add more recent number
 
       expect(await SGV(value: 1, date: now, eid: "2").save(), true);
-      expect(await SGV.count(), 2);
-      sgv = SGV.lastSGV().value;
+      expect(await CleanSGV.count(), 2);
+      sgv = CleanSGV.lastSGV().value;
       expect(sgv!.value, 1);
       expect(sgv.rate5m, -1);
     });
@@ -59,7 +61,7 @@ void main() async {
       expect(await SGV(value: 100, date: now.subtract(min5), eid: "3").save(), true);
 
       await withClock(Clock.fixed(now), () async {
-        var percent = await SGV.todaysPercentage.future;
+        var percent = await CleanSGV.todaysPercentage.future;
         expect(percent, 100.0);
       });
     });
@@ -67,37 +69,37 @@ void main() async {
     test('orderOFSVGs', () async {
       // create SGVs
       var ret = await Future.wait([
-        SGV.fromMap({'value': 1, 'timestamp': minTime(0), "eid": "1"}).save(),
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "2"}).save(),
+        SQLToSGV().aToB(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})).save(),
+        SQLToSGV().aToB(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})).save(),
       ]);
       expect(ret.where((b) => b).length, 2);
 
-      expect(await SGV.count(), 2);
-      var sgvs = await SGV.query();
+      expect(await CleanSGV.count(), 2);
+      var sgvs = await CleanSGV.query();
       expect(sgvs.length, 2);
       expect(sgvs.first.value, 2);
 
       // fetch SGVs
       ret = await Future.wait([
-        SGV.fromMap({'value': 1, 'timestamp': minTime(0), "eid": "1"}).save(),
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "2"}).save(),
+        SQLToSGV().aToB(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})).save(),
+        SQLToSGV().aToB(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})).save(),
       ]);
 
       expect(ret.where((b) => b).length, 0); // Nothing was changed
 
-      sgvs = await SGV.query();
+      sgvs = await CleanSGV.query();
       expect(sgvs.length, 2);
       expect(sgvs.first.value, 2);
 
       ret = await Future.wait([
-        SGV.fromMap({'value': 2, 'timestamp': minTime(5), "eid": "2"}).save(),
-        SGV.fromMap({'value': 1, 'timestamp': minTime(5), "eid": "3"}).save(), // new at same date
+        SQLToSGV().aToB(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})).save(),
+        SQLToSGV().aToB(SQLRow({'value': 1, 'timestamp': minTime(5), "eid": "3"})).save(), // new at same date
       ]);
 
       expect(ret.where((b) => b).length, 1); // only one new value
 
       // Should be ordered by date, then lowest value
-      sgvs = await SGV.query();
+      sgvs = await CleanSGV.query();
       expect(sgvs.length, 3);
       expect(sgvs.first.value, 1);
     });
@@ -114,8 +116,7 @@ void main() async {
 
       for (var badInput in badInputs) {
         try {
-          var sgv = SGV.fromMap(badInput);
-          expect(sgv.validate().length, greaterThan(0));
+          SQLToSGV().aToB(SQLRow(badInput));
         } catch (e) {
           expect(e, isA<ArgumentError>());
         }
@@ -124,55 +125,55 @@ void main() async {
 
     test("countSGVs", () async {
       var ret = await Future.wait([
-        SGV.fromMap({'timestamp': minTime(0), 'value': 4, "eid": "1"}).save(),
-        SGV.fromMap({'timestamp': minTime(5), 'value': 3, "eid": "2"}).save(),
-        SGV.fromMap({'timestamp': minTime(10), 'value': 2, "eid": "3"}).save(),
-        SGV.fromMap({'timestamp': minTime(15), 'value': 1, "eid": "4"}).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(10), 'value': 2, "eid": "3"})).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})).save(),
       ]);
       expect(ret.where((b) => b).length, 4);
 
-      expect(await SGV.count(), 4);
-      expect(await SGV.count(after: minTime(10)), 2); // inclusive
-      expect(await SGV.count(before: minTime(15)), 3); // exclusive
-      expect(await SGV.count(low: 2), 3); // inclusive
-      expect(await SGV.count(high: 4), 3); // exclusive
+      expect(await CleanSGV.count(), 4);
+      expect(await CleanSGV.count(after: minTime(10)), 2); // inclusive
+      expect(await CleanSGV.count(before: minTime(15)), 3); // exclusive
+      expect(await CleanSGV.count(low: 2), 3); // inclusive
+      expect(await CleanSGV.count(high: 4), 3); // exclusive
 
-      expect(await SGV.count(after: minTime(10), before: minTime(15), low: 2, high: 3), 1);
+      expect(await CleanSGV.count(after: minTime(10), before: minTime(15), low: 2, high: 3), 1);
     });
 
     test("sgvs", () async {
       // create SGVs
       var ret = await Future.wait([
-        SGV.fromMap({'timestamp': minTime(0), 'value': 4, "eid": "1"}).save(),
-        SGV.fromMap({'timestamp': minTime(5), 'value': 3, "eid": "2"}).save(),
-        SGV.fromMap({'timestamp': minTime(10), 'value': 2, "eid": "3"}).save(),
-        SGV.fromMap({'timestamp': minTime(15), 'value': 1, "eid": "4"}).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(10), 'value': 2, "eid": "3"})).save(),
+        SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})).save(),
       ]);
       expect(ret.where((b) => b).length, 4);
 
       // fetch SGVs
-      var sgvs = await SGV.query(after: minTime(5)); // inclusive
+      var sgvs = await CleanSGV.query(after: minTime(5)); // inclusive
       expect(sgvs.length, 3);
       expect(sgvs[0].value, 1);
       expect(sgvs[1].value, 2);
       expect(sgvs[2].value, 3);
 
-      sgvs = await SGV.query(before: minTime(10)); // exclusive
+      sgvs = await CleanSGV.query(before: minTime(10)); // exclusive
       expect(sgvs.length, 2);
       expect(sgvs[0].value, 3);
       expect(sgvs[1].value, 4);
 
-      sgvs = await SGV.query(low: 3); // inclusive
+      sgvs = await CleanSGV.query(low: 3); // inclusive
       expect(sgvs.length, 2);
       expect(sgvs[0].value, 3);
       expect(sgvs[1].value, 4);
 
-      sgvs = await SGV.query(high: 3); // exclusive
+      sgvs = await CleanSGV.query(high: 3); // exclusive
       expect(sgvs.length, 2);
       expect(sgvs[0].value, 1);
       expect(sgvs[1].value, 2);
 
-      sgvs = await SGV.query(limit: 1); // inclusive
+      sgvs = await CleanSGV.query(limit: 1); // inclusive
       expect(sgvs.length, 1);
       expect(sgvs[0].value, 1);
     });
@@ -180,15 +181,15 @@ void main() async {
     group("clean sgvs", () {
       test("close sgvs", () async {
         var ret = await Future.wait([
-          SGV.fromMap({'timestamp': minTime(0), 'value': 4, "eid": "1"}).save(),
-          SGV.fromMap({'timestamp': minTime(5), 'value': 3, "eid": "2"}).save(),
-          SGV.fromMap({'timestamp': minTime(10), 'value': 5, "eid": "3"}).save(),
-          SGV.fromMap({'timestamp': minTime(15), 'value': 1, "eid": "4"}).save(),
-          SGV.fromMap({'timestamp': minTime(16), 'value': 2, "eid": "5"}).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 4, "eid": "1"})).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(5), 'value': 3, "eid": "2"})).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(10), 'value': 5, "eid": "3"})).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 1, "eid": "4"})).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(16), 'value': 2, "eid": "5"})).save(),
         ]);
         expect(ret.where((b) => b).length, 5);
 
-        var sgvs = await SGV.query();
+        var sgvs = await CleanSGV.query();
         expect(sgvs.length, 5);
         expect(sgvs[0].value, 2);
         expect(sgvs[1].value, 1);
@@ -207,13 +208,13 @@ void main() async {
 
       test("close sgvs", () async {
         var ret = await Future.wait([
-          SGV.fromMap({'timestamp': minTime(0), 'value': 1, "eid": "1"}).save(),
-          SGV.fromMap({'timestamp': minTime(15), 'value': 5, "eid": "2"}).save(),
-          SGV.fromMap({'timestamp': minTime(30), 'value': 20, "eid": "3"}).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(0), 'value': 1, "eid": "1"})).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(15), 'value': 5, "eid": "2"})).save(),
+          SQLToSGV().aToB(SQLRow({'timestamp': minTime(30), 'value': 20, "eid": "3"})).save(),
         ]);
         expect(ret.where((b) => b).length, 3);
 
-        var sgvs = await SGV.query();
+        var sgvs = await CleanSGV.query();
         expect(sgvs.length, 3);
         expect(sgvs[0].value, 20);
         expect(sgvs[1].value, 5);

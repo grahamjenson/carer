@@ -21,8 +21,8 @@ void main() async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame
         expect(await SGV(value: 140, date: clock.now(), eid: "1").save(), true);
-        await SGV.lastSGV.future;
-        expect(SGV.lastSGV().value!.value, 140);
+        await CleanSGV.lastSGV.future;
+        expect(CleanSGV.lastSGV().value!.value, 140);
 
         await tester.pumpWidget(
           const MaterialApp(home: BGL()),

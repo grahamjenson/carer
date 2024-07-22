@@ -16,7 +16,7 @@ class BGL extends StatelessWidget {
     return AWatch((context) {
       const loader = Center(child: CircularProgressIndicator());
 
-      var sgv = SGV.lastSGV().value;
+      var sgv = CleanSGV.lastSGV().value;
       if (sgv == null) {
         return loader;
       }

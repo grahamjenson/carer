@@ -13,13 +13,13 @@ abstract class Predictor {
   init();
 
   // Returns the predicted value at mins
-  SGV predictAt(double timestamp);
+  CleanSGV predictAt(double timestamp);
 
   DateTime get lastReadingDate => _lastReadingDate;
 
   // Returns all predicted values until mins
-  List<SGV> predictRange(List<double> timestamp) {
-    List<SGV> predictions = [];
+  List<CleanSGV> predictRange(List<double> timestamp) {
+    List<CleanSGV> predictions = [];
     for (var ts in timestamp) {
       var p = predictAt(ts);
       predictions.add(p);
@@ -27,19 +27,19 @@ abstract class Predictor {
     return predictions;
   }
 
-  List<SGV> predictNextHour() {
+  List<CleanSGV> predictNextHour() {
     var times = List.generate(60, (i) => lastReadingDate.add(Duration(minutes: (i + 1))).millisecondsSinceEpoch.toDouble());
 
     return predictRange(times);
   }
 
-  SGV predictNext() {
+  CleanSGV predictNext() {
     var time = lastReadingDate.add(const Duration(minutes: 5)).millisecondsSinceEpoch.toDouble();
 
     return predictAt(time);
   }
 
-  SGV predictMin(int mins) {
+  CleanSGV predictMin(int mins) {
     var time = lastReadingDate.add(Duration(minutes: mins)).millisecondsSinceEpoch.toDouble();
 
     return predictAt(time);
@@ -67,11 +67,11 @@ abstract class RegressionPredictor extends Predictor {
   double fnX(num x) => (x / 60000.0).round().toDouble() - mimnutesFromEpochToLastWeek;
   int fnRX(double x) => (x * 60000.0).toInt() + mimnutesFromEpochToLastWeek.toInt();
 
-  List<SGV> sgvs = [];
+  List<CleanSGV> sgvs = [];
 
   @override
   init() {
-    sgvs = SGV.last3Hours().value!;
+    sgvs = CleanSGV.last3Hours().value!;
 
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();
@@ -91,13 +91,13 @@ abstract class RegressionPredictor extends Predictor {
   }
 
   @override
-  SGV predictAt(double timestamp) {
+  CleanSGV predictAt(double timestamp) {
     var pred = regression.predict(fnX(timestamp));
     if (pred.isNaN || pred.isInfinite) {
-      return SGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
+      return CleanSGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
     }
     int limitedValue = pred.toInt().clamp(20, 500);
-    return SGV(value: limitedValue, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
+    return CleanSGV(value: limitedValue, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
   }
 }
 

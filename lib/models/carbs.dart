@@ -10,12 +10,12 @@ class CarbsRepository extends ModelRepository<Carbs> {
 
   @override
   Carbs fromMap(Map<String, Object?> map) {
-    return CarbsToSQLRow().from(SQLRow(carbsTableName, map));
+    return SQLToCarbs().aToB(SQLRow(map));
   }
 
   @override
   Map<String, Object> toSQLMap(Carbs model) {
-    return SQLRowToCarbs().from(model).toCleanMap();
+    return SQLToCarbs().bToA(model).toCleanMap();
   }
 }
 

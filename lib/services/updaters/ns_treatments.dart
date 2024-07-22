@@ -40,16 +40,16 @@ class NSTreatmentsUpdater extends Updater {
 
     alog("Retrieved ${treatments.treatments.length} treatments");
 
-    List<Bolus> boluses = const NSBolusToBolus().map(treatments.boluses);
+    List<Bolus> boluses = const NSBolusToBolus().mapAToB(treatments.boluses);
     int bolusUpdates = await Bolus.saveAll(boluses);
 
-    List<Carbs> carbs = const NSCarbstoCarbs().map(treatments.carbs);
+    List<Carbs> carbs = const NSCarbstoCarbs().mapAToB(treatments.carbs);
     int carbUpdates = await Carbs.saveAll(carbs);
 
-    List<TempBasal> tempBasals = const NSTempBasalToTempBasal().map(treatments.tempBasals);
+    List<TempBasal> tempBasals = const NSTempBasalToTempBasal().mapAToB(treatments.tempBasals);
     int tempBasalUpdates = await TempBasal.upsertAll(tempBasals);
 
-    List<TempTarget> tempTargets = const NSTempTargettoTempTarget().map(treatments.tempTargets);
+    List<TempTarget> tempTargets = const NSTempTargettoTempTarget().mapAToB(treatments.tempTargets);
     int tempTargetUpdates = await TempTarget.upsertAll(tempTargets);
 
     // get the profileswitches
@@ -57,7 +57,7 @@ class NSTreatmentsUpdater extends Updater {
     for (var profileSwitch in treatments.profileSwitchs) {
       NSProfileToProfileExtras extras =
           NSProfileToProfileExtras(profileSwitch.source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000);
-      Profile profileModel = const NSProfileToProfile().from((profileSwitch.profile, extras));
+      Profile profileModel = const NSProfileToProfile().aToB((profileSwitch.profile, extras));
 
       profileSwitches.add(profileModel);
     }

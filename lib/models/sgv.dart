@@ -2,32 +2,35 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/settings/target_settings.dart';
-import 'package:carer/sql/sqlmodel.dart';
-import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
-class SGVRepository extends ModelRepository<SGV> {
-  SGVRepository() : super(sgvsCleanViewTableName, writeTableName: sgvsTableName);
+class SGV extends Model {
+  @override
+  ModelRepository get repository => throw UnimplementedError();
+
+  final int value;
 
   @override
-  SGV fromMap(Map<String, Object?> map) {
-    return CleanSGVToSQLRow().from(SQLRow(sgvsCleanViewTableName, map));
-  }
+  final DateTime date;
 
-  @override
-  Map<String, Object> toSQLMap(SGV model) {
-    return SQLRowToSGV().from(model).toCleanMap();
-  }
+  SGV({
+    required this.value,
+    required this.date,
+    required super.eid,
+    super.id,
+  });
+
+  ////
+  // SIGNALS
+  ////
 }
 
-class SGV extends Model {
-  static final SGVRepository _q = SGVRepository();
-
+class CleanSGV extends Model {
   @override
-  SGVRepository get repository => _q;
+  ModelRepository get repository => throw UnimplementedError();
 
   final int value;
 
@@ -37,11 +40,11 @@ class SGV extends Model {
   int? diff;
   int? idBefore; // previous SVGs ID
 
-  SGV({
+  CleanSGV({
+    super.id,
     required this.value,
     required this.date,
     required super.eid,
-    super.id,
     this.rate5m,
     this.diff,
     this.idBefore,
@@ -86,10 +89,10 @@ class SGV extends Model {
     if (high != null) {
       conditions["value < ?"] = high;
     }
-    return _q.count(after: after, before: before, conditions: conditions);
+    return SQLToCleanSGV().count(after: after, before: before, conditions: conditions);
   }
 
-  static Future<List<SGV>> query({int? after, int? before, int? low, int? high, int? limit, String? name}) async {
+  static Future<List<CleanSGV>> query({int? after, int? before, int? low, int? high, int? limit, String? name}) async {
     var conditions = <String, Object>{};
     if (low != null) {
       conditions["value >= ?"] = low;
@@ -98,22 +101,22 @@ class SGV extends Model {
       conditions["value < ?"] = high;
     }
 
-    return _q.query(after: after, before: before, conditions: conditions, limit: limit, name: name, orderBy: "timestamp DESC, value");
+    return SQLToCleanSGV().query(after: after, before: before, conditions: conditions, limit: limit, name: name, orderBy: "timestamp DESC, value");
   }
 
-  static Future<List<SGV>> lastMins(int minsAgo) => _q.lastMins(minsAgo);
+  static Future<List<CleanSGV>> lastMins(int minsAgo) => SQLToCleanSGV().lastMins(minsAgo);
 
   static Future<double> _percentInRangeToday(int low, int high) async {
     DateTime now = clock.now();
     DateTime startOfDay = DateTime(now.year, now.month, now.day);
     int startOfDayEpoch = startOfDay.millisecondsSinceEpoch;
 
-    var sgvsTodayInRange = await _q.count(
+    var sgvsTodayInRange = await SQLToCleanSGV().count(
       after: startOfDayEpoch,
       conditions: {"value >= ?": low, "value < ?": high},
     );
 
-    var sgvsToday = await _q.count(after: startOfDayEpoch);
+    var sgvsToday = await SQLToCleanSGV().count(after: startOfDayEpoch);
     if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
       return 0.0;
     }
@@ -129,13 +132,13 @@ class SGV extends Model {
     DateTime startOfYesterday = DateTime(now.year, now.month, now.day - 1);
     int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
 
-    var sgvsTodayInRange = await _q.count(
+    var sgvsTodayInRange = await SQLToCleanSGV().count(
       after: startOfYesterdayEpoch,
       before: startOfDayEpoch,
       conditions: {"value >= ?": low, "value < ?": high},
     );
 
-    var sgvsToday = await _q.count(after: startOfYesterdayEpoch, before: startOfDayEpoch);
+    var sgvsToday = await SQLToCleanSGV().count(after: startOfYesterdayEpoch, before: startOfDayEpoch);
 
     if (sgvsTodayInRange == null || sgvsToday == null || sgvsToday == 0) {
       return 0.0;
@@ -144,14 +147,8 @@ class SGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
-  static Future<int> saveAll(List<SGV> sgvs) => _q.saveAll(sgvs);
-
-  ////
-  // SIGNALS
-  ////
-
   static FutureSignal<double?> todaysPercentage = acomputedAsync(() async {
-    var _ = writeSignal.value; // force update on save
+    var _ = SQLToSGV().writeSignal.value; // force update on save
     var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
     if (err != null || value == null) {
       alog("Error todaysPercentage: $err");
@@ -163,7 +160,7 @@ class SGV extends Model {
 
   static FutureSignal<double?> yesterdaysPercentage = acomputedAsync(() async {
     alog("updating yesterdaysPercentage");
-    var _ = writeSignal.value; // force update on save
+    var _ = SQLToSGV().writeSignal.value; // force update on save
 
     var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget));
 
@@ -175,23 +172,21 @@ class SGV extends Model {
     return value * 100.0;
   }, 0.0, debugLabel: 'yesterdaysPercentage');
 
-  static FutureSignal<SGV?> lastSGV = acomputedAsync(() async {
+  static FutureSignal<CleanSGV?> lastSGV = acomputedAsync(() async {
     alog("updating LastSGV");
-    var _ = writeSignal.value; // force update on save
+    var _ = SQLToSGV().writeSignal.value; // force update on save
 
-    var ret = await _q.query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
+    var ret = await SQLToCleanSGV().query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
     alog("updated LastSGV Signal");
     return ret;
   }, null, debugLabel: 'LastSGV');
 
-  static FutureSignal<List<SGV>> last3Hours = acomputedAsync(() async {
+  static FutureSignal<List<CleanSGV>> last3Hours = acomputedAsync(() async {
     alog("updating last3Hours");
-    var _ = writeSignal.value; // force update on save
+    var _ = SQLToSGV().writeSignal.value; // force update on save
 
-    var ret = await SGV.lastMins(60 * 3);
+    var ret = await SQLToCleanSGV().lastMins(60 * 3);
     alog("updated last3Hours Signal");
     return ret;
   }, [], debugLabel: 'last3Hours');
-
-  static Signal<int> get writeSignal => _q.writeSignal;
 }

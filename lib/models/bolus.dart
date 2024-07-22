@@ -10,12 +10,12 @@ class BolusRepository extends ModelRepository<Bolus> {
 
   @override
   Bolus fromMap(Map<String, Object?> map) {
-    return BolusToSQLRow().from(SQLRow(bolusTableName, map));
+    return SQLToBolus().aToB(SQLRow(map));
   }
 
   @override
   Map<String, Object> toSQLMap(Bolus model) {
-    return SQLRowToBolus().from(model).toCleanMap();
+    return SQLToBolus().bToA(model).toCleanMap();
   }
 }
 

@@ -13,12 +13,17 @@ class NSBolusToBolus extends DataMapper<NSTreatmentInsulin, Bolus> {
   const NSBolusToBolus();
 
   @override
-  Bolus from(NSTreatmentInsulin model) {
+  Bolus aToB(NSTreatmentInsulin model) {
     return Bolus(
       value: model.insulin,
       date: model.date,
       eid: model.id,
     );
+  }
+
+  @override
+  NSTreatmentInsulin bToA(Bolus model) {
+    throw UnimplementedError();
   }
 }
 
@@ -26,12 +31,17 @@ class NSCarbstoCarbs extends DataMapper<NSTreatmentCarbs, Carbs> {
   const NSCarbstoCarbs();
 
   @override
-  Carbs from(NSTreatmentCarbs model) {
+  Carbs aToB(NSTreatmentCarbs model) {
     return Carbs(
       value: model.carbs.round(),
       date: model.date,
       eid: model.id,
     );
+  }
+
+  @override
+  NSTreatmentCarbs bToA(Carbs model) {
+    throw UnimplementedError();
   }
 }
 
@@ -39,7 +49,7 @@ class NSTempBasalToTempBasal extends DataMapper<NSTreatmentTempBasal, TempBasal>
   const NSTempBasalToTempBasal();
 
   @override
-  TempBasal from(NSTreatmentTempBasal model) {
+  TempBasal aToB(NSTreatmentTempBasal model) {
     return TempBasal(
       startDate: model.date,
       duration: model.durationInMilliseconds ~/ 1000,
@@ -47,13 +57,18 @@ class NSTempBasalToTempBasal extends DataMapper<NSTreatmentTempBasal, TempBasal>
       eid: model.id,
     );
   }
+
+  @override
+  NSTreatmentTempBasal bToA(TempBasal model) {
+    throw UnimplementedError();
+  }
 }
 
 class NSTempTargettoTempTarget extends DataMapper<NSTemporaryTarget, TempTarget> {
   const NSTempTargettoTempTarget();
 
   @override
-  TempTarget from(NSTemporaryTarget model) {
+  TempTarget aToB(NSTemporaryTarget model) {
     return TempTarget(
       eid: model.id,
       startDate: model.date,
@@ -61,6 +76,11 @@ class NSTempTargettoTempTarget extends DataMapper<NSTemporaryTarget, TempTarget>
       highTarget: model.targetTop.toInt(),
       lowTarget: model.targetBottom.toInt(),
     );
+  }
+
+  @override
+  NSTemporaryTarget bToA(TempTarget model) {
+    throw UnimplementedError();
   }
 }
 
@@ -76,7 +96,7 @@ class NSProfileToProfile extends DataMapper<(NSProfile, NSProfileToProfileExtras
   const NSProfileToProfile();
 
   @override
-  Profile from((NSProfile, NSProfileToProfileExtras) joint) {
+  Profile aToB((NSProfile, NSProfileToProfileExtras) joint) {
     var (profile, extras) = joint;
     return Profile(
       name: profile.name,
@@ -95,13 +115,23 @@ class NSProfileToProfile extends DataMapper<(NSProfile, NSProfileToProfileExtras
       highTarget: profile.expandedTargetHigh(),
     );
   }
+
+  @override
+  (NSProfile, NSProfileToProfileExtras) bToA(Profile model) {
+    throw UnimplementedError();
+  }
 }
 
 class NSEntryToSGV extends DataMapper<NSEntry, SGV> {
   const NSEntryToSGV();
 
   @override
-  SGV from(NSEntry model) {
+  SGV aToB(NSEntry model) {
     return SGV(value: model.sgv!, date: model.date, eid: model.id);
+  }
+
+  @override
+  NSEntry bToA(SGV model) {
+    throw UnimplementedError();
   }
 }

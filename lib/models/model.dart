@@ -1,7 +1,7 @@
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/bolus.dart';
 import 'package:carer/models/carbs.dart';
 import 'package:carer/models/profile.dart';
-import 'package:carer/models/sgv.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/models/valueAtTime.dart';
@@ -68,7 +68,7 @@ abstract class Model {
     Bolus.writeSignal.value = 0;
     Carbs.writeSignal.value = 0;
     Profile.writeSignal.value = 0;
-    SGV.writeSignal.value = 0;
+    SQLToSGV().writeSignal.value = 0;
     TempBasal.writeSignal.value = 0;
     TempTarget.writeSignal.value = 0;
     ValueAtTime.writeSignal.value = 0;

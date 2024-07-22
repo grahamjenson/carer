@@ -13,6 +13,7 @@ enum StateDataName {
 class StateData {
   static final StateData _singleton = StateData._();
   factory StateData() => _singleton;
+  StateData._();
 
   final Map<StateDataName, Signal> _signals = {
     StateDataName.summaryIOB: Signal<double>(0.0, debugLabel: 'summaryIOB'),
@@ -20,8 +21,6 @@ class StateData {
     StateDataName.summaryCAge: Signal<double>(0.0, debugLabel: 'summaryCAge'),
     StateDataName.summaryBattery: Signal<double>(0.0, debugLabel: 'summaryBattery'),
   };
-
-  StateData._();
 
   // Constructor
   setupDBPropagation() async {

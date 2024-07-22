@@ -38,7 +38,7 @@ abstract class Alarm {
   }
 
   Range5 get targetRange5 {
-    var lastSGV = SGV.lastSGV().value;
+    var lastSGV = CleanSGV.lastSGV().value;
 
     if (lastSGV == null) {
       return Range5.mid;
@@ -50,7 +50,7 @@ abstract class Alarm {
   }
 
   List<Range5> targetRange5ForMins(int minsAgo) {
-    var sgvs = SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo);
+    var sgvs = CleanSGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo);
     return sgvs.map((e) {
       var (t, _) = targetRange(e.value);
       return t;
@@ -58,7 +58,7 @@ abstract class Alarm {
   }
 
   List<int> diffPer5Minute(int minsAgo) {
-    var sgvs = SGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo);
+    var sgvs = CleanSGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo);
 
     List<int> diffs = [];
     for (var sgv in sgvs) {
@@ -308,7 +308,7 @@ class NoDataAlarm extends Alarm {
     if (AlarmSettings().noDataAlarmMinutes == -1) {
       return false;
     }
-    var lastSGV = SGV.lastSGV().value;
+    var lastSGV = CleanSGV.lastSGV().value;
     if (lastSGV == null) {
       return false;
     }

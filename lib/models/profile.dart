@@ -13,12 +13,12 @@ class ProfileRepository extends ModelRepository<Profile> {
 
   @override
   Profile fromMap(Map<String, Object?> map) {
-    return ProfileToSQLRow().from(SQLRow(profileTableName, map));
+    return SQLToProfile().aToB(SQLRow(map));
   }
 
   @override
   Map<String, Object> toSQLMap(Profile model) {
-    return SQLRowToProfile().from(model).toCleanMap();
+    return SQLToProfile().bToA(model).toCleanMap();
   }
 }
 

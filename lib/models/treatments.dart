@@ -16,7 +16,7 @@ class TreatmentRepository extends ModelRepository<Treatment> {
 
   @override
   Treatment fromMap(Map<String, Object?> map) {
-    return TreatmentToSQLRow().from(SQLRow(concatTreatmentsViewName, map));
+    return SQLToTreatment().aToB(SQLRow(map));
   }
 
   @override

@@ -14,7 +14,7 @@ class PredictionService {
 
   PredictionService._();
 
-  final Computed<List<SGV>> predictionsSignal = acomputed(() {
+  final Computed<List<CleanSGV>> predictionsSignal = acomputed(() {
     var _ = TimerService().minuteSignal.value;
     Exp2Predictor exp2predictor = Exp2Predictor();
     exp2predictor.init();
@@ -25,7 +25,7 @@ class PredictionService {
     return exp2predictor.predictNextHour();
   }, [], debugLabel: "PredictionService");
 
-  List<SGV> get predictions => predictionsSignal.value;
+  List<CleanSGV> get predictions => predictionsSignal.value;
 
   List<Range5> get predictionRanges {
     return predictions.map((e) {

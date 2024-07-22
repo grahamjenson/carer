@@ -30,7 +30,7 @@ class NSProfileUpdater extends Updater {
     raw = profile.raw ?? "";
 
     NSProfileToProfileExtras extras = const NSProfileToProfileExtras("CurrentProfile", 100, 0);
-    Profile profileModel = const NSProfileToProfile().from((profile, extras));
+    Profile profileModel = const NSProfileToProfile().aToB((profile, extras));
 
     // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await profileModel.save();

@@ -139,8 +139,8 @@ const profileTable = DBTable(profileTableName, '''
     )
   ''');
 
-const String treatmentsTableName = 'treatments';
-const treatmentsView = DBTable(treatmentsTableName, '''
+const String treatmentsViewName = 'treatments';
+const treatmentsView = DBTable(treatmentsViewName, '''
     CREATE VIEW treatments AS
     WITH 
     b AS  (SELECT  timestamp, value AS insulin FROM bolus) ,
@@ -169,8 +169,8 @@ const concatTreatmentsView = DBTable(concatTreatmentsViewName, '''
 // SGV clean view
 // CLEAN:
 // Link SVGS WITH the previous reading that is further than 4 minutes before.
-const String sgvsCleanViewTableName = 'sgvsClean';
-const sgvsCleanView = DBTable(sgvsCleanViewTableName, '''
+const String sgvsCleanViewName = 'sgvsClean';
+const sgvsCleanView = DBTable(sgvsCleanViewName, '''
     CREATE VIEW sgvsClean AS
     SELECT 
       safter.id AS id,

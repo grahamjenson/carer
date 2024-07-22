@@ -1,7 +1,4 @@
-import 'package:carer/models/model.dart';
-
-class SQLRow<T extends Model> {
-  String table;
+class SQLRow {
   final Map<String, Object?> _attributes;
 
   int get id => _attributes["id"] as int;
@@ -10,7 +7,11 @@ class SQLRow<T extends Model> {
   String get eid => _attributes["eid"] as String;
   set eid(String eid) => _attributes["eid"] = eid;
 
-  SQLRow(this.table, this._attributes);
+  static List<SQLRow> fromResult(List<Map<String, Object?>> result) {
+    return result.map((map) => SQLRow(map)).toList();
+  }
+
+  SQLRow(this._attributes);
 
   Object? operator [](String key) => _attributes[key];
 
@@ -46,5 +47,9 @@ class SQLRow<T extends Model> {
         return MapEntry(key, value);
       }
     }).cast<String, Object>();
+  }
+
+  Map<String, Object?> toMap() {
+    return _attributes;
   }
 }

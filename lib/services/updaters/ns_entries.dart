@@ -1,4 +1,5 @@
 import 'package:carer/mappers/ns_to_models.dart';
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
@@ -19,7 +20,7 @@ class NSEntriesUpdater extends Updater {
   List<String> shouldUpdate() {
     var reasons = super.shouldUpdate();
 
-    var lastSGV = SGV.lastSGV().value;
+    var lastSGV = CleanSGV.lastSGV().value;
     if (lastSGV == null) {
       reasons.add("Last SGV is null");
     } else {
@@ -47,8 +48,8 @@ class NSEntriesUpdater extends Updater {
     }
 
     raw = entries.raw;
-    List<SGV> sgvs = const NSEntryToSGV().map(entries.entries);
-    var total = await SGV.saveAll(sgvs);
+    List<SGV> sgvs = const NSEntryToSGV().mapAToB(entries.entries);
+    var total = await SQLToSGV().saveAll(sgvs);
 
     alog("Updated Entries $total");
     return true;

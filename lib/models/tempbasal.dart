@@ -9,12 +9,12 @@ class TempBasalRepository extends ModelRepository<TempBasal> {
 
   @override
   TempBasal fromMap(Map<String, Object?> map) {
-    return TempBasalToSQLRow().from(SQLRow(tempbasalTableName, map));
+    return SQLToTempBasal().aToB(SQLRow(map));
   }
 
   @override
   Map<String, Object> toSQLMap(TempBasal model) {
-    return SQLRowToTempBasal().from(model).toCleanMap();
+    return SQLToTempBasal().bToA(model).toCleanMap();
   }
 }
 

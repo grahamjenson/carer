@@ -17,12 +17,12 @@ class ValueAtTimeRepository extends ModelRepository<ValueAtTime> {
 
   @override
   ValueAtTime fromMap(Map<String, Object?> map) {
-    return ValueAtTimeToSQLRow().from(SQLRow(valuesAtTimeTableName, map));
+    return SQLToValueAtTime().aToB(SQLRow(map));
   }
 
   @override
   Map<String, Object> toSQLMap(ValueAtTime model) {
-    return SQLRowToValueAtTime().from(model).toCleanMap();
+    return SQLToValueAtTime().bToA(model).toCleanMap();
   }
 }
 

@@ -9,12 +9,12 @@ class TempTargetRepository extends ModelRepository<TempTarget> {
 
   @override
   TempTarget fromMap(Map<String, Object?> map) {
-    return TempTargetToSQLRow().from(SQLRow(temptargetsTableName, map));
+    return SQLToTempTarget().aToB(SQLRow(map));
   }
 
   @override
   Map<String, Object> toSQLMap(TempTarget model) {
-    return SQLRowToTempTarget().from(model).toCleanMap();
+    return SQLToTempTarget().bToA(model).toCleanMap();
   }
 }
 
