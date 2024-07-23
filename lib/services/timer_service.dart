@@ -6,6 +6,7 @@ class TimerService {
   factory TimerService() => _singleton;
 
   late Signal secondSignal;
+  late Signal tenSecondSignal;
   late Signal fifteenSecondSignal;
   late Signal minuteSignal;
 
@@ -15,10 +16,12 @@ class TimerService {
       minuteSignal = Signal(0, debugLabel: "MinuteSignal");
       secondSignal = Signal(0, debugLabel: "SecondsSignal");
       fifteenSecondSignal = Signal(0, debugLabel: "fifteenSecondSignal");
+      tenSecondSignal = Signal(0, debugLabel: "tenSecondSignal");
     } else {
       minuteSignal = TimerSignal(every: const Duration(minutes: 1), debugLabel: "MinuteSignal");
       secondSignal = TimerSignal(every: const Duration(seconds: 1), debugLabel: "SecondsSignal");
       fifteenSecondSignal = TimerSignal(every: const Duration(seconds: 15), debugLabel: "fifteenSecondSignal");
+      tenSecondSignal = TimerSignal(every: const Duration(seconds: 10), debugLabel: "tenSecondSignal");
     }
   }
 }

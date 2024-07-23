@@ -14,6 +14,8 @@ class AlarmPlayer {
   Future<bool> playAlarm() async {
     // We dont await because this will block until player stops
     playAudioPlayer(alarmAudioPlayer);
+    await waitForPlaying(alarmAudioPlayer);
+
     return true;
   }
 
@@ -28,25 +30,32 @@ class AlarmPlayer {
   Future<bool> playTestAlarm() async {
     // We dont await because this will block until player stops
     playAudioPlayer(testAudioPlayer);
+    await waitForPlaying(testAudioPlayer);
     return true;
+  }
+
+  Future<void> waitForPlaying(AudioPlayer player) async {
+    var tries = 0;
+    while (player.state != PlayerState.playing && tries < 10) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      tries++;
+    }
+    alog("WAITED FOR AUDIO $tries times, and is ${player.state.name}");
   }
 
   // Return IF stopped
   // Horrific fact that play takes a few seconds, so a play then stop, will result in a play
-  Future<bool> stopAudioPlayer(AudioPlayer player, {int tries = 5}) async {
+  Future<bool> stopAudioPlayer(AudioPlayer player) async {
+    // This is just to make sure that the player is properly initialized.
+    await Future.delayed(const Duration(milliseconds: 300));
     await VolumeProgressionController().resetOriginalVolume();
-
+    alog("stop tries player");
     if (player.state == PlayerState.playing) {
       await player.stop();
-      alog("successfully stopped player after $tries");
+      alog("successfully stopped player");
       return true;
     }
-    if (tries == 0) {
-      alog("unsuccessfully stopped player");
-      return false;
-    }
-    await Future.delayed(const Duration(milliseconds: 100));
-    return stopAudioPlayer(player, tries: tries - 1);
+    return false;
   }
 
   Future<void> playAudioPlayer(AudioPlayer player) async {

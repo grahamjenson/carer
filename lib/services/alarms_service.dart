@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
@@ -41,104 +42,123 @@ class AlarmsService {
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
+  Signal<Set<Alarm>> triggeredAlarms = Signal<Set<Alarm>>({}, debugLabel: "TriggeredAlarms");
+  Signal<Set<Alarm>> activeAlarms = Signal<Set<Alarm>>({}, debugLabel: "ActiveAlarms");
+
   AlarmsService._() {
-    aeffect(() {
-      // When an alarm settings
-      var sigs = AlarmSettings().allValues();
-      var aas = AlarmAlertSettings().allValues();
-      // When a Target setting changes
-      var tigs = TargetSettings().allValues();
+    List<Signal> allSettingsSignals = AlarmSettings().allSignals() + AlarmAlertSettings().allSignals() + TargetSettings().allSignals();
+
+    acomputedAsync(() async {
       // Stop test alarm
-      stopTestAlarm();
-    }, debugLabel: "StopTestAlarmWhenSettingsChange");
+      await stopTestAlarm();
+      return false;
+    }, false, lazy: false, debugLabel: "StopTestAlarmWhenSettingsChange", dependencies: allSettingsSignals);
 
-    aeffect(() async {
-      alog("checking alarms");
-      var notSleeping = _sleepUntilSignal.value == null;
+    bool isCheckingAlarms = false;
+    List<Signal> checkAlarmsDependencies = allSettingsSignals +
+        [
+          TimerService().tenSecondSignal,
+          _sleepUntilSignal,
+          SQLToSGV().writeSignal,
+        ];
 
-      var newTriggeredAlarms = <Alarm>{};
-      var newActiveAlarms = <Alarm>{};
-      var disabledAllAlarms = AlarmSettings().disableAlarms;
-      var smartSnoozeOn = AlarmAlertSettings().smartSnooze;
-      for (var alarm in allAlarms) {
-        var (triggered, active, smartSnooze) = alarm.alarmStatus();
-
-        // Build the lists
-        if (triggered) {
-          newTriggeredAlarms.add(alarm);
-        }
-
-        // If Sleeping do not add
-        if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze)) {
-          newActiveAlarms.add(alarm);
-        }
+    acomputedAsync(() async {
+      // Only execute this one at a time
+      if (isCheckingAlarms) {
+        alog("CheckAlarms: Skipping check alarms, already checking");
+        return false;
       }
+      isCheckingAlarms = true;
 
-      alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
-      // Set alarms that have been triggered
-      triggeredAlarms = newTriggeredAlarms;
-      activeAlarms = newActiveAlarms;
-    }, debugLabel: "CheckAlarms");
-
-    ////
-    // Audio Alarms
-    ////
-    aeffect(() async {
-      // For some reason on restart this doesnt work, so just keep trying to see if we need alarms seems like a good idea
-      // Also needs to restart playing if reaches end of song
-      var _ = TimerService().fifteenSecondSignal.value;
-      if (activeAlarms.isEmpty) {
-        alog("Stopping AUDIO Alarms");
-        var (playing, err) = await go(player.stopAlarm());
-        if (playing == null || err != null) {
-          alog("Error stopping alarm: $err");
-        }
-      } else {
-        alog("Playing AUDIO Alarms");
-        var (playing, err) = await go(player.playAlarm());
-        if (playing == null || err != null) {
-          alog("Error playing alarm: $err");
-        }
+      alog("CheckAlarms: checking alarms");
+      try {
+        await _checkAlarms();
+      } catch (err) {
+        alog("CheckAlarms: Error checking alarms: $err");
+      } finally {
+        alog("CheckAlarms: Finished checking alarms");
+        isCheckingAlarms = false;
       }
-    }, debugLabel: "PlayAUDIOAlarm");
-
-    ////
-    // Audio Alarms
-    ////
-    var brightness = BrightnessAlarm();
-    aeffect(() async {
-      if (!AlarmAlertSettings().brightnessAdjust) {
-        alog("Stopping Brightness Alarms Turned off");
-        brightness.stop();
-        return;
-      }
-
-      if (activeAlarms.isEmpty) {
-        alog("Stopping Brightness Alarms");
-        brightness.stop();
-      } else {
-        alog("Starting Brightness Alarms");
-        brightness.start();
-      }
-    }, debugLabel: "BrightnessAlarms");
+      return true;
+    }, false, debugLabel: "CheckAlarms", lazy: false, dependencies: checkAlarmsDependencies);
   }
 
-  final Signal<Set<Alarm>> _triggeredAlarmsSignal = Signal(<Alarm>{}, debugLabel: "triggeredAlarms");
-  Set<Alarm> get triggeredAlarms => _triggeredAlarmsSignal.value;
-  set triggeredAlarms(Set<Alarm> value) {
-    if (se.equals(value, _triggeredAlarmsSignal.value)) {
-      return;
+  Future<bool> _checkAlarms() async {
+    var notSleeping = _sleepUntilSignal.value == null;
+
+    Set<Alarm> newTriggeredAlarms = {};
+    Set<Alarm> newActiveAlarms = {};
+
+    var disabledAllAlarms = AlarmSettings().disableAlarms;
+    var smartSnoozeOn = AlarmAlertSettings().smartSnooze;
+    for (var alarm in allAlarms) {
+      var (triggered, active, smartSnooze) = alarm.alarmStatus();
+
+      // Build the lists
+      if (triggered) {
+        newTriggeredAlarms.add(alarm);
+      }
+
+      // If Sleeping do not add
+      if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze)) {
+        newActiveAlarms.add(alarm);
+      }
     }
-    _triggeredAlarmsSignal.value = value;
+
+    alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
+
+    // Set alarms that have been triggered
+    triggeredAlarms.value = newTriggeredAlarms;
+    activeAlarms.value = newActiveAlarms;
+
+    var (_, err) = await go(audioAlerts(newActiveAlarms));
+    if (err != null) {
+      alog("Error checking audio alarms: $err");
+    }
+
+    (_, err) = await go(brightnessAlert(newActiveAlarms));
+    if (err != null) {
+      alog("Error checking brightness alarms: $err");
+    }
+
+    return true;
   }
 
-  final Signal<Set<Alarm>> _activeAlarmsSignal = Signal(<Alarm>{}, debugLabel: "activeAlarms");
-  Set<Alarm> get activeAlarms => _activeAlarmsSignal.value;
-  set activeAlarms(Set<Alarm> value) {
-    if (se.equals(value, _activeAlarmsSignal.value)) {
-      return;
+  Future<bool> audioAlerts(Set<Alarm> alarms) async {
+    if (alarms.isEmpty) {
+      alog("Stopping AUDIO Alarms");
+      var (playing, err) = await go(player.stopAlarm());
+      if (playing == null || err != null) {
+        alog("Error stopping alarm: $err");
+      }
+      return false;
     }
-    _activeAlarmsSignal.value = value;
+
+    alog("Playing AUDIO Alarms");
+    var (playing, err) = await go(player.playAlarm());
+    if (playing == null || err != null) {
+      alog("Error playing alarm: $err");
+    }
+    return true;
+  }
+
+  Future<bool> brightnessAlert(Set<Alarm> alarms) async {
+    var brightness = BrightnessAlert();
+    if (!AlarmAlertSettings().brightnessAdjust) {
+      alog("Stopping Brightness Alarms Turned off");
+      brightness.stop();
+      return false;
+    }
+
+    if (alarms.isEmpty) {
+      alog("Stopping Brightness Alarms");
+      brightness.stop();
+      return false;
+    }
+
+    alog("Starting Brightness Alarms");
+    brightness.start();
+    return true;
   }
 
   // Sleep

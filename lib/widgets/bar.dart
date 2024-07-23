@@ -69,7 +69,9 @@ class Bar extends StatelessWidget {
 
   Widget getActiveAlarms(BuildContext context) {
     // Returns a small container that contains the active alarm
-    if (AlarmsService().triggeredAlarms.isEmpty) {
+    var triggeredAlarms = AlarmsService().triggeredAlarms.value;
+
+    if (triggeredAlarms.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -80,7 +82,7 @@ class Bar extends StatelessWidget {
           onPointerDown: (e) {
             diss = showOverlay(
               (context, t) {
-                return CustomAnimationToast(value: t, str: AlarmsService().triggeredAlarms.map((alarm) => alarm.status()).join('\n'));
+                return CustomAnimationToast(value: t, str: triggeredAlarms.map((alarm) => alarm.status()).join('\n'));
               },
               duration: const Duration(seconds: 10),
             );

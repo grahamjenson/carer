@@ -35,6 +35,10 @@ class TargetSettings {
     }
   }
 
+  List<Signal> allSignals() {
+    return _signals.values.toList();
+  }
+
   int get highTarget => _signals[_TNames.highTarget]!.value;
   int get highTargetPeek => _signals[_TNames.highTarget]!.peek();
   set highTarget(int value) {
