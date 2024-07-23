@@ -7,35 +7,19 @@ class BrightnessAlert {
   factory BrightnessAlert() => _singleton;
   BrightnessAlert._();
 
-  double? originalBrightness;
   bool torched = false;
 
   Future<void> start() async {
-    originalBrightness = await currentBrightness();
-    alog("ORIGINAL BRIGHTNESS: $originalBrightness");
-    await setBrightness(1.0);
-  }
-
-  Future<void> stop() async {
-    if (originalBrightness != null) {
-      await setBrightness(originalBrightness!);
-      originalBrightness = null;
-    }
-  }
-
-  Future<double> currentBrightness() async {
+    alog("BRIGHTNESS: SET 1.0");
     try {
-      return await ScreenBrightness().current;
-    } catch (e) {
-      throw 'BRIGHTNESS Alarm: Failed to get current brightness';
-    }
-  }
-
-  Future<void> setBrightness(double brightness) async {
-    try {
-      await ScreenBrightness().setScreenBrightness(brightness);
+      await ScreenBrightness().setScreenBrightness(1.0);
     } catch (e) {
       throw 'BRIGHTNESS Alarm: Failed to set brightness';
     }
+  }
+
+  Future<void> stop() async {
+    alog("BRIGHTNESS: RESET");
+    ScreenBrightness().resetScreenBrightness();
   }
 }

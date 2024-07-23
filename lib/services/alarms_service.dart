@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/services/alarms/alarms.dart';
@@ -143,21 +144,24 @@ class AlarmsService {
   }
 
   Future<bool> brightnessAlert(Set<Alarm> alarms) async {
-    var brightness = BrightnessAlert();
+    if (!Platform.isIOS && !Platform.isAndroid) {
+      return false;
+    }
+
     if (!AlarmAlertSettings().brightnessAdjust) {
       alog("Stopping Brightness Alarms Turned off");
-      brightness.stop();
+      BrightnessAlert().stop();
       return false;
     }
 
     if (alarms.isEmpty) {
       alog("Stopping Brightness Alarms");
-      brightness.stop();
+      BrightnessAlert().stop();
       return false;
     }
 
     alog("Starting Brightness Alarms");
-    brightness.start();
+    BrightnessAlert().start();
     return true;
   }
 

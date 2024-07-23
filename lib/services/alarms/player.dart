@@ -48,11 +48,11 @@ class AlarmPlayer {
   Future<bool> stopAudioPlayer(AudioPlayer player) async {
     // This is just to make sure that the player is properly initialized.
     await Future.delayed(const Duration(milliseconds: 300));
-    await VolumeProgressionController().resetOriginalVolume();
     alog("stop tries player");
     if (player.state == PlayerState.playing) {
       await player.stop();
       alog("successfully stopped player");
+      await VolumeProgressionController().resetOriginalVolume();
       return true;
     }
     return false;
@@ -88,7 +88,7 @@ class AlarmPlayer {
     return (AlarmAlertSettings().alarmAsset).asset;
   }
 
-  Future<void> playerPlay(AudioPlayer player, {double? volume}) {
+  Future<void> playerPlay(AudioPlayer player, double? volume) {
     return player.play(
       AssetSource(alarmFile),
       ctx: audioContext,
@@ -97,12 +97,13 @@ class AlarmPlayer {
   }
 
   Future<void> playAlarmWithoutOverrideWithoutProgression(AudioPlayer player) async {
-    return playerPlay(player);
+    return playerPlay(player, null);
   }
 
   Future<void> playAlarmWithoutOverrideWithProgression(AudioPlayer player) async {
-    await playerPlay(player, volume: 0);
-    VolumeProgressionController().startLoop(player, false);
+    await playerPlay(player, 0);
+    // progression
+    VolumeProgressionController().startLoop(player);
   }
 
   final audioContext = const AudioContext(
@@ -111,16 +112,24 @@ class AlarmPlayer {
   );
 
   Future<void> playAlarmWithOverrideWithoutProgression(AudioPlayer player) async {
+    // Override
     await VolumeProgressionController().saveOriginalVolume();
     var finalVolume = AlarmAlertSettings().volumeOverrideValue;
     await VolumeProgressionController().setSystemVolume(finalVolume);
 
-    return playerPlay(player);
+    return playerPlay(player, null);
   }
 
   Future<void> playAlarmWithOverrideWithProgression(AudioPlayer player) async {
-    await playerPlay(player, volume: 0);
-    VolumeProgressionController().startLoop(player, true);
+    // Override
+    await VolumeProgressionController().saveOriginalVolume();
+    var finalVolume = AlarmAlertSettings().volumeOverrideValue;
+    await VolumeProgressionController().setSystemVolume(finalVolume);
+
+    await playerPlay(player, 0);
+
+    // progression
+    VolumeProgressionController().startLoop(player);
   }
 }
 
@@ -131,24 +140,22 @@ class VolumeProgressionController {
   VolumeProgressionController._internal();
 
   double? _originalVolume;
-  bool looping = false;
+  Map<AudioPlayer, bool> loopingMap = {};
 
-  // The goal is to have a single volume progression loop at any given time.
+  // The goal is to have a single volume progression loop per player at any given time.
   // Because there seems to be pathways where the loop causes bouncing if called multiple times
-  Future<void> startLoop(AudioPlayer player, bool systemVolumeOveride) async {
-    // TODO: A stupid semafore
-    if (looping) {
+  Future<void> startLoop(AudioPlayer player) async {
+    // Lock
+    if (!loopingMap.containsKey(player)) {
+      loopingMap[player] = false;
+    }
+
+    if (loopingMap[player]!) {
       return;
     }
-    looping = true;
+    loopingMap[player] = true;
 
-    var finalVolume = AlarmAlertSettings().volumeOverrideValue;
     var progressionSeconds = AlarmAlertSettings().volumeProgressionSeconds;
-
-    if (systemVolumeOveride) {
-      await saveOriginalVolume();
-      await setSystemVolume(finalVolume);
-    }
 
     for (var i = 1; i < 100; i++) {
       if (player.state != PlayerState.playing) {
@@ -164,7 +171,8 @@ class VolumeProgressionController {
 
       await player.setVolume(volume);
     }
-    looping = false;
+
+    loopingMap[player] = false;
   }
 
   Future<void> setSystemVolume(int volume) async {
@@ -178,8 +186,8 @@ class VolumeProgressionController {
   }
 
   Future<void> resetOriginalVolume() async {
-    alog("VolumeProgressionController RESET VOLUME? = $_originalVolume");
     if (_originalVolume != null) {
+      alog("VolumeProgressionController RESET VOLUME? = $_originalVolume");
       await FlutterVolumeController.setVolume(_originalVolume!);
     }
     _originalVolume = null;

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
@@ -22,7 +23,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
     return AWatch((context) {
       double width = min(820, MediaQuery.of(context).size.width);
 
-      var tiles = [
+      List<SettingsTile> tiles = [
         smartSnooze(),
         brightnessAdjust(),
         volumeOverride(context),
@@ -30,7 +31,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
         progressiveVolume(context),
         alarmFileSelect(),
         testAlert(context, width),
-      ];
+      ].whereType<SettingsTile>().toList();
 
       return SettingsSection(
         title: const Text('Alarm Alert'),
@@ -39,7 +40,10 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
     });
   }
 
-  SettingsTile brightnessAdjust() {
+  SettingsTile? brightnessAdjust() {
+    if (!Platform.isIOS && !Platform.isAndroid) {
+      return null;
+    }
     return SettingsTile.switchTile(
       title: const Text("Brightness Adjust"),
       descriptionInlineIos: true,
