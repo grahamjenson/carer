@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/settings.dart';
@@ -6,11 +8,22 @@ import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:workmanager/workmanager.dart';
+
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    print("Native called background task: $task $inputData");
+    alog("Native called background task: $task $inputData");
+    return Future.value(true);
+  });
+}
 
 void main() async {
   //databaseFactory = databaseFactory.debugQuickLoggerWrapper();
@@ -30,6 +43,19 @@ void main() async {
 }
 
 void runCarer() async {
+  if (Platform.isIOS || Platform.isAndroid) {
+    Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
+        isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+        );
+
+    Workmanager().registerPeriodicTask(
+      "nz.t1d.carer.updateValues",
+      "nz.t1d.carer.updateValues",
+      frequency: const Duration(minutes: 15),
+      initialDelay: const Duration(seconds: 10),
+    );
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load the settings from Shared Preferences before starting
