@@ -31,11 +31,15 @@ class CarerDB {
     return path;
   }
 
+  static int getVersion() {
+    var dbScript = (dbTables + dbViews).map((e) => e.create).join("\n");
+    return dbScript.hashCode;
+  }
+
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
     // This will grab all the db code and hash it, if it changes it drops all past stuff and replaces
-    var dbScript = (dbTables + dbViews).map((e) => e.create).join("\n");
-    var version = dbScript.hashCode;
+    var version = getVersion();
 
     alog("Opening database at $path for version $version");
     var db = await openDatabase(
@@ -139,6 +143,10 @@ class CarerDB {
     var cdb = await CarerDB.instance;
     var db = cdb.db;
 
+    return writeLogToDB(db, dt, message, level);
+  }
+
+  static Future<bool> writeLogToDB(Database db, DateTime dt, String message, int level) async {
     logCounter++;
     // Write the log
     await db.insert(logsTableName, {"timestamp": dt.millisecondsSinceEpoch, "message": message, "level": level});
