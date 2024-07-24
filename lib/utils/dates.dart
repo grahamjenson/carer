@@ -31,31 +31,6 @@ class Dates {
 
   static final DateTime earliest = DateTime.fromMillisecondsSinceEpoch(0);
 
-  static String shortSecondsLeft(Duration duration) {
-    var totalSeconds = duration.inSeconds;
-    if (totalSeconds <= 0) {
-      return "";
-    }
-
-    var hours = (totalSeconds / 3600).floor();
-    var minutes = ((totalSeconds % 3600) / 60).floor();
-
-    var minutesStr = "<1m";
-
-    if (hours > 0) {
-      if (minutes == 0) {
-        return "${hours}h";
-      }
-      return "${hours}h${minutes}m";
-    }
-
-    if (minutes > 0) {
-      return "${minutes}m";
-    }
-
-    return minutesStr;
-  }
-
   static int secondsTillNext24HourTime(int timeAsHour) {
     DateTime now = clock.now();
     DateTime nextTime = DateTime(now.year, now.month, now.day, timeAsHour);

@@ -62,9 +62,7 @@ class Bar extends StatelessWidget {
   }
 
   Widget getSleepButton(BuildContext context) {
-    return const SleepButton(
-      icon: Icon(Icons.bedtime, color: mainColor),
-    );
+    return const SleepButton();
   }
 
   Widget getActiveAlarms(BuildContext context) {

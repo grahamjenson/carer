@@ -6,26 +6,45 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
+String shortSecondsLeft(Duration duration) {
+  var totalSeconds = duration.inSeconds;
+  if (totalSeconds <= 0) {
+    return "";
+  }
+
+  var hours = (totalSeconds / 3600).floor();
+  var minutes = ((totalSeconds % 3600) / 60).floor();
+
+  var minutesStr = "<1m";
+
+  if (hours > 0) {
+    if (minutes == 0) {
+      return "${hours}h";
+    }
+    return "${hours}h\n${minutes}m";
+  }
+
+  if (minutes > 0) {
+    return "${minutes}m";
+  }
+
+  return minutesStr;
+}
+
 Computed<String> sleepStringSignal = acomputed(() {
   var duration = AlarmsService().sleepDuration;
   if (duration == null) {
     return "";
   }
-  return Dates.shortSecondsLeft(duration);
+  return shortSecondsLeft(duration);
 }, "");
 
 class SleepButton extends StatelessWidget {
-  ///Change it to gave a label on a widget of your choice.
-  final Widget? label;
-
-  ///Gives a alignment to a slider icon.
-  final Widget? icon;
-
   const SleepButton({
     super.key,
-    this.label,
-    this.icon,
   });
+
+  final Widget icon = const Icon(Icons.bedtime, color: mainColor);
 
   @override
   Widget build(BuildContext context) {
@@ -47,52 +66,50 @@ class SleepButton extends StatelessWidget {
         return true;
       }
 
-      var sleepDuration = AlarmsService().sleepDuration;
-      Widget child;
-      // There is currently a sleep value
-      if (sleepDuration != null) {
-        child = TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: mainColor.withAlpha(20),
-            ),
-            onPressed: stopSleep,
-            child: SizedBox(
-              width: width,
-              child: Text(
-                textAlign: TextAlign.center,
-                sleepStringSignal.value,
-                style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
-              ),
-            ));
-      } else {
-        child = Dismissible(
-          key: UniqueKey(),
-          direction: DismissDirection.startToEnd,
-          dismissThresholds: const {DismissDirection.startToEnd: 0.75},
-          confirmDismiss: (_) async {
-            await go(openSleepDialog());
-
-            return true;
-          },
-          child: Container(
-            width: width - height,
-            height: height,
-            alignment: Alignment.centerLeft,
-            child: Container(
-              height: height,
-              width: height,
-              decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(100)),
-              child: Center(child: icon),
-            ),
+      Widget child = TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: mainColor.withAlpha(20),
+            padding: const EdgeInsets.all(0),
           ),
-        );
+          onPressed: stopSleep,
+          child: Text(
+            textAlign: TextAlign.center,
+            sleepStringSignal.value,
+            style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
+          ));
+
+      if (AlarmsService().sleepDuration == null) {
+        child = icon;
       }
+
+      var dismissable = Dismissible(
+        key: UniqueKey(),
+        direction: DismissDirection.startToEnd,
+        dismissThresholds: const {DismissDirection.startToEnd: 0.75},
+        confirmDismiss: (_) async {
+          await go(openSleepDialog());
+
+          return true;
+        },
+        child: Container(
+          width: width - height,
+          height: height,
+          alignment: Alignment.centerLeft,
+          child: Container(
+            height: height,
+            width: height,
+            decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(100)),
+            child: Center(child: child),
+          ),
+        ),
+      );
+
       return Container(
         height: height,
         width: width,
         decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
         alignment: Alignment.centerLeft,
-        child: child,
+        child: dismissable,
       );
     });
   }
