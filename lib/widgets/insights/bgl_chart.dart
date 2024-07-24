@@ -6,7 +6,6 @@ import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -57,7 +56,6 @@ class BGLChart extends StatelessWidget {
     return AWatch((context) {
       int minsAgo = 120;
 
-      alog("Redrawing BGL Chart");
       List<ValueAtTime> targets = ValueAtTime.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
       List<CleanSGV> sgvs = CleanSGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
       List<Treatment> lastTreatments = Treatment.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();

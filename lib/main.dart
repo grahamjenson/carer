@@ -21,9 +21,9 @@ void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     alog("callbackDispatcher: background task $task EXECUTING");
 
-    var allGood = await UpdateService().updateAll();
-    if (!allGood) {
-      alog("Error updating all");
+    var (allGood, err) = await go(UpdateService().updateAll());
+    if (err != null || allGood == null || !allGood) {
+      alog("callbackDispatcher: Error updating all err: $err");
     }
 
     return Future.value(true);

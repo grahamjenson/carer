@@ -41,6 +41,7 @@ class CarerDB {
     var db = await openDatabase(
       path,
       version: version, // TODO: replace this eventually with a version number
+      singleInstance: false,
       onCreate: (db, version) async {
         alog("Creating database at version $version");
         await dropAll(db);
@@ -58,6 +59,24 @@ class CarerDB {
         await createAll(db);
       },
     );
+
+    // Try WAL
+    var walStr = 'PRAGMA journal_mode=WAL';
+    var busyStr = 'PRAGMA busy_timeout = 2000';
+    try {
+      await db.execute(walStr);
+      await db.execute(busyStr);
+    } catch (_) {
+      alog("database execute pragma failed");
+    }
+    try {
+      await db.rawQuery(walStr);
+      await db.rawQuery(busyStr);
+    } catch (_) {
+      alog("database rawQuery pragma failed");
+    }
+
+    alog("WAL MODE ENABLED? ${await db.rawQuery('PRAGMA journal_mode')}");
 
     return db;
   }
@@ -115,16 +134,18 @@ class CarerDB {
   }
 
   static int logCounter = 0;
+  static int maxLogRows = 10000;
   static Future<bool> writeLog(DateTime dt, String message, int level) async {
     var cdb = await CarerDB.instance;
     var db = cdb.db;
 
     logCounter++;
     // Write the log
-    db.insert(logsTableName, {"timestamp": dt.millisecondsSinceEpoch, "message": message, "level": level});
+    await db.insert(logsTableName, {"timestamp": dt.millisecondsSinceEpoch, "message": message, "level": level});
     // count the writes, every few thousand writes truncate the end of the table
-    if (logCounter % 10000 == 0) {
-      db.delete(logsTableName, where: "where timestamp < ?", whereArgs: [dt.subtract(const Duration(days: 2)).millisecondsSinceEpoch]);
+
+    if (logCounter % maxLogRows == 0) {
+      await db.execute("DELETE FROM $logsTableName WHERE id < (SELECT MAX(id) - $maxLogRows FROM $logsTableName)");
     }
 
     return true;

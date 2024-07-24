@@ -238,6 +238,7 @@ const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
 const String logsTableName = 'logs';
 const logsTable = DBTable(logsTableName, '''
     CREATE TABLE logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       level TEXT,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
