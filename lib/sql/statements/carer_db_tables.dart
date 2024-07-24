@@ -15,6 +15,7 @@ const dbTables = [
   temptargetsTable,
   profileTable,
   valuesAtTimeTable,
+  logsTable,
 ];
 
 const dbViews = [
@@ -231,5 +232,15 @@ const valuesAtTimeTable = DBTable(valuesAtTimeTableName, '''
       profilePercent INTEGER,
 
       UNIQUE(eid)
+    )
+  ''');
+
+const String logsTableName = 'logs';
+const logsTable = DBTable(logsTableName, '''
+    CREATE TABLE logs (
+      level TEXT,
+      timestamp INTEGER,
+      datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+      message TEXT
     )
   ''');

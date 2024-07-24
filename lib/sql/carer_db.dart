@@ -63,28 +63,6 @@ class CarerDB {
   }
 
   ////
-  // Fun queries
-  ////
-
-  Future<int> fixBadTempTargets() {
-    return _db.rawUpdate(fixBadTable(temptargetsTableName));
-  }
-
-  Future<int> fixBadTempBasals() {
-    return _db.rawUpdate(fixBadTable(tempbasalTableName));
-  }
-
-  String fixBadTable(table) {
-    // This query finds temp basals and temp targets which seem to be incorrect (for some reason)
-    // TODO limit this to a time scope, no point joining tables months ago
-    return '''
-    with badData  as (
-      select a.id as a_id, (b.start -a.start)/1000 as nd from $table as a join $table as b on a.start < b.start and b.start < a.end order by nd desc
-    )
-    update $table set duration = nd from badData where id = a_id 
-    ''';
-  }
-  ////
   // DB Table functions
   ////
 
@@ -134,5 +112,21 @@ class CarerDB {
     }
 
     await batch.commit();
+  }
+
+  static int logCounter = 0;
+  static Future<bool> writeLog(DateTime dt, String message, int level) async {
+    var cdb = await CarerDB.instance;
+    var db = cdb.db;
+
+    logCounter++;
+    // Write the log
+    db.insert(logsTableName, {"timestamp": dt.millisecondsSinceEpoch, "message": message, "level": level});
+    // count the writes, every few thousand writes truncate the end of the table
+    if (logCounter % 10000 == 0) {
+      db.delete(logsTableName, where: "where timestamp < ?", whereArgs: [dt.subtract(const Duration(days: 2)).millisecondsSinceEpoch]);
+    }
+
+    return true;
   }
 }

@@ -18,9 +18,14 @@ import 'package:workmanager/workmanager.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) {
-    print("Native called background task: $task $inputData");
-    alog("Native called background task: $task $inputData");
+  Workmanager().executeTask((task, inputData) async {
+    alog("callbackDispatcher: background task $task EXECUTING");
+
+    var allGood = await UpdateService().updateAll();
+    if (!allGood) {
+      alog("Error updating all");
+    }
+
     return Future.value(true);
   });
 }
@@ -73,7 +78,7 @@ void runCarer() async {
     }
   }, debugLabel: "WakelockPlus");
 
-  UpdateService();
+  UpdateService().start();
   AlarmsService();
 
   runApp(const MyApp());

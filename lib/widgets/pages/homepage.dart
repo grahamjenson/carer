@@ -16,15 +16,13 @@ class HomePage extends StatelessWidget {
           builder: (context, constraints) => RefreshIndicator(
             onRefresh: () async {
               alog("Forcing Update");
-              for (var element in UpdateService().updaters) {
-                element.forceUpdate();
-              }
+              UpdateService().forceUpdateAll();
               // just to see something is happening
               await Future.delayed(const Duration(seconds: 1));
             },
             displacement: 10,
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const StickyRefreshPhysics(),
               padding: EdgeInsets.zero,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight, maxHeight: constraints.maxHeight),
@@ -37,4 +35,21 @@ class HomePage extends StatelessWidget {
       bottomNavigationBar: const Bar(),
     );
   }
+}
+
+class StickyRefreshPhysics extends ScrollPhysics {
+  const StickyRefreshPhysics({super.parent});
+
+  @override
+  StickyRefreshPhysics applyTo(ScrollPhysics? ancestor) {
+    return StickyRefreshPhysics(parent: buildParent(ancestor));
+  }
+
+  // Always draggable
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) => true;
+
+  // Increase the distance needed to pull down to start drag, so it doesn't interfere with other interactions like chart
+  @override
+  double get dragStartDistanceMotionThreshold => 50;
 }

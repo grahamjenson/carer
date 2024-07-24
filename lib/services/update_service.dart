@@ -11,11 +11,32 @@ class UpdateService {
 
   List<Updater> updaters = [];
   UpdateService._() {
-    var nsSummaryUpdater = NSSummaryUpdater()..start();
-    var nsEntriesUpdater = NSEntriesUpdater()..start();
-    var nsTreatmentUpdater = NSTreatmentsUpdater()..start();
-    var nsProfileUpdater = NSProfileUpdater()..start();
+    var nsSummaryUpdater = NSSummaryUpdater();
+    var nsEntriesUpdater = NSEntriesUpdater();
+    var nsTreatmentUpdater = NSTreatmentsUpdater();
+    var nsProfileUpdater = NSProfileUpdater();
 
     updaters.addAll([nsSummaryUpdater, nsEntriesUpdater, nsTreatmentUpdater, nsProfileUpdater]);
+  }
+
+  start() {
+    for (var element in updaters) {
+      element.start();
+    }
+  }
+
+  bool forceUpdateAll() {
+    for (var element in updaters) {
+      element.forceUpdate();
+    }
+    return true;
+  }
+
+  Future<bool> updateAll() async {
+    var all = true;
+    for (var element in updaters) {
+      all = all && await element.update();
+    }
+    return all;
   }
 }
