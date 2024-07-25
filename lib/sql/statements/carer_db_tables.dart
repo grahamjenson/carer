@@ -240,6 +240,7 @@ const logsTable = DBTable(logsTableName, '''
     CREATE TABLE logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       level TEXT,
+      thread TEXT,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
       message TEXT

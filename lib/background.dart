@@ -1,44 +1,55 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:workmanager/workmanager.dart';
+import 'dart:isolate';
 
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    try {
-      print("BACKGROUND 1");
-      // final SharedPreferences prefs = await SharedPreferences.getInstance();
-      // print("BACKGROUND 1.1");
-      // var dbpath = prefs.getString('dbpath');
-      // print("BACKGROUND 1.2 $dbpath");
-      // var dbversion = prefs.getInt('dbversion');
-      // print("BACKGROUND 1.3 $dbversion");
+import 'package:background_fetch/background_fetch.dart';
+import 'package:carer/services/update_service.dart';
+import 'package:carer/utils/logs.dart';
 
-      // var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
-      // print("BACKGROUND 1: $nsURL $dbpath $dbversion");
-      // var ep = entryEndpoint(nsURL, nsToken, clock.daysAgo(10));
-      // print("BACKGROUND 2, $ep");
-      // final response = await http.get(Uri.parse("https://google.com"));
-      // print("BACKGROUND 3 ${response.body}");
-      // // var entries = NSEntries.fromJson(response.body);
-      // // print("BACKGROUND 4: ${entries.entries} entries");
-      // var db = await openDatabaseAndCreateTables(dbpath!, dbversion!);
-      // print("BACKGROUND 5: $db");
-      // var ret = await CarerDB.writeLogToDB(db, clock.now(), "BACKGROUND: Got $response entries from Nightscout", 1);
-      // print("BACKGROUND 6: write $ret");
-      return Future.value(true);
-    } catch (e, st) {
-      print("BACKGROUND 7: $e, $st");
-      return Future.value(true);
-    }
-  });
+void setupBackgroundFetch() async {
+  var config = BackgroundFetchConfig(
+      minimumFetchInterval: 15,
+      stopOnTerminate: false,
+      enableHeadless: true,
+      requiresBatteryNotLow: false,
+      requiresCharging: false,
+      requiresStorageNotLow: false,
+      requiresDeviceIdle: false,
+      requiredNetworkType: NetworkType.ANY);
+
+  int status = await BackgroundFetch.configure(config, onFetch, onTimeout);
+  alog('BackgroundFetch: configure success: $status');
+  // Andoird only
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
-Future<Database> openDatabaseAndCreateTables(String dbpath, int dbversion) async {
-  // This will grab all the db code and hash it, if it changes it drops all past stuff and replaces
-  var db = await openDatabase(
-    dbpath,
-    version: dbversion,
-  );
+void onFetch(String taskId) async {
+  try {
+    debugPrint = true;
+    print("BBB ${Isolate.current.debugName}");
+    alog("BackgroundFetch(${Isolate.current.debugName}): Event received $taskId");
 
-  return db;
+    var x = await UpdateService().updateAll();
+    alog("BackgroundFetch: updateALL $x");
+  } catch (err, st) {
+    alog("BackgroundFetch: onFetch error: $err, $st");
+  } finally {
+    debugPrint = false;
+    BackgroundFetch.finish(taskId);
+  }
+}
+
+void onTimeout(String taskId) async {
+  // just log the timeout
+  BackgroundFetch.finish(taskId);
+}
+
+// ANDROID ONLY RUN WHEN PROGRAM EXITED
+@pragma('vm:entry-point')
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  alog("BackgroundFetch] backgroundFetchHeadlessTask");
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  // This task has exceeded its allowed running-time.
+  // You must stop what you're doing and immediately .finish(taskId)
+  alog("BackgroundFetch: Headless task timed-out: $taskId $isTimeout");
+  BackgroundFetch.finish(taskId);
 }

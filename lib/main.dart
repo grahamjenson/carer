@@ -7,16 +7,13 @@ import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:workmanager/workmanager.dart';
 
 void main() async {
   //databaseFactory = databaseFactory.debugQuickLoggerWrapper();
@@ -56,27 +53,11 @@ void runCarer() async {
   UpdateService().start();
   AlarmsService();
 
-  if (Platform.isIOS || Platform.isAndroid) {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('dbpath', await CarerDB.getPath());
-    await prefs.setInt('dbversion', CarerDB.getVersion());
-
-    Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
-        isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-        );
-
-    Workmanager().registerPeriodicTask("nz.t1d.carer.updateValues", "nz.t1d.carer.updateValues",
-        frequency: const Duration(minutes: 15),
-        initialDelay: const Duration(seconds: 10),
-        constraints: Constraints(
-            networkType: NetworkType.connected,
-            requiresBatteryNotLow: true,
-            requiresCharging: false,
-            requiresDeviceIdle: false,
-            requiresStorageNotLow: true));
-  }
-
   runApp(const MyApp());
+
+  if (Platform.isIOS || Platform.isAndroid) {
+    setupBackgroundFetch();
+  }
 }
 
 class MyApp extends StatelessWidget {

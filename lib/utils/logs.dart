@@ -1,4 +1,5 @@
 import "dart:developer" as developer;
+import "dart:isolate";
 
 import "package:carer/services/settings/secure_settings.dart";
 import "package:carer/sql/carer_db.dart";
@@ -7,6 +8,8 @@ import "package:carer/utils/futures.dart";
 import "package:clock/clock.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "package:signals/signals_flutter.dart";
+
+bool debugPrint = false;
 
 enum LogLevel {
   info(1),
@@ -34,23 +37,28 @@ class ALogger {
     LogLevel level = LogLevel.debug,
     String name = '',
   }) {
+    time ??= clock.now();
+
+    if (debugPrint) {
+      print("$time $message ${Isolate.current.debugName}");
+    }
+
     message = censorLogs(message);
 
-    var now = clock.now();
-    signal.value = now.millisecondsSinceEpoch;
-    logLines.insert(0, (now, level, message));
+    signal.value = time.millisecondsSinceEpoch;
+    logLines.insert(0, (time, level, message));
 
     if (logLines.length > 10000) {
       logLines = logLines.sublist(0, 10000);
     }
 
     // Wrap in golang to avoid errors
-    go(CarerDB.writeLog(now, message, level.level));
+    go(CarerDB.writeLog(time, message, level.level));
 
     developer.log(
-      "$now $message",
+      "$time $message",
       level: level.level,
-      time: now,
+      time: time,
     );
   }
 

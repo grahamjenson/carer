@@ -6,6 +6,7 @@ import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:carer/widgets/settings/debug_pages/do_background.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
@@ -47,43 +48,64 @@ class DebugSettingsWidget extends AbstractSettingsSection {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
+      var backgrounddo = SettingsTile.navigation(
+        title: const Text("Background Do"),
+        descriptionInlineIos: true,
+        leading: const Icon(UniconsLine.bug),
+        onPressed: (context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DoBackground()),
+          );
+        },
+      );
+
+      var logError = SettingsTile.navigation(
+        title: const Text("Error Log"),
+        descriptionInlineIos: true,
+        leading: const Icon(UniconsLine.bug),
+        onPressed: (context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const LogErrorPage()),
+          );
+        },
+      );
+
+      var shareLogs = SettingsTile.navigation(
+        title: const Text("Share Debug Files"),
+        descriptionInlineIos: true,
+        leading: const Icon(UniconsLine.bug),
+        onPressed: (context) async {
+          List<String> paths = [];
+
+          // Add main DB and KV DB
+          paths.add(await CarerDB.getPath());
+          paths.add(await KeyValueStore.getPath());
+
+          // Add logs
+          paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));
+
+          // Add the last raw value from all updaters
+          for (var updater in UpdateService().updaters) {
+            paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));
+          }
+
+          zipAndShare(paths, "carer_debug_${clock.now().millisecondsSinceEpoch}");
+        },
+      );
+
+      var tiles = [
+        logError,
+        shareLogs,
+      ];
+      if (Platform.isIOS || Platform.isAndroid) {
+        tiles.add(backgrounddo);
+      }
+
       return SettingsSection(
         title: const Text('Debug'),
-        tiles: [
-          SettingsTile.navigation(
-            title: const Text("Share Debug Files"),
-            descriptionInlineIos: true,
-            leading: const Icon(UniconsLine.bug),
-            onPressed: (context) async {
-              List<String> paths = [];
-
-              // Add main DB and KV DB
-              paths.add(await CarerDB.getPath());
-              paths.add(await KeyValueStore.getPath());
-
-              // Add logs
-              paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));
-
-              // Add the last raw value from all updaters
-              for (var updater in UpdateService().updaters) {
-                paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));
-              }
-
-              zipAndShare(paths, "carer_debug_${clock.now().millisecondsSinceEpoch}");
-            },
-          ),
-          SettingsTile.navigation(
-            title: const Text("Error Log"),
-            descriptionInlineIos: true,
-            leading: const Icon(UniconsLine.bug),
-            onPressed: (context) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LogErrorPage()),
-              );
-            },
-          ),
-        ],
+        tiles: tiles,
       );
     });
   }

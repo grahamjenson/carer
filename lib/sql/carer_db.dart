@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'dart:math';
 
 import 'package:carer/sql/statements/carer_db_tables.dart';
@@ -149,7 +150,12 @@ class CarerDB {
   static Future<bool> writeLogToDB(Database db, DateTime dt, String message, int level) async {
     logCounter++;
     // Write the log
-    await db.insert(logsTableName, {"timestamp": dt.millisecondsSinceEpoch, "message": message, "level": level});
+    await db.insert(logsTableName, {
+      "timestamp": dt.millisecondsSinceEpoch,
+      "message": message,
+      "level": level,
+      "thread": Isolate.current.debugName,
+    });
     // count the writes, every few thousand writes truncate the end of the table
 
     if (logCounter % maxLogRows == 0) {
