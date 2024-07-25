@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:carer/background.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/background_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -58,7 +58,7 @@ void runCarer() async {
   runApp(const MyApp());
 
   if (Platform.isIOS || Platform.isAndroid) {
-    setupBackgroundFetch();
+    BackgroundService();
   }
 }
 

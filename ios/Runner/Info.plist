@@ -4,6 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
+		<string>com.transistorsoft.customtask</string>
 		<string>com.transistorsoft.fetch</string>
 		<string>nz.t1d.carer.updateValues</string>
 	</array>

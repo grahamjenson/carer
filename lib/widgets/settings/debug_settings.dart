@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
+import 'package:carer/services/background_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/settings/debug_pages/do_background.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
@@ -52,11 +52,12 @@ class DebugSettingsWidget extends AbstractSettingsSection {
         title: const Text("Background Do"),
         descriptionInlineIos: true,
         leading: const Icon(UniconsLine.bug),
-        onPressed: (context) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DoBackground()),
-          );
+        onPressed: (context) async {
+          // manually schedule the background task to be run
+          // print("Stargin Background Do");
+          // await BackgroundService().run();
+          // print("Done Background Do");
+          BackgroundService().onFetch("com.transistorsoft.fetch");
         },
       );
 
