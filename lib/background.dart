@@ -1,6 +1,5 @@
-import 'dart:isolate';
-
 import 'package:background_fetch/background_fetch.dart';
+import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
 
@@ -23,16 +22,14 @@ void setupBackgroundFetch() async {
 
 void onFetch(String taskId) async {
   try {
-    debugPrint = true;
-    print("BBB ${Isolate.current.debugName}");
-    alog("BackgroundFetch(${Isolate.current.debugName}): Event received $taskId");
-
+    alog("BackgroundFetch: Event received $taskId");
     var x = await UpdateService().updateAll();
     alog("BackgroundFetch: updateALL $x");
+
+    NotificationService().showNotification("Done", "How Fun!");
   } catch (err, st) {
     alog("BackgroundFetch: onFetch error: $err, $st");
   } finally {
-    debugPrint = false;
     BackgroundFetch.finish(taskId);
   }
 }

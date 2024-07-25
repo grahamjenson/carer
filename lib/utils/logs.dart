@@ -1,5 +1,4 @@
 import "dart:developer" as developer;
-import "dart:isolate";
 
 import "package:carer/services/settings/secure_settings.dart";
 import "package:carer/sql/carer_db.dart";
@@ -8,8 +7,6 @@ import "package:carer/utils/futures.dart";
 import "package:clock/clock.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "package:signals/signals_flutter.dart";
-
-bool debugPrint = false;
 
 enum LogLevel {
   info(1),
@@ -38,10 +35,6 @@ class ALogger {
     String name = '',
   }) {
     time ??= clock.now();
-
-    if (debugPrint) {
-      print("$time $message ${Isolate.current.debugName}");
-    }
 
     message = censorLogs(message);
 

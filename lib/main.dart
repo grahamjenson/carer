@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:carer/background.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
@@ -50,6 +51,7 @@ void runCarer() async {
     }
   }, debugLabel: "WakelockPlus");
 
+  NotificationService();
   UpdateService().start();
   AlarmsService();
 
