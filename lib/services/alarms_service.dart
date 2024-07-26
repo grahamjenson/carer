@@ -85,6 +85,25 @@ class AlarmsService {
   }
 
   Future<bool> _checkAlarms() async {
+    var (newTriggeredAlarms, newActiveAlarms) = await calculateAlarms();
+
+    triggeredAlarms.value = newTriggeredAlarms;
+    activeAlarms.value = newActiveAlarms;
+
+    var (_, err) = await go(audioAlerts(newActiveAlarms));
+    if (err != null) {
+      alog("Error checking audio alarms: $err");
+    }
+
+    (_, err) = await go(brightnessAlert(newActiveAlarms));
+    if (err != null) {
+      alog("Error checking brightness alarms: $err");
+    }
+
+    return true;
+  }
+
+  Future<(Set<Alarm>, Set<Alarm>)> calculateAlarms() async {
     var notSleeping = _sleepUntilSignal.value == null;
 
     Set<Alarm> newTriggeredAlarms = {};
@@ -109,20 +128,8 @@ class AlarmsService {
     alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
 
     // Set alarms that have been triggered
-    triggeredAlarms.value = newTriggeredAlarms;
-    activeAlarms.value = newActiveAlarms;
 
-    var (_, err) = await go(audioAlerts(newActiveAlarms));
-    if (err != null) {
-      alog("Error checking audio alarms: $err");
-    }
-
-    (_, err) = await go(brightnessAlert(newActiveAlarms));
-    if (err != null) {
-      alog("Error checking brightness alarms: $err");
-    }
-
-    return true;
+    return (newTriggeredAlarms, newActiveAlarms);
   }
 
   Future<bool> audioAlerts(Set<Alarm> alarms) async {

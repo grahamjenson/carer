@@ -17,6 +17,11 @@ abstract class Alarm {
     return [];
   }
 
+  @override
+  String toString() {
+    return runtimeType.toString();
+  }
+
   String status() {
     var (t, a, s) = alarmStatus();
     var name = runtimeType.toString();
