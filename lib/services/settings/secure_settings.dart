@@ -40,7 +40,10 @@ class SecureSettings {
   (String, String) get nightscoutURLAndToken => _nightscoutURLAndTokenSignal.value;
 
   setupDBPropagation() async {
-    nightscoutURL = await store.read(key: _SSNames.nightscoutUrl.name);
+    // https://github.com/mogol/flutter_secure_storage/issues/709
+    // read errors, read all doesn't
+    final allKeys = await store.readAll();
+    nightscoutURL = allKeys[_SSNames.nightscoutUrl.name];
 
     aeffect(() {
       if (nightscoutURL == null) {

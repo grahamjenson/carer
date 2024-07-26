@@ -17,7 +17,7 @@ class Settings {
 
   Settings._();
 
-  setupDBPropagation() async {
+  Future<bool> setupDBPropagation() async {
     var prefs = await KeyValueStore.instance;
 
     await secureSettings.setupDBPropagation();
@@ -25,5 +25,6 @@ class Settings {
     targetSettings.setupDBPropagation(prefs);
     alarmSettings.setupDBPropagation(prefs);
     alarmAlertSettings.setupDBPropagation(prefs);
+    return true;
   }
 }

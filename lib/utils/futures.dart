@@ -32,6 +32,30 @@ _closeOutProfile(Stopwatch? stopwatch, String? name, String msg) {
   }
 }
 
+Future<T> executeWithRetry<T>(
+  Future<T> Function() task, {
+  int maxRetries = 3,
+  Duration retryDelay = const Duration(milliseconds: 100),
+}) async {
+  int retries = 0;
+  while (true) {
+    try {
+      // Attempt to execute the task
+      return await task();
+    } catch (error) {
+      // If an error occurs, check if the retry limit is reached
+      if (retries >= maxRetries) {
+        // If the retry limit is exceeded, rethrow the error
+        rethrow;
+      }
+      // Log the error and retry after a delay
+      print('Attempt $retries failed: $error');
+      await Future.delayed(retryDelay);
+      retries++;
+    }
+  }
+}
+
 ////
 // Signals Wrappers
 ////

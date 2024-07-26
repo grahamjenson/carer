@@ -23,7 +23,7 @@ class StateData {
   };
 
   // Constructor
-  setupDBPropagation() async {
+  Future<bool> setupDBPropagation() async {
     final db = (await CarerDB.instance).db;
     var kvdb = KeyValueStore(db);
     await kvdb.internalPopulate();
@@ -43,6 +43,8 @@ class StateData {
     aeffect(() {
       kvdb.setDouble(StateDataName.summaryCAge.name, _signals[StateDataName.summaryCAge]!.value);
     });
+
+    return true;
   }
 
   double iob() {

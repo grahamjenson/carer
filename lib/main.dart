@@ -37,11 +37,11 @@ void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load the settings from Shared Preferences before starting
-  var settings = Settings();
-  await settings.setupDBPropagation();
+
+  await executeWithRetry(Settings().setupDBPropagation);
 
   // Setup the StateData DB stuff
-  await StateData().setupDBPropagation();
+  await executeWithRetry(StateData().setupDBPropagation);
 
   // For some reason screens forget to stay awake
   aeffect(() {

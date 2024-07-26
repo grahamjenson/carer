@@ -36,4 +36,34 @@ void main() async {
       // Expect that the profile has been logged
     });
   });
+
+  group("executeWithRetry", () {
+    test("executeWithRetry works", () async {
+      var x = await executeWithRetry(() => Future.value(1));
+      expect(x, 1);
+
+      var y;
+      Object? err;
+      try {
+        y = await executeWithRetry(() async {
+          throw "ThisError";
+        });
+      } catch (e) {
+        err = e;
+      }
+      expect(y, null);
+      expect(err, "ThisError");
+
+      bool shouldThrow = true;
+      x = await executeWithRetry(() async {
+        if (shouldThrow) {
+          shouldThrow = false;
+          throw "ThisError";
+        }
+        return 1;
+      });
+      expect(x, 1);
+      expect(shouldThrow, false);
+    });
+  });
 }
