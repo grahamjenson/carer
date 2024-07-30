@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/background_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/settings.dart';
@@ -51,6 +52,7 @@ void runCarer() async {
     }
   }, debugLabel: "WakelockPlus");
 
+  AppLifecycleService();
   NotificationService();
   UpdateService().start();
   AlarmsService();
@@ -62,9 +64,14 @@ void runCarer() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

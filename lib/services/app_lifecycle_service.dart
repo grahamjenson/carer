@@ -1,0 +1,44 @@
+import 'package:carer/main.dart';
+import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
+import 'package:flutter/widgets.dart';
+import 'package:signals/signals_flutter.dart';
+
+class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
+  Signal<DateTime> lastResumed = Signal(clock.now());
+
+  //singleton
+  static final AppLifecycleService _instance = AppLifecycleService._();
+  factory AppLifecycleService() => _instance;
+  AppLifecycleService._() {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.inactive:
+        alog("AppLifecycleService: Inactive");
+        break;
+      case AppLifecycleState.paused:
+        alog("AppLifecycleService: Paused");
+        break;
+      case AppLifecycleState.resumed:
+        alog("AppLifecycleService: Resumed");
+        lastResumed.value = clock.now();
+        break;
+      case AppLifecycleState.hidden:
+        alog("AppLifecycleService: Suspending");
+        break;
+      case AppLifecycleState.detached:
+        alog("AppLifecycleService: Detached");
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}

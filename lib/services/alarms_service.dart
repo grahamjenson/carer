@@ -5,6 +5,7 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -64,6 +65,13 @@ class AlarmsService {
         ];
 
     acomputedAsync(() async {
+      var lastResumed = AppLifecycleService().lastResumed.peek();
+      // Skip if lastResumed less than 3 seconds ago
+      if (lastResumed.isAfter(clock.secondsAgo(2))) {
+        alog("CheckAlarms: Skipping since resumed less than 2 seconds ago");
+        return false;
+      }
+
       // Only execute this one at a time
       if (isCheckingAlarms) {
         alog("CheckAlarms: Skipping check alarms, already checking");
