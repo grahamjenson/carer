@@ -89,9 +89,13 @@ EffectCleanup aeffect(
   EffectCallback compute, {
   String? debugLabel,
   EffectCallback? onDispose,
+  List<ReadonlySignal<dynamic>> dependencies = const [],
 }) {
   return effect(() {
     try {
+      for (var dep in dependencies) {
+        dep.value;
+      }
       return compute();
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
@@ -125,7 +129,7 @@ FutureSignal<T> acomputedAsync<T>(
 }) {
   return computedAsync(() async {
     try {
-      return await callback();
+      return callback();
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
       return initialValue;

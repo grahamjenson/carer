@@ -16,6 +16,7 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // WARNING: this works differently on all platforms, so anything complicated should be platform specific
     switch (state) {
       case AppLifecycleState.inactive:
         alog("AppLifecycleService: Inactive");

@@ -48,7 +48,7 @@ class BackgroundService {
 
       var (newTriggeredAlarms, _) = await AlarmsService().calculateAlarms();
       if (newTriggeredAlarms.isNotEmpty) {
-        CleanSGV? sgv = CleanSGV.lastSGV().value;
+        CleanSGV? sgv = CleanSGV.lastSGV.value;
         var unit = UISettings().unit;
         var svgstr = "unknwon sgv";
         if (sgv != null) {

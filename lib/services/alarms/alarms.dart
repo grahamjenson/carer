@@ -43,7 +43,7 @@ abstract class Alarm {
   }
 
   Range5 get targetRange5 {
-    var lastSGV = CleanSGV.lastSGV().value;
+    var lastSGV = CleanSGV.lastSGV.value;
 
     if (lastSGV == null) {
       return Range5.mid;
@@ -313,7 +313,7 @@ class NoDataAlarm extends Alarm {
     if (AlarmSettings().noDataAlarmMinutes == -1) {
       return false;
     }
-    var lastSGV = CleanSGV.lastSGV().value;
+    var lastSGV = CleanSGV.lastSGV.value;
     if (lastSGV == null) {
       return false;
     }

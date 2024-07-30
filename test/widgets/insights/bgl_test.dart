@@ -12,7 +12,9 @@ void main() async {
   await sqfliteTestInit();
 
   group('bgl', () {
-    setUp(() async {});
+    setUp(() async {
+      CleanSGV.setupSQLSignals();
+    });
 
     tearDown(() async {
       await (await CarerDB.instance).deleteAll();
@@ -22,8 +24,8 @@ void main() async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame
         expect(await SQLToSGV().save(SGV(value: 140, date: clock.now(), eid: "1")), true);
-        await CleanSGV.lastSGV.future;
-        expect(CleanSGV.lastSGV().value!.value, 140);
+
+        expect(CleanSGV.lastSGV.value, 140);
 
         await tester.pumpWidget(
           const MaterialApp(home: BGL()),

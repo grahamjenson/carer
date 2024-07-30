@@ -20,7 +20,7 @@ class NSEntriesUpdater extends Updater {
   List<String> shouldUpdate() {
     var reasons = super.shouldUpdate();
 
-    var lastSGV = CleanSGV.lastSGV().value;
+    var lastSGV = CleanSGV.lastSGV.value;
     if (lastSGV == null) {
       reasons.add("Last SGV is null");
     } else {

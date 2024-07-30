@@ -65,13 +65,6 @@ class AlarmsService {
         ];
 
     acomputedAsync(() async {
-      var lastResumed = AppLifecycleService().lastResumed.peek();
-      // Skip if lastResumed less than 3 seconds ago
-      if (lastResumed.isAfter(clock.secondsAgo(2))) {
-        alog("CheckAlarms: Skipping since resumed less than 2 seconds ago");
-        return false;
-      }
-
       // Only execute this one at a time
       if (isCheckingAlarms) {
         alog("CheckAlarms: Skipping check alarms, already checking");
@@ -93,7 +86,13 @@ class AlarmsService {
   }
 
   Future<bool> _checkAlarms() async {
-    var (newTriggeredAlarms, newActiveAlarms) = await calculateAlarms();
+    Set<Alarm> newTriggeredAlarms = {};
+    Set<Alarm> newActiveAlarms = {};
+
+    if (!tooSoon()) {
+      // If it was resumed recently we want to turn off all alarms, otherwise check alarms
+      (newTriggeredAlarms, newActiveAlarms) = await calculateAlarms();
+    }
 
     triggeredAlarms.value = newTriggeredAlarms;
     activeAlarms.value = newActiveAlarms;
@@ -109,6 +108,16 @@ class AlarmsService {
     }
 
     return true;
+  }
+
+  bool tooSoon() {
+    var lastResumed = AppLifecycleService().lastResumed.peek();
+    // Skip if lastResumed less than 3 seconds ago
+    if (lastResumed.isAfter(clock.secondsAgo(1))) {
+      alog("CheckAlarms: Skipping since resumed less than 1 seconds ago");
+      return true;
+    }
+    return false;
   }
 
   Future<(Set<Alarm>, Set<Alarm>)> calculateAlarms() async {

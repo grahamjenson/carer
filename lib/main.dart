@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carer/models/sgv.dart';
 import 'package:carer/models/state_data.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/app_lifecycle_service.dart';
@@ -38,7 +39,6 @@ void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load the settings from Shared Preferences before starting
-
   await executeWithRetry(Settings().setupDBPropagation);
 
   // Setup the StateData DB stuff
@@ -52,10 +52,19 @@ void runCarer() async {
     }
   }, debugLabel: "WakelockPlus");
 
+  ////
+  // SERVICES
+  ////
+
   AppLifecycleService();
   NotificationService();
   UpdateService().start();
   AlarmsService();
+
+  ////
+  // SQL Signals
+  ////
+  CleanSGV.setupSQLSignals();
 
   runApp(const MyApp());
 

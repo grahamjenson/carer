@@ -162,14 +162,7 @@ class CleanSGV extends Model {
     return value * 100.0;
   }, 0.0, debugLabel: 'yesterdaysPercentage');
 
-  static FutureSignal<CleanSGV?> lastSGV = acomputedAsync(() async {
-    alog("updating LastSGV");
-    var _ = SQLToSGV().writeSignal.value; // force update on save
-
-    var ret = await SQLToCleanSGV().query(limit: 1, name: "lastSGV").then((value) => value.firstOrNull);
-    alog("updated LastSGV Signal");
-    return ret;
-  }, null, debugLabel: 'LastSGV');
+  static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');
 
   static FutureSignal<List<CleanSGV>> last3Hours = acomputedAsync(() async {
     alog("updating last3Hours");
@@ -179,4 +172,17 @@ class CleanSGV extends Model {
     alog("updated last3Hours Signal");
     return ret;
   }, [], debugLabel: 'last3Hours');
+
+  static setupSQLSignals() {
+    //acomputedAsync will set the value of the signal to null while computing
+    // This makes the app blink a bunch
+    aeffect(() async {
+      var sgv = await SQLToCleanSGV().query(limit: 1, name: "lastSGVQuery").then((value) => value.firstOrNull);
+      untracked(() {
+        lastSGV.value = sgv;
+      });
+
+      return null;
+    }, debugLabel: 'lastSGVQuery', dependencies: [SQLToSGV().writeSignal]);
+  }
 }

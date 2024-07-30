@@ -36,13 +36,13 @@ void main() async {
     });
 
     test("lastSGV", () async {
-      var sgv = CleanSGV.lastSGV().value;
+      var sgv = CleanSGV.lastSGV.value;
       expect(sgv, null);
       expect(await CleanSGV.count(), 0);
 
       expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
       expect(await CleanSGV.count(), 1);
-      sgv = CleanSGV.lastSGV().value;
+      sgv = CleanSGV.lastSGV.value;
       expect(sgv!.value, 2);
       expect(sgv.rate5m, null);
 
@@ -50,7 +50,7 @@ void main() async {
 
       expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
       expect(await CleanSGV.count(), 2);
-      sgv = CleanSGV.lastSGV().value;
+      sgv = CleanSGV.lastSGV.value;
       expect(sgv!.value, 1);
       expect(sgv.rate5m, -1);
     });
