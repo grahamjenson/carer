@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:carer/nsclient/entries.dart';
 import 'package:test/test.dart';
 
+import '../test_utils.dart';
 import 'fixtures/files.dart';
 
-void main() {
+void main() async {
+  await sqfliteTestInit();
+
   test('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
     final file = File(files["entries_basic"]!);
     final jsonString = await file.readAsString();

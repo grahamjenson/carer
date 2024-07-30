@@ -137,52 +137,36 @@ class CleanSGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
-  static FutureSignal<double?> todaysPercentage = acomputedAsync(() async {
-    var _ = SQLToSGV().writeSignal.value; // force update on save
-    var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
-    if (err != null || value == null) {
-      alog("Error todaysPercentage: $err");
-      return 0.0;
-    }
-    alog("updated todaysPercentage");
-    return value * 100.0;
-  }, 0.0, debugLabel: 'todaysPercentage');
-
-  static FutureSignal<double?> yesterdaysPercentage = acomputedAsync(() async {
-    alog("updating yesterdaysPercentage");
-    var _ = SQLToSGV().writeSignal.value; // force update on save
-
-    var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget));
-
-    if (err != null || value == null) {
-      alog("Error yesterdaysPercentage: $err");
-      return 0.0;
-    }
-    alog("updated yesterdaysPercentage Signal");
-    return value * 100.0;
-  }, 0.0, debugLabel: 'yesterdaysPercentage');
-
   static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');
-
-  static FutureSignal<List<CleanSGV>> last3Hours = acomputedAsync(() async {
-    alog("updating last3Hours");
-    var _ = SQLToSGV().writeSignal.value; // force update on save
-
-    var ret = await SQLToCleanSGV().lastMins(60 * 3);
-    alog("updated last3Hours Signal");
-    return ret;
-  }, [], debugLabel: 'last3Hours');
+  static Signal<List<CleanSGV>> last3Hours = Signal([], debugLabel: 'lastSGV');
+  static Signal<double?> yesterdaysPercentage = Signal(0.0, debugLabel: 'yesterdaysPercentage');
+  static Signal<double?> todaysPercentage = Signal(0.0, debugLabel: 'todaysPercentage');
 
   static setupSQLSignals() {
-    //acomputedAsync will set the value of the signal to null while computing
-    // This makes the app blink a bunch
-    aeffect(() async {
-      var sgv = await SQLToCleanSGV().query(limit: 1, name: "lastSGVQuery").then((value) => value.firstOrNull);
-      untracked(() {
-        lastSGV.value = sgv;
-      });
+    signalAssign(lastSGV, () => SQLToCleanSGV().query(limit: 1, name: "lastSGVQuery").then((value) => value.firstOrNull),
+        debugLabel: 'lastSGVQuery', dependencies: [SQLToSGV().writeSignal]);
 
-      return null;
-    }, debugLabel: 'lastSGVQuery', dependencies: [SQLToSGV().writeSignal]);
+    signalAssign(last3Hours, () => SQLToCleanSGV().lastMins(60 * 3), debugLabel: 'last3HoursQuery', dependencies: [SQLToSGV().writeSignal]);
+
+    signalAssign(yesterdaysPercentage, () async {
+      var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget));
+
+      if (err != null || value == null) {
+        alog("Error yesterdaysPercentage: $err");
+        return 0.0;
+      }
+      alog("updated yesterdaysPercentage Signal");
+      return value * 100.0;
+    }, debugLabel: 'yesterdaysPercentage', dependencies: [SQLToSGV().writeSignal]);
+
+    signalAssign(todaysPercentage, () async {
+      var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
+      if (err != null || value == null) {
+        alog("Error todaysPercentage: $err");
+        return 0.0;
+      }
+      alog("updated todaysPercentage");
+      return value * 100.0;
+    }, debugLabel: 'todaysPercentage', dependencies: [SQLToSGV().writeSignal]);
   }
 }

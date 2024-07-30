@@ -56,9 +56,9 @@ class BGLChart extends StatelessWidget {
     return AWatch((context) {
       int minsAgo = 120;
 
-      List<ValueAtTime> targets = ValueAtTime.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
-      List<CleanSGV> sgvs = CleanSGV.last3Hours().value!.where((e) => e.minsAgo < minsAgo).toList();
-      List<Treatment> lastTreatments = Treatment.lastSixHours().value!.where((e) => e.minsAgo < minsAgo).toList();
+      List<ValueAtTime> targets = ValueAtTime.lastSixHours.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<CleanSGV> sgvs = CleanSGV.last3Hours.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<Treatment> lastTreatments = Treatment.lastSixHours.value.where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);

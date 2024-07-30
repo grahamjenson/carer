@@ -85,6 +85,19 @@ class AWatch<T extends Widget> extends StatelessWidget {
   }
 }
 
+EffectCleanup signalAssign<T>(
+  Signal<T> signal,
+  Future<T> Function() fn, {
+  String? debugLabel,
+  List<ReadonlySignal<dynamic>> dependencies = const [],
+}) {
+  return aeffect(() {
+    untracked(() async {
+      signal.value = await fn();
+    });
+  }, debugLabel: debugLabel, dependencies: dependencies);
+}
+
 EffectCleanup aeffect(
   EffectCallback compute, {
   String? debugLabel,
@@ -119,6 +132,7 @@ Computed<T> acomputed<T>(
   }, debugLabel: debugLabel, autoDispose: autoDispose);
 }
 
+// This is kind of shit, because while computing it sets the value to null
 FutureSignal<T> acomputedAsync<T>(
   Future<T> Function() callback,
   T initialValue, {

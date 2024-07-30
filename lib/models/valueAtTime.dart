@@ -43,6 +43,11 @@ class ValueAtTime extends Model {
     required this.isTempProfile,
   });
 
+  @override
+  String toString() {
+    return "ValueAtTime($date, $lowTarget, $highTarget, $basal, $isf, $cr, $profileName, $profilePercent, $isTempBasal, $isTempTarget, $isTempProfile)";
+  }
+
   static Future<List<ValueAtTime>> query({
     int? after,
     int? before,
@@ -51,41 +56,6 @@ class ValueAtTime extends Model {
   }) {
     return SQLToValueAtTime().query(before: before, after: after, limit: limit, conditions: conditions);
   }
-
-  static FutureSignal<List<ValueAtTime>> lastSixHours = acomputedAsync(() async {
-    alog("updating ValueAtTime lastSixHours");
-    var _ = updateValues.value; // Update every write to this table
-    return await SQLToValueAtTime().lastMins(60 * 6);
-  }, [], debugLabel: 'valueAtTimeLastSixHours');
-
-  static FutureSignal<int> updateValues = acomputedAsync(() async {
-    var now = clock.now();
-    // rounded to nearest minute
-    now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
-
-    var start = now.subtract(const Duration(hours: 6));
-
-    var profiles = await Profile.after(start);
-    var tempTargets = await TempTarget.after(start);
-    var tempBasals = await TempBasal.after(start);
-
-    // go over the last 6 hours and for every minute generate a new ValueAtTime
-    List<ValueAtTime> vats = [];
-    for (var i = 0; i < 120; i++) {
-      var d = now.subtract(Duration(minutes: i));
-      vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
-    }
-    var ret = SQLToValueAtTime().upsertAll(vats);
-
-    alog("updated $ret ValueAtTime entries");
-
-    return ret;
-  }, 0, debugLabel: 'updateValueAtTime', dependencies: [
-    TimerService().minuteSignal,
-    SQLToProfile().writeSignal,
-    SQLToTempBasal().writeSignal,
-    SQLToTempTarget().writeSignal,
-  ]);
 
   static ValueAtTime createValueAtTime(List<Profile> profiles, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {
     int hourOfDay = date.hour;
@@ -127,5 +97,46 @@ class ValueAtTime extends Model {
     );
 
     return v;
+  }
+
+  static Signal<List<ValueAtTime>> lastSixHours = Signal([], debugLabel: 'valueAtTimeLastSixHours');
+
+  static Future<int> updateValues() async {
+    alog("ValueAtTime updateValues: start");
+    var now = clock.now();
+    // rounded to nearest minute
+    now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+    var start = now.subtract(const Duration(hours: 6));
+
+    var profiles = await Profile.after(start);
+    var tempTargets = await TempTarget.after(start);
+    var tempBasals = await TempBasal.after(start);
+
+    // go over the last 6 hours and for every minute generate a new ValueAtTime
+    List<ValueAtTime> vats = [];
+    for (var i = 0; i < 120; i++) {
+      var d = now.subtract(Duration(minutes: i));
+      vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
+    }
+    var ret = SQLToValueAtTime().upsertAll(vats);
+
+    alog("ValueAtTime updateValues: start $ret");
+
+    return ret;
+  }
+
+  static setupSQLSignals() {
+    aeffect(updateValues, debugLabel: 'valueAtTimeUpdate', dependencies: [
+      TimerService().minuteSignal,
+      SQLToProfile().writeSignal,
+      SQLToTempBasal().writeSignal,
+      SQLToTempTarget().writeSignal,
+    ]);
+
+    signalAssign(lastSixHours, () => SQLToValueAtTime().lastMins(60 * 6), debugLabel: 'valueAtTimeLastSixHours', dependencies: [
+      TimerService().minuteSignal,
+      SQLToValueAtTime().writeSignal,
+    ]);
   }
 }

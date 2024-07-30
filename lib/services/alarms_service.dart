@@ -50,11 +50,11 @@ class AlarmsService {
   AlarmsService._() {
     List<Signal> allSettingsSignals = AlarmSettings().allSignals() + AlarmAlertSettings().allSignals() + TargetSettings().allSignals();
 
-    acomputedAsync(() async {
+    aeffect(() async {
       // Stop test alarm
       await stopTestAlarm();
       return false;
-    }, false, lazy: false, debugLabel: "StopTestAlarmWhenSettingsChange", dependencies: allSettingsSignals);
+    }, debugLabel: "StopTestAlarmWhenSettingsChange", dependencies: allSettingsSignals);
 
     bool isCheckingAlarms = false;
     List<Signal> checkAlarmsDependencies = allSettingsSignals +
@@ -64,7 +64,7 @@ class AlarmsService {
           SQLToSGV().writeSignal,
         ];
 
-    acomputedAsync(() async {
+    aeffect(() async {
       // Only execute this one at a time
       if (isCheckingAlarms) {
         alog("CheckAlarms: Skipping check alarms, already checking");
@@ -82,7 +82,7 @@ class AlarmsService {
         isCheckingAlarms = false;
       }
       return true;
-    }, false, debugLabel: "CheckAlarms", lazy: false, dependencies: checkAlarmsDependencies);
+    }, debugLabel: "CheckAlarms", dependencies: checkAlarmsDependencies);
   }
 
   Future<bool> _checkAlarms() async {

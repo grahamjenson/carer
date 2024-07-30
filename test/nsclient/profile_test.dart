@@ -4,9 +4,12 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:test/test.dart';
 
+import '../test_utils.dart';
 import 'fixtures/files.dart';
 
-void main() {
+void main() async {
+  await sqfliteTestInit();
+
   test('NSProfile.fromJson should parse JSON and create NSProfile object', () async {
     final file = File(files["current_profile"]!);
     final jsonString = await file.readAsString();

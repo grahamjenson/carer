@@ -26,15 +26,12 @@ void main() async {
   group("Alarms", () {
     setUp(() async {
       cleanSignals();
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
     });
 
     tearDown(() async {
       await (await CarerDB.instance).deleteAll();
       cleanSignals();
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
+
       PredictionService().predictionsSignal.recompute();
     });
 
@@ -56,9 +53,6 @@ void main() async {
             SGV(value: 220, date: clock.minutesAgo(10), eid: "3"),
           ]),
           3);
-
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
 
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
@@ -83,9 +77,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 60, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 50, date: clock.minutesAgo(10), eid: "3")), true);
 
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
-
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
       expect(active, true);
@@ -107,9 +98,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 200, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 220, date: clock.minutesAgo(10), eid: "3")), true);
 
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
-
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
       expect(active, true);
@@ -130,9 +118,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 70, date: clock.now(), eid: "1")), true);
       expect(await SQLToSGV().save(SGV(value: 60, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 50, date: clock.minutesAgo(10), eid: "3")), true);
-
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
 
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
@@ -156,9 +141,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 181, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 170, date: clock.minutesAgo(10), eid: "3")), true);
 
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
-
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
       expect(active, true);
@@ -181,9 +163,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 130, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 150, date: clock.minutesAgo(10), eid: "3")), true);
 
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
-
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
       expect(active, true);
@@ -203,8 +182,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 187, date: clock.minutesAgo(30), eid: "1")), true);
       expect(await SQLToSGV().save(SGV(value: 200, date: clock.minutesAgo(35), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 220, date: clock.minutesAgo(40), eid: "3")), true);
-
-      await CleanSGV.lastSGV.future;
 
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);
@@ -228,8 +205,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 100, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 120, date: clock.minutesAgo(10), eid: "3")), true);
 
-      await CleanSGV.lastSGV.future;
-      await CleanSGV.last3Hours.future;
       PredictionService().predictionsSignal.recompute();
 
       (trigger, active, smartSnooze) = alarm.alarmStatus();

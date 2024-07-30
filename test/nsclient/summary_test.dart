@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:carer/nsclient/summary.dart';
 import 'package:test/test.dart';
 
+import '../test_utils.dart';
 import 'fixtures/files.dart';
 
-void main() {
+void main() async {
+  await sqfliteTestInit();
+
   test('Summary JSON parsing test', () async {
     final file = File(files["summary"]!);
     final jsonString = await file.readAsString();

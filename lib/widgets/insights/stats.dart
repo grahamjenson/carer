@@ -29,7 +29,7 @@ class Stats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      var valuesAtTime = ValueAtTime.lastSixHours().value!;
+      var valuesAtTime = ValueAtTime.lastSixHours.value;
       var currentBasal = 0.0;
       var profileLowTarget = 0;
       var profileHighTarget = 0;
@@ -43,7 +43,7 @@ class Stats extends StatelessWidget {
       var cobNow = StateData().cob();
       var cageNow = StateData().cage();
       var powerNow = StateData().battery();
-      var sgvs = CleanSGV.last3Hours().value!;
+      var sgvs = CleanSGV.last3Hours.value;
       var exp2preds = PredictionService().predictions;
 
       if (sgvs.isNotEmpty) {
@@ -103,7 +103,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow currentProfile() {
-    var profile = Profile.currentProfile().value;
+    var profile = Profile.currentProfile.value;
     var texts = ["none"];
     var styles = [row];
 
@@ -308,7 +308,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow todaysInRange() {
-    var percent = CleanSGV.todaysPercentage().value;
+    var percent = CleanSGV.todaysPercentage.value;
     if (percent == null || percent.isNaN || percent.isInfinite) {
       percent = 0.0;
     }
@@ -323,7 +323,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow yesterdayInRange() {
-    var percent = CleanSGV.yesterdaysPercentage().value;
+    var percent = CleanSGV.yesterdaysPercentage.value;
     if (percent == null || percent.isNaN || percent.isInfinite) {
       percent = 0.0;
     }

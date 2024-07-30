@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import 'fixtures/files.dart';
 
-void main() {
+void main() async {
+  await sqfliteTestInit();
+
   test('basic_treatments parse check', () async {
     final file = File(files["treatments_basic"]!);
     final jsonString = await file.readAsString();

@@ -2,7 +2,6 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -69,10 +68,16 @@ class Profile extends DateRangeModel {
     return SQLToProfile().query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
   }
 
-  static FutureSignal<Profile?> currentProfile = acomputedAsync(() async {
-    alog("updating currentProfile");
-    return await atTime(clock.now());
-  }, null, debugLabel: 'currentProfile', dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal]);
+  static Signal<Profile?> currentProfile = Signal<Profile?>(null, debugLabel: 'currentProfile');
+
+  static setupSQLSignals() {
+    signalAssign(
+      currentProfile,
+      () => atTime(clock.now()),
+      debugLabel: 'currentProfile',
+      dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
+    );
+  }
 }
 
 const crKeys = [

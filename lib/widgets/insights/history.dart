@@ -34,12 +34,7 @@ class History extends StatelessWidget {
     return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute
 
-      var loader = const CircularProgressIndicator();
-
-      var treatments = Treatment.lastSixHours().value;
-      if (treatments == null) {
-        return loader;
-      }
+      var treatments = Treatment.lastSixHours.value;
 
       var history = [for (var t in treatments) historyRow(t)].where((row) => row != null).map((row) => row as DataRow).toList();
 

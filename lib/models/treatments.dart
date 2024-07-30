@@ -3,7 +3,6 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/math.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -38,16 +37,10 @@ class Treatment extends Model {
   // Future Signals
   ////
 
-  static FutureSignal<List<Treatment>> lastSixHours = acomputedAsync(
-    () async {
-      alog("updating Treatments lastSixHours");
-      // Needs to update every minute to get latest results.
-      TimerService().minuteSignal.value;
-      SQLToBolus().writeSignal.value;
-      SQLToCarbs().writeSignal.value;
-      return SQLToTreatment().lastMins(60 * 6);
-    },
-    [],
-    debugLabel: 'treatmentsLastSixHours',
-  );
+  static Signal<List<Treatment>> lastSixHours = Signal([], debugLabel: 'treatmentsLastSixHours');
+
+  static setupSQLSignals() {
+    signalAssign(lastSixHours, () => SQLToTreatment().lastMins(60 * 6),
+        debugLabel: 'treatmentsLastSixHours', dependencies: [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal]);
+  }
 }

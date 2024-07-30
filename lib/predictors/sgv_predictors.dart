@@ -71,7 +71,7 @@ abstract class RegressionPredictor extends Predictor {
 
   @override
   init() {
-    sgvs = CleanSGV.last3Hours().value!;
+    sgvs = CleanSGV.last3Hours.value;
 
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();

@@ -61,7 +61,7 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5), eid: "3")), true);
 
       await withClock(Clock.fixed(now), () async {
-        var percent = await CleanSGV.todaysPercentage.future;
+        var percent = CleanSGV.todaysPercentage.value;
         expect(percent, 100.0);
       });
     });

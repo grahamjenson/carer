@@ -3,7 +3,6 @@ import "dart:developer" as developer;
 import "package:carer/services/settings/secure_settings.dart";
 import "package:carer/sql/carer_db.dart";
 import "package:carer/utils/env.dart";
-import "package:carer/utils/futures.dart";
 import "package:clock/clock.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "package:signals/signals_flutter.dart";
@@ -46,7 +45,12 @@ class ALogger {
     }
 
     // Wrap in golang to avoid errors
-    go(CarerDB.writeLog(time, message, level.level));
+    try {
+      CarerDB.writeLog(time, message, level.level);
+    } catch (e, stacktrace) {
+      // Dont handle the error since that is a BAD loop
+      print("Error $e\n$stacktrace");
+    }
 
     developer.log(
       "$time $message",

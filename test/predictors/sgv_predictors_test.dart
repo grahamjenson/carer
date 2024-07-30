@@ -36,8 +36,6 @@ void main() async {
 
     test("Linear2Predictor", () async {
       withClock(Clock.fixed(now), () async {
-        await CleanSGV.last3Hours.future;
-
         Linear2Predictor pr = Linear2Predictor();
         await pr.init();
 
