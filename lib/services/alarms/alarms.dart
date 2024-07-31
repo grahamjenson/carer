@@ -103,7 +103,6 @@ class PredictiveLowAlarm extends Alarm {
   }
 
   Range5? get range {
-    print("numberofreadings $numberOfReadings  ${PredictionService().getPredictionAt(at)}");
     return PredictionService().atPredictedTime(at);
   }
 
