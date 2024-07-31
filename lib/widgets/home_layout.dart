@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/alarms/sleepbutton.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/current_time.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
@@ -48,7 +49,8 @@ Widget getLayout(BuildContext context, UILayout uiLayoutVertical, uiLayoutHorizo
   if (isHorizontal) {
     switch (layout) {
       case UILayout.showBGLChartHistoryStats:
-        mainLine = Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl, Flexible(flex: 3, child: getInsights())]);
+        mainLine =
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl, const SleepButton(), Flexible(flex: 3, child: getInsights())]);
         break;
       default:
         mainLine = Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [bgl]);

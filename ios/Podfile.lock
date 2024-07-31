@@ -10,6 +10,7 @@ PODS:
     - Flutter
   - flutter_volume_controller (0.0.1):
     - Flutter
+  - Mute (0.6.1)
   - package_info_plus (0.4.5):
     - Flutter
   - path_provider_foundation (0.0.1):
@@ -27,6 +28,9 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - sound_mode (0.0.1):
+    - Flutter
+    - Mute (~> 0.6.0)
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
@@ -46,11 +50,13 @@ DEPENDENCIES:
   - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - sound_mode (from `.symlinks/plugins/sound_mode/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
 
 SPEC REPOS:
   trunk:
+    - Mute
     - Sentry
 
 EXTERNAL SOURCES:
@@ -78,6 +84,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  sound_mode:
+    :path: ".symlinks/plugins/sound_mode/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/darwin"
   wakelock_plus:
@@ -90,6 +98,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
   flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
+  Mute: 20135a96076f140cc82bfc8b810e2d6150d8ec7e
   package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   screen_brightness_ios: 7437207a2a9bc56553aa10f782afecf830b4c4e2
@@ -97,6 +106,7 @@ SPEC CHECKSUMS:
   sentry_flutter: ca7760fc008dc3bc2981730dc0c1d2f892178370
   share_plus: 8875f4f2500512ea181eef553c3e27dba5135aad
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  sound_mode: ef0072f20e7306c1c371984a443156e39be092d5
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   wakelock_plus: 78ec7c5b202cab7761af8e2b2b3d0671be6c4ae1
 

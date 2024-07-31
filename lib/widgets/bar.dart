@@ -1,15 +1,10 @@
-import 'dart:math';
-
+import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms_service.dart';
-import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/audio_info_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
-import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
-import 'package:carer/widgets/sleepbutton.dart';
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
-import 'package:unicons/unicons.dart';
 
 class Bar extends StatelessWidget {
   const Bar({super.key});
@@ -17,22 +12,15 @@ class Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      var tiles = [
+      List<Widget> tiles = [
+        getIsSilentOnIcon(),
+        getTriggeredAlarmIcons(),
         const Expanded(
           child: SizedBox.shrink(),
         ),
         getSettingsButton(context),
       ];
-      if (!AlarmSettings().disableAlarms) {
-        tiles = [
-          getSleepButton(context),
-          getActiveAlarms(context),
-          const Expanded(
-            child: SizedBox.shrink(),
-          ),
-          getSettingsButton(context),
-        ];
-      }
+
       return BottomAppBar(
         color: Colors.transparent,
         padding: const EdgeInsets.only(left: 8, right: 8),
@@ -61,91 +49,89 @@ class Bar extends StatelessWidget {
     );
   }
 
-  Widget getSleepButton(BuildContext context) {
-    return const SleepButton();
-  }
-
-  Widget getActiveAlarms(BuildContext context) {
-    // Returns a small container that contains the active alarm
+  Widget getTriggeredAlarmIcons() {
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;
 
-    if (triggeredAlarms.isEmpty) {
+    List<Widget> alarmWidgets = [];
+    for (var alarm in triggeredAlarms) {
+      alarmWidgets.add(AlarmIcons.getAlarmToolTip(alarm));
+    }
+    return Row(
+      children: alarmWidgets,
+    );
+  }
+
+  Widget getIsSilentOnIcon() {
+    var ringer = AudioInfoService().ringerMode.value;
+    if (ringer == RingerMode.silent || ringer == RingerMode.vibrate) {
+      return const Tooltip(
+          message: "Silent Mode",
+          triggerMode: TooltipTriggerMode.tap,
+          child: Icon(
+            Icons.volume_off,
+            color: mainColor,
+          ));
+    } else {
       return const SizedBox.shrink();
     }
-
-    OverlaySupportEntry? diss;
-    return Container(
-        padding: const EdgeInsets.only(left: 5),
-        child: Listener(
-          onPointerDown: (e) {
-            diss = showOverlay(
-              (context, t) {
-                return CustomAnimationToast(value: t, str: triggeredAlarms.map((alarm) => alarm.status()).join('\n'));
-              },
-              duration: const Duration(seconds: 10),
-            );
-          },
-          onPointerUp: (e) => diss?.dismiss(),
-          child: TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: mainColor.withAlpha(40),
-              ),
-              onPressed: null,
-              child: const SizedBox(
-                  width: 20,
-                  child: Icon(
-                    UniconsLine.bell,
-                    color: mainColor,
-                    weight: 0.1,
-                  ))),
-        ));
   }
 }
 
-class IosStyleToast extends StatelessWidget {
-  final String str;
+class AlarmIcons {
+  // Icons
+  static const IconData highAlarm = Icons.warning; // Example for High Alarm
+  static const IconData urgentHighAlarm = Icons.warning_amber; // Example for Urgent High Alarm
+  static const IconData lowAlarm = Icons.priority_high; // Example for Low Alarm
+  static const IconData urgentLowAlarm = Icons.add_alert; // Example for Urgent Low Alarm
 
-  const IosStyleToast({super.key, required this.str});
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
-      child: SafeArea(
-        child: Align(
-          alignment: const Alignment(-0.7, 0.7),
-          child: Container(
-            color: Colors.black,
-            height: 150,
-            width: 300,
-            child: Window(
-              title: "Alarms",
-              child: Text(str),
-            ),
+  // Map
+  static Tooltip getAlarmToolTip(Alarm alarm) {
+    switch (alarm.runtimeType) {
+      case HighAlarm:
+        return const Tooltip(
+          message: "High Alarm",
+          triggerMode: TooltipTriggerMode.tap,
+          child: Icon(
+            highAlarm,
+            color: mainColor,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomAnimationToast extends StatelessWidget {
-  final double value;
-
-  static final Tween<Offset> tweenOffset = Tween<Offset>(begin: const Offset(-400, 0), end: const Offset(0, 0));
-
-  final String str;
-  const CustomAnimationToast({super.key, required this.value, required this.str});
-
-  double logTransform(double value, {double base = 20}) {
-    return log((base - 1) * value + 1) / log(base);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: tweenOffset.transform(logTransform(value)),
-      child: IosStyleToast(str: str),
-    );
+        );
+      case UrgentHighAlarm:
+        return const Tooltip(
+          message: "Urgent High Alarm",
+          triggerMode: TooltipTriggerMode.tap,
+          child: Icon(
+            urgentHighAlarm,
+            color: mainColor,
+          ),
+        );
+      case LowAlarm:
+        return const Tooltip(
+          message: "Low Alarm",
+          triggerMode: TooltipTriggerMode.tap,
+          child: Icon(
+            lowAlarm,
+            color: mainColor,
+          ),
+        );
+      case UrgentLowAlarm:
+        return const Tooltip(
+          message: "Urgent Low Alarm",
+          triggerMode: TooltipTriggerMode.tap,
+          child: Icon(
+            urgentLowAlarm,
+            color: mainColor,
+          ),
+        );
+      default:
+        return const Tooltip(
+          message: "Unknown Alarm",
+          triggerMode: TooltipTriggerMode.tap,
+          child: Icon(
+            Icons.error,
+            color: mainColor,
+          ),
+        );
+    }
   }
 }
