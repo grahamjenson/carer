@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:test/test.dart';
 
+import '../test_utils.dart';
 import 'fixtures/files.dart';
 
 void main() async {

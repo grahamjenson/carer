@@ -34,8 +34,12 @@ class PredictionService {
     }).toList();
   }
 
-  Range5? atPredictedTime(int mins) {
-    var sgv = predictions.firstWhereOrNull((e) => e.minsFromNow >= mins);
+  CleanSGV? getPredictionAt(DateTime time) {
+    return predictions.firstWhereOrNull((e) => e.date.isAfter(time));
+  }
+
+  Range5? atPredictedTime(DateTime time) {
+    var sgv = getPredictionAt(time);
 
     if (sgv == null) {
       return null;

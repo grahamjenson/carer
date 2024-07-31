@@ -3,6 +3,7 @@ import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/math.dart';
+import 'package:clock/clock.dart';
 
 abstract class Alarm {
   const Alarm();
@@ -72,6 +73,16 @@ abstract class Alarm {
 
     return diffs;
   }
+
+  // Estimated mins to next reading
+  DateTime currentReadingAt() {
+    var lastSGV = CleanSGV.lastSGV.value;
+    if (lastSGV == null) {
+      return clock.now();
+    }
+
+    return lastSGV.date;
+  }
 }
 
 class PredictiveLowAlarm extends Alarm {
@@ -80,15 +91,20 @@ class PredictiveLowAlarm extends Alarm {
   @override
   List<String> properties() {
     return [
-      "mins($mins)",
+      "${PredictionService().getPredictionAt(at)}",
       "pRange($range)",
     ];
   }
 
-  int get mins => AlarmSettings().lowPredictionMinutes;
+  int get numberOfReadings => AlarmSettings().lowPredictionMinutes ~/ 5;
+
+  DateTime get at {
+    return currentReadingAt().add(Duration(minutes: numberOfReadings * 5));
+  }
 
   Range5? get range {
-    return PredictionService().atPredictedTime(mins);
+    print("numberofreadings $numberOfReadings  ${PredictionService().getPredictionAt(at)}");
+    return PredictionService().atPredictedTime(at);
   }
 
   @override
@@ -149,7 +165,7 @@ class LowAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var range = PredictionService().atPredictedTime(10);
+    var range = PredictionService().atPredictedTime(clock.minutesFromNow(10));
     return range == Range5.mid;
   }
 }
@@ -188,7 +204,7 @@ class HighAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var range = PredictionService().atPredictedTime(10);
+    var range = PredictionService().atPredictedTime(clock.minutesFromNow(10));
     return range == Range5.mid;
   }
 }
