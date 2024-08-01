@@ -1,12 +1,11 @@
 import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
-import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/alarms/sleep_text_status.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
-import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -25,34 +24,13 @@ class SleepButton extends StatelessWidget {
         height: buttonRadias,
         child: Stack(
           children: [
-            getSleepStatus(),
+            const SleepTextStatus(),
             getDismissable(context, buttonRadias, width),
             getSleepCancel(buttonRadias),
           ],
         ),
       );
     });
-  }
-
-  Widget getSleepStatus() {
-    return AWatch((context) {
-      var sleepString = sleepStringWidget();
-      var alarmString = alarmStringWidget();
-
-      List<Widget> rows = [];
-      if (sleepString != null) {
-        rows.add(sleepString);
-      }
-      if (alarmString != null) {
-        rows.add(alarmString);
-      }
-
-      return Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.zero,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: rows),
-      );
-    }, dependencies: [TimerService().tenSecondSignal, AlarmsService().sleepUntilSignal]);
   }
 
   Widget getSleepCancel(double buttonRadias) {
@@ -220,63 +198,4 @@ Future<int?> _openSleepDialog(BuildContext context) {
       ),
     ),
   );
-}
-
-const big = TextStyle(
-  color: mainColor,
-  fontSize: 20,
-  fontFeatures: [FontFeature.tabularFigures()],
-);
-
-const small = TextStyle(
-  color: mainColor,
-  fontSize: 10,
-);
-
-Widget? sleepStringWidget() {
-  var duration = AlarmsService().sleepDuration;
-  if (duration == null) {
-    return null;
-  }
-  var totalSeconds = duration.inSeconds;
-  if (totalSeconds <= 0) {
-    return null;
-  }
-
-  var hours = (totalSeconds / 3600).floor();
-  var minutes = ((totalSeconds % 3600) / 60).floor();
-
-  if (hours > 0) {
-    if (minutes == 0) {
-      return SmartText(texts: ["Sleep $hours", "h"], styles: const [big, small]);
-    }
-    return SmartText(texts: ["Sleep $hours", "h", "$minutes", "m"], styles: const [big, small, big, small]);
-  }
-
-  if (minutes > 0) {
-    return SmartText(texts: ["Sleep $minutes", "m"], styles: const [big, small]);
-  }
-
-  return SmartText(texts: const ["Sleep <1m"], styles: const [big]);
-}
-
-Widget? alarmStringWidget() {
-  var style = small;
-  // TODO fix this logic, should be seperated into its own thing
-  // Should flash or pulse or something
-  if (AlarmsService().sleepDuration == null) {
-    style = big;
-  }
-  var triggeredAlarms = AlarmsService().triggeredAlarms.value;
-  if (triggeredAlarms.isEmpty) {
-    return null;
-  }
-  List<String> texts = [];
-  List<TextStyle> styles = [];
-  for (var alarm in triggeredAlarms) {
-    texts.add(alarm.status());
-    styles.add(style);
-  }
-
-  return SmartText(texts: texts, styles: styles);
 }

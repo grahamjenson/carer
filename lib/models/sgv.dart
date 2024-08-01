@@ -137,12 +137,11 @@ class CleanSGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
-  // TODO fix this up somehow and TEST IT
-  // This method returns all the last3Hour of SGVs, but chained together with their before values
-  static List<CleanSGV> last3HoursChained() {
-    List<CleanSGV> sgvs = CleanSGV.last3Hours.value;
+  static List<CleanSGV> _makeChained(List<CleanSGV> sgvs) {
+    // TODO fix this up somehow and TEST IT
+    // This method returns all the last3Hour of SGVs, but chained together with their before values
     if (sgvs.isEmpty) {
-      return [];
+      return sgvs;
     }
     List<CleanSGV> chainedSGVs = [sgvs.first];
     // Get the first id before
@@ -159,8 +158,11 @@ class CleanSGV extends Model {
     return chainedSGVs;
   }
 
-  static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');
   static Signal<List<CleanSGV>> last3Hours = Signal([], debugLabel: 'lastSGV');
+  static Signal<List<CleanSGV>> last3HoursChained = Signal([], debugLabel: 'lastSGVChained');
+
+  static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');
+
   static Signal<double?> yesterdaysPercentage = Signal(0.0, debugLabel: 'yesterdaysPercentage');
   static Signal<double?> todaysPercentage = Signal(0.0, debugLabel: 'todaysPercentage');
 
@@ -190,5 +192,7 @@ class CleanSGV extends Model {
       alog("updated todaysPercentage");
       return value * 100.0;
     }, debugLabel: 'todaysPercentage', dependencies: [SQLToSGV().writeSignal]);
+
+    signalAssign(last3HoursChained, () async => _makeChained(last3Hours.value), debugLabel: 'last3HoursChained', dependencies: [last3Hours]);
   }
 }

@@ -69,11 +69,9 @@ abstract class RegressionPredictor extends Predictor {
   double fnX(num x) => (x / 60000.0).round().toDouble() - mimnutesFromEpochToLastWeek;
   int fnRX(double x) => (x * 60000.0).toInt() + mimnutesFromEpochToLastWeek.toInt();
 
-  List<CleanSGV> sgvs = [];
-
   @override
   init() {
-    sgvs = CleanSGV.last3HoursChained();
+    List<CleanSGV> sgvs = CleanSGV.last3HoursChained.value;
 
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();
