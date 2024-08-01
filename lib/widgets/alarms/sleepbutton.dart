@@ -36,11 +36,7 @@ class SleepButton extends StatelessWidget {
 
   Widget getSleepStatus() {
     return AWatch((context) {
-      var sleepDuration = AlarmsService().sleepDuration;
-      if (sleepDuration == null) {
-        return const SizedBox.shrink();
-      }
-      var sleepString = sleepStringWidget(sleepDuration);
+      var sleepString = sleepStringWidget();
       var alarmString = alarmStringWidget();
 
       List<Widget> rows = [];
@@ -237,7 +233,11 @@ const small = TextStyle(
   fontSize: 10,
 );
 
-Widget? sleepStringWidget(Duration duration) {
+Widget? sleepStringWidget() {
+  var duration = AlarmsService().sleepDuration;
+  if (duration == null) {
+    return null;
+  }
   var totalSeconds = duration.inSeconds;
   if (totalSeconds <= 0) {
     return null;
@@ -261,6 +261,12 @@ Widget? sleepStringWidget(Duration duration) {
 }
 
 Widget? alarmStringWidget() {
+  var style = small;
+  // TODO fix this logic, should be seperated into its own thing
+  // Should flash or pulse or something
+  if (AlarmsService().sleepDuration == null) {
+    style = big;
+  }
   var triggeredAlarms = AlarmsService().triggeredAlarms.value;
   if (triggeredAlarms.isEmpty) {
     return null;
@@ -269,7 +275,7 @@ Widget? alarmStringWidget() {
   List<TextStyle> styles = [];
   for (var alarm in triggeredAlarms) {
     texts.add(alarm.status());
-    styles.add(small);
+    styles.add(style);
   }
 
   return SmartText(texts: texts, styles: styles);

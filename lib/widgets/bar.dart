@@ -4,6 +4,7 @@ import 'package:carer/widgets/alarms/alarms_bar.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class Bar extends StatelessWidget {
   const Bar({super.key});
@@ -63,7 +64,7 @@ class Bar extends StatelessWidget {
                 message: "Silent Mode",
                 triggerMode: TooltipTriggerMode.tap,
                 child: Icon(
-                  Icons.volume_off,
+                  UniconsLine.bell_slash,
                   color: mainColor,
                 )));
       } else {
