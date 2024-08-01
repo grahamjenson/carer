@@ -17,7 +17,8 @@ class SleepButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       var width = constraints.maxWidth - 50;
-      double buttonRadias = min(75, width);
+      var height = constraints.maxHeight;
+      double buttonRadias = min(height, min(75, width));
 
       return SizedBox(
         width: width,
