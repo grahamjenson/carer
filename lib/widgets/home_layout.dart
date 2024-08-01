@@ -130,7 +130,7 @@ class HomeLayout extends StatelessWidget {
           5,
           5
         ], [
-          flexListCol([-1, 10, -1, 3], [const SizedBox.shrink(), const BGL(), const SizedBox.shrink(), const SleepButton()]),
+          flexListCol([20, 5], [const BGL(), const SleepButton()]),
           getInsights()
         ]);
       case LayoutTypes.verticalBGL:

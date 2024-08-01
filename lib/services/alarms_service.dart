@@ -59,7 +59,7 @@ class AlarmsService {
     bool isCheckingAlarms = false;
     List<Signal> checkAlarmsDependencies = allSettingsSignals +
         [
-          TimerService().tenSecondSignal,
+          TimerService().secondSignal,
           sleepUntilSignal,
           SQLToSGV().writeSignal,
         ];

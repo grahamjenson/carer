@@ -13,7 +13,12 @@ class AudioInfoService {
   }
 
   AudioInfoService._() {
-    signalAssign(ringerMode, getRingerMode, debugLabel: "RingerModeSignal", dependencies: [TimerService().tenSecondSignal]);
+    signalAssign(
+      ringerMode,
+      getRingerMode,
+      debugLabel: "RingerModeSignal",
+      dependencies: [TimerService().fiveSecondSignal],
+    );
   }
 
   Signal<RingerMode> ringerMode = Signal(RingerMode.unknown, debugLabel: "RingerMode");
