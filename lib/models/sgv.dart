@@ -137,6 +137,25 @@ class CleanSGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
+  // TODO fix this up somehow
+  // This method returns all the last3Hour of SGVs, but chained together with their before values
+  static List<CleanSGV> last3HoursChained() {
+    List<CleanSGV> sgvs = CleanSGV.last3Hours.value;
+    List<CleanSGV> chainedSGVs = [sgvs.first];
+    // Get the first id before
+
+    var idBefore = sgvs.first.idBefore;
+    for (var i = 1; i < sgvs.length; i++) {
+      var sgv = sgvs[i];
+      if (sgv.id != idBefore) {
+      } else {
+        idBefore = sgv.idBefore;
+        chainedSGVs.add(sgv);
+      }
+    }
+    return chainedSGVs;
+  }
+
   static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');
   static Signal<List<CleanSGV>> last3Hours = Signal([], debugLabel: 'lastSGV');
   static Signal<double?> yesterdaysPercentage = Signal(0.0, debugLabel: 'yesterdaysPercentage');

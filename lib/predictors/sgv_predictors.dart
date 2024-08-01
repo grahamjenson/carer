@@ -13,7 +13,7 @@ abstract class Predictor {
   init();
 
   // Returns the predicted value at mins
-  CleanSGV predictAt(double timestamp);
+  CleanSGV? predictAt(double timestamp);
 
   DateTime get lastReadingDate => _lastReadingDate;
 
@@ -22,7 +22,9 @@ abstract class Predictor {
     List<CleanSGV> predictions = [];
     for (var ts in timestamp) {
       var p = predictAt(ts);
-      predictions.add(p);
+      if (p != null) {
+        predictions.add(p);
+      }
     }
     return predictions;
   }
@@ -33,13 +35,13 @@ abstract class Predictor {
     return predictRange(times);
   }
 
-  CleanSGV predictNext() {
+  CleanSGV? predictNext() {
     var time = lastReadingDate.add(const Duration(minutes: 5)).millisecondsSinceEpoch.toDouble();
 
     return predictAt(time);
   }
 
-  CleanSGV predictMin(int mins) {
+  CleanSGV? predictMin(int mins) {
     var time = lastReadingDate.add(Duration(minutes: mins)).millisecondsSinceEpoch.toDouble();
 
     return predictAt(time);
@@ -71,7 +73,7 @@ abstract class RegressionPredictor extends Predictor {
 
   @override
   init() {
-    sgvs = CleanSGV.last3Hours.value;
+    sgvs = CleanSGV.last3HoursChained().sublist(0, 10);
 
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();
@@ -91,7 +93,7 @@ abstract class RegressionPredictor extends Predictor {
   }
 
   @override
-  CleanSGV predictAt(double timestamp) {
+  CleanSGV? predictAt(double timestamp) {
     var pred = regression.predict(fnX(timestamp));
     if (pred.isNaN || pred.isInfinite) {
       return CleanSGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');

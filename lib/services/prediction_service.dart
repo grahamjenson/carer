@@ -47,8 +47,7 @@ class PredictionService {
   }
 
   Range5? atPredictedTime(DateTime time) {
-    var sgv = getPredictionAt(time);
-
+    CleanSGV? sgv = predictions.firstWhereOrNull((e) => e.date.isAfter(time));
     if (sgv == null) {
       return null;
     }
