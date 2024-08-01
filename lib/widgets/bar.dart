@@ -124,10 +124,10 @@ class AlarmIcons {
           ),
         );
       default:
-        return const Tooltip(
-          message: "Unknown Alarm",
+        return Tooltip(
+          message: "${alarm.runtimeType}",
           triggerMode: TooltipTriggerMode.tap,
-          child: Icon(
+          child: const Icon(
             Icons.error,
             color: mainColor,
           ),

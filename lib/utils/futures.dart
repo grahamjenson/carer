@@ -61,7 +61,8 @@ Future<T> executeWithRetry<T>(
 ////
 
 class AWatch<T extends Widget> extends StatelessWidget {
-  const AWatch(this.builder, {super.key});
+  final List<Signal> dependencies;
+  const AWatch(this.builder, {super.key, this.dependencies = const []});
 
   /// The widget to rebuild when any signals change
   final T Function(BuildContext context) builder;
@@ -70,6 +71,9 @@ class AWatch<T extends Widget> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Watch((context) {
       try {
+        for (var dep in dependencies) {
+          dep.value;
+        }
         return builder(context);
       } catch (e, stackTrace) {
         // Only report stack for internal lines

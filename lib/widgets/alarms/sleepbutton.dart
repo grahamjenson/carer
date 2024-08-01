@@ -1,117 +1,119 @@
+import 'dart:math';
+
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
+import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
-
-String shortSecondsLeft(Duration duration) {
-  var totalSeconds = duration.inSeconds;
-  if (totalSeconds <= 0) {
-    return "";
-  }
-
-  var hours = (totalSeconds / 3600).floor();
-  var minutes = ((totalSeconds % 3600) / 60).floor();
-
-  var minutesStr = "<1m";
-
-  if (hours > 0) {
-    if (minutes == 0) {
-      return "${hours}h";
-    }
-    return "${hours}h\n${minutes}m";
-  }
-
-  if (minutes > 0) {
-    return "${minutes}m";
-  }
-
-  return minutesStr;
-}
-
-Computed<String> sleepStringSignal = acomputed(() {
-  var duration = AlarmsService().sleepDuration;
-  if (duration == null) {
-    return "";
-  }
-  return shortSecondsLeft(duration);
-}, "");
+import 'package:unicons/unicons.dart';
 
 class SleepButton extends StatelessWidget {
-  const SleepButton({
-    super.key,
-  });
-
-  final Widget icon = const Icon(Icons.bedtime, color: mainColor);
+  const SleepButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var backgroundColor = mainColor.withAlpha(40);
-    var buttonColor = mainColor.withAlpha(80);
-    var width = 150.0;
-    var height = 35.0;
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      var width = constraints.maxWidth - 50;
+      double buttonRadias = min(75, width);
 
-    return AWatch((context) {
-      // OnPressed only cancels the sleep time, this makes it easy to turn off sleep, but hard to accidentally sleep it
-      stopSleep() {
-        AlarmsService().sleepDurationSeconds = null;
-      }
-
-      openSleepDialog() async {
-        var sleepTime = await _openSleepDialog(context);
-        sleepTime ??= 0;
-        AlarmsService().sleepDurationSeconds = sleepTime;
-        return true;
-      }
-
-      Widget child = TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: mainColor.withAlpha(20),
-            padding: const EdgeInsets.all(0),
-          ),
-          onPressed: stopSleep,
-          child: Text(
-            textAlign: TextAlign.center,
-            sleepStringSignal.value,
-            style: const TextStyle(color: mainColor, fontWeight: FontWeight.bold, height: 0.8),
-          ));
-
-      if (AlarmsService().sleepDuration == null) {
-        child = icon;
-      }
-
-      var dismissable = Dismissible(
-        key: UniqueKey(),
-        direction: DismissDirection.startToEnd,
-        dismissThresholds: const {DismissDirection.startToEnd: 0.75},
-        confirmDismiss: (_) async {
-          await go(openSleepDialog());
-
-          return true;
-        },
-        child: Container(
-          width: width - height,
-          height: height,
-          alignment: Alignment.centerLeft,
-          child: Container(
-            height: height,
-            width: height,
-            decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(100)),
-            child: Center(child: child),
-          ),
+      return SizedBox(
+        width: width,
+        height: buttonRadias,
+        child: Stack(
+          children: [
+            getSleepStatus(),
+            getDismissable(context, buttonRadias, width),
+            getSleepCancel(buttonRadias),
+          ],
         ),
       );
-
-      return Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
-        alignment: Alignment.centerLeft,
-        child: dismissable,
-      );
     });
+  }
+
+  Widget getSleepStatus() {
+    return AWatch((context) {
+      var sleepDuration = AlarmsService().sleepDuration;
+      if (sleepDuration == null) {
+        return const SizedBox.shrink();
+      }
+      var sleepString = sleepStringWidget(sleepDuration);
+      return Container(alignment: Alignment.center, child: sleepString);
+    }, dependencies: [TimerService().tenSecondSignal, AlarmsService().sleepUntilSignal]);
+  }
+
+  Widget getSleepCancel(double buttonRadias) {
+    return AWatch(
+      (context) {
+        if (AlarmsService().sleepDuration == null) {
+          return const SizedBox.shrink();
+        }
+
+        var backgroundColor = mainColor.withAlpha(40);
+        var cancelIcon = Icon(UniconsLine.times, color: mainColor, size: buttonRadias);
+
+        return Align(
+            alignment: Alignment.topRight,
+            child: Container(
+              alignment: Alignment.center,
+              height: buttonRadias,
+              width: buttonRadias,
+              decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                alignment: Alignment.center,
+                icon: cancelIcon,
+                onPressed: () {
+                  AlarmsService().sleepDurationSeconds = null;
+                },
+              ),
+            ));
+      },
+      dependencies: [AlarmsService().sleepUntilSignal],
+    );
+  }
+
+  Widget getDismissable(BuildContext context, double buttonRadias, double width) {
+    var backgroundColor = mainColor.withAlpha(40);
+    var buttonColor = mainColor.withAlpha(80);
+
+    var dismissibleIcon = Icon(UniconsLine.angle_right, color: mainColor, size: buttonRadias);
+
+    openSleepDialog() async {
+      var sleepTime = await _openSleepDialog(context);
+      sleepTime ??= 0;
+      AlarmsService().sleepDurationSeconds = sleepTime;
+      return true;
+    }
+
+    return Container(
+        height: buttonRadias,
+        width: width,
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+        alignment: Alignment.centerLeft,
+        child: Dismissible(
+          key: UniqueKey(),
+          direction: DismissDirection.startToEnd,
+          dismissThresholds: const {DismissDirection.startToEnd: 0.5},
+          confirmDismiss: (_) async {
+            await go(openSleepDialog());
+            return false;
+          },
+          child: Container(
+            alignment: Alignment.centerLeft,
+            height: buttonRadias,
+            width: width - buttonRadias,
+            child: Container(
+              alignment: Alignment.center,
+              height: buttonRadias,
+              width: buttonRadias,
+              decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(10)),
+              child: Center(child: dismissibleIcon),
+            ),
+          ),
+        ));
   }
 }
 
@@ -207,4 +209,38 @@ Future<int?> _openSleepDialog(BuildContext context) {
       ),
     ),
   );
+}
+
+const big = TextStyle(
+  color: mainColor,
+  fontSize: 20,
+  fontFeatures: [FontFeature.tabularFigures()],
+);
+
+const small = TextStyle(
+  color: mainColor,
+  fontSize: 10,
+);
+
+Widget sleepStringWidget(Duration duration) {
+  var totalSeconds = duration.inSeconds;
+  if (totalSeconds <= 0) {
+    return const SizedBox.shrink();
+  }
+
+  var hours = (totalSeconds / 3600).floor();
+  var minutes = ((totalSeconds % 3600) / 60).floor();
+
+  if (hours > 0) {
+    if (minutes == 0) {
+      return SmartText(texts: ["Sleep $hours", "h"], styles: const [big, small]);
+    }
+    return SmartText(texts: ["Sleep $hours", "h", "$minutes", "m"], styles: const [big, small, big, small]);
+  }
+
+  if (minutes > 0) {
+    return SmartText(texts: ["Sleep $minutes", "m"], styles: const [big, small]);
+  }
+
+  return SmartText(texts: const ["Sleep <1m"], styles: const [big]);
 }

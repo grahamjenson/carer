@@ -23,7 +23,7 @@ class AlarmsService {
   factory AlarmsService() => _singleton;
   final AlarmPlayer player = AlarmPlayer();
 
-  final Signal<DateTime?> _sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
+  final Signal<DateTime?> sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
 
   late final Set<Alarm> allAlarms = {
     // Target Alarms
@@ -60,7 +60,7 @@ class AlarmsService {
     List<Signal> checkAlarmsDependencies = allSettingsSignals +
         [
           TimerService().tenSecondSignal,
-          _sleepUntilSignal,
+          sleepUntilSignal,
           SQLToSGV().writeSignal,
         ];
 
@@ -121,7 +121,7 @@ class AlarmsService {
   }
 
   Future<(Set<Alarm>, Set<Alarm>)> calculateAlarms() async {
-    var notSleeping = _sleepUntilSignal.value == null;
+    var notSleeping = sleepUntilSignal.value == null;
 
     Set<Alarm> newTriggeredAlarms = {};
     Set<Alarm> newActiveAlarms = {};
@@ -193,10 +193,10 @@ class AlarmsService {
 
   Timer? sleepTimer;
   Duration? get sleepDuration {
-    if (_sleepUntilSignal.value == null) {
+    if (sleepUntilSignal.value == null) {
       return null;
     }
-    return _sleepUntilSignal.value!.difference(clock.now());
+    return sleepUntilSignal.value!.difference(clock.now());
   }
 
   set sleepDurationSeconds(int? value) {
@@ -205,15 +205,15 @@ class AlarmsService {
     }
 
     if (value == null) {
-      _sleepUntilSignal.value = null;
+      sleepUntilSignal.value = null;
       return;
     }
 
     sleepTimer = Timer(Duration(seconds: value), () {
-      _sleepUntilSignal.value = null;
+      sleepUntilSignal.value = null;
     });
 
-    _sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
+    sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
   }
 
   Future<void> stopTestAlarm() async {
