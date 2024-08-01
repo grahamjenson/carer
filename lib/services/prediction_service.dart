@@ -38,6 +38,14 @@ class PredictionService {
     return predictions.firstWhereOrNull((e) => e.date.isAfter(time));
   }
 
+  int getPredictionAtValue(DateTime time) {
+    var pv = getPredictionAt(time);
+    if (pv == null) {
+      return 0;
+    }
+    return pv.value;
+  }
+
   Range5? atPredictedTime(DateTime time) {
     var sgv = getPredictionAt(time);
 

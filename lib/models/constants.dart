@@ -46,6 +46,10 @@ enum Unit {
     }
   }
 
+  String strWithUnit(num value) {
+    return '${str(value)}$name';
+  }
+
   static Unit fromBool(bool? b) {
     if (b == false) {
       return Unit.mg;

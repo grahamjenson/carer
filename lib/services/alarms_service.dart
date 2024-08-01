@@ -25,19 +25,28 @@ class AlarmsService {
 
   final Signal<DateTime?> sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
 
+  final Alarm _noDataAlarm = const NoDataAlarm();
+  final Alarm _predictiveLowAlarm = const PredictiveLowAlarm();
+  final Alarm _lowAlarm = const LowAlarm();
+  final Alarm _urgentLowAlarm = const UrgentLowAlarm();
+  final Alarm _highAlarm = const HighAlarm();
+  final Alarm _urgentHighAlarm = const UrgentHighAlarm();
+  final Alarm _fastDropAlarm = const FastDropAlarm();
+  final Alarm _fastRiseAlarm = const FastRiseAlarm();
+
   late final Set<Alarm> allAlarms = {
     // Target Alarms
-    const UrgentLowAlarm(),
-    const LowAlarm(),
-    const HighAlarm(),
-    const UrgentHighAlarm(),
+    _urgentLowAlarm,
+    _lowAlarm,
+    _highAlarm,
+    _urgentHighAlarm,
     // Rate Alarms
-    const FastDropAlarm(),
-    const FastRiseAlarm(),
+    _fastDropAlarm,
+    _fastRiseAlarm,
     // No Data Alarm
-    const NoDataAlarm(),
+    _noDataAlarm,
     // Predictive Alarms
-    const PredictiveLowAlarm(),
+    _predictiveLowAlarm,
   };
 
   final Signal<bool> _testAlarmPlayingSignal = Signal<bool>(false, debugLabel: "TestAlarmPlaying");
@@ -86,12 +95,11 @@ class AlarmsService {
   }
 
   Future<bool> _checkAlarms() async {
-    Set<Alarm> newTriggeredAlarms = {};
-    Set<Alarm> newActiveAlarms = {};
+    var (newTriggeredAlarms, newActiveAlarms) = await calculateAlarms();
 
-    if (!tooSoon()) {
-      // If it was resumed recently we want to turn off all alarms, otherwise check alarms
-      (newTriggeredAlarms, newActiveAlarms) = await calculateAlarms();
+    if (tooSoon()) {
+      // If it was recently resumed it might cause bad alarm data
+      newActiveAlarms = {};
     }
 
     triggeredAlarms.value = newTriggeredAlarms;
@@ -141,12 +149,33 @@ class AlarmsService {
         newActiveAlarms.add(alarm);
       }
     }
+    // Filter out doubles of alarms
+    newTriggeredAlarms = filterAlarms(newTriggeredAlarms);
+    newActiveAlarms = filterAlarms(newActiveAlarms);
 
     alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
 
     // Set alarms that have been triggered
 
     return (newTriggeredAlarms, newActiveAlarms);
+  }
+
+  Set<Alarm> filterAlarms(Set<Alarm> alarms) {
+    // Remove predictive low if actually low
+    if (alarms.contains(_lowAlarm) && alarms.contains(_predictiveLowAlarm)) {
+      alarms.remove(_predictiveLowAlarm);
+    }
+
+    // remove low if urgent low
+    if (alarms.contains(_lowAlarm) && alarms.contains(_urgentLowAlarm)) {
+      alarms.remove(_lowAlarm);
+    }
+
+    // remove high if urgent high
+    if (alarms.contains(_highAlarm) && alarms.contains(_urgentHighAlarm)) {
+      alarms.remove(_highAlarm);
+    }
+    return alarms;
   }
 
   Future<bool> audioAlerts(Set<Alarm> alarms) async {

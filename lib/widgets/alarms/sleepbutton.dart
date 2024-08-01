@@ -41,7 +41,21 @@ class SleepButton extends StatelessWidget {
         return const SizedBox.shrink();
       }
       var sleepString = sleepStringWidget(sleepDuration);
-      return Container(alignment: Alignment.center, child: sleepString);
+      var alarmString = alarmStringWidget();
+
+      List<Widget> rows = [];
+      if (sleepString != null) {
+        rows.add(sleepString);
+      }
+      if (alarmString != null) {
+        rows.add(alarmString);
+      }
+
+      return Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.zero,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: rows),
+      );
     }, dependencies: [TimerService().tenSecondSignal, AlarmsService().sleepUntilSignal]);
   }
 
@@ -223,10 +237,10 @@ const small = TextStyle(
   fontSize: 10,
 );
 
-Widget sleepStringWidget(Duration duration) {
+Widget? sleepStringWidget(Duration duration) {
   var totalSeconds = duration.inSeconds;
   if (totalSeconds <= 0) {
-    return const SizedBox.shrink();
+    return null;
   }
 
   var hours = (totalSeconds / 3600).floor();
@@ -244,4 +258,19 @@ Widget sleepStringWidget(Duration duration) {
   }
 
   return SmartText(texts: const ["Sleep <1m"], styles: const [big]);
+}
+
+Widget? alarmStringWidget() {
+  var triggeredAlarms = AlarmsService().triggeredAlarms.value;
+  if (triggeredAlarms.isEmpty) {
+    return null;
+  }
+  List<String> texts = [];
+  List<TextStyle> styles = [];
+  for (var alarm in triggeredAlarms) {
+    texts.add(alarm.status());
+    styles.add(small);
+  }
+
+  return SmartText(texts: texts, styles: styles);
 }

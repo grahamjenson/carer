@@ -2,8 +2,13 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:unicons/unicons.dart';
 
 abstract class Alarm {
   const Alarm();
@@ -23,24 +28,19 @@ abstract class Alarm {
     return runtimeType.toString();
   }
 
-  String status() {
-    var (t, a, s) = alarmStatus();
-    var name = runtimeType.toString();
-    var statuses = properties();
-    if (t) {
-      statuses.add('T');
-    }
-    if (a) {
-      statuses.add('A');
-    }
-    if (s) {
-      statuses.add('S');
-    }
-    return '$name: (${statuses.join(",")})';
-  }
+  String status();
+  IconData icon();
 
   (bool, bool, bool) alarmStatus() {
     return (trigger(), active(), smartSnooze());
+  }
+
+  int lastSgvReading() {
+    var lastSGV = CleanSGV.lastSGV.value;
+    if (lastSGV == null) {
+      return 0;
+    }
+    return lastSGV.value;
   }
 
   Range5 get targetRange5 {
@@ -83,6 +83,14 @@ abstract class Alarm {
 
     return lastSGV.date;
   }
+
+  String lastSGVStr() {
+    return unitStr(lastSgvReading());
+  }
+
+  String unitStr(int value) {
+    return UISettings().unit.str(value);
+  }
 }
 
 class PredictiveLowAlarm extends Alarm {
@@ -95,6 +103,12 @@ class PredictiveLowAlarm extends Alarm {
       "pRange($range)",
     ];
   }
+
+  @override
+  IconData icon() => UniconsLine.windsock;
+
+  @override
+  String status() => "Predictive Low ${unitStr(PredictionService().getPredictionAtValue(at))} < ${unitStr(TargetSettings().lowUrgent)}";
 
   int get numberOfReadings => AlarmSettings().lowPredictionMinutes ~/ 5;
 
@@ -122,6 +136,12 @@ class UrgentLowAlarm extends Alarm {
   const UrgentLowAlarm();
 
   @override
+  IconData icon() => UniconsLine.temperature_minus;
+
+  @override
+  String status() => "Urgent Low  ${lastSGVStr()} < ${unitStr(TargetSettings().lowUrgent)}";
+
+  @override
   bool trigger() {
     return targetRange5 == Range5.veryLow;
   }
@@ -134,6 +154,12 @@ class UrgentLowAlarm extends Alarm {
 
 class LowAlarm extends Alarm {
   const LowAlarm();
+
+  @override
+  String status() => "Low ${lastSGVStr()} < ${unitStr(TargetSettings().lowTarget)}";
+
+  @override
+  IconData icon() => UniconsLine.temperature_empty;
 
   @override
   List<String> properties() {
@@ -171,6 +197,12 @@ class LowAlarm extends Alarm {
 
 class HighAlarm extends Alarm {
   const HighAlarm();
+
+  @override
+  IconData icon() => UniconsLine.temperature;
+
+  @override
+  String status() => "High ${lastSGVStr()} > ${unitStr(TargetSettings().highTarget)}";
 
   @override
   List<String> properties() {
@@ -212,6 +244,12 @@ class UrgentHighAlarm extends Alarm {
   const UrgentHighAlarm();
 
   @override
+  IconData icon() => UniconsLine.temperature_plus;
+
+  @override
+  String status() => "Urgent High ${lastSGVStr()} > ${unitStr(TargetSettings().highUrgent)}";
+
+  @override
   bool trigger() {
     return targetRange5 == Range5.veryHigh;
   }
@@ -224,6 +262,12 @@ class UrgentHighAlarm extends Alarm {
 
 class FastRiseAlarm extends Alarm {
   const FastRiseAlarm();
+
+  @override
+  IconData icon() => UniconsLine.angle_double_up;
+
+  @override
+  String status() => "Fast Rise < ${unitStr(TargetSettings().fastRiseDelta)}";
 
   @override
   List<String> properties() {
@@ -263,6 +307,12 @@ class FastRiseAlarm extends Alarm {
 
 class FastDropAlarm extends Alarm {
   const FastDropAlarm();
+
+  @override
+  IconData icon() => UniconsLine.angle_double_down;
+
+  @override
+  String status() => "Fast Drop > ${unitStr(TargetSettings().fastDropDelta)}";
 
   @override
   List<String> properties() {
@@ -306,6 +356,12 @@ class NoDataAlarm extends Alarm {
   const NoDataAlarm();
 
   @override
+  IconData icon() => UniconsLine.x;
+
+  @override
+  String status() => "No Data ${age.inMinutes}m > ${alarmMinutes()}m";
+
+  @override
   List<String> properties() {
     return [
       "mins(${alarmMinutes()})",
@@ -328,12 +384,16 @@ class NoDataAlarm extends Alarm {
     if (AlarmSettings().noDataAlarmMinutes == -1) {
       return false;
     }
+
+    return age.inMinutes > alarmMinutes();
+  }
+
+  Duration get age {
     var lastSGV = CleanSGV.lastSGV.value;
     if (lastSGV == null) {
-      return false;
+      return Duration.zero;
     }
-
-    return lastSGV.age.inMinutes > alarmMinutes();
+    return lastSGV.age;
   }
 
   @override
