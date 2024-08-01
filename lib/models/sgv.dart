@@ -141,6 +141,9 @@ class CleanSGV extends Model {
   // This method returns all the last3Hour of SGVs, but chained together with their before values
   static List<CleanSGV> last3HoursChained() {
     List<CleanSGV> sgvs = CleanSGV.last3Hours.value;
+    if (sgvs.isEmpty) {
+      return [];
+    }
     List<CleanSGV> chainedSGVs = [sgvs.first];
     // Get the first id before
 
