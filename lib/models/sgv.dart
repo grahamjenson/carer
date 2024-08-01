@@ -137,7 +137,7 @@ class CleanSGV extends Model {
     return sgvsTodayInRange / sgvsToday;
   }
 
-  // TODO fix this up somehow
+  // TODO fix this up somehow and TEST IT
   // This method returns all the last3Hour of SGVs, but chained together with their before values
   static List<CleanSGV> last3HoursChained() {
     List<CleanSGV> sgvs = CleanSGV.last3Hours.value;
