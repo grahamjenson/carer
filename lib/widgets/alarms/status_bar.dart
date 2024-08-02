@@ -14,24 +14,14 @@ class StatusesBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((_) {
-      var silentStatus = getIsSilentOnIcon();
-      var batteryStatus = getIsPluggedInIcon();
-      var sage = sensorChangeDay();
-      var cage = cannulaChangeDay();
-
-      List<Widget> rows = [];
-      if (silentStatus != null) {
-        rows.add(silentStatus);
-      }
-      if (batteryStatus != null) {
-        rows.add(batteryStatus);
-      }
-      if (sage != null) {
-        rows.add(sage);
-      }
-      if (cage != null) {
-        rows.add(cage);
-      }
+      List<Widget?> rowsMaybe = [
+        getIsSilentOnIcon(),
+        getIsPluggedInIcon(),
+        sensorChangeDay(),
+        cannulaChangeDay(),
+        uploaderPhoneLowPower(),
+      ];
+      List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
 
       if (rows.isEmpty) {
         return const SizedBox.shrink();
@@ -122,6 +112,22 @@ class StatusesBar extends StatelessWidget {
         triggerMode: TooltipTriggerMode.tap,
         child: const Icon(
           UniconsLine.mobile_android,
+          color: mainColor,
+        ),
+      );
+    }
+    return null;
+  }
+
+  // TODO: Maybe this should be an alarm
+  Widget? uploaderPhoneLowPower() {
+    var battery = PropertiesData().battery.toInt();
+    if (battery < 30) {
+      return Tooltip(
+        message: "Uploader Phone Low Battery $battery%",
+        triggerMode: TooltipTriggerMode.tap,
+        child: const Icon(
+          UniconsLine.battery_empty,
           color: mainColor,
         ),
       );
