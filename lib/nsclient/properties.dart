@@ -60,14 +60,14 @@ class NSProperties {
       var json = jsonDecode(jsonString);
 
       return NSProperties(
-        battery: json["upbat"]?["min"]?["battery"],
-        batteryDisplay: json["upbat"]?["min"]?["display"],
-        iob: json["iob"]?["iob"],
-        basaliob: json["iob"]?["basaliob"],
-        treatmentIob: json["iob"]?["treatmentIob"],
-        cob: json["cob"]?["cob"],
-        sensorChangeTime: json["sage"]?["Sensor Change"]?["treatmentDate"],
-        cannulaChangeTime: json["cage"]?["treatmentDate"],
+        battery: json["upbat"]?["min"]?["battery"]?.toInt(),
+        batteryDisplay: json["upbat"]?["min"]?["display"]?.toString(),
+        iob: json["iob"]?["iob"]?.toDouble(),
+        basaliob: json["iob"]?["basaliob"]?.toDouble(),
+        treatmentIob: json["iob"]?["treatmentIob"]?.toDouble(),
+        cob: json["cob"]?["cob"]?.toDouble(),
+        sensorChangeTime: json["sage"]?["Sensor Change"]?["treatmentDate"]?.toInt(),
+        cannulaChangeTime: json["cage"]?["treatmentDate"]?.toInt(),
       );
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);

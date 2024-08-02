@@ -12,7 +12,7 @@ class Window extends StatelessWidget {
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        border: Border.all(color: mainColor, width: 1),
+        border: Border.all(width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -21,15 +21,16 @@ class Window extends StatelessWidget {
         children: [
           Container(
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: mainColor,
-            ),
             child: Text(title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: mainColor,
                   fontSize: 10,
                 )),
+          ),
+          Container(
+            height: 1,
+            color: mainColor.withAlpha(250), // Color of the bottom line
           ),
           child
         ],

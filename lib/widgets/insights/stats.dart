@@ -43,6 +43,7 @@ class Stats extends StatelessWidget {
       var cobNow = PropertiesData().cob;
       var cageNow = PropertiesData().cage;
       var powerNow = PropertiesData().battery;
+      var charging = PropertiesData().isCharging;
       var sageNow = PropertiesData().sage;
 
       var sgvs = CleanSGV.last3Hours.value;
@@ -86,7 +87,7 @@ class Stats extends StatelessWidget {
                 rows: [
                   iob(iobNow),
                   cob(cobNow),
-                  power(powerNow),
+                  power(powerNow.toInt(), charging),
                   basal(currentBasal),
                   target(UISettings().unit, profileLowTarget, profileHighTarget),
                   currentProfile(),
@@ -96,6 +97,7 @@ class Stats extends StatelessWidget {
                   predictions("Forecast", exp2preds, UISettings().unit),
                   cage(cageNow),
                   sage(sageNow),
+                  profileValues(),
                 ],
               );
             }),
@@ -103,6 +105,43 @@ class Stats extends StatelessWidget {
         ),
       );
     });
+  }
+
+  DataRow profileValues() {
+    ValueAtTime? valueAtTime = ValueAtTime.lastSixHours.value.firstOrNull;
+    if (valueAtTime == null) {
+      return const DataRow(
+        cells: [
+          DataCell(Text("CR/ISF", style: heading)),
+          DataCell(
+            Text("none", style: row),
+          ),
+        ],
+      );
+    }
+    var cr = valueAtTime.cr;
+    var isf = valueAtTime.isf;
+
+    return DataRow(
+      cells: [
+        const DataCell(Text("CR/ISF", style: heading)),
+        DataCell(
+          SmartText(textAlign: TextAlign.center, texts: [
+            "$cr",
+            "g",
+            " | ",
+            "$isf",
+            "u",
+          ], styles: const [
+            row,
+            small,
+            row,
+            row,
+            small,
+          ]),
+        ),
+      ],
+    );
   }
 
   DataRow currentProfile() {
@@ -189,12 +228,18 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow power(double battery) {
+  DataRow power(int battery, bool charging) {
+    List<String> chargingList = [];
+    List<TextStyle> chargingStyles = [];
+    if (charging) {
+      chargingList = ["⚡"];
+      chargingStyles = [row];
+    }
     return DataRow(
       cells: [
         const DataCell(Text("Power", style: heading)),
         DataCell(
-          SmartText(texts: ["$battery", "%"], styles: const [row, small]),
+          SmartText(texts: ["$battery", "%"] + chargingList, styles: const [row, small] + chargingStyles),
         ),
       ],
     );

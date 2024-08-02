@@ -74,6 +74,8 @@ class PropertiesData {
   // Getters
   double get battery => _signals[PropertiesDataName.battery]!.value;
   String get batteryDisplay => _signals[PropertiesDataName.batteryDisplay]!.value;
+  bool get isCharging => batteryDisplay.contains("⚡");
+
   double get iob => _signals[PropertiesDataName.iob]!.value;
   double get basaliob => _signals[PropertiesDataName.basaliob]!.value;
   double get treatmentIob => _signals[PropertiesDataName.treatmentIob]!.value;
