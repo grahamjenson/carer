@@ -1,4 +1,5 @@
 import 'package:carer/nsclient/entries.dart';
+import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
@@ -30,9 +31,7 @@ Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token
 
 Uri currentProfile(nsURL, token) => Uri.parse('$nsURL/api/v1/profile/current.json?token=$token');
 
-Uri iobEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/iob.json?token=$token');
-Uri cobEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/cob.json?token=$token');
-Uri basalEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties/basal.json?token=$token');
+Uri propertiesEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties.json?token=$token');
 
 // Singleton
 class NSClient {
@@ -108,5 +107,24 @@ class NSClient {
     }
 
     return NSProfile.fromCurrentJson(response.body);
+  }
+
+  Future<NSProperties?> getProperties(String nsURL, String token) async {
+    if (nsURL == "" || token == "") {
+      alog("getProperties No NS URL");
+      return null;
+    }
+    var ep = propertiesEndpoint(nsURL, token);
+    final (response, err) = await go(http.get(ep));
+    if (err != null || response == null) {
+      return null;
+    }
+    alog("FETCHED ${ep.toString()}");
+    if (response.statusCode != 200) {
+      alog("NON 200 responce code ${response.statusCode}");
+      return null;
+    }
+
+    return NSProperties.fromJson(response.body);
   }
 }

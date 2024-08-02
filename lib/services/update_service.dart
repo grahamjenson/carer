@@ -1,6 +1,6 @@
 import 'package:carer/services/updaters/ns_entries.dart';
 import 'package:carer/services/updaters/ns_profile.dart';
-import 'package:carer/services/updaters/ns_summary.dart';
+import 'package:carer/services/updaters/ns_properties.dart';
 import 'package:carer/services/updaters/ns_treatments.dart';
 import 'package:carer/services/updaters/updater.dart';
 
@@ -11,7 +11,7 @@ class UpdateService {
 
   List<Updater> updaters = [];
   UpdateService._() {
-    var nsSummaryUpdater = NSSummaryUpdater();
+    var nsSummaryUpdater = NSPropertiesUpdater();
     var nsEntriesUpdater = NSEntriesUpdater();
     var nsTreatmentUpdater = NSTreatmentsUpdater();
     var nsProfileUpdater = NSProfileUpdater();

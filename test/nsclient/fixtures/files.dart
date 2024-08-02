@@ -15,4 +15,5 @@ var files = {
   "summary_bad": 'test/nsclient/fixtures/summary_bad.json',
 
   "current_profile": 'test/nsclient/fixtures/current_profile.json',
+  "properties": 'test/nsclient/fixtures/properties.json',
 };

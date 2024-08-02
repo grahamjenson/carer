@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:carer/models/profile.dart';
+import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/models/state_data.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/alarms_service.dart';
@@ -45,7 +45,7 @@ void runCarer() async {
   await executeWithRetry(Settings().setupDBPropagation);
 
   // Setup the StateData DB stuff
-  await executeWithRetry(StateData().setupDBPropagation);
+  await executeWithRetry(PropertiesData().setupDBPropagation);
 
   // For some reason screens forget to stay awake
   aeffect(() {

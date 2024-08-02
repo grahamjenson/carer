@@ -1,7 +1,7 @@
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/profile.dart';
+import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sgv.dart';
-import 'package:carer/models/state_data.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -39,10 +39,12 @@ class Stats extends StatelessWidget {
         profileHighTarget = valuesAtTime.first.highTarget;
       }
 
-      var iobNow = StateData().iob();
-      var cobNow = StateData().cob();
-      var cageNow = StateData().cage();
-      var powerNow = StateData().battery();
+      var iobNow = PropertiesData().iob;
+      var cobNow = PropertiesData().cob;
+      var cageNow = PropertiesData().cage;
+      var powerNow = PropertiesData().battery;
+      var sageNow = PropertiesData().sage;
+
       var sgvs = CleanSGV.last3Hours.value;
       var exp2preds = PredictionService().predictions;
 
@@ -93,6 +95,7 @@ class Stats extends StatelessWidget {
                   yesterdayInRange(),
                   predictions("Forecast", exp2preds, UISettings().unit),
                   cage(cageNow),
+                  sage(sageNow),
                 ],
               );
             }),
@@ -159,6 +162,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow iob(double iob) {
+    iob = toMax2dp(iob);
     return DataRow(
       cells: [
         const DataCell(
@@ -172,6 +176,7 @@ class Stats extends StatelessWidget {
   }
 
   DataRow cob(double cob) {
+    cob = toMax2dp(cob);
     return DataRow(
       cells: [
         const DataCell(
@@ -196,11 +201,26 @@ class Stats extends StatelessWidget {
   }
 
   DataRow cage(double cage) {
+    var cageDT = DateTime.fromMillisecondsSinceEpoch(cage.toInt());
+    Duration d = DateTime.now().difference(cageDT);
     return DataRow(
       cells: [
         const DataCell(Text("cage", style: heading)),
         DataCell(
-          SmartText(texts: ["$cage", "h"], styles: const [row, small]),
+          SmartText(texts: ["${d.inDays}", "d"], styles: const [row, small]),
+        ),
+      ],
+    );
+  }
+
+  DataRow sage(double sage) {
+    var sageDT = DateTime.fromMillisecondsSinceEpoch(sage.toInt());
+    Duration d = DateTime.now().difference(sageDT);
+    return DataRow(
+      cells: [
+        const DataCell(Text("sage", style: heading)),
+        DataCell(
+          SmartText(texts: ["${d.inDays}", "d"], styles: const [row, small]),
         ),
       ],
     );

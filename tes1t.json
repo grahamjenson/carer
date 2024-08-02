@@ -1,0 +1,31 @@
+{
+  "upbat": {
+    "min": {
+      "battery": 87,
+      "value": 87,
+      "display": "87%",
+      "level": 75
+    }
+  },
+  "iob": {
+    "iob": 1.983,
+    "basaliob": -0.669,
+    "treatmentIob": 3.464
+  },
+  "cob": {
+    "cob": 12.39360495744192
+  },
+  "cage": {
+    "treatmentDate": 1722497240926,
+  },
+  "sage": {
+    "Sensor Start": {
+      "found": false
+    },
+    "Sensor Change": {
+      "found": true,
+      "treatmentDate": 1721978583000
+    },
+    "min": "Sensor Change"
+  }
+}
