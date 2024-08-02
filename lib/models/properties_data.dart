@@ -78,8 +78,8 @@ class PropertiesData {
   double get basaliob => _signals[PropertiesDataName.basaliob]!.value;
   double get treatmentIob => _signals[PropertiesDataName.treatmentIob]!.value;
   double get cob => _signals[PropertiesDataName.cob]!.value;
-  double get cage => _signals[PropertiesDataName.cage]!.value;
-  double get sage => _signals[PropertiesDataName.sage]!.value;
+  DateTime get cage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.cage]!.value.toInt());
+  DateTime get sage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.sage]!.value.toInt());
 
   setBattery(double value) {
     _signals[PropertiesDataName.battery]!.value = value;

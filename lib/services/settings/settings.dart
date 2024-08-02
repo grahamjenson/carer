@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/device_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -14,6 +15,7 @@ class Settings {
   final alarmSettings = AlarmSettings();
   final alarmAlertSettings = AlarmAlertSettings();
   final secureSettings = SecureSettings();
+  final deviceSettings = DeviceSettings();
 
   Settings._();
 
@@ -25,6 +27,7 @@ class Settings {
     targetSettings.setupDBPropagation(prefs);
     alarmSettings.setupDBPropagation(prefs);
     alarmAlertSettings.setupDBPropagation(prefs);
+    deviceSettings.setupDBPropagation(prefs);
     return true;
   }
 }

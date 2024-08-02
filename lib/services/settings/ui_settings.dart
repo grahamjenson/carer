@@ -3,7 +3,13 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:signals/signals_flutter.dart';
 
-enum _UINames { screenActive, uiLayoutVertical, uiLayoutHorizontal, uiTheme, unit }
+enum _UINames {
+  screenActive,
+  uiLayoutVertical,
+  uiLayoutHorizontal,
+  uiTheme,
+  unit,
+}
 
 class UISettings {
   static final UISettings _singleton = UISettings._();

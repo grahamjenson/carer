@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:carer/models/constants.dart';
-import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';

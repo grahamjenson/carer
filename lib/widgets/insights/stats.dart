@@ -200,9 +200,8 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow cage(double cage) {
-    var cageDT = DateTime.fromMillisecondsSinceEpoch(cage.toInt());
-    Duration d = DateTime.now().difference(cageDT);
+  DataRow cage(DateTime cage) {
+    Duration d = DateTime.now().difference(cage);
     return DataRow(
       cells: [
         const DataCell(Text("cage", style: heading)),
@@ -213,9 +212,8 @@ class Stats extends StatelessWidget {
     );
   }
 
-  DataRow sage(double sage) {
-    var sageDT = DateTime.fromMillisecondsSinceEpoch(sage.toInt());
-    Duration d = DateTime.now().difference(sageDT);
+  DataRow sage(DateTime sage) {
+    Duration d = DateTime.now().difference(sage);
     return DataRow(
       cells: [
         const DataCell(Text("sage", style: heading)),

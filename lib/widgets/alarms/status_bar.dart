@@ -1,7 +1,10 @@
+import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
+import 'package:carer/services/settings/device_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/colours.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -13,12 +16,21 @@ class StatusesBar extends StatelessWidget {
     return AWatch((_) {
       var silentStatus = getIsSilentOnIcon();
       var batteryStatus = getIsPluggedInIcon();
+      var sage = sensorChangeDay();
+      var cage = cannulaChangeDay();
+
       List<Widget> rows = [];
       if (silentStatus != null) {
         rows.add(silentStatus);
       }
       if (batteryStatus != null) {
         rows.add(batteryStatus);
+      }
+      if (sage != null) {
+        rows.add(sage);
+      }
+      if (cage != null) {
+        rows.add(cage);
       }
 
       if (rows.isEmpty) {
@@ -64,6 +76,52 @@ class StatusesBar extends StatelessWidget {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bolt_slash,
+          color: mainColor,
+        ),
+      );
+    }
+    return null;
+  }
+
+  Widget? sensorChangeDay() {
+    var sage = PropertiesData().sage;
+    var sageExpiry = sage.add(DeviceSettings().sensorDuration);
+    var hours = sageExpiry.difference(clock.now()).inHours;
+
+    var hoursStr = "in ${hours}h";
+    if (hours < 1) {
+      hoursStr = "NOW";
+    }
+
+    if (hours < 24) {
+      return Tooltip(
+        message: "Sensor Change $hoursStr",
+        triggerMode: TooltipTriggerMode.tap,
+        child: const Icon(
+          UniconsLine.processor,
+          color: mainColor,
+        ),
+      );
+    }
+    return null;
+  }
+
+  Widget? cannulaChangeDay() {
+    var cage = PropertiesData().cage;
+    var cageExpiry = cage.add(DeviceSettings().cannulaDuration);
+    var hours = cageExpiry.difference(clock.now()).inHours;
+
+    var hoursStr = "in ${hours}h";
+    if (hours < 1) {
+      hoursStr = "NOW";
+    }
+
+    if (hours < 24) {
+      return Tooltip(
+        message: "Cannula Change $hoursStr",
+        triggerMode: TooltipTriggerMode.tap,
+        child: const Icon(
+          UniconsLine.mobile_android,
           color: mainColor,
         ),
       );
