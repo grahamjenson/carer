@@ -22,6 +22,9 @@ enum _AlarmNames {
 
   lowPredictionAlarm,
   lowPredictionMinutes,
+
+  carerBatteryAlarm,
+  t1dBatteryAlarm,
 }
 
 class AlarmSettings {
@@ -43,6 +46,8 @@ class AlarmSettings {
     _AlarmNames.noDataAlarmMinutes: Signal<int>(-1, debugLabel: 'noDataAlarmMinutes'),
     _AlarmNames.lowPredictionAlarm: Signal<bool>(false, debugLabel: 'lowPredictionAlarm'),
     _AlarmNames.lowPredictionMinutes: Signal<int>(5, debugLabel: 'lowPredictionMinutes'),
+    _AlarmNames.carerBatteryAlarm: Signal<bool>(false, debugLabel: 'carerBatteryAlarm'),
+    _AlarmNames.t1dBatteryAlarm: Signal<bool>(false, debugLabel: 't1dBatteryAlarm'),
   };
 
   AlarmSettings._();
@@ -91,6 +96,12 @@ class AlarmSettings {
 
   int get noDataAlarmMinutes => _signals[_AlarmNames.noDataAlarmMinutes]!.value as int;
   set noDataAlarmMinutes(int value) => noDataAlarmSet(_signals[_AlarmNames.noDataAlarmMinutes]! as Signal<int>, value);
+
+  bool get carerBatteryAlarm => _signals[_AlarmNames.carerBatteryAlarm]!.value as bool;
+  set carerBatteryAlarm(bool value) => _signals[_AlarmNames.carerBatteryAlarm]!.value = value;
+
+  bool get t1dBatteryAlarm => _signals[_AlarmNames.t1dBatteryAlarm]!.value as bool;
+  set t1dBatteryAlarm(bool value) => _signals[_AlarmNames.t1dBatteryAlarm]!.value = value;
 
   allValues() {
     for (var signal in _signals.values) {
@@ -153,8 +164,10 @@ class AlarmSettings {
 
     noDataAlarmMinutes = prefs.getInt(_AlarmNames.noDataAlarmMinutes.name, defaultValue: 30)!;
 
+    // Turn off alarms
     aeffect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms));
 
+    // Target Alarms
     aeffect(() => prefs.setBool(_AlarmNames.urgentLowAlarm.name, urgentLowAlarm));
 
     aeffect(() => prefs.setBool(_AlarmNames.lowAlarm.name, lowAlarm));
@@ -167,6 +180,7 @@ class AlarmSettings {
 
     aeffect(() => prefs.setBool(_AlarmNames.urgentHighAlarm.name, urgentHighAlarm));
 
+    // Diff alarms
     aeffect(() => prefs.setBool(_AlarmNames.fastDropAlarm.name, fastDropAlarm));
 
     aeffect(() => prefs.setInt(_AlarmNames.fastDropAlarmMinutes.name, fastDropAlarmMinutes));
@@ -175,10 +189,17 @@ class AlarmSettings {
 
     aeffect(() => prefs.setInt(_AlarmNames.fastRiseAlarmMinutes.name, fastRiseAlarmMinutes));
 
+    // No data alarms
     aeffect(() => prefs.setInt(_AlarmNames.noDataAlarmMinutes.name, noDataAlarmMinutes));
 
+    // Prediction alarms
     aeffect(() => prefs.setBool(_AlarmNames.lowPredictionAlarm.name, lowPredictionAlarm));
 
     aeffect(() => prefs.setInt(_AlarmNames.lowPredictionMinutes.name, lowPredictionMinutes));
+
+    // Battery alarms
+    aeffect(() => prefs.setBool(_AlarmNames.carerBatteryAlarm.name, carerBatteryAlarm));
+
+    aeffect(() => prefs.setBool(_AlarmNames.t1dBatteryAlarm.name, t1dBatteryAlarm));
   }
 }

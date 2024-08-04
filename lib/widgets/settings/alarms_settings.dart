@@ -30,6 +30,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           predictionAlarms(context),
           diffSettings(context),
           noDataAlarmSettings(),
+          batteryAlarms(),
         ];
       }
       return SettingsSection(
@@ -251,6 +252,44 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             text: "30m",
             height: _size,
             width: _size,
+          ),
+        ],
+      ),
+    );
+  }
+
+  SettingsTile batteryAlarms() {
+    return SettingsTile(
+      title: const Text("Low Battery Alarm"),
+      trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size * 2),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
+        isSelected: [
+          AlarmSettings().carerBatteryAlarm,
+          AlarmSettings().t1dBatteryAlarm,
+        ],
+        onPressed: (int index) {
+          switch (index) {
+            case 0:
+              AlarmSettings().carerBatteryAlarm = !AlarmSettings().carerBatteryAlarm;
+              break;
+            case 1:
+              AlarmSettings().t1dBatteryAlarm = !AlarmSettings().t1dBatteryAlarm;
+              break;
+          }
+        },
+        children: const [
+          ToggleButton(
+            text: "Carer Phone\n< 30%",
+            height: _size,
+            width: _size * 1.5,
+          ),
+          ToggleButton(
+            text: "T1D Phone\n< 30%",
+            height: _size,
+            width: _size * 1.5,
           ),
         ],
       ),

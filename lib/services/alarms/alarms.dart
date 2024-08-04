@@ -1,4 +1,6 @@
+import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sgv.dart';
+import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -399,5 +401,63 @@ class NoDataAlarm extends Alarm {
   @override
   bool active() {
     return AlarmSettings().noDataAlarmMinutes != -1;
+  }
+}
+
+class CarerPhoneLowBatteryAlarm extends Alarm {
+  const CarerPhoneLowBatteryAlarm();
+
+  @override
+  IconData icon() => UniconsLine.battery_empty;
+
+  @override
+  String status() => "This Phones Battery ${carerBatteryLevel()}% < 30%";
+
+  @override
+  bool trigger() {
+    // Less than 30% and not charging
+    return carerBatteryLevel() < 30 && !carerBatteryCharging();
+  }
+
+  @override
+  bool active() {
+    return AlarmSettings().carerBatteryAlarm;
+  }
+
+  int carerBatteryLevel() {
+    return PlatformInfoService().batteryLevel.value;
+  }
+
+  bool carerBatteryCharging() {
+    var bm = PlatformInfoService().batteryMode.value;
+    return bm == BatteryMode.charging;
+  }
+}
+
+class T1DPhoneLowBatteryAlarm extends Alarm {
+  const T1DPhoneLowBatteryAlarm();
+
+  @override
+  IconData icon() => UniconsLine.battery_empty;
+
+  @override
+  String status() => "Uploader/T1D Phones Battery  ${t1dBatteryLevel()}% < 30";
+
+  @override
+  bool trigger() {
+    return t1dBatteryLevel() < 30 && !t1dBatteryCharning();
+  }
+
+  int t1dBatteryLevel() {
+    return PropertiesData().battery.toInt();
+  }
+
+  bool t1dBatteryCharning() {
+    return PropertiesData().isCharging;
+  }
+
+  @override
+  bool active() {
+    return AlarmSettings().t1dBatteryAlarm;
   }
 }

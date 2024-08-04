@@ -22,6 +22,9 @@ class PlatformInfoService {
     );
 
     var battery = Battery();
+
+    signalAssign(batteryLevel, () => battery.batteryLevel, debugLabel: "BatteryLevelSignal", dependencies: [TimerService().fiveSecondSignal]);
+
     battery.onBatteryStateChanged.listen((BatteryState state) {
       switch (state) {
         case BatteryState.full:
@@ -45,6 +48,7 @@ class PlatformInfoService {
 
   Signal<RingerMode> ringerMode = Signal(RingerMode.unknown, debugLabel: "RingerMode");
   Signal<BatteryMode> batteryMode = Signal(BatteryMode.unknown, debugLabel: "BatteryMode");
+  Signal<int> batteryLevel = Signal(100, debugLabel: "BatteryLevel");
 
   Future<RingerMode> getRingerMode() async {
     RingerMode ringerStatus = RingerMode.unknown;

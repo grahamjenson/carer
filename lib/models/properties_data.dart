@@ -20,7 +20,7 @@ class PropertiesData {
   PropertiesData._();
 
   final Map<PropertiesDataName, Signal> _signals = {
-    PropertiesDataName.battery: Signal(0.0, debugLabel: "Battery"),
+    PropertiesDataName.battery: Signal(100.0, debugLabel: "Battery"),
     PropertiesDataName.batteryDisplay: Signal("", debugLabel: "BatteryDisplay"),
     PropertiesDataName.iob: Signal(0.0, debugLabel: "IOB"),
     PropertiesDataName.basaliob: Signal(0.0, debugLabel: "BasalIOB"),

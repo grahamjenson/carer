@@ -34,6 +34,9 @@ class AlarmsService {
   final Alarm _fastDropAlarm = const FastDropAlarm();
   final Alarm _fastRiseAlarm = const FastRiseAlarm();
 
+  final Alarm _carerBatteryAlarm = const CarerPhoneLowBatteryAlarm();
+  final Alarm _t1dBatteryAlarm = const T1DPhoneLowBatteryAlarm();
+
   late final Set<Alarm> allAlarms = {
     // Target Alarms
     _urgentLowAlarm,
@@ -47,6 +50,10 @@ class AlarmsService {
     _noDataAlarm,
     // Predictive Alarms
     _predictiveLowAlarm,
+
+    // Battery Alarms
+    _carerBatteryAlarm,
+    _t1dBatteryAlarm,
   };
 
   final Signal<bool> _testAlarmPlayingSignal = Signal<bool>(false, debugLabel: "TestAlarmPlaying");
