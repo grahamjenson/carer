@@ -1,11 +1,12 @@
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/device_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:unicons/unicons.dart';
 
 class StatusesBar extends StatelessWidget {
@@ -112,7 +113,7 @@ class StatusesBar extends StatelessWidget {
         triggerMode: TooltipTriggerMode.tap,
         child: const Icon(
           UniconsLine.mobile_android,
-          color: mainColor,
+          color: primaryColor(context: context),
         ),
       );
     }
@@ -128,7 +129,7 @@ class StatusesBar extends StatelessWidget {
         triggerMode: TooltipTriggerMode.tap,
         child: const Icon(
           UniconsLine.battery_empty,
-          color: mainColor,
+          color: primaryColor(context: context),
         ),
       );
     }

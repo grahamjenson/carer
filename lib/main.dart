@@ -11,13 +11,13 @@ import 'package:carer/services/background_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -63,6 +63,7 @@ void runCarer() async {
   NotificationService();
   UpdateService().start();
   AlarmsService();
+  ThemeService();
 
   ////
   // SQL Signals
@@ -90,16 +91,16 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport.global(
-      child: MaterialApp(
-        title: 'Carer',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 50, 0), brightness: Brightness.dark),
-          useMaterial3: true,
-        ),
-        home: const HomePage(),
-      ),
+    return AWatch(
+      (context) {
+        return MaterialApp(
+          title: 'Carer',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeService().theme,
+          home: const HomePage(),
+        );
+      },
+      dependencies: [ThemeService().themeSignal],
     );
   }
 }

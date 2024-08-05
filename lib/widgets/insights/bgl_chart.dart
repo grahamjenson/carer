@@ -4,10 +4,10 @@ import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class BasalSpot extends FlSpot {
   BasalSpot(super.x, super.y, this.basal);
 }
 
-const TextStyle touchedTextStyle = TextStyle(fontSize: 10, height: 0.6, fontWeight: FontWeight.w700, color: mainColor, shadows: [
+TextStyle touchedTextStyle = TextStyle(fontSize: 10, height: 0.6, fontWeight: FontWeight.w700, color: primaryColor(), shadows: const [
   Shadow(
       // bottomLeft
       offset: Offset(-1.5, -1.5),
@@ -66,6 +66,7 @@ class BGLChart extends StatelessWidget {
       var (lowTargets, highTargets) = targetSpots(targets);
       var treatments = treatmentsSpots(lastTreatments);
 
+      var mainColor = primaryColor(context: context);
       var bglLineData = LineChartBarData(
         color: mainColor,
         spots: bglSpotData,
@@ -83,7 +84,17 @@ class BGLChart extends StatelessWidget {
                 ),
                 child: AWatch((context) {
                   return LineChart(
-                    buildlineChartData(minsAgo, maxBasal, bglSpotData, basalSpotData, lowTargets, highTargets, treatments, bglLineData),
+                    buildlineChartData(
+                      minsAgo,
+                      maxBasal,
+                      bglSpotData,
+                      basalSpotData,
+                      lowTargets,
+                      highTargets,
+                      treatments,
+                      bglLineData,
+                      mainColor,
+                    ),
                     duration: Duration.zero,
                   );
                 }))),
@@ -100,6 +111,7 @@ class BGLChart extends StatelessWidget {
     List<FlSpot> highTargets,
     List<FlSpot> treatments,
     LineChartBarData bglLineData,
+    Color mainColor,
   ) {
     double maxY = 306;
     double minY = 0;
@@ -214,7 +226,7 @@ class BGLChart extends StatelessWidget {
     return (lowTargets, highTargets);
   }
 
-  LineTouchData lineTouchData(Unit unit) {
+  LineTouchData lineTouchData(Unit unit, Color mainColor) {
     return LineTouchData(
       enabled: true,
       touchTooltipData: LineTouchTooltipData(
@@ -258,7 +270,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlBorderData borderData() {
+  FlBorderData borderData(Color mainColor) {
     return FlBorderData(
       show: true,
       border: Border.all(color: mainColor.withAlpha(50), width: 1),
@@ -279,7 +291,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlGridData gridData() {
+  FlGridData gridData(Color mainColor) {
     return FlGridData(
       show: true,
       drawVerticalLine: true,
@@ -300,7 +312,7 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  RangeAnnotations rangeAnnotations() {
+  RangeAnnotations rangeAnnotations(Color mainColor) {
     return RangeAnnotations(
       horizontalRangeAnnotations: [
         HorizontalRangeAnnotation(
@@ -317,13 +329,13 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  SideTitles bottomTitleWidgets() {
+  SideTitles bottomTitleWidgets(Color mainColor) {
     return SideTitles(
         showTitles: true,
         reservedSize: 17,
         interval: 30,
         getTitlesWidget: (double value, TitleMeta meta) {
-          const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 7, color: mainColor, height: 0.5);
+          var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 7, color: mainColor, height: 0.5);
 
           //return Spacer if value is not mod 30
           if (value.toInt() % 30 != 0) {
@@ -337,13 +349,13 @@ class BGLChart extends StatelessWidget {
         });
   }
 
-  SideTitles rightTitleWidgets(double maxBasal) {
+  SideTitles rightTitleWidgets(double maxBasal, Color mainColor) {
     return SideTitles(
       showTitles: true,
       interval: 1,
       reservedSize: 19,
       getTitlesWidget: (double value, TitleMeta meta) {
-        const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
+        var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
 
         bool drawTitle = (value == basalMultiplier.toDouble() || value == basalMultiplier.toDouble() / 2);
 
@@ -362,13 +374,13 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  SideTitles leftTitleWidgets() {
+  SideTitles leftTitleWidgets(Color mainColor) {
     return SideTitles(
       showTitles: true,
       interval: 1,
       reservedSize: 18,
       getTitlesWidget: (double value, TitleMeta meta) {
-        const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
+        var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
 
         if (value.toInt() == TargetSettings().highUrgent ||
             value.toInt() == TargetSettings().lowUrgent ||
@@ -392,8 +404,8 @@ class BGLChart extends StatelessWidget {
   }) {
     return FlDotCirclePainter(
       radius: 2,
-      color: mainColor,
-      strokeColor: mainColor,
+      color: primaryColor(),
+      strokeColor: primaryColor(),
     );
   }
 

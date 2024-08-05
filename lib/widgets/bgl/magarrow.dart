@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 class MagArrow extends StatefulWidget {
@@ -114,6 +114,7 @@ class MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    var mainColor = primaryColor();
     Color main = mainColor;
     Color dim = mainColor.withAlpha(75);
 

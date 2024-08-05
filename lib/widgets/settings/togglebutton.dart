@@ -1,4 +1,4 @@
-import 'package:carer/widgets/colours.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:flutter/material.dart';
 
 class ToggleButton extends StatelessWidget {
@@ -15,7 +15,7 @@ class ToggleButton extends StatelessWidget {
       this.icon,
       this.height = 40,
       this.width = 40,
-      this.textStyle = const TextStyle(fontSize: 10, color: mainColor),
+      this.textStyle = const TextStyle(fontSize: 10),
       this.onLongPress});
 
   @override

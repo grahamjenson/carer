@@ -1,32 +1,32 @@
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
-
-const big = TextStyle(
-  color: mainColor,
-  fontSize: 20,
-  fontFeatures: [FontFeature.tabularFigures()],
-);
-
-const small = TextStyle(
-  color: mainColor,
-  fontSize: 10,
-);
 
 class SleepTextStatus extends StatelessWidget {
   const SleepTextStatus({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var big = TextStyle(
+      color: primaryColor(context: context),
+      fontSize: 20,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+
+    var small = TextStyle(
+      color: primaryColor(context: context),
+      fontSize: 10,
+    );
+
     return AWatch((context) {
       List<Widget> rows = [];
       if (isSleeping()) {
         rows = [sleepStringWidget(), alarmStringWidget(small)];
       } else {
-        rows = [const Text("Sleep", style: big), alarmStringWidget(small)];
+        rows = [Text("Sleep", style: big), alarmStringWidget(small)];
       }
 
       return Container(

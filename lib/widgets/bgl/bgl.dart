@@ -4,7 +4,6 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 //copied from https://xdrip.readthedocs.io/en/latest/use/mainUI/#trend-arrow
@@ -47,8 +46,8 @@ class BGL extends StatelessWidget {
                   child: AWatch((_) {
                     var unit = UISettings().unit;
                     return Text(sgv.sgvStr(unit),
-                        style: const TextStyle(
-                          color: mainColor,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
                         ));
                   }),
@@ -66,8 +65,8 @@ class BGL extends StatelessWidget {
                           var unit = UISettings().unit;
                           return Text(
                             sgv.rate5mWithSign(unit),
-                            style: const TextStyle(
-                              color: mainColor,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           );

@@ -2,7 +2,6 @@ import 'package:carer/models/treatments.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';

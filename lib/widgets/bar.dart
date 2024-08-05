@@ -1,6 +1,6 @@
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/widgets/alarms/alarms_bar.dart';
 import 'package:carer/widgets/alarms/status_bar.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:flutter/material.dart';
 
@@ -30,9 +30,10 @@ class Bar extends StatelessWidget {
   }
 
   Widget getSettingsButton(BuildContext context) {
+    var mainColor = primaryColor(context: context);
     return IconButton(
       padding: EdgeInsets.zero,
-      icon: const Icon(
+      icon: Icon(
         Icons.settings,
         color: mainColor,
       ),

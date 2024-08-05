@@ -1,7 +1,7 @@
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 class AlarmsBarIcons extends StatelessWidget {
@@ -20,7 +20,7 @@ class AlarmsBarIcons extends StatelessWidget {
         padding: const EdgeInsets.all(4), // Add padding inside the border
         decoration: BoxDecoration(
           border: Border.all(
-            color: mainColor, // Color of the border
+            color: primaryColor(context: context), // Color of the border
             width: 1, // Width of the border
           ),
           borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners

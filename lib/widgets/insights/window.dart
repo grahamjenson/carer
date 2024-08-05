@@ -1,4 +1,4 @@
-import 'package:carer/widgets/colours.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:flutter/material.dart';
 
 class Window extends StatelessWidget {
@@ -8,6 +8,7 @@ class Window extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var mainColor = primaryColor(context: context);
     return Container(
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,

@@ -1,5 +1,6 @@
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
+import 'package:flutter/material.dart';
 
 class Dates {
   static String dateAgoFromMills(Duration? diff) {
@@ -52,5 +53,12 @@ class Dates {
       return "${timeAsHour - 12}PM";
     }
     return "${timeAsHour}AM";
+  }
+
+  static String tODToString(TimeOfDay tod) {
+    // fill in zeros
+    String minZeros = "${tod.minute}".padLeft(2, '0');
+    String ampm = tod.period == DayPeriod.am ? "AM" : "PM";
+    return "${tod.hour}:$minZeros$ampm";
   }
 }

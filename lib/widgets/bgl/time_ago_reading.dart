@@ -1,7 +1,6 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:flutter/material.dart';
 
 class TimeAgoReading extends StatelessWidget {
@@ -24,10 +23,10 @@ class TimeAgoReading extends StatelessWidget {
 
       Widget text;
       if (sgv.age.inMinutes == 0) {
-        text = const Text(
+        text = Text(
           "now",
           style: TextStyle(
-            color: mainColor,
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
             fontSize: 100,
           ),
@@ -36,8 +35,8 @@ class TimeAgoReading extends StatelessWidget {
         text = RichText(
           text: TextSpan(
             text: "${sgv.age.inMinutes}",
-            style: const TextStyle(
-              color: mainColor,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
               fontSize: 110,
             ),

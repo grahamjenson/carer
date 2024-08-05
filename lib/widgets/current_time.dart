@@ -1,6 +1,6 @@
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +15,10 @@ class CurrentTimeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
+      var mainColor = primaryColor(context: context);
       var _ = TimerService().secondSignal.value;
       final String formattedDateTime = _formatDateTime(clock.now());
-      return Text(formattedDateTime, style: const TextStyle(height: 0.5, fontSize: 32, fontWeight: FontWeight.bold, color: mainColor));
+      return Text(formattedDateTime, style: TextStyle(height: 0.5, fontSize: 32, fontWeight: FontWeight.bold, color: mainColor));
     });
   }
 }

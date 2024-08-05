@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/sleep_text_status.dart';
-import 'package:carer/widgets/colours.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -40,8 +40,8 @@ class SleepButton extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        var backgroundColor = mainColor.withAlpha(40);
-        var cancelIcon = Icon(UniconsLine.times, color: mainColor, size: buttonRadias);
+        var backgroundColor = Theme.of(context).colorScheme.secondary;
+        var cancelIcon = Icon(UniconsLine.times, color: primaryColor(context: context), size: buttonRadias);
 
         return Align(
             alignment: Alignment.topRight,
@@ -65,6 +65,8 @@ class SleepButton extends StatelessWidget {
   }
 
   Widget getDismissable(BuildContext context, double buttonRadias, double width) {
+    var mainColor = primaryColor(context: context);
+
     var backgroundColor = mainColor.withAlpha(40);
     var buttonColor = mainColor.withAlpha(80);
 
