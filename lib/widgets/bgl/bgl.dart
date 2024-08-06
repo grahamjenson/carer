@@ -1,7 +1,6 @@
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +14,10 @@ class BGL extends StatelessWidget {
   Widget build(BuildContext context) {
     return AWatch((context) {
       const loader = Center(child: CircularProgressIndicator());
-      alog("BGL: BUILDING SGV");
       var sgv = CleanSGV.lastSGV.value;
-      alog("BGL: BUILDING SGV  $sgv");
       if (sgv == null) {
-        alog("BGL: BUILDING LOADER  $sgv");
         return loader;
       }
-      alog("BGL: BUILDING PROPER  $sgv");
 
       return AspectRatio(
           aspectRatio: 1.5,

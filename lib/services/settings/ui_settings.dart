@@ -9,6 +9,7 @@ enum _UINames {
   uiLayoutVertical,
   uiLayoutHorizontal,
   uiTheme,
+  alarmTheme,
   nightTheme,
   nightStartTime,
   nightEndTime,
@@ -24,6 +25,7 @@ class UISettings {
     _UINames.uiLayoutVertical: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutVertical'),
     _UINames.uiLayoutHorizontal: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutHorizontal'),
     _UINames.uiTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'uiTheme'),
+    _UINames.alarmTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'alarmTheme'),
     _UINames.nightTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'nightTheme'),
     _UINames.nightStartTime: Signal<TimeOfDay>(const TimeOfDay(hour: 22, minute: 0), debugLabel: 'nightStartTime'),
     _UINames.nightEndTime: Signal<TimeOfDay>(const TimeOfDay(hour: 6, minute: 0), debugLabel: 'nightEndTime'),
@@ -44,6 +46,10 @@ class UISettings {
   Signal<UITheme> get uiThemeSignal => _signals[_UINames.uiTheme]! as Signal<UITheme>;
   UITheme get uiTheme => uiThemeSignal.value;
   set uiTheme(UITheme value) => uiThemeSignal.value = value;
+
+  Signal<UITheme> get alarmThemeSignal => _signals[_UINames.alarmTheme]! as Signal<UITheme>;
+  UITheme get alarmTheme => alarmThemeSignal.value;
+  set alarmTheme(UITheme value) => alarmThemeSignal.value = value;
 
   Signal<UITheme> get nightThemeSignal => _signals[_UINames.nightTheme]! as Signal<UITheme>;
   UITheme get nightTheme => nightThemeSignal.value;
@@ -92,6 +98,8 @@ class UISettings {
 
     uiTheme = UITheme.fromString(prefs.getString(_UINames.uiTheme.name));
 
+    alarmTheme = UITheme.fromString(prefs.getString(_UINames.alarmTheme.name));
+
     nightTheme = UITheme.fromString(prefs.getString(_UINames.nightTheme.name));
 
     nightStartTime = tODfromInt(prefs.getInt(_UINames.nightStartTime.name, defaultValue: 22 * 60)!);
@@ -118,6 +126,10 @@ class UISettings {
 
     aeffect(() {
       prefs.setString(_UINames.uiTheme.name, uiTheme.name);
+    });
+
+    aeffect(() {
+      prefs.setString(_UINames.alarmTheme.name, alarmTheme.name);
     });
 
     aeffect(() {

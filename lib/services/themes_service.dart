@@ -1,3 +1,4 @@
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -12,10 +13,15 @@ class ThemeService {
   }
 
   Signal<ThemeData> themeSignal = Signal(normalTheme, debugLabel: "Theme");
+  late ValueNotifier<ThemeData> themeNotifier;
 
   ThemeService._internal() {
+    themeNotifier = themeSignal.toValueNotifier();
+
     signalAssign(themeSignal, () async {
-      if (UISettings().isNightModeActive()) {
+      if (AlarmsService().activeAlarms.value.isNotEmpty) {
+        return selectTheme(UISettings().alarmTheme);
+      } else if (UISettings().isNightModeActive()) {
         return selectTheme(UISettings().nightTheme);
       } else {
         return selectTheme(UISettings().uiTheme);
@@ -23,9 +29,11 @@ class ThemeService {
     }, dependencies: [
       TimerService().minuteSignal,
       UISettings().uiThemeSignal,
+      UISettings().alarmThemeSignal,
       UISettings().nightThemeSignal,
       UISettings().nightStartTimeSignal,
       UISettings().nightEndTimeSignal,
+      AlarmsService().activeAlarms,
     ]);
   }
 

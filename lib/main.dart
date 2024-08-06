@@ -88,19 +88,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return AWatch(
-      (context) {
-        return MaterialApp(
-          title: 'Carer',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeService().theme,
-          home: const HomePage(),
-        );
+    return ValueListenableBuilder<ThemeData>(
+      valueListenable: ThemeService().themeNotifier,
+      builder: (context, theme, _) {
+        return TweenAnimationBuilder<ThemeData>(
+            tween: ThemeDataTween(begin: theme, end: theme),
+            duration: const Duration(seconds: 1), // Increase duration here
+            builder: (context, theme, _) {
+              return MaterialApp(
+                title: 'Carer',
+                debugShowCheckedModeBanner: false,
+                theme: theme,
+                home: const HomePage(),
+              );
+            });
       },
-      dependencies: [ThemeService().themeSignal],
     );
   }
 }

@@ -71,6 +71,22 @@ class UISettingsWidget extends AbstractSettingsSection {
             ),
           ),
           SettingsTile(
+            title: const Text("Alarm Theme"),
+            trailing: DropdownButton(
+              items: UITheme.values
+                  .map((e) => DropdownMenuItem(
+                        value: e,
+                        child: SizedBox(width: 130, child: Text(e.viewName)),
+                      ))
+                  .toList(),
+              value: UISettings().alarmTheme,
+              onChanged: (value) {
+                if (value == null) return;
+                UISettings().alarmTheme = value;
+              },
+            ),
+          ),
+          SettingsTile(
             title: const Text("Night Theme"),
             trailing: DropdownButton(
               items: UITheme.values
