@@ -27,26 +27,7 @@ class BasalSpot extends FlSpot {
   BasalSpot(super.x, super.y, this.basal);
 }
 
-TextStyle touchedTextStyle = TextStyle(fontSize: 10, height: 0.6, fontWeight: FontWeight.w700, color: primaryColor(), shadows: const [
-  Shadow(
-      // bottomLeft
-      offset: Offset(-1.5, -1.5),
-      color: Colors.black),
-  Shadow(
-      // bottomRight
-      offset: Offset(1.5, -1.5),
-      color: Colors.black),
-  Shadow(
-      // topRight
-      offset: Offset(1.5, 1.5),
-      color: Colors.black),
-  Shadow(
-      // topLeft
-      offset: Offset(-1.5, 1.5),
-      color: Colors.black),
-]);
-
-class BGLChart extends StatelessWidget {
+class BGLChart extends StatelessWidget with ThemeMixin {
   final basalMultiplier = 18 * 3;
 
   const BGLChart({super.key});
@@ -66,12 +47,12 @@ class BGLChart extends StatelessWidget {
       var (lowTargets, highTargets) = targetSpots(targets);
       var treatments = treatmentsSpots(lastTreatments);
 
-      var mainColor = primaryColor(context: context);
+      var mainColor = primaryColor(context);
       var bglLineData = LineChartBarData(
         color: mainColor,
         spots: bglSpotData,
         barWidth: 1,
-        dotData: FlDotData(show: true, getDotPainter: bglDotPainter),
+        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(mainColor)),
       );
 
       return Window(
@@ -119,10 +100,10 @@ class BGLChart extends StatelessWidget {
     double maxX = 0; // now
 
     return LineChartData(
-      rangeAnnotations: rangeAnnotations(),
-      gridData: gridData(),
-      titlesData: titleData(maxBasal),
-      borderData: borderData(),
+      rangeAnnotations: rangeAnnotations(mainColor),
+      gridData: gridData(mainColor),
+      titlesData: titleData(maxBasal, mainColor),
+      borderData: borderData(mainColor),
       maxX: maxX,
       minX: minX,
       minY: minY,
@@ -138,7 +119,7 @@ class BGLChart extends StatelessWidget {
         LineChartBarData(
           spots: treatments,
           barWidth: 0,
-          dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter),
+          dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter(mainColor)),
         ),
         LineChartBarData(
           color: mainColor.withAlpha(140),
@@ -153,7 +134,7 @@ class BGLChart extends StatelessWidget {
           dotData: const FlDotData(show: false),
         ),
       ],
-      lineTouchData: lineTouchData(UISettings().unit),
+      lineTouchData: lineTouchData(UISettings().unit, mainColor),
       betweenBarsData: [
         BetweenBarsData(fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
       ],
@@ -248,7 +229,7 @@ class BGLChart extends StatelessWidget {
               );
               return TouchedSpotIndicatorData(
                 line,
-                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit)),
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, mainColor)),
               );
             }
 
@@ -259,7 +240,7 @@ class BGLChart extends StatelessWidget {
               );
               return TouchedSpotIndicatorData(
                 line,
-                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit)),
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, mainColor)),
               );
             }
 
@@ -277,17 +258,17 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlTitlesData titleData(double maxBasal) {
+  FlTitlesData titleData(double maxBasal, Color mainColor) {
     return FlTitlesData(
       show: true,
-      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal)),
+      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal, mainColor)),
       topTitles: const AxisTitles(
         sideTitles: SideTitles(showTitles: false),
       ),
       bottomTitles: AxisTitles(
-        sideTitles: bottomTitleWidgets(),
+        sideTitles: bottomTitleWidgets(mainColor),
       ),
-      leftTitles: AxisTitles(sideTitles: leftTitleWidgets()),
+      leftTitles: AxisTitles(sideTitles: leftTitleWidgets(mainColor)),
     );
   }
 
@@ -395,21 +376,23 @@ class BGLChart extends StatelessWidget {
     );
   }
 
-  FlDotPainter bglDotPainter(
-    FlSpot spot,
-    double xPercentage,
-    LineChartBarData bar,
-    int index, {
-    double? size,
-  }) {
-    return FlDotCirclePainter(
-      radius: 2,
-      color: primaryColor(),
-      strokeColor: primaryColor(),
-    );
+  GetDotPainterCallback bglDotPainter(Color mainColor) {
+    return (
+      FlSpot spot,
+      double xPercentage,
+      LineChartBarData bar,
+      int index, {
+      double? size,
+    }) {
+      return FlDotCirclePainter(
+        radius: 2,
+        color: mainColor,
+        strokeColor: mainColor,
+      );
+    };
   }
 
-  GetDotPainterCallback bglHighlightPainter(Unit unit) {
+  GetDotPainterCallback bglHighlightPainter(Unit unit, Color mainColor) {
     return (
       FlSpot spot,
       double xPercentage,
@@ -452,45 +435,47 @@ class BGLChart extends StatelessWidget {
     return Alignment.bottomCenter;
   }
 
-  FlDotPainter treatmentsDotPainter(
-    FlSpot spot,
-    double xPercentage,
-    LineChartBarData bar,
-    int index, {
-    double? size,
-  }) {
-    if (spot is TreatmentSpot) {
-      if (spot.treatment.insulin != 0 && spot.treatment.carbs != 0) {
-        return FlTextPainterPainter(
-          "${spot.treatment.insulinStr} ${spot.treatment.carbStr}",
-          align: flipAlignment(index),
-          strokeColor: Colors.black,
-          size: 8,
-          color: mainColor,
-        );
-      } else if (spot.treatment.insulin != 0) {
-        return FlTextPainterPainter(
-          spot.treatment.insulinStr,
-          align: flipAlignment(index),
-          strokeColor: Colors.black,
-          size: 8,
-          color: mainColor,
-        );
-      } else if (spot.treatment.carbs != 0) {
-        return FlTextPainterPainter(
-          spot.treatment.carbStr,
-          align: flipAlignment(index),
-          strokeColor: Colors.black,
-          size: 8,
-          color: mainColor,
-        );
+  GetDotPainterCallback treatmentsDotPainter(Color mainColor) {
+    return (
+      FlSpot spot,
+      double xPercentage,
+      LineChartBarData bar,
+      int index, {
+      double? size,
+    }) {
+      if (spot is TreatmentSpot) {
+        if (spot.treatment.insulin != 0 && spot.treatment.carbs != 0) {
+          return FlTextPainterPainter(
+            "${spot.treatment.insulinStr} ${spot.treatment.carbStr}",
+            align: flipAlignment(index),
+            strokeColor: Colors.black,
+            size: 8,
+            color: mainColor,
+          );
+        } else if (spot.treatment.insulin != 0) {
+          return FlTextPainterPainter(
+            spot.treatment.insulinStr,
+            align: flipAlignment(index),
+            strokeColor: Colors.black,
+            size: 8,
+            color: mainColor,
+          );
+        } else if (spot.treatment.carbs != 0) {
+          return FlTextPainterPainter(
+            spot.treatment.carbStr,
+            align: flipAlignment(index),
+            strokeColor: Colors.black,
+            size: 8,
+            color: mainColor,
+          );
+        }
       }
-    }
-    return FlDotCirclePainter(
-      radius: 0,
-      color: mainColor,
-      strokeColor: mainColor,
-    );
+      return FlDotCirclePainter(
+        radius: 0,
+        color: mainColor,
+        strokeColor: mainColor,
+      );
+    };
   }
 }
 

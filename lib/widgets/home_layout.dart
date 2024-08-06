@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/sleepbutton.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
@@ -23,8 +24,8 @@ enum LayoutTypes {
   verticalBGLWithInsightsAndSleep,
 }
 
-class HomeLayout extends StatelessWidget {
-  const HomeLayout({super.key});
+class HomeLayout extends StatelessWidget with ThemeMixin {
+  HomeLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +103,7 @@ class HomeLayout extends StatelessWidget {
   Widget getInsights() {
     var children = [const Flexible(child: BGLChart())];
 
-    children.add(const Flexible(
+    children.add(Flexible(
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
       Expanded(child: History()),
       Expanded(child: Stats()),

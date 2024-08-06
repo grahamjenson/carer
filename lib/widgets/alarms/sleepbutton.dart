@@ -9,7 +9,7 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class SleepButton extends StatelessWidget {
+class SleepButton extends StatelessWidget with ThemeMixin {
   const SleepButton({super.key});
 
   @override
@@ -40,8 +40,8 @@ class SleepButton extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        var backgroundColor = Theme.of(context).colorScheme.secondary;
-        var cancelIcon = Icon(UniconsLine.times, color: primaryColor(context: context), size: buttonRadias);
+        var backgroundColor = secondaryColor(context);
+        var cancelIcon = Icon(UniconsLine.times, color: primaryColor(context), size: buttonRadias);
 
         return Align(
             alignment: Alignment.topRight,
@@ -65,7 +65,7 @@ class SleepButton extends StatelessWidget {
   }
 
   Widget getDismissable(BuildContext context, double buttonRadias, double width) {
-    var mainColor = primaryColor(context: context);
+    var mainColor = primaryColor(context);
 
     var backgroundColor = mainColor.withAlpha(40);
     var buttonColor = mainColor.withAlpha(80);

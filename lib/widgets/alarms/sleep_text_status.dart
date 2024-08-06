@@ -5,26 +5,26 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
-class SleepTextStatus extends StatelessWidget {
+class SleepTextStatus extends StatelessWidget with ThemeMixin {
   const SleepTextStatus({super.key});
 
   @override
   Widget build(BuildContext context) {
     var big = TextStyle(
-      color: primaryColor(context: context),
+      color: primaryColor(context),
       fontSize: 20,
       fontFeatures: const [FontFeature.tabularFigures()],
     );
 
     var small = TextStyle(
-      color: primaryColor(context: context),
+      color: primaryColor(context),
       fontSize: 10,
     );
 
     return AWatch((context) {
       List<Widget> rows = [];
       if (isSleeping()) {
-        rows = [sleepStringWidget(), alarmStringWidget(small)];
+        rows = [sleepStringWidget(big, small), alarmStringWidget(small)];
       } else {
         rows = [Text("Sleep", style: big), alarmStringWidget(small)];
       }
@@ -48,40 +48,40 @@ class SleepTextStatus extends StatelessWidget {
     }
     return true;
   }
-}
 
-Widget sleepStringWidget() {
-  var duration = AlarmsService().sleepDuration!;
-  var totalSeconds = duration.inSeconds;
+  Widget sleepStringWidget(TextStyle big, TextStyle small) {
+    var duration = AlarmsService().sleepDuration!;
+    var totalSeconds = duration.inSeconds;
 
-  var hours = (totalSeconds / 3600).floor();
-  var minutes = ((totalSeconds % 3600) / 60).floor();
+    var hours = (totalSeconds / 3600).floor();
+    var minutes = ((totalSeconds % 3600) / 60).floor();
 
-  if (hours > 0) {
-    if (minutes == 0) {
-      return SmartText(texts: ["Sleep $hours", "h"], styles: const [big, small]);
+    if (hours > 0) {
+      if (minutes == 0) {
+        return SmartText(texts: ["Sleep $hours", "h"], styles: [big, small]);
+      }
+      return SmartText(texts: ["Sleep $hours", "h", "$minutes", "m"], styles: [big, small, big, small]);
     }
-    return SmartText(texts: ["Sleep $hours", "h", "$minutes", "m"], styles: const [big, small, big, small]);
+
+    if (minutes > 0) {
+      return SmartText(texts: ["Sleep $minutes", "m"], styles: [big, small]);
+    }
+
+    return SmartText(texts: const ["Sleep <1m"], styles: [big]);
   }
 
-  if (minutes > 0) {
-    return SmartText(texts: ["Sleep $minutes", "m"], styles: const [big, small]);
-  }
+  Widget alarmStringWidget(TextStyle style) {
+    var triggeredAlarms = AlarmsService().triggeredAlarms.value;
+    if (triggeredAlarms.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    List<String> texts = [];
+    List<TextStyle> styles = [];
+    for (var alarm in triggeredAlarms) {
+      texts.add(alarm.status());
+      styles.add(style);
+    }
 
-  return SmartText(texts: const ["Sleep <1m"], styles: const [big]);
-}
-
-Widget alarmStringWidget(TextStyle style) {
-  var triggeredAlarms = AlarmsService().triggeredAlarms.value;
-  if (triggeredAlarms.isEmpty) {
-    return const SizedBox.shrink();
+    return SmartText(texts: texts, styles: styles);
   }
-  List<String> texts = [];
-  List<TextStyle> styles = [];
-  for (var alarm in triggeredAlarms) {
-    texts.add(alarm.status());
-    styles.add(style);
-  }
-
-  return SmartText(texts: texts, styles: styles);
 }

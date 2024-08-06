@@ -32,14 +32,57 @@ class ThemeService {
   ThemeData get theme => themeSignal.value;
 }
 
-Color primaryColor({BuildContext? context}) {
-  if (context != null) {
-    Theme.of(context).colorScheme.primary;
-  }
-  return ThemeService().theme.colorScheme.primary;
-}
+Color _primaryColor = const Color.fromARGB(255, 199, 210, 172);
 
-const _primaryColor = Color.fromARGB(255, 199, 210, 172);
+mixin ThemeMixin {
+  Color primaryColor(BuildContext? context) {
+    if (context == null) {
+      return _primaryColor;
+    }
+    return Theme.of(context).colorScheme.primary;
+  }
+
+  Color secondaryColor(BuildContext? context) {
+    if (context == null) {
+      return _primaryColor;
+    }
+    return Theme.of(context).colorScheme.secondary;
+  }
+
+  TextStyle getHeadingTextStyle(BuildContext? context) {
+    return TextStyle(
+      fontWeight: FontWeight.bold,
+      color: primaryColor(context),
+      fontSize: 10,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+  }
+
+  TextStyle getRowTextStyle(BuildContext? context) {
+    return TextStyle(
+      color: primaryColor(context),
+      fontSize: 20,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+  }
+
+  TextStyle getSmallTextStyle(BuildContext? context) {
+    return TextStyle(
+      color: primaryColor(context),
+      fontSize: 10,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+  }
+
+  TextStyle getSuperscriptTextStyle(BuildContext? context) {
+    return TextStyle(
+      color: primaryColor(context),
+      fontSize: 20,
+      fontWeight: FontWeight.w100,
+      fontFeatures: const [FontFeature.superscripts(), FontFeature.tabularFigures()],
+    );
+  }
+}
 
 ThemeData dayTheme = ThemeData(
   useMaterial3: true,

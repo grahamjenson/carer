@@ -1,7 +1,7 @@
 import 'package:carer/services/themes_service.dart';
 import 'package:flutter/material.dart';
 
-class ToggleButton extends StatelessWidget {
+class ToggleButton extends StatelessWidget with ThemeMixin {
   final String text;
   final IconData? icon;
   final double height;
@@ -27,13 +27,13 @@ class ToggleButton extends StatelessWidget {
             height: height,
             child: Stack(
               children: [
-                Positioned(right: 0, child: buildIcon()),
+                Positioned(right: 0, child: buildIcon(primaryColor(context))),
                 Center(child: buildText()),
               ],
             )));
   }
 
-  Widget buildIcon() {
+  Widget buildIcon(Color mainColor) {
     if (icon == null) {
       return const SizedBox.shrink();
     }

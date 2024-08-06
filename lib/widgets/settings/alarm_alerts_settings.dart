@@ -3,12 +3,13 @@ import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
+class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   const AlarmsAlertSettingsWidget({super.key});
   static const double _size = 50;
 
@@ -86,7 +87,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection {
     int minRange = 0;
     int maxRange = 100;
 
-    var color = mainColor;
+    var color = primaryColor(context);
     if (!AlarmAlertSettings().volumeOveride) {
       color = Colors.grey;
     }

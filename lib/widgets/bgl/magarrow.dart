@@ -15,7 +15,7 @@ class MagArrow extends StatefulWidget {
   State<MagArrow> createState() => _MagArrowState();
 }
 
-class _MagArrowState extends State<MagArrow> {
+class _MagArrowState extends State<MagArrow> with ThemeMixin {
   int diff = 0;
   int limit = 3;
   late Timer _timer;
@@ -63,7 +63,7 @@ class _MagArrowState extends State<MagArrow> {
       return AspectRatio(
         aspectRatio: 0.3,
         child: CustomPaint(
-          painter: MyPainter(value),
+          painter: MyPainter(value, primaryColor(context)),
         ),
       );
     });
@@ -110,13 +110,13 @@ Range7 diffRange7() {
 
 class MyPainter extends CustomPainter {
   int? magnitutude;
-  MyPainter(this.magnitutude);
+  Color primaryColor;
+  MyPainter(this.magnitutude, this.primaryColor);
 
   @override
   void paint(Canvas canvas, Size size) {
-    var mainColor = primaryColor();
-    Color main = mainColor;
-    Color dim = mainColor.withAlpha(75);
+    Color main = primaryColor;
+    Color dim = primaryColor.withAlpha(75);
 
     Paint paint = Paint();
     double minV = min(size.height, size.width);

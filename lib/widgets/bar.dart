@@ -4,14 +4,14 @@ import 'package:carer/widgets/alarms/status_bar.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:flutter/material.dart';
 
-class Bar extends StatelessWidget {
+class Bar extends StatelessWidget with ThemeMixin {
   const Bar({super.key});
 
   @override
   Widget build(BuildContext context) {
     List<Widget> tiles = [
       const StatusesBar(),
-      const AlarmsBarIcons(),
+      AlarmsBarIcons(),
       const Expanded(
         child: SizedBox.shrink(),
       ),
@@ -30,7 +30,7 @@ class Bar extends StatelessWidget {
   }
 
   Widget getSettingsButton(BuildContext context) {
-    var mainColor = primaryColor(context: context);
+    var mainColor = primaryColor(context);
     return IconButton(
       padding: EdgeInsets.zero,
       icon: Icon(

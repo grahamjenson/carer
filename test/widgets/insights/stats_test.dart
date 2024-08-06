@@ -19,7 +19,7 @@ void main() async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame
         await tester.pumpWidget(
-          const MaterialApp(home: Stats()),
+          MaterialApp(home: Stats()),
           duration: const Duration(seconds: 2),
         );
       });

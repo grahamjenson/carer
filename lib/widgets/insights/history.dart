@@ -1,4 +1,5 @@
 import 'package:carer/models/treatments.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
@@ -6,36 +7,20 @@ import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
-class History extends StatelessWidget {
-  const History({super.key});
-
-  static const heading = TextStyle(fontWeight: FontWeight.bold, color: mainColor, fontSize: 10);
-
-  static const row = TextStyle(
-    color: mainColor,
-    fontSize: 20,
-    fontFeatures: [FontFeature.tabularFigures()],
-  );
-  static const small = TextStyle(
-    color: mainColor,
-    fontSize: 10,
-  );
-
-  static const superscript = TextStyle(
-    color: mainColor,
-    fontSize: 20,
-    fontWeight: FontWeight.w100,
-    fontFeatures: [FontFeature.superscripts()],
-  );
+class History extends StatelessWidget with ThemeMixin {
+  History({super.key});
 
   @override
   Widget build(BuildContext context) {
+    TextStyle row = getRowTextStyle(context);
+    TextStyle small = getSmallTextStyle(context);
+
     return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute
 
       var treatments = Treatment.lastSixHours.value;
 
-      var history = [for (var t in treatments) historyRow(t)].where((row) => row != null).map((row) => row as DataRow).toList();
+      var history = [for (var t in treatments) historyRow(t, row, small)].where((row) => row != null).map((row) => row as DataRow).toList();
 
       return Window(
         title: "History",
@@ -44,9 +29,9 @@ class History extends StatelessWidget {
               child: Container(
                   alignment: Alignment.center,
                   child: DataTable(
-                      border: const TableBorder(
-                        verticalInside: BorderSide(color: mainColor, width: 0.2),
-                        horizontalInside: BorderSide(color: mainColor, width: 0.2),
+                      border: TableBorder(
+                        verticalInside: BorderSide(color: primaryColor(context), width: 0.2),
+                        horizontalInside: BorderSide(color: primaryColor(context), width: 0.2),
                       ),
                       columnSpacing: 5,
                       dividerThickness: 0.01,
@@ -55,9 +40,9 @@ class History extends StatelessWidget {
                       dataRowMaxHeight: 20,
                       horizontalMargin: 0,
                       columns: [
-                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('', style: heading))),
-                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('', style: heading))),
-                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('', style: heading))),
+                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text(''))),
+                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text(''))),
+                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text(''))),
                       ],
                       rows: history))),
         ),
@@ -65,19 +50,19 @@ class History extends StatelessWidget {
     });
   }
 
-  DataRow? historyRow(Treatment treatment) {
+  DataRow? historyRow(Treatment treatment, TextStyle row, TextStyle small) {
     return DataRow(cells: [
-      DataCell(dateAgoShort(treatment)),
-      DataCell(insulinSmartText(treatment)),
-      DataCell(carbsSmartText(treatment)),
+      DataCell(dateAgoShort(treatment, row, small)),
+      DataCell(insulinSmartText(treatment, row, small)),
+      DataCell(carbsSmartText(treatment, row, small)),
     ]);
   }
 
-  SmartText dateAgoShort(Treatment treatment) {
+  SmartText dateAgoShort(Treatment treatment, TextStyle row, TextStyle small) {
     var diff = treatment.age;
 
     if (diff.inMinutes == 0) {
-      return SmartText(texts: const ["now"], styles: const [row]);
+      return SmartText(texts: const ["now"], styles: [row]);
     }
 
     List<String> texts = [];
@@ -102,17 +87,17 @@ class History extends StatelessWidget {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Widget insulinSmartText(Treatment treatment) {
+  Widget insulinSmartText(Treatment treatment, TextStyle row, TextStyle small) {
     if (treatment.insulin == 0 || treatment.insulin == null) {
       return const SizedBox.shrink();
     }
-    return SmartText(texts: ["${toMax2dp(treatment.insulin!)}", "u"], styles: const [row, small]);
+    return SmartText(texts: ["${toMax2dp(treatment.insulin!)}", "u"], styles: [row, small]);
   }
 
-  Widget carbsSmartText(Treatment treatment) {
+  Widget carbsSmartText(Treatment treatment, TextStyle row, TextStyle small) {
     if (treatment.carbs == 0 || treatment.carbs == null) {
       return const SizedBox.shrink();
     }
-    return SmartText(texts: ["${treatment.carbs!.round()}", "g"], styles: const [row, small]);
+    return SmartText(texts: ["${treatment.carbs!.round()}", "g"], styles: [row, small]);
   }
 }

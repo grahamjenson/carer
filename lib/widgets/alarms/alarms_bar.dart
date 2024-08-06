@@ -4,12 +4,12 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 
-class AlarmsBarIcons extends StatelessWidget {
-  const AlarmsBarIcons({super.key});
+class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
+  AlarmsBarIcons({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((_) {
+    return AWatch((context) {
       var triggeredAlarms = AlarmsService().triggeredAlarms.value;
 
       if (triggeredAlarms.isEmpty) {
@@ -20,27 +20,27 @@ class AlarmsBarIcons extends StatelessWidget {
         padding: const EdgeInsets.all(4), // Add padding inside the border
         decoration: BoxDecoration(
           border: Border.all(
-            color: primaryColor(context: context), // Color of the border
+            color: primaryColor(context), // Color of the border
             width: 1, // Width of the border
           ),
           borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
         ),
         child: Row(
-          children: getAlarmWidgets(triggeredAlarms),
+          children: getAlarmWidgets(triggeredAlarms, primaryColor(context)),
         ),
       );
     });
   }
 
-  List<Widget> getAlarmWidgets(Set<Alarm> triggeredAlarms) {
+  List<Widget> getAlarmWidgets(Set<Alarm> triggeredAlarms, Color mainColor) {
     List<Widget> alarmWidgets = [];
     for (var alarm in triggeredAlarms) {
-      alarmWidgets.add(getAlarmToolTip(alarm));
+      alarmWidgets.add(getAlarmToolTip(alarm, mainColor));
     }
     return alarmWidgets;
   }
 
-  static Tooltip getAlarmToolTip(Alarm alarm) {
+  static Tooltip getAlarmToolTip(Alarm alarm, Color mainColor) {
     return Tooltip(
       message: alarm.status(),
       triggerMode: TooltipTriggerMode.tap,
