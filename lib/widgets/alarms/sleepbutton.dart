@@ -24,24 +24,40 @@ class SleepButton extends StatelessWidget with ThemeMixin {
         height: buttonRadias,
         child: Stack(
           children: [
+            getBackground(context, buttonRadias, width),
             const SleepTextStatus(),
             getDismissable(context, buttonRadias, width),
-            getSleepCancel(buttonRadias),
+            getSleepCancel(context, buttonRadias),
           ],
         ),
       );
     });
   }
 
-  Widget getSleepCancel(double buttonRadias) {
+  Widget getBackground(BuildContext context, double buttonRadias, double width) {
+    var mainColor = primaryColor(context);
+
+    var backgroundColor = mainColor.dimdimdim;
+    return Container(
+      height: buttonRadias,
+      width: width,
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+      alignment: Alignment.centerLeft,
+    );
+  }
+
+  Widget getSleepCancel(BuildContext context, double buttonRadias) {
+    var mainColor = primaryColor(context);
+
+    var backgroundColor = mainColor.dimdimdim;
+
     return AWatch(
       (context) {
         if (AlarmsService().sleepDuration == null) {
           return const SizedBox.shrink();
         }
 
-        var backgroundColor = secondaryColor(context);
-        var cancelIcon = Icon(UniconsLine.times, color: primaryColor(context), size: buttonRadias);
+        var cancelIcon = Icon(UniconsLine.times, color: mainColor, size: buttonRadias);
 
         return Align(
             alignment: Alignment.topRight,
@@ -67,10 +83,10 @@ class SleepButton extends StatelessWidget with ThemeMixin {
   Widget getDismissable(BuildContext context, double buttonRadias, double width) {
     var mainColor = primaryColor(context);
 
-    var backgroundColor = mainColor.withAlpha(40);
-    var buttonColor = mainColor.withAlpha(80);
+    var backgroundColor = mainColor.dimdimdim;
+    var buttonColor = mainColor.dimdim;
 
-    var dismissibleIcon = Icon(UniconsLine.angle_right, color: mainColor, size: buttonRadias);
+    Icon dismissibleIcon = Icon(UniconsLine.angle_right, color: mainColor, size: buttonRadias);
 
     openSleepDialog() async {
       var sleepTime = await _openSleepDialog(context);
@@ -79,32 +95,27 @@ class SleepButton extends StatelessWidget with ThemeMixin {
       return true;
     }
 
-    return Container(
-        height: buttonRadias,
-        width: width,
-        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.startToEnd,
+      dismissThresholds: const {DismissDirection.startToEnd: 0.5},
+      confirmDismiss: (_) async {
+        await go(openSleepDialog());
+        return false;
+      },
+      child: Container(
         alignment: Alignment.centerLeft,
-        child: Dismissible(
-          key: UniqueKey(),
-          direction: DismissDirection.startToEnd,
-          dismissThresholds: const {DismissDirection.startToEnd: 0.5},
-          confirmDismiss: (_) async {
-            await go(openSleepDialog());
-            return false;
-          },
-          child: Container(
-            alignment: Alignment.centerLeft,
-            height: buttonRadias,
-            width: width - buttonRadias,
-            child: Container(
-              alignment: Alignment.center,
-              height: buttonRadias,
-              width: buttonRadias,
-              decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(10)),
-              child: Center(child: dismissibleIcon),
-            ),
-          ),
-        ));
+        height: buttonRadias,
+        width: width - buttonRadias,
+        child: Container(
+          alignment: Alignment.center,
+          height: buttonRadias,
+          width: buttonRadias,
+          decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(10)),
+          child: Center(child: dismissibleIcon),
+        ),
+      ),
+    );
   }
 }
 

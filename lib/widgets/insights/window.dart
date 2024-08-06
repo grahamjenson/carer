@@ -8,7 +8,7 @@ class Window extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var mainColor = primaryColor(context);
+    Color mainColor = primaryColor(context);
     return Container(
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,
@@ -31,7 +31,7 @@ class Window extends StatelessWidget with ThemeMixin {
           ),
           Container(
             height: 1,
-            color: mainColor.withAlpha(250), // Color of the bottom line
+            color: mainColor.dim, // Color of the bottom line
           ),
           child
         ],

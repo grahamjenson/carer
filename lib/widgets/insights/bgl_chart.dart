@@ -122,13 +122,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter(mainColor)),
         ),
         LineChartBarData(
-          color: mainColor.withAlpha(140),
+          color: mainColor.dimdim,
           spots: lowTargets,
           barWidth: 2,
           dotData: const FlDotData(show: false),
         ),
         LineChartBarData(
-          color: mainColor.withAlpha(140),
+          color: mainColor.dimdim,
           spots: highTargets,
           barWidth: 2,
           dotData: const FlDotData(show: false),
@@ -136,7 +136,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       ],
       lineTouchData: lineTouchData(UISettings().unit, mainColor),
       betweenBarsData: [
-        BetweenBarsData(fromIndex: 3, toIndex: 4, color: mainColor.withAlpha(60)),
+        BetweenBarsData(fromIndex: 3, toIndex: 4, color: mainColor.dimdimdim),
       ],
     );
   }
@@ -223,7 +223,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             var spot = barData.spots[index];
             if (spot is BGLSpot) {
               var line = FlLine(
-                color: mainColor.withAlpha(150),
+                color: mainColor.dimdim,
                 strokeWidth: 1,
                 dashArray: [2, 4],
               );
@@ -254,7 +254,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   FlBorderData borderData(Color mainColor) {
     return FlBorderData(
       show: true,
-      border: Border.all(color: mainColor.withAlpha(50), width: 1),
+      border: Border.all(color: mainColor.dimdimdim, width: 1),
     );
   }
 
@@ -280,13 +280,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       verticalInterval: 10,
       getDrawingHorizontalLine: (value) {
         return FlLine(
-          color: mainColor.withAlpha(90),
+          color: mainColor.dimdimdim,
           strokeWidth: 1,
         );
       },
       getDrawingVerticalLine: (value) {
         return FlLine(
-          color: mainColor.withAlpha(90),
+          color: mainColor.dimdimdim,
           strokeWidth: 1,
         );
       },
@@ -299,12 +299,12 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         HorizontalRangeAnnotation(
           y1: TargetSettings().highUrgent.toDouble(),
           y2: TargetSettings().lowUrgent.toDouble(),
-          color: mainColor.withAlpha(35),
+          color: mainColor.dimdimdimdim,
         ),
         HorizontalRangeAnnotation(
           y1: TargetSettings().highTarget.toDouble(),
           y2: TargetSettings().lowTarget.toDouble(),
-          color: mainColor.withAlpha(35),
+          color: mainColor.dimdimdimdim,
         ),
       ],
     );

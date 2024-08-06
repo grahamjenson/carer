@@ -116,7 +116,7 @@ class MyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Color main = primaryColor;
-    Color dim = primaryColor.withAlpha(75);
+    Color dim = primaryColor.dimdimdim;
 
     Paint paint = Paint();
     double minV = min(size.height, size.width);

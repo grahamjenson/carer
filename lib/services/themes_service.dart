@@ -11,14 +11,14 @@ class ThemeService {
     return _themeService;
   }
 
-  Signal<ThemeData> themeSignal = Signal(dayTheme, debugLabel: "Theme");
+  Signal<ThemeData> themeSignal = Signal(normalTheme, debugLabel: "Theme");
 
   ThemeService._internal() {
     signalAssign(themeSignal, () async {
       if (UISettings().isNightModeActive()) {
-        return nightTheme;
+        return selectTheme(UISettings().nightTheme);
       } else {
-        return dayTheme;
+        return selectTheme(UISettings().uiTheme);
       }
     }, dependencies: [
       TimerService().minuteSignal,
@@ -30,6 +30,15 @@ class ThemeService {
   }
 
   ThemeData get theme => themeSignal.value;
+
+  static ThemeData selectTheme(UITheme uitheme) {
+    switch (uitheme) {
+      case UITheme.normal:
+        return normalTheme;
+      case UITheme.dim:
+        return nightTheme;
+    }
+  }
 }
 
 Color _primaryColor = const Color.fromARGB(255, 199, 210, 172);
@@ -84,7 +93,7 @@ mixin ThemeMixin {
   }
 }
 
-ThemeData dayTheme = ThemeData(
+ThemeData normalTheme = ThemeData(
   useMaterial3: true,
 
   // Define the default brightness and colors.
@@ -92,7 +101,7 @@ ThemeData dayTheme = ThemeData(
     brightness: Brightness.dark,
     primary: _primaryColor,
     onPrimary: Colors.black,
-    secondary: _primaryColor.withAlpha(40),
+    secondary: _primaryColor.dimdim,
     onSecondary: Colors.black,
     error: Colors.black,
     onError: _primaryColor,
@@ -105,9 +114,9 @@ ThemeData nightTheme = ThemeData(
   useMaterial3: true,
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: _primaryColor,
+    primary: _primaryColor.dimdim,
     onPrimary: Colors.black,
-    secondary: _primaryColor.withAlpha(40),
+    secondary: _primaryColor.dimdimdim,
     onSecondary: Colors.black,
     error: Colors.black,
     onError: _primaryColor,
@@ -117,7 +126,7 @@ ThemeData nightTheme = ThemeData(
 );
 
 // TODO make this proper
-class Colours {
+class AColors {
   static Color targetColor(Range5 target, num proportion) {
     var color1 = const Color.fromARGB(255, 169, 131, 129);
     var color2 = const Color.fromARGB(255, 107, 129, 108);
@@ -174,5 +183,27 @@ class Colours {
       color = Colors.red;
     }
     return color;
+  }
+}
+
+extension ColorExtension on Color {
+  Color scaleAlphaa(double factor) {
+    return withAlpha((alpha * factor).round().clamp(0, 255));
+  }
+
+  Color get dim {
+    return scaleAlphaa(0.7);
+  }
+
+  Color get dimdim {
+    return scaleAlphaa(0.5);
+  }
+
+  Color get dimdimdim {
+    return scaleAlphaa(0.3);
+  }
+
+  Color get dimdimdimdim {
+    return scaleAlphaa(0.1);
   }
 }
