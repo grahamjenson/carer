@@ -1,7 +1,7 @@
 import 'package:carer/services/settings/ui_settings.dart';
-import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
+import 'package:carer/widgets/settings/ui_pages/theme_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -10,6 +10,7 @@ class UISettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
+    double size = 50;
     return AWatch((context) {
       return SettingsSection(
         title: const Text('UI'),
@@ -21,127 +22,53 @@ class UISettingsWidget extends AbstractSettingsSection {
               UISettings().screenActive = value;
             },
           ),
-          SettingsTile(
-            title: const Text("Vertical Layout"),
-            trailing: DropdownButton(
-              alignment: Alignment.topLeft,
-              items: UILayout.values
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: SizedBox(width: 130, child: Text(e.viewName)),
-                      ))
-                  .toList(),
-              value: UISettings().uiLayoutVertical,
-              onChanged: (value) {
-                if (value == null) return;
-                UISettings().uiLayoutVertical = value;
-              },
-            ),
-          ),
-          SettingsTile(
-            title: const Text("Horizontal Layout"),
-            trailing: DropdownButton(
-              items: UILayout.values
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: SizedBox(width: 130, child: Text(e.viewName)),
-                      ))
-                  .toList(),
-              value: UISettings().uiLayoutHorizontal,
-              onChanged: (value) {
-                if (value == null) return;
-                UISettings().uiLayoutHorizontal = value;
-              },
-            ),
-          ),
-          SettingsTile(
-            title: const Text("Theme"),
-            trailing: DropdownButton(
-              items: UITheme.values
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: SizedBox(width: 130, child: Text(e.viewName)),
-                      ))
-                  .toList(),
-              value: UISettings().uiTheme,
-              onChanged: (value) {
-                if (value == null) return;
-                UISettings().uiTheme = value;
-              },
-            ),
-          ),
-          SettingsTile(
-            title: const Text("Alarm Theme"),
-            trailing: DropdownButton(
-              items: UITheme.values
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: SizedBox(width: 130, child: Text(e.viewName)),
-                      ))
-                  .toList(),
-              value: UISettings().alarmTheme,
-              onChanged: (value) {
-                if (value == null) return;
-                UISettings().alarmTheme = value;
-              },
-            ),
-          ),
-          SettingsTile(
-            title: const Text("Night Theme"),
-            trailing: DropdownButton(
-              items: UITheme.values
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: SizedBox(width: 130, child: Text(e.viewName)),
-                      ))
-                  .toList(),
-              value: UISettings().nightTheme,
-              onChanged: (value) {
-                if (value == null) return;
-                UISettings().nightTheme = value;
-              },
-            ),
-          ),
-          SettingsTile(
-            title: const Text("Day Time"),
+          SettingsTile.navigation(
+            title: const Text('Themes'),
+            leading: const Icon(Icons.palette),
             trailing: ToggleButtons(
-              constraints: const BoxConstraints(maxHeight: 50, maxWidth: 100),
+              constraints: BoxConstraints(maxHeight: size, maxWidth: size),
               renderBorder: true,
               borderRadius: BorderRadius.circular(10),
               borderWidth: 0,
               isSelected: [
-                UISettings().isNightModeActive(),
-                UISettings().isNightModeActive(),
+                true,
+                UISettings().alarmUIThemeLayout.enabled,
+                UISettings().nightUIThemeLayout.enabled,
               ],
               onPressed: (int index) async {
                 switch (index) {
                   case 0:
-                    TimeOfDay? value = await showTimePicker(context: context, initialTime: UISettings().nightStartTime);
-                    if (value != null) {
-                      UISettings().nightStartTime = value;
-                    }
+                    UISettings().mainUIThemeLayout.enabled = !UISettings().mainUIThemeLayout.enabled;
                     break;
                   case 1:
-                    TimeOfDay? value = await showTimePicker(context: context, initialTime: UISettings().nightEndTime);
-                    if (value != null) {
-                      UISettings().nightEndTime = value;
-                    }
+                    UISettings().alarmUIThemeLayout.enabled = !UISettings().alarmUIThemeLayout.enabled;
+                    break;
+                  case 2:
+                    UISettings().nightUIThemeLayout.enabled = !UISettings().nightUIThemeLayout.enabled;
                     break;
                 }
               },
               children: [
                 ToggleButton(
-                  text: "Night Start\n${Dates.tODToString(UISettings().nightStartTime)}",
-                  height: 50,
-                  width: 70,
+                  text: "Main Layout\n${UISettings().mainUIThemeLayout.theme.viewName}",
+                  height: size,
+                  width: size,
                 ),
                 ToggleButton(
-                  text: "Night End\n${Dates.tODToString(UISettings().nightEndTime)}",
-                  height: 50,
-                  width: 70,
+                  text: "Alarm Layout\n${UISettings().alarmUIThemeLayout.theme.viewName}",
+                  height: size,
+                  width: size,
+                ),
+                ToggleButton(
+                  text: "Night Layout\n${UISettings().nightUIThemeLayout.theme.viewName}",
+                  height: size,
+                  width: size,
                 ),
               ],
             ),
+            onPressed: (BuildContext context) {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ThemePage()));
+            },
           ),
         ],
       );

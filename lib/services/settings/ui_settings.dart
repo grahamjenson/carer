@@ -5,15 +5,100 @@ import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
 enum _UINames {
+  unit,
   screenActive,
-  uiLayoutVertical,
-  uiLayoutHorizontal,
-  uiTheme,
-  alarmTheme,
-  nightTheme,
   nightStartTime,
   nightEndTime,
-  unit,
+}
+
+enum UITheme {
+  // NS Settings
+  normal("Normal"),
+  dim("Dim");
+
+  final String viewName;
+
+  const UITheme(this.viewName);
+
+  static UITheme fromString(String? value) {
+    return UITheme.values.firstWhere((e) => e.name == value, orElse: () => UITheme.normal);
+  }
+}
+
+enum UILayout {
+  // NS Settings
+  showBGLChartHistoryStats("Everything"),
+  showBGL("BGL");
+
+  final String viewName;
+
+  const UILayout(this.viewName);
+
+  static UILayout fromString(String? value) {
+    return UILayout.values.firstWhere((e) => e.name == value, orElse: () => UILayout.showBGL);
+  }
+}
+
+enum ThemeLayout {
+  mainUI,
+  alarmUI,
+  nightUI,
+}
+
+class UIThemeLayout {
+  final String baseName;
+  late Signal<UITheme> themeSignal;
+  late Signal<UILayout> horizonalLayoutSignal;
+  late Signal<UILayout> verticalLayoutSignal;
+  late Signal<bool> enabledSignal;
+
+  UIThemeLayout(this.baseName) {
+    enabledSignal = Signal<bool>(true, debugLabel: enabledPref);
+    themeSignal = Signal<UITheme>(UITheme.normal, debugLabel: themePref);
+    horizonalLayoutSignal = Signal<UILayout>(UILayout.showBGL, debugLabel: horizonalLayoutPref);
+    verticalLayoutSignal = Signal<UILayout>(UILayout.showBGL, debugLabel: verticalLayoutPref);
+  }
+
+  List<Signal> get signals => [enabledSignal, themeSignal, horizonalLayoutSignal, verticalLayoutSignal];
+
+  String get enabledPref => "${baseName}Enabled";
+  bool get enabled => enabledSignal.value;
+  set enabled(bool value) => enabledSignal.value = value;
+
+  String get themePref => "${baseName}Theme";
+  UITheme get theme => themeSignal.value;
+  set theme(UITheme value) => themeSignal.value = value;
+
+  String get horizonalLayoutPref => "${baseName}HorizonalLayout";
+  UILayout get horizonalLayout => horizonalLayoutSignal.value;
+  set horizonalLayout(UILayout value) => horizonalLayoutSignal.value = value;
+
+  String get verticalLayoutPref => "${baseName}VerticalLayout";
+  UILayout get verticalLayout => verticalLayoutSignal.value;
+  set verticalLayout(UILayout value) => verticalLayoutSignal.value = value;
+
+  setup(KeyValueStore prefs) {
+    enabled = prefs.getBool(enabledPref, defaultValue: true)!;
+    theme = UITheme.fromString(prefs.getString(themePref));
+    horizonalLayout = UILayout.fromString(prefs.getString(horizonalLayoutPref));
+    verticalLayout = UILayout.fromString(prefs.getString(verticalLayoutPref));
+
+    aeffect(() {
+      prefs.setBool(enabledPref, enabled);
+    });
+
+    aeffect(() {
+      prefs.setString(themePref, theme.name);
+    });
+
+    aeffect(() {
+      prefs.setString(horizonalLayoutPref, horizonalLayout.name);
+    });
+
+    aeffect(() {
+      prefs.setString(verticalLayoutPref, verticalLayout.name);
+    });
+  }
 }
 
 class UISettings {
@@ -22,38 +107,26 @@ class UISettings {
 
   final Map<_UINames, Signal> _signals = {
     _UINames.screenActive: Signal<bool>(false, debugLabel: 'screenActive'),
-    _UINames.uiLayoutVertical: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutVertical'),
-    _UINames.uiLayoutHorizontal: Signal<UILayout>(UILayout.showBGL, debugLabel: 'uiLayoutHorizontal'),
-    _UINames.uiTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'uiTheme'),
-    _UINames.alarmTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'alarmTheme'),
-    _UINames.nightTheme: Signal<UITheme>(UITheme.normal, debugLabel: 'nightTheme'),
     _UINames.nightStartTime: Signal<TimeOfDay>(const TimeOfDay(hour: 22, minute: 0), debugLabel: 'nightStartTime'),
     _UINames.nightEndTime: Signal<TimeOfDay>(const TimeOfDay(hour: 6, minute: 0), debugLabel: 'nightEndTime'),
     _UINames.unit: Signal<Unit>(Unit.mg, debugLabel: 'unit'),
   };
 
+  Map<ThemeLayout, UIThemeLayout> themeLayouts = {
+    ThemeLayout.mainUI: UIThemeLayout(ThemeLayout.mainUI.name),
+    ThemeLayout.alarmUI: UIThemeLayout(ThemeLayout.alarmUI.name),
+    ThemeLayout.nightUI: UIThemeLayout(ThemeLayout.nightUI.name),
+  };
+
+  List<Signal> get themeLayoutSignals => themeLayouts.values.expand((e) => e.signals).toList();
+  UIThemeLayout get mainUIThemeLayout => themeLayouts[ThemeLayout.mainUI]!;
+  UIThemeLayout get alarmUIThemeLayout => themeLayouts[ThemeLayout.alarmUI]!;
+  UIThemeLayout get nightUIThemeLayout => themeLayouts[ThemeLayout.nightUI]!;
+
   UISettings._();
 
   bool get screenActive => _signals[_UINames.screenActive]!.value as bool;
   set screenActive(bool value) => _signals[_UINames.screenActive]!.value = value;
-
-  UILayout get uiLayoutVertical => _signals[_UINames.uiLayoutVertical]!.value as UILayout;
-  set uiLayoutVertical(UILayout value) => _signals[_UINames.uiLayoutVertical]!.value = value;
-
-  UILayout get uiLayoutHorizontal => _signals[_UINames.uiLayoutHorizontal]!.value as UILayout;
-  set uiLayoutHorizontal(UILayout value) => _signals[_UINames.uiLayoutHorizontal]!.value = value;
-
-  Signal<UITheme> get uiThemeSignal => _signals[_UINames.uiTheme]! as Signal<UITheme>;
-  UITheme get uiTheme => uiThemeSignal.value;
-  set uiTheme(UITheme value) => uiThemeSignal.value = value;
-
-  Signal<UITheme> get alarmThemeSignal => _signals[_UINames.alarmTheme]! as Signal<UITheme>;
-  UITheme get alarmTheme => alarmThemeSignal.value;
-  set alarmTheme(UITheme value) => alarmThemeSignal.value = value;
-
-  Signal<UITheme> get nightThemeSignal => _signals[_UINames.nightTheme]! as Signal<UITheme>;
-  UITheme get nightTheme => nightThemeSignal.value;
-  set nightTheme(UITheme value) => nightThemeSignal.value = value;
 
   Signal<TimeOfDay> get nightStartTimeSignal => _signals[_UINames.nightStartTime]! as Signal<TimeOfDay>;
   TimeOfDay get nightStartTime => nightStartTimeSignal.value;
@@ -92,22 +165,15 @@ class UISettings {
     // Assign the values from the DB
     screenActive = prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
 
-    uiLayoutVertical = UILayout.fromString(prefs.getString(_UINames.uiLayoutVertical.name));
-
-    uiLayoutHorizontal = UILayout.fromString(prefs.getString(_UINames.uiLayoutHorizontal.name));
-
-    uiTheme = UITheme.fromString(prefs.getString(_UINames.uiTheme.name));
-
-    alarmTheme = UITheme.fromString(prefs.getString(_UINames.alarmTheme.name));
-
-    nightTheme = UITheme.fromString(prefs.getString(_UINames.nightTheme.name));
-
     nightStartTime = tODfromInt(prefs.getInt(_UINames.nightStartTime.name, defaultValue: 22 * 60)!);
 
     nightEndTime = tODfromInt(prefs.getInt(_UINames.nightEndTime.name, defaultValue: 6 * 60)!);
 
     unit = Unit.fromBool(prefs.getBool(_UINames.unit.name, defaultValue: true)!);
 
+    for (var themeLayout in themeLayouts.values) {
+      themeLayout.setup(prefs);
+    }
     // Setup DB sync for when signalls change
 
     aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()));
@@ -117,59 +183,11 @@ class UISettings {
     });
 
     aeffect(() {
-      prefs.setString(_UINames.uiLayoutVertical.name, uiLayoutVertical.name);
-    });
-
-    aeffect(() {
-      prefs.setString(_UINames.uiLayoutHorizontal.name, uiLayoutHorizontal.name);
-    });
-
-    aeffect(() {
-      prefs.setString(_UINames.uiTheme.name, uiTheme.name);
-    });
-
-    aeffect(() {
-      prefs.setString(_UINames.alarmTheme.name, alarmTheme.name);
-    });
-
-    aeffect(() {
-      prefs.setString(_UINames.nightTheme.name, nightTheme.name);
-    });
-
-    aeffect(() {
       prefs.setInt(_UINames.nightStartTime.name, tODtoInt(nightStartTime));
     });
 
     aeffect(() {
       prefs.setInt(_UINames.nightEndTime.name, tODtoInt(nightEndTime));
     });
-  }
-}
-
-enum UITheme {
-  // NS Settings
-  normal("Normal"),
-  dim("Dim");
-
-  final String viewName;
-
-  const UITheme(this.viewName);
-
-  static UITheme fromString(String? value) {
-    return UITheme.values.firstWhere((e) => e.name == value, orElse: () => UITheme.normal);
-  }
-}
-
-enum UILayout {
-  // NS Settings
-  showBGLChartHistoryStats("Everything"),
-  showBGL("BGL");
-
-  final String viewName;
-
-  const UILayout(this.viewName);
-
-  static UILayout fromString(String? value) {
-    return UILayout.values.firstWhere((e) => e.name == value, orElse: () => UILayout.showBGL);
   }
 }

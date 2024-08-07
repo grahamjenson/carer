@@ -36,7 +36,10 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight, maxHeight: constraints.maxHeight),
-            child: AWatch((context) => getLayout(layoutType(context))),
+            child: AWatch(
+              (context) => getLayout(layoutType(context)),
+              dependencies: UISettings().themeLayoutSignals,
+            ),
           ),
           const Positioned(
             top: 10, // Adjust these values as needed
@@ -50,11 +53,14 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
 
   // All layout selection logic here, try figure out what needs to be seen outside of the rendering
   LayoutTypes layoutType(BuildContext context) {
-    var horizontalTheme = UISettings().uiLayoutHorizontal;
-    var verticalTheme = UISettings().uiLayoutVertical;
+    UIThemeLayout tl = ThemeService().getCurrentThemeLayout();
+
+    var horizontalLayout = tl.horizonalLayout;
+    var verticalLayout = tl.verticalLayout;
+
     final isHorizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     final isSleepShown = !AlarmSettings().disableAlarms;
-    var theme = isHorizontal ? horizontalTheme : verticalTheme;
+    var theme = isHorizontal ? horizontalLayout : verticalLayout;
 
     switch ((isHorizontal, isSleepShown, theme)) {
       case (false, false, UILayout.showBGL):

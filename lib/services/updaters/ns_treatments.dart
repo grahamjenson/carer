@@ -66,15 +66,10 @@ class NSTreatmentsUpdater extends Updater {
 
     // Get the profile, upsert the profile, update current percentage of profile in the KV store
 
-    alog('''
-  update Treatments 
-      bolus:$bolusUpdates
-      carb:$carbUpdates
-      TB: $tempBasalUpdates
-      TT: $tempTargetUpdates
-      profileSwitches:$profileSwitchUpdates
-          ''');
-
+    if (bolusUpdates > 0 || carbUpdates > 0 || tempBasalUpdates > 0 || tempTargetUpdates > 0 || profileSwitchUpdates > 0) {
+      alog(
+          "update Treatments bolus:$bolusUpdates carb:$carbUpdates TB: $tempBasalUpdates TT: $tempTargetUpdates profileSwitches:$profileSwitchUpdates");
+    }
     return true;
   }
 }

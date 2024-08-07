@@ -48,7 +48,6 @@ class AlarmPlayer {
   Future<bool> stopAudioPlayer(AudioPlayer player) async {
     // This is just to make sure that the player is properly initialized.
     await Future.delayed(const Duration(milliseconds: 300));
-    alog("stop tries player");
     if (player.state == PlayerState.playing) {
       await player.stop();
       alog("successfully stopped player");

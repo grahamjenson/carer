@@ -19,20 +19,16 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
     // WARNING: this works differently on all platforms, so anything complicated should be platform specific
     switch (state) {
       case AppLifecycleState.inactive:
-        alog("AppLifecycleService: Inactive");
         break;
       case AppLifecycleState.paused:
-        alog("AppLifecycleService: Paused");
         break;
       case AppLifecycleState.resumed:
         alog("AppLifecycleService: Resumed");
         lastResumed.value = clock.now();
         break;
       case AppLifecycleState.hidden:
-        alog("AppLifecycleService: Suspending");
         break;
       case AppLifecycleState.detached:
-        alog("AppLifecycleService: Detached");
         break;
     }
   }

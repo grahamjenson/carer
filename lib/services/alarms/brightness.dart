@@ -7,11 +7,15 @@ class BrightnessAlert {
   factory BrightnessAlert() => _singleton;
   BrightnessAlert._();
 
-  bool torched = false;
+  bool started = false;
 
   Future<void> start() async {
-    alog("BRIGHTNESS: SET 1.0");
+    if (started) {
+      return;
+    }
     try {
+      started = true;
+      alog("BRIGHTNESS: SET 1.0");
       await ScreenBrightness().setScreenBrightness(1.0);
     } catch (e) {
       throw 'BRIGHTNESS Alarm: Failed to set brightness';
@@ -19,7 +23,10 @@ class BrightnessAlert {
   }
 
   Future<void> stop() async {
-    alog("BRIGHTNESS: RESET");
-    ScreenBrightness().resetScreenBrightness();
+    if (started) {
+      started = false;
+      alog("BRIGHTNESS: RESET");
+      ScreenBrightness().resetScreenBrightness();
+    }
   }
 }

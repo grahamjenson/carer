@@ -15,26 +15,33 @@ class ThemeService {
   Signal<ThemeData> themeSignal = Signal(normalTheme, debugLabel: "Theme");
   late ValueNotifier<ThemeData> themeNotifier;
 
+  UIThemeLayout getCurrentThemeLayout() {
+    if (AlarmsService().activeAlarms.value.isNotEmpty && UISettings().alarmUIThemeLayout.enabled) {
+      return UISettings().alarmUIThemeLayout;
+    } else if (UISettings().isNightModeActive() && UISettings().nightUIThemeLayout.enabled) {
+      return UISettings().nightUIThemeLayout;
+    } else {
+      return UISettings().mainUIThemeLayout;
+    }
+  }
+
   ThemeService._internal() {
     themeNotifier = themeSignal.toValueNotifier();
 
-    signalAssign(themeSignal, () async {
-      if (AlarmsService().activeAlarms.value.isNotEmpty) {
-        return selectTheme(UISettings().alarmTheme);
-      } else if (UISettings().isNightModeActive()) {
-        return selectTheme(UISettings().nightTheme);
-      } else {
-        return selectTheme(UISettings().uiTheme);
-      }
-    }, dependencies: [
-      TimerService().minuteSignal,
-      UISettings().uiThemeSignal,
-      UISettings().alarmThemeSignal,
-      UISettings().nightThemeSignal,
-      UISettings().nightStartTimeSignal,
-      UISettings().nightEndTimeSignal,
-      AlarmsService().activeAlarms,
-    ]);
+    signalAssign(
+      themeSignal,
+      () async {
+        UIThemeLayout themeLayout = getCurrentThemeLayout();
+        return selectTheme(themeLayout.theme);
+      },
+      dependencies: [
+            TimerService().minuteSignal,
+            UISettings().nightStartTimeSignal,
+            UISettings().nightEndTimeSignal,
+            AlarmsService().activeAlarms,
+          ] +
+          UISettings().themeLayoutSignals,
+    );
   }
 
   ThemeData get theme => themeSignal.value;

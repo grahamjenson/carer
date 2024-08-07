@@ -83,18 +83,15 @@ class AlarmsService {
     aeffect(() async {
       // Only execute this one at a time
       if (isCheckingAlarms) {
-        alog("CheckAlarms: Skipping check alarms, already checking");
         return false;
       }
       isCheckingAlarms = true;
 
-      alog("CheckAlarms: checking alarms");
       try {
         await _checkAlarms();
       } catch (err) {
         alog("CheckAlarms: Error checking alarms: $err");
       } finally {
-        alog("CheckAlarms: Finished checking alarms");
         isCheckingAlarms = false;
       }
       return true;
@@ -160,7 +157,9 @@ class AlarmsService {
     newTriggeredAlarms = filterAlarms(newTriggeredAlarms);
     newActiveAlarms = filterAlarms(newActiveAlarms);
 
-    alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
+    if (newTriggeredAlarms.isNotEmpty || newActiveAlarms.isNotEmpty) {
+      alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
+    }
 
     // Set alarms that have been triggered
 
@@ -187,7 +186,6 @@ class AlarmsService {
 
   Future<bool> audioAlerts(Set<Alarm> alarms) async {
     if (alarms.isEmpty) {
-      alog("Stopping AUDIO Alarms");
       var (playing, err) = await go(player.stopAlarm());
       if (playing == null || err != null) {
         alog("Error stopping alarm: $err");
