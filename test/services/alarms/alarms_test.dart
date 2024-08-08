@@ -1,7 +1,6 @@
 import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/alarms/alarms.dart';
-import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/sql/carer_db.dart';
@@ -31,8 +30,6 @@ void main() async {
     tearDown(() async {
       await (await CarerDB.instance).deleteAll();
       cleanSignals();
-
-      PredictionService().predictionsSignal.recompute();
     });
 
     test("HighAlarm", () async {
@@ -204,8 +201,6 @@ void main() async {
       expect(await SQLToSGV().save(SGV(value: 80, date: clock.now(), eid: "1")), true);
       expect(await SQLToSGV().save(SGV(value: 100, date: clock.minutesAgo(5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 120, date: clock.minutesAgo(10), eid: "3")), true);
-
-      PredictionService().predictionsSignal.recompute();
 
       (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, true);

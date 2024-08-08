@@ -76,16 +76,6 @@ abstract class Alarm {
     return diffs;
   }
 
-  // Estimated mins to next reading
-  DateTime currentReadingAt() {
-    var lastSGV = CleanSGV.lastSGV.value;
-    if (lastSGV == null) {
-      return clock.now();
-    }
-
-    return lastSGV.date;
-  }
-
   String lastSGVStr() {
     return unitStr(lastSgvReading());
   }
@@ -101,7 +91,7 @@ class PredictiveLowAlarm extends Alarm {
   @override
   List<String> properties() {
     return [
-      "${PredictionService().getPredictionAt(at)}",
+      "${PredictionService().getReadingsAhead(numberOfReadings)}",
       "pRange($range)",
     ];
   }
@@ -110,16 +100,18 @@ class PredictiveLowAlarm extends Alarm {
   IconData icon() => UniconsLine.windsock;
 
   @override
-  String status() => "Predictive Low ${unitStr(PredictionService().getPredictionAtValue(at))} < ${unitStr(TargetSettings().lowUrgent)}";
+  String status() =>
+      "Predictive Low ${unitStr(PredictionService().getReadingsAheadValue(numberOfReadings))} < ${unitStr(TargetSettings().lowTarget)}";
 
   int get numberOfReadings => AlarmSettings().lowPredictionMinutes ~/ 5;
 
-  DateTime get at {
-    return currentReadingAt().add(Duration(minutes: numberOfReadings * 5));
-  }
-
   Range5? get range {
-    return PredictionService().atPredictedTime(at);
+    CleanSGV? sgv = PredictionService().getReadingsAhead(numberOfReadings);
+    if (sgv == null) {
+      return null;
+    }
+    var (range, _) = targetRange(sgv.value);
+    return range;
   }
 
   @override
@@ -192,7 +184,7 @@ class LowAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var range = PredictionService().atPredictedTime(clock.minutesFromNow(10));
+    var range = PredictionService().getPredictionAtRange(clock.minutesFromNow(10));
     return range == Range5.mid;
   }
 }
@@ -237,7 +229,7 @@ class HighAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var range = PredictionService().atPredictedTime(clock.minutesFromNow(10));
+    var range = PredictionService().getPredictionAtRange(clock.minutesFromNow(10));
     return range == Range5.mid;
   }
 }

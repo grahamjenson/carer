@@ -2,6 +2,7 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/constants.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
@@ -181,7 +182,7 @@ class CleanSGV extends Model {
       }
       alog("updated yesterdaysPercentage Signal");
       return value * 100.0;
-    }, debugLabel: 'yesterdaysPercentage', dependencies: [SQLToSGV().writeSignal]);
+    }, debugLabel: 'yesterdaysPercentage', dependencies: [TimerService().minuteSignal]);
 
     signalAssign(todaysPercentage, () async {
       var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
@@ -191,7 +192,7 @@ class CleanSGV extends Model {
       }
       alog("updated todaysPercentage");
       return value * 100.0;
-    }, debugLabel: 'todaysPercentage', dependencies: [SQLToSGV().writeSignal]);
+    }, debugLabel: 'todaysPercentage', dependencies: [TimerService().minuteSignal]);
 
     signalAssign(last3HoursChained, () async => _makeChained(last3Hours.value), debugLabel: 'last3HoursChained', dependencies: [last3Hours]);
   }

@@ -36,9 +36,23 @@ class ThemePage extends StatelessWidget {
   }
 
   List<SettingsTile> getThemeLayoutSettings(UIThemeLayout themeLayout) {
-    var tiles = [
+    List<SettingsTile> tiles = [];
+    bool enabled = true;
+    if (themeLayout != UISettings().mainUIThemeLayout) {
+      enabled = themeLayout.enabled;
+      tiles.add(SettingsTile.switchTile(
+        title: const Text('Enabled'),
+        initialValue: themeLayout.enabled,
+        onToggle: (value) {
+          themeLayout.enabled = value;
+        },
+      ));
+    }
+
+    tiles.add(
       SettingsTile(
         title: const Text("Vertical Layout"),
+        enabled: enabled,
         trailing: DropdownButton(
           alignment: Alignment.topLeft,
           items: UILayout.values
@@ -54,8 +68,12 @@ class ThemePage extends StatelessWidget {
           },
         ),
       ),
+    );
+
+    tiles.add(
       SettingsTile(
         title: const Text("Horizontal Layout"),
+        enabled: enabled,
         trailing: DropdownButton(
           items: UILayout.values
               .map((e) => DropdownMenuItem(
@@ -70,35 +88,26 @@ class ThemePage extends StatelessWidget {
           },
         ),
       ),
-      SettingsTile(
-        title: const Text("Theme"),
-        trailing: DropdownButton(
-          items: UITheme.values
-              .map((e) => DropdownMenuItem(
-                    value: e,
-                    child: SizedBox(width: 130, child: Text(e.viewName)),
-                  ))
-              .toList(),
-          value: themeLayout.theme,
-          onChanged: (value) {
-            if (value == null) return;
-            themeLayout.theme = value;
-          },
-        ),
-      ),
-    ];
+    );
 
-    if (themeLayout != UISettings().mainUIThemeLayout) {
-      tiles.insert(
-          0,
-          SettingsTile.switchTile(
-            title: const Text('Enabled'),
-            initialValue: themeLayout.enabled,
-            onToggle: (value) {
-              themeLayout.enabled = value;
-            },
-          ));
-    }
+    tiles.add(SettingsTile(
+      title: const Text("Theme"),
+      enabled: enabled,
+      trailing: DropdownButton(
+        items: UITheme.values
+            .map((e) => DropdownMenuItem(
+                  value: e,
+                  child: SizedBox(width: 130, child: Text(e.viewName)),
+                ))
+            .toList(),
+        value: themeLayout.theme,
+        onChanged: (value) {
+          if (value == null) return;
+          themeLayout.theme = value;
+        },
+      ),
+    ));
+
     return tiles;
   }
 

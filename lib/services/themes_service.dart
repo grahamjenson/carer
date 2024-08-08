@@ -30,7 +30,7 @@ class ThemeService {
 
     signalAssign(
       themeSignal,
-      () async {
+      () {
         UIThemeLayout themeLayout = getCurrentThemeLayout();
         return selectTheme(themeLayout.theme);
       },

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/foundation.dart';
@@ -91,14 +93,21 @@ class AWatch<T extends Widget> extends StatelessWidget {
 
 EffectCleanup signalAssign<T>(
   Signal<T> signal,
-  Future<T> Function() fn, {
+  FutureOr<T> Function() fn, {
   String? debugLabel,
   List<ReadonlySignal<dynamic>> dependencies = const [],
 }) {
   return aeffect(() {
-    untracked(() async {
-      signal.value = await fn();
-    });
+    final result = fn();
+    if (result is Future) {
+      untracked(() async {
+        signal.value = await result;
+      });
+    } else {
+      untracked(() {
+        signal.value = result;
+      });
+    }
   }, debugLabel: debugLabel, dependencies: dependencies);
 }
 

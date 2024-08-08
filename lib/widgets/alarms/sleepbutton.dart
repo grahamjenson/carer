@@ -120,7 +120,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
 }
 
 Future<int?> _openSleepDialog(BuildContext context) {
-  const List<int> minutesTimes = [5, 10, 20, 30];
+  const List<int> minutesTimes = [5, 20, 30, 45];
   const List<int> hoursTimes = [1, 2, 12, 24];
   const List<int> timeTimes = [6, 7, 21, 22];
   const TextStyle textStyle = TextStyle(fontSize: 24, height: 0.5);
