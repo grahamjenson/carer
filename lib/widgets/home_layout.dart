@@ -60,9 +60,9 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
 
     final isHorizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     final isSleepShown = !AlarmSettings().disableAlarms;
-    var theme = isHorizontal ? horizontalLayout : verticalLayout;
+    var layout = isHorizontal ? horizontalLayout : verticalLayout;
 
-    switch ((isHorizontal, isSleepShown, theme)) {
+    switch ((isHorizontal, isSleepShown, layout)) {
       case (false, false, UILayout.showBGL):
         return LayoutTypes.verticalBGL;
       case (false, true, UILayout.showBGL):

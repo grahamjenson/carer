@@ -13,11 +13,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
   const AlarmsAlertSettingsWidget({super.key});
   static const double _size = 50;
 
-  static const TextStyle description = TextStyle(
-    fontSize: 12,
-    color: Colors.grey,
-  );
-
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
@@ -49,7 +44,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       descriptionInlineIos: true,
       description: const Text(
         "Adjust Screen Brightness on Alarm",
-        style: description,
       ),
       initialValue: AlarmAlertSettings().brightnessAdjust,
       onToggle: (bool value) {
@@ -64,7 +58,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       descriptionInlineIos: true,
       description: const Text(
         "Ignore when  good direction",
-        style: description,
       ),
       initialValue: AlarmAlertSettings().smartSnooze,
       onToggle: (bool value) {
@@ -87,11 +80,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     int minRange = 0;
     int maxRange = 100;
 
-    var color = primaryColor(context);
-    if (!AlarmAlertSettings().volumeOveride) {
-      color = Colors.grey;
-    }
-
     ValueChanged<double>? sliderCallback = (double value) => AlarmAlertSettings().volumeOverrideValue = value.toInt();
 
     if (!AlarmAlertSettings().volumeOveride) {
@@ -108,7 +96,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
               Expanded(
                   flex: 1,
                   child: InkWell(
-                      child: Icon(Icons.volume_down, color: color),
+                      child: const Icon(Icons.volume_down),
                       onTap: () {
                         var ov = AlarmAlertSettings().volumeOverrideValuePeek;
                         AlarmAlertSettings().volumeOverrideValue = max(minRange, ov - 10).toInt();
@@ -128,10 +116,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
               Expanded(
                 flex: 1,
                 child: InkWell(
-                  child: Icon(
-                    Icons.volume_up,
-                    color: color,
-                  ),
+                  child: const Icon(Icons.volume_up),
                   onTap: () {
                     var ov = AlarmAlertSettings().volumeOverrideValuePeek;
                     AlarmAlertSettings().volumeOverrideValue = min(maxRange, ov + 10).toInt();

@@ -12,8 +12,8 @@ class History extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle row = getRowTextStyle(context);
-    TextStyle small = getSmallTextStyle(context);
+    TextStyle row = getRowTextStyle();
+    TextStyle small = getSmallTextStyle();
 
     return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute

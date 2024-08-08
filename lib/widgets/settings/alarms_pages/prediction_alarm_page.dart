@@ -7,11 +7,6 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 class PredictionAlarmPage extends StatelessWidget {
   const PredictionAlarmPage({super.key});
 
-  static const TextStyle description = TextStyle(
-    fontSize: 12,
-    color: Colors.grey,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +24,6 @@ class PredictionAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Low Alarm",
-                    style: description,
                   ),
                   initialValue: AlarmSettings().lowPredictionAlarm,
                   onToggle: (value) {
@@ -41,7 +35,6 @@ class PredictionAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Alarm after",
-                    style: description,
                   ),
                   trailing: ToggleButton.selectOne<int>(AlarmSettings().lowPredictionMinutes, ["5m", "10m", "15m", "20m", "30m"], [5, 10, 15, 20, 30],
                       (value) => AlarmSettings().lowPredictionMinutes = value),

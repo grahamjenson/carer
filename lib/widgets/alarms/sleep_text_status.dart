@@ -10,16 +10,8 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var big = TextStyle(
-      color: primaryColor(context),
-      fontSize: 20,
-      fontFeatures: const [FontFeature.tabularFigures()],
-    );
-
-    var small = TextStyle(
-      color: primaryColor(context),
-      fontSize: 10,
-    );
+    var big = getRowTextStyle();
+    var small = getSmallTextStyle();
 
     return AWatch((context) {
       List<Widget> rows = [];

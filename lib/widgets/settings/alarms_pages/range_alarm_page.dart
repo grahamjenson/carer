@@ -7,11 +7,6 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 class RangeAlarmPage extends StatelessWidget {
   const RangeAlarmPage({super.key});
 
-  static const TextStyle description = TextStyle(
-    fontSize: 12,
-    color: Colors.grey,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +24,6 @@ class RangeAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Low Alarm",
-                    style: description,
                   ),
                   initialValue: AlarmSettings().lowAlarm,
                   onToggle: (value) {
@@ -41,7 +35,6 @@ class RangeAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Alarm after",
-                    style: description,
                   ),
                   trailing: ToggleButton.selectOne<int>(AlarmSettings().lowMinutes, ["0m", "5m", "10m", "15m", "20m", "30m"], [0, 5, 10, 15, 20, 30],
                       (value) => AlarmSettings().lowMinutes = value),
@@ -56,7 +49,6 @@ class RangeAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "High Alarm",
-                    style: description,
                   ),
                   initialValue: AlarmSettings().highAlarm,
                   onToggle: (value) {
@@ -68,7 +60,6 @@ class RangeAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Alarm after",
-                    style: description,
                   ),
                   trailing: ToggleButton.selectOne<int>(
                       AlarmSettings().highMinutes, ["0m", "20m", "40m", "60m"], [0, 20, 40, 60], (value) => AlarmSettings().highMinutes = value),

@@ -73,37 +73,33 @@ mixin ThemeMixin {
     return Theme.of(context).colorScheme.secondary;
   }
 
-  TextStyle getHeadingTextStyle(BuildContext? context) {
-    return TextStyle(
+  TextStyle getHeadingTextStyle() {
+    return const TextStyle(
       fontWeight: FontWeight.bold,
-      color: primaryColor(context),
       fontSize: 10,
-      fontFeatures: const [FontFeature.tabularFigures()],
+      fontFeatures: [FontFeature.tabularFigures()],
     );
   }
 
-  TextStyle getRowTextStyle(BuildContext? context) {
-    return TextStyle(
-      color: primaryColor(context),
+  TextStyle getRowTextStyle() {
+    return const TextStyle(
       fontSize: 20,
-      fontFeatures: const [FontFeature.tabularFigures()],
+      fontFeatures: [FontFeature.tabularFigures()],
     );
   }
 
-  TextStyle getSmallTextStyle(BuildContext? context) {
-    return TextStyle(
-      color: primaryColor(context),
+  TextStyle getSmallTextStyle() {
+    return const TextStyle(
       fontSize: 10,
-      fontFeatures: const [FontFeature.tabularFigures()],
+      fontFeatures: [FontFeature.tabularFigures()],
     );
   }
 
-  TextStyle getSuperscriptTextStyle(BuildContext? context) {
-    return TextStyle(
-      color: primaryColor(context),
+  TextStyle getSuperscriptTextStyle() {
+    return const TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.w100,
-      fontFeatures: const [FontFeature.superscripts(), FontFeature.tabularFigures()],
+      fontFeatures: [FontFeature.superscripts(), FontFeature.tabularFigures()],
     );
   }
 }
@@ -115,8 +111,8 @@ ThemeData normalTheme = ThemeData(
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
     primary: _primaryColor,
-    onPrimary: Colors.black,
-    secondary: _primaryColor.dimdim,
+    onPrimary: _primaryColor,
+    secondary: _primaryColor.dim.dim,
     onSecondary: Colors.black,
     error: Colors.black,
     onError: _primaryColor,
@@ -129,9 +125,9 @@ ThemeData nightTheme = ThemeData(
   useMaterial3: true,
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: _primaryColor.dimdim,
+    primary: _primaryColor.dim.dim,
     onPrimary: Colors.black,
-    secondary: _primaryColor.dimdimdim,
+    secondary: _primaryColor.dim.dim.dim,
     onSecondary: Colors.black,
     error: Colors.black,
     onError: _primaryColor,
@@ -202,23 +198,13 @@ class AColors {
 }
 
 extension ColorExtension on Color {
-  Color scaleAlphaa(double factor) {
-    return withAlpha((alpha * factor).round().clamp(0, 255));
-  }
-
   Color get dim {
-    return scaleAlphaa(0.7);
-  }
-
-  Color get dimdim {
-    return scaleAlphaa(0.5);
-  }
-
-  Color get dimdimdim {
-    return scaleAlphaa(0.3);
-  }
-
-  Color get dimdimdimdim {
-    return scaleAlphaa(0.1);
+    var amount = 0.6;
+    return Color.fromARGB(
+      alpha,
+      (red * amount).round(),
+      (green * amount).round(),
+      (blue * amount).round(),
+    );
   }
 }

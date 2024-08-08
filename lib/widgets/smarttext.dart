@@ -15,7 +15,7 @@ class SmartText extends StatelessWidget {
       textAlign: textAlign,
       overflow: TextOverflow.visible,
       softWrap: false,
-      text: TextSpan(children: childrenTextSpans),
+      text: TextSpan(children: childrenTextSpans, style: DefaultTextStyle.of(context).style),
     );
   }
 }

@@ -11,11 +11,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
   const AlarmsSettingsWidget({super.key});
   static const double _size = 50;
 
-  static const TextStyle description = TextStyle(
-    fontSize: 12,
-    color: Colors.grey,
-  );
-
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
@@ -46,7 +41,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
       descriptionInlineIos: true,
       description: const Text(
         "Turn off all alarms",
-        style: description,
       ),
       initialValue: AlarmSettings().disableAlarms,
       onToggle: (bool disable) async {
@@ -96,7 +90,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
       descriptionInlineIos: true,
       description: const Text(
         "Out of range",
-        style: description,
       ),
       onPressed: (context) {
         Navigator.push(
@@ -167,10 +160,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         );
       },
       descriptionInlineIos: true,
-      description: const Text(
-        "Rising or dropping quickly",
-        style: description,
-      ),
+      description: const Text("Rising or dropping quickly"),
       trailing: ToggleButtons(
         constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
         renderBorder: true,

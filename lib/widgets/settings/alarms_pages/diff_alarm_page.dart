@@ -7,11 +7,6 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 class DiffAlarmPage extends StatelessWidget {
   const DiffAlarmPage({super.key});
 
-  static const TextStyle description = TextStyle(
-    fontSize: 12,
-    color: Colors.grey,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +24,6 @@ class DiffAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Fast Drop Alarm",
-                    style: description,
                   ),
                   initialValue: AlarmSettings().fastDropAlarm,
                   onToggle: (value) {
@@ -41,7 +35,6 @@ class DiffAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Alarm after",
-                    style: description,
                   ),
                   trailing: ToggleButton.selectOne<int>(AlarmSettings().fastDropAlarmMinutes, ["5m", "10m", "15m", "20m", "30m"], [5, 10, 15, 20, 30],
                       (value) => AlarmSettings().fastDropAlarmMinutes = value),
@@ -56,7 +49,6 @@ class DiffAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Fast Rise Alarm",
-                    style: description,
                   ),
                   initialValue: AlarmSettings().fastRiseAlarm,
                   onToggle: (value) {
@@ -68,7 +60,6 @@ class DiffAlarmPage extends StatelessWidget {
                   descriptionInlineIos: true,
                   description: const Text(
                     "Alarm after",
-                    style: description,
                   ),
                   trailing: ToggleButton.selectOne<int>(AlarmSettings().fastRiseAlarmMinutes, ["5m", "10m", "15m", "20m", "30m"], [5, 10, 15, 20, 30],
                       (value) => AlarmSettings().fastRiseAlarmMinutes = value),

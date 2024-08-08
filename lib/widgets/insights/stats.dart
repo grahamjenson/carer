@@ -17,9 +17,9 @@ class Stats extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle heading = getHeadingTextStyle(context);
-    TextStyle row = getRowTextStyle(context);
-    TextStyle small = getSmallTextStyle(context);
+    TextStyle heading = getHeadingTextStyle();
+    TextStyle row = getRowTextStyle();
+    TextStyle small = getSmallTextStyle();
 
     return AWatch((context) {
       var valuesAtTime = ValueAtTime.lastSixHours.value;

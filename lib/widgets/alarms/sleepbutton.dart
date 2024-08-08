@@ -37,7 +37,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
   Widget getBackground(BuildContext context, double buttonRadias, double width) {
     var mainColor = primaryColor(context);
 
-    var backgroundColor = mainColor.dimdimdim;
+    var backgroundColor = mainColor.dim.dim.dim;
     return Container(
       height: buttonRadias,
       width: width,
@@ -49,7 +49,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
   Widget getSleepCancel(BuildContext context, double buttonRadias) {
     var mainColor = primaryColor(context);
 
-    var backgroundColor = mainColor.dimdimdim;
+    var backgroundColor = mainColor.dim.dim.dim;
 
     return AWatch(
       (context) {
@@ -83,8 +83,8 @@ class SleepButton extends StatelessWidget with ThemeMixin {
   Widget getDismissable(BuildContext context, double buttonRadias, double width) {
     var mainColor = primaryColor(context);
 
-    var backgroundColor = mainColor.dimdimdim;
-    var buttonColor = mainColor.dimdim;
+    var backgroundColor = mainColor.dim.dim.dim;
+    var buttonColor = mainColor.dim.dim;
 
     Icon dismissibleIcon = Icon(UniconsLine.angle_right, color: mainColor, size: buttonRadias);
 
