@@ -28,7 +28,8 @@ enum UITheme {
 enum UILayout {
   // NS Settings
   showBGLChartHistoryStats("Everything"),
-  showBGL("BGL");
+  showBGL("BGL"),
+  showMinimal("Minimal");
 
   final String viewName;
 

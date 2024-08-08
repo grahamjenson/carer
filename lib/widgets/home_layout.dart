@@ -15,13 +15,21 @@ import 'package:flutter/material.dart';
 enum LayoutTypes {
   horizontalBGL,
   horizontalBGLWithSleep,
+
   horizonalBGLWithInsights,
   horizonalBGLWithInsightsAndSleep,
 
+  horizontalMinimal,
+  horizontalMinimalWithSleep,
+
   verticalBGL,
   verticalBGLWithSleep,
+
   verticalBGLWithInsights,
   verticalBGLWithInsightsAndSleep,
+
+  verticalMinimal,
+  verticalMinimalWithSleep,
 }
 
 class HomeLayout extends StatelessWidget with ThemeMixin {
@@ -67,20 +75,28 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
         return LayoutTypes.verticalBGL;
       case (false, true, UILayout.showBGL):
         return LayoutTypes.verticalBGLWithSleep;
-      case (false, false, UILayout.showBGLChartHistoryStats):
-        return LayoutTypes.verticalBGLWithInsights;
-      case (false, true, UILayout.showBGLChartHistoryStats):
-        return LayoutTypes.verticalBGLWithInsightsAndSleep;
       case (true, false, UILayout.showBGL):
         return LayoutTypes.horizontalBGL;
       case (true, true, UILayout.showBGL):
         return LayoutTypes.horizontalBGLWithSleep;
+
+      case (false, false, UILayout.showBGLChartHistoryStats):
+        return LayoutTypes.verticalBGLWithInsights;
+      case (false, true, UILayout.showBGLChartHistoryStats):
+        return LayoutTypes.verticalBGLWithInsightsAndSleep;
       case (true, false, UILayout.showBGLChartHistoryStats):
         return LayoutTypes.horizonalBGLWithInsights;
       case (true, true, UILayout.showBGLChartHistoryStats):
         return LayoutTypes.horizonalBGLWithInsightsAndSleep;
-      default:
-        throw UnimplementedError('Layout not implemented');
+
+      case (false, false, UILayout.showMinimal):
+        return LayoutTypes.verticalMinimal;
+      case (false, true, UILayout.showMinimal):
+        return LayoutTypes.verticalMinimalWithSleep;
+      case (true, false, UILayout.showMinimal):
+        return LayoutTypes.horizontalMinimal;
+      case (true, true, UILayout.showMinimal):
+        return LayoutTypes.horizontalMinimalWithSleep;
     }
   }
 
@@ -116,6 +132,11 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     ])));
 
     return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
+  }
+
+  Widget getMinimalInsights() {
+    // TODO this should be better
+    return History(minimal: true);
   }
 
   Widget getLayout(LayoutTypes layout) {
@@ -164,8 +185,42 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
           const SizedBox.shrink(),
           const SleepButton(),
         ]);
-      default:
-        throw UnimplementedError('Layout not implemented');
+      case LayoutTypes.horizontalMinimal:
+        return flexListRow([
+          5,
+          5
+        ], [
+          flexListCol([4], [const BGL()]),
+          getMinimalInsights(),
+        ]);
+      case LayoutTypes.horizontalMinimalWithSleep:
+        return flexListRow([
+          5,
+          5
+        ], [
+          flexListCol([20, 5], [const BGL(), const SleepButton()]),
+          getMinimalInsights(),
+        ]);
+      case LayoutTypes.verticalMinimal:
+        return flexListCol([
+          5,
+          5
+        ], [
+          flexListRow([4], [const BGL()]),
+          getMinimalInsights()
+        ]);
+      case LayoutTypes.verticalMinimalWithSleep:
+        return flexListCol([
+          10,
+          12,
+          -1,
+          3,
+        ], [
+          flexListRow([4], [const BGL()]),
+          getMinimalInsights(),
+          const SizedBox.shrink(),
+          const SleepButton(),
+        ]);
     }
   }
 }

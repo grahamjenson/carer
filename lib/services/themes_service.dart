@@ -132,7 +132,7 @@ ThemeData nightTheme = ThemeData(
     error: Colors.black,
     onError: _primaryColor,
     surface: Colors.black,
-    onSurface: _primaryColor,
+    onSurface: _primaryColor.dim.dim,
   ),
 );
 
