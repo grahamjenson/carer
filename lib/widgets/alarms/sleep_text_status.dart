@@ -10,13 +10,16 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var big = getRowTextStyle();
+    var big = const TextStyle(
+      fontSize: 35,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
     var small = getSmallTextStyle();
 
     return AWatch((context) {
       List<Widget> rows = [];
       if (isSleeping()) {
-        rows = [sleepStringWidget(big, small), alarmStringWidget(small)];
+        rows = [sleepStringWidget(), alarmStringWidget(small)];
       } else {
         rows = [Text("Sleep", style: big), alarmStringWidget(small)];
       }
@@ -41,7 +44,10 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     return true;
   }
 
-  Widget sleepStringWidget(TextStyle big, TextStyle small) {
+  Widget sleepStringWidget() {
+    var big = const TextStyle(fontSize: 40, fontWeight: FontWeight.bold);
+    var small = const TextStyle(fontSize: 20);
+
     var duration = AlarmsService().sleepDuration!;
     var totalSeconds = duration.inSeconds;
 
@@ -50,16 +56,16 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
 
     if (hours > 0) {
       if (minutes == 0) {
-        return SmartText(texts: ["Sleep $hours", "h"], styles: [big, small]);
+        return SmartText(texts: ["Sleep ", "$hours", "h"], styles: [small, big, small]);
       }
-      return SmartText(texts: ["Sleep $hours", "h", "$minutes", "m"], styles: [big, small, big, small]);
+      return SmartText(texts: ["Sleep ", "$hours", "h", "$minutes", "m"], styles: [small, big, small, big, small]);
     }
 
     if (minutes > 0) {
-      return SmartText(texts: ["Sleep $minutes", "m"], styles: [big, small]);
+      return SmartText(texts: ["Sleep ", " $minutes", "m"], styles: [small, big, small]);
     }
 
-    return SmartText(texts: const ["Sleep <1m"], styles: [big]);
+    return SmartText(texts: const ["Sleep ", "<1m"], styles: [small, big]);
   }
 
   Widget alarmStringWidget(TextStyle style) {
