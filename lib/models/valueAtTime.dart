@@ -48,15 +48,6 @@ class ValueAtTime extends Model {
     return "ValueAtTime($date, $lowTarget, $highTarget, $basal, $isf, $cr, $profileName, $profilePercent, $isTempBasal, $isTempTarget, $isTempProfile)";
   }
 
-  static Future<List<ValueAtTime>> query({
-    int? after,
-    int? before,
-    Map<String, Object>? conditions,
-    int? limit,
-  }) {
-    return SQLToValueAtTime().query(before: before, after: after, limit: limit, conditions: conditions);
-  }
-
   static ValueAtTime createValueAtTime(List<Profile> profiles, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {
     int hourOfDay = date.hour;
     int minutesSinceEpoch = date.millisecondsSinceEpoch ~/ 60000;
@@ -101,8 +92,8 @@ class ValueAtTime extends Model {
 
   static Signal<List<ValueAtTime>> lastSixHours = Signal([], debugLabel: 'valueAtTimeLastSixHours');
 
-  static Future<int> updateValues() async {
-    alog("ValueAtTime updateValues: start");
+  static Future<List<ValueAtTime>> updateValues() async {
+    alog('ValueAtTime.updateValues');
     var now = clock.now();
     // rounded to nearest minute
     now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
@@ -119,24 +110,16 @@ class ValueAtTime extends Model {
       var d = now.subtract(Duration(minutes: i));
       vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
     }
-    var ret = SQLToValueAtTime().upsertAll(vats);
 
-    alog("ValueAtTime updateValues: start $ret");
-
-    return ret;
+    return vats;
   }
 
   static setupSQLSignals() {
-    aeffect(updateValues, debugLabel: 'valueAtTimeUpdate', dependencies: [
+    signalAssign(lastSixHours, updateValues, debugLabel: 'valueAtTimeLastSixHours', dependencies: [
       TimerService().minuteSignal,
       SQLToProfile().writeSignal,
       SQLToTempBasal().writeSignal,
       SQLToTempTarget().writeSignal,
-    ]);
-
-    signalAssign(lastSixHours, () => SQLToValueAtTime().lastMins(60 * 6), debugLabel: 'valueAtTimeLastSixHours', dependencies: [
-      TimerService().minuteSignal,
-      SQLToValueAtTime().writeSignal,
     ]);
   }
 }

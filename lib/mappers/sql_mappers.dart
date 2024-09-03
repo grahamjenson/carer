@@ -6,7 +6,6 @@ import 'package:carer/models/sgv.dart';
 import 'package:carer/models/tempbasal.dart';
 import 'package:carer/models/temptarget.dart';
 import 'package:carer/models/treatments.dart';
-import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 
@@ -388,80 +387,5 @@ class SQLToTreatment extends SQLReadMapper<Treatment> {
       carbs: row["carbs"] as int?,
       insulin: row["insulin"] as double?,
     );
-  }
-}
-
-////
-// ValueAtTime
-////
-
-class SQLToValueAtTime extends SQLMapper<ValueAtTime> {
-  static final SQLToValueAtTime _singleton = SQLToValueAtTime._();
-  factory SQLToValueAtTime() => _singleton;
-  SQLToValueAtTime._();
-
-  @override
-  String get tableName => valuesAtTimeTableName;
-
-  @override
-  ValueAtTime aToB(SQLRow row) {
-    List<String> errors = [];
-
-    errors.addAll(row.validateRequiredAttributes(["timestamp", "lowTarget", "highTarget", "isTempTarget", "basal", "isTempBasal"]));
-
-    errors.addAll(row.validateTypes([
-      ("eid", String),
-      ("timestamp", int),
-      ("lowTarget", int),
-      ("highTarget", int),
-      ("basal", double),
-      ("isf", int),
-      ("cr", int),
-      ("isTempProfile", int),
-      ("isTempTarget", int),
-      ("isTempBasal", int),
-      ("profileName", String),
-    ]));
-
-    if (errors.isNotEmpty) {
-      throw ArgumentError("Invalid ValueAtTime Row: $row, Errors: $errors");
-    }
-
-    return ValueAtTime(
-      eid: "${row["eid"]}",
-      date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
-      lowTarget: row["lowTarget"] as int,
-      highTarget: row["highTarget"] as int,
-      basal: row["basal"] as double,
-      isf: row["isf"] as int,
-      cr: row["cr"] as int,
-      isTempProfile: row["isTempProfile"] == 1,
-      isTempBasal: row["isTempBasal"] == 1,
-      isTempTarget: row["isTempTarget"] == 1,
-      profileName: row["profileName"] as String,
-      profilePercent: row["profilePercent"] as int,
-    );
-  }
-
-  @override
-  SQLRow bToA(ValueAtTime model) {
-    return SQLRow({
-      "eid": model.eid!,
-      "timestamp": model.date.millisecondsSinceEpoch,
-      //
-      "lowTarget": model.lowTarget,
-      "highTarget": model.highTarget,
-      //
-      "basal": model.basal,
-      "isf": model.isf,
-      "cr": model.cr,
-      //
-      "profileName": model.profileName,
-      "profilePercent": model.profilePercent,
-      //
-      "isTempProfile": model.isTempProfile ? 1 : 0,
-      "isTempBasal": model.isTempBasal ? 1 : 0,
-      "isTempTarget": model.isTempTarget ? 1 : 0,
-    });
   }
 }

@@ -16,7 +16,6 @@ cleanSignals() {
   SQLToSGV().writeSignal.value = 0;
   SQLToTempBasal().writeSignal.value = 0;
   SQLToTempTarget().writeSignal.value = 0;
-  SQLToValueAtTime().writeSignal.value = 0;
 }
 
 void main() async {
