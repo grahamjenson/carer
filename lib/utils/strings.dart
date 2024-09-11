@@ -17,3 +17,11 @@ String prettyPrintJson(String input) {
     return input;
   }
 }
+
+String truncateString(String str, int maxLength) {
+  if (str.length <= maxLength) {
+    return str;
+  } else {
+    return '${str.substring(0, maxLength)}...';
+  }
+}

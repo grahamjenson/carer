@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -73,7 +74,7 @@ class ASignal<T> extends Signal<T> {
   bool set(T val, {bool force = false}) {
     bool ret = super.set(val, force: force);
     if (ret) {
-      alog("Signal $debugLabel set to $val");
+      alog(truncateString("ASignal: $debugLabel set to $val", 100));
     }
     return ret;
   }
@@ -196,4 +197,21 @@ FutureSignal<T> acomputedAsync<T>(
       return initialValue;
     }
   }, initialValue: initialValue, debugLabel: debugLabel, autoDispose: autoDispose, dependencies: dependencies, lazy: lazy);
+}
+
+class SignalsDevObserverWrapper extends DevToolsSignalsObserver {
+  @override
+  void log(String message) {
+    // Don't log here, because this will never work in prod because Signals use `assert` block to notify observer
+  }
+}
+
+void setupSignalsLogging() {
+  // if kdebug is true, then it will be a DevToolsSignalsObserver
+  SignalsObserver? oldinstance = SignalsObserver.instance;
+  if (oldinstance != null && oldinstance is DevToolsSignalsObserver) {
+    oldinstance.enabled = false;
+    var newinstance = SignalsDevObserverWrapper();
+    SignalsObserver.instance = newinstance;
+  }
 }

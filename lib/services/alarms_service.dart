@@ -23,7 +23,8 @@ class AlarmsService {
   factory AlarmsService() => _singleton;
   final AlarmPlayer player = AlarmPlayer();
 
-  final ASignal<DateTime?> sleepUntilSignal = ASignal(null, debugLabel: "sleepUntil");
+  // Start with a sleep, to give time for the app to catch up
+  final ASignal<DateTime?> sleepUntilSignal = ASignal(clock.fromNow(seconds: 10), debugLabel: "sleepUntil");
 
   final Alarm _noDataAlarm = const NoDataAlarm();
   final Alarm _predictiveLowAlarm = const PredictiveLowAlarm();

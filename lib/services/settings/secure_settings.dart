@@ -23,10 +23,21 @@ class SecureSettings {
   }
 
   String? get nightscoutURL => _signals[_SSNames.nightscoutUrl]!.value as String?;
-  set nightscoutURL(String? value) => _signals[_SSNames.nightscoutUrl]!.value = value;
+  set nightscoutURL(String? value) {
+    if (value != null) {
+      ALogger().addCensoredString("NS_URL", value);
+    }
+    _signals[_SSNames.nightscoutUrl]!.value = value;
+  }
 
   String? get nightscoutToken => _signals[_SSNames.nightscoutToken]!.value as String?;
-  set nightscoutToken(String? value) => _signals[_SSNames.nightscoutToken]!.value = value;
+  set nightscoutToken(String? value) {
+    if (value != null) {
+      ALogger().addCensoredString("NS_TOKEN", value);
+    }
+
+    _signals[_SSNames.nightscoutToken]!.value = value;
+  }
 
   (String, String) get nightscoutURLAndToken {
     return (nightscoutURL ?? "", nightscoutToken ?? "");
@@ -43,7 +54,7 @@ class SecureSettings {
       if (nightscoutURL == null) {
         return;
       }
-      ALogger().addCensoredString("NS_URL", nightscoutURL!);
+
       store.write(key: _SSNames.nightscoutUrl.name, value: nightscoutURL!);
     });
 
@@ -51,7 +62,7 @@ class SecureSettings {
       if (nightscoutToken == null) {
         return;
       }
-      ALogger().addCensoredString("NS_TOKEN", nightscoutToken!);
+
       store.write(key: _SSNames.nightscoutToken.name, value: nightscoutToken!);
     });
   }
