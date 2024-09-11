@@ -64,30 +64,35 @@ Future<T> executeWithRetry<T>(
 
 class AWatch<T extends Widget> extends StatelessWidget {
   final List<Signal> dependencies;
-  const AWatch(this.builder, {super.key, this.dependencies = const []});
+  final String debugLabel;
+
+  const AWatch(this.builder, {super.key, this.dependencies = const [], this.debugLabel = "AWatch"});
 
   /// The widget to rebuild when any signals change
   final T Function(BuildContext context) builder;
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      try {
-        for (var dep in dependencies) {
-          dep.value;
-        }
-        return builder(context);
-      } catch (e, stackTrace) {
-        // Only report stack for internal lines
-        Errors.captureError(e, stackTrace);
+    return Watch(
+      (context) {
+        try {
+          for (var dep in dependencies) {
+            dep.value;
+          }
+          return builder(context);
+        } catch (e, stackTrace) {
+          // Only report stack for internal lines
+          Errors.captureError(e, stackTrace);
 
-        if (kDebugMode) {
-          return ErrorWidget(e);
+          if (kDebugMode) {
+            return ErrorWidget(e);
+          }
+          // Return instructinos on reporting
+          return const Text("Error. Please restart the app. If continues, please contact support.");
         }
-        // Return instructinos on reporting
-        return const Text("Error. Please restart the app. If continues, please contact support.");
-      }
-    });
+      },
+      debugLabel: this.debugLabel,
+    );
   }
 }
 
@@ -134,9 +139,13 @@ Computed<T> acomputed<T>(
   T onError, {
   String? debugLabel,
   bool autoDispose = false,
+  List<ReadonlySignal<dynamic>> dependencies = const [],
 }) {
   return computed(() {
     try {
+      for (var dep in dependencies) {
+        dep.value;
+      }
       return compute();
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
@@ -162,4 +171,40 @@ FutureSignal<T> acomputedAsync<T>(
       return initialValue;
     }
   }, initialValue: initialValue, debugLabel: debugLabel, autoDispose: autoDispose, dependencies: dependencies, lazy: lazy);
+}
+
+class SignalsObserverWrapper extends LoggingSignalsObserver {
+  bool isIniting = true;
+
+  /// Logs a message to the console.
+  @override
+  void log(String message) {
+    if (isIniting) return;
+    alog("Signal: $message");
+  }
+}
+
+class SignalsDevObserverWrapper extends DevToolsSignalsObserver {
+  @override
+  void log(String message) {
+    alog("SignalDev: $message");
+  }
+}
+
+void setupSignalsLogging() {
+  return;
+  // if kdebug is true, then it will be a DevToolsSignalsObserver
+  SignalsObserver? oldinstance = SignalsObserver.instance;
+
+  if (oldinstance != null && oldinstance is DevToolsSignalsObserver) {
+    oldinstance.enabled = false;
+
+    var newinstance = SignalsDevObserverWrapper();
+    SignalsObserver.instance = newinstance;
+    alog("Signal Logging setup");
+  } else {
+    var newinstance = SignalsDevObserverWrapper();
+    SignalsObserver.instance = newinstance;
+    alog("Signal Logging setup");
+  }
 }

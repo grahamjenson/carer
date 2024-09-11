@@ -159,7 +159,7 @@ class CleanSGV extends Model {
     return chainedSGVs;
   }
 
-  static Signal<List<CleanSGV>> last3Hours = Signal([], debugLabel: 'lastSGV');
+  static Signal<List<CleanSGV>> last3Hours = Signal([], debugLabel: 'lastSGV3Hours');
   static Signal<List<CleanSGV>> last3HoursChained = Signal([], debugLabel: 'lastSGVChained');
 
   static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');

@@ -46,10 +46,9 @@ class Stats extends StatelessWidget with ThemeMixin {
         title: "Stats",
         child: Expanded(
           child: SingleChildScrollView(
-              child: Container(
-            alignment: Alignment.center,
-            child: AWatch((_) {
-              return DataTable(
+            child: Container(
+              alignment: Alignment.center,
+              child: DataTable(
                 border: TableBorder(
                   verticalInside: BorderSide(color: primaryColor(context)),
                 ),
@@ -84,9 +83,9 @@ class Stats extends StatelessWidget with ThemeMixin {
                   sage(sageNow, heading, row, small),
                   profileValues(heading, row, small),
                 ],
-              );
-            }),
-          )),
+              ),
+            ),
+          ),
         ),
       );
     });

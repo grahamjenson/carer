@@ -8,57 +8,60 @@ class TimeAgoReading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      var _ = TimerService().secondSignal.value;
-      var sgv = CleanSGV.lastSGV.value;
-      if (sgv == null) {
-        return const SizedBox.shrink();
-      }
+    return AWatch(
+      (context) {
+        var _ = TimerService().secondSignal.value;
+        var sgv = CleanSGV.lastSGV.value;
+        if (sgv == null) {
+          return const SizedBox.shrink();
+        }
 
-      var seconds = sgv.age.inSeconds % 300;
-      var additionalTX = const TextSpan(text: "");
-      if ((sgv.age.inSeconds > 300 && seconds < 15)) {
-        additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 30));
-      }
+        var seconds = sgv.age.inSeconds % 300;
+        var additionalTX = const TextSpan(text: "");
+        if ((sgv.age.inSeconds > 300 && seconds < 15)) {
+          additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 30));
+        }
 
-      Widget text;
-      if (sgv.age.inMinutes == 0) {
-        text = Text(
-          "now",
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.bold,
-            fontSize: 100,
-          ),
-        );
-      } else {
-        text = RichText(
-          text: TextSpan(
-            text: "${sgv.age.inMinutes}",
+        Widget text;
+        if (sgv.age.inMinutes == 0) {
+          text = Text(
+            "now",
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
-              fontSize: 110,
+              fontSize: 100,
             ),
-            children: [
-              const TextSpan(text: "min", style: TextStyle(fontSize: 40)),
-              additionalTX,
-            ],
-          ),
-        );
-      }
+          );
+        } else {
+          text = RichText(
+            text: TextSpan(
+              text: "${sgv.age.inMinutes}",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 110,
+              ),
+              children: [
+                const TextSpan(text: "min", style: TextStyle(fontSize: 40)),
+                additionalTX,
+              ],
+            ),
+          );
+        }
 
-      return text;
-      //   return SizedBox(
-      //     width: 350,
-      //     height: 110,
-      //     child: Row(
-      //       children: [
-      //         Container(padding: const EdgeInsets.only(top: 26, right: 10), child: const Expanded(flex: 1, child: TimeGrid())), // Wrapped in Expanded
-      //         Expanded(flex: 3, child: text), // Wrapped in Expanded
-      //       ],
-      //     ),
-      //   );
-    });
+        return text;
+        //   return SizedBox(
+        //     width: 350,
+        //     height: 110,
+        //     child: Row(
+        //       children: [
+        //         Container(padding: const EdgeInsets.only(top: 26, right: 10), child: const Expanded(flex: 1, child: TimeGrid())), // Wrapped in Expanded
+        //         Expanded(flex: 3, child: text), // Wrapped in Expanded
+        //       ],
+        //     ),
+        //   );
+      },
+      debugLabel: "TimeAgoReading",
+    );
   }
 }

@@ -868,26 +868,26 @@ packages:
     dependency: "direct main"
     description:
       name: signals
-      sha256: "94927d4069a158a6a20ad98990e6c67faeeed4ae6af681c1696fb98f3fbd5d2e"
+      sha256: "4ea50be15466de9460af2e1ac2b189e2f772bd7f0ccb84d72e1f6f9fea828138"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.2"
+    version: "5.5.0"
   signals_core:
     dependency: transitive
     description:
       name: signals_core
-      sha256: e5888685b9a3cff7c9814bd433195b1f76d0bfa3eae135e0a2f4ff5c48a56a1c
+      sha256: f4af1dd285e89bf0bb268676c9d175ea6fb6a894d81260f6b564decad46ad240
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.2"
+    version: "5.5.0"
   signals_flutter:
     dependency: transitive
     description:
       name: signals_flutter
-      sha256: "1c202bc5136fbe1d8d71b66202e8f71bc10b957ca678c1f44d0d3af2aeb678cc"
+      sha256: "2d9678e39d698ca633c8609872354797511f2af33b4d4ee7b6bfeb487aad6258"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.2"
+    version: "5.5.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -950,7 +950,7 @@ packages:
     source: hosted
     version: "2.3.3+1"
   sqflite_common:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: sqflite_common
       sha256: "3da423ce7baf868be70e2c0976c28a1bb2f73644268b7ffa7d2e08eab71f16a4"

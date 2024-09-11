@@ -14,7 +14,6 @@ const dbTables = [
   tempbasalTable,
   temptargetsTable,
   profileTable,
-  logsTable,
 ];
 
 const dbViews = [
@@ -204,16 +203,4 @@ const sgvsCleanView = DBTable(sgvsCleanViewName, '''
       )
     ORDER BY
       timestamp DESC
-  ''');
-
-const String logsTableName = 'logs';
-const logsTable = DBTable(logsTableName, '''
-    CREATE TABLE logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      level TEXT,
-      thread TEXT,
-      timestamp INTEGER,
-      datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
-      message TEXT
-    )
   ''');

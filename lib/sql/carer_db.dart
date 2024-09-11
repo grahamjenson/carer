@@ -1,11 +1,8 @@
-import 'dart:isolate';
-import 'dart:math';
-
+import 'package:carer/sql/db.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
-import 'package:carer/utils/env.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common/sqflite_logger.dart';
 
 class CarerDB {
   static final Future<CarerDB> _instance = _createInstance();
@@ -16,20 +13,24 @@ class CarerDB {
 
   Database get db => _db;
 
-  static Future<CarerDB> _createInstance() async {
-    var db = await _openDatabaseAndCreateTables();
-    return CarerDB(db);
+  static Future<String> getPath() async {
+    return DB.getPath('carer');
   }
 
-  static Future<String> getPath() async {
-    final databasePath = await getDatabasesPath();
-    var name = 'carer.db';
-    if (Env.isTest) {
-      // TODO make database in memory for tests
-      name = 'test_carer_${Random().nextInt(999999999)}.db';
-    }
-    final path = join(databasePath, name);
-    return path;
+  static Future<CarerDB> _createInstance() async {
+    // Set a wrapper on database factory
+    var factoryWithLogs = SqfliteDatabaseFactoryLogger(
+      databaseFactory,
+      options: SqfliteLoggerOptions(
+        log: (SqfliteLoggerEvent event) => alog("CarerDB: $event"),
+        type: SqfliteDatabaseFactoryLoggerType.all,
+      ),
+    );
+
+    databaseFactory = factoryWithLogs;
+
+    var db = await _openDatabaseAndCreateTables();
+    return CarerDB(db);
   }
 
   static int getVersion() {
@@ -136,32 +137,5 @@ class CarerDB {
     }
 
     await batch.commit();
-  }
-
-  static int logCounter = 0;
-  static int maxLogRows = 10000;
-  static Future<bool> writeLog(DateTime dt, String message, int level) async {
-    var cdb = await CarerDB.instance;
-    var db = cdb.db;
-
-    return writeLogToDB(db, dt, message, level);
-  }
-
-  static Future<bool> writeLogToDB(Database db, DateTime dt, String message, int level) async {
-    logCounter++;
-    // Write the log
-    await db.insert(logsTableName, {
-      "timestamp": dt.millisecondsSinceEpoch,
-      "message": message,
-      "level": level,
-      "thread": Isolate.current.debugName,
-    });
-    // count the writes, every few thousand writes truncate the end of the table
-
-    if (logCounter % maxLogRows == 0) {
-      await db.execute("DELETE FROM $logsTableName WHERE id < (SELECT MAX(id) - $maxLogRows FROM $logsTableName)");
-    }
-
-    return true;
   }
 }

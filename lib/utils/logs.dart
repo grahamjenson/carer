@@ -1,11 +1,9 @@
 import "dart:developer" as developer;
 
-import "package:carer/services/settings/secure_settings.dart";
-import "package:carer/sql/carer_db.dart";
+import "package:carer/sql/log_db.dart";
 import "package:carer/utils/env.dart";
 import "package:clock/clock.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
-import "package:signals/signals_flutter.dart";
 
 enum LogLevel {
   info(1),
@@ -18,8 +16,6 @@ enum LogLevel {
 }
 
 class ALogger {
-  final signal = Signal(0, debugLabel: "ALoggerSignal");
-
   ALogger._internal();
   static final ALogger _instance = ALogger._internal();
   factory ALogger() => _instance;
@@ -37,7 +33,6 @@ class ALogger {
 
     message = censorLogs(message);
 
-    signal.value = time.millisecondsSinceEpoch;
     logLines.insert(0, (time, level, message));
 
     if (logLines.length > 10000) {
@@ -46,7 +41,7 @@ class ALogger {
 
     // Wrap in golang to avoid errors
     try {
-      CarerDB.writeLog(time, message, level.level);
+      LogDB.writeLog(time, message, level.level);
     } catch (e, stacktrace) {
       // Dont handle the error since that is a BAD loop
       print("Error $e\n$stacktrace");
@@ -59,10 +54,14 @@ class ALogger {
     );
   }
 
+  final Map<String, String> _censoredString = {};
+  void addCensoredString(String replacement, String string) {
+    _censoredString[replacement] = string;
+  }
+
   String censorLogs(String msg) {
-    var (nsurl, token) = SecureSettings().nightscoutURLAndToken;
-    if (nsurl.isNotEmpty) {
-      msg = msg.replaceAll(nsurl, "NS_URL").replaceAll(token, "NS_TOKEN");
+    for (var entry in _censoredString.entries) {
+      msg = msg.replaceAll(entry.value, entry.key);
     }
     return msg;
   }

@@ -9,27 +9,30 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      var triggeredAlarms = AlarmsService().triggeredAlarms.value;
+    return AWatch(
+      (context) {
+        var triggeredAlarms = AlarmsService().triggeredAlarms.value;
 
-      if (triggeredAlarms.isEmpty) {
-        return const SizedBox.shrink();
-      }
+        if (triggeredAlarms.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-      return Container(
-        padding: const EdgeInsets.all(4), // Add padding inside the border
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: primaryColor(context), // Color of the border
-            width: 1, // Width of the border
+        return Container(
+          padding: const EdgeInsets.all(4), // Add padding inside the border
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: primaryColor(context), // Color of the border
+              width: 1, // Width of the border
+            ),
+            borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
           ),
-          borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
-        ),
-        child: Row(
-          children: getAlarmWidgets(triggeredAlarms, primaryColor(context)),
-        ),
-      );
-    });
+          child: Row(
+            children: getAlarmWidgets(triggeredAlarms, primaryColor(context)),
+          ),
+        );
+      },
+      debugLabel: "AlarmsBarIcons",
+    );
   }
 
   List<Widget> getAlarmWidgets(Set<Alarm> triggeredAlarms, Color mainColor) {

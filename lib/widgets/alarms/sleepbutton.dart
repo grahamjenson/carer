@@ -76,6 +76,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
             ));
       },
       dependencies: [AlarmsService().sleepUntilSignal],
+      debugLabel: "SleepCancel",
     );
   }
 

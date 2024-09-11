@@ -2,13 +2,10 @@
 // It will make it easier to have a single location for all persisted entities.
 // Hopefully, this will make it easier to manage the data.
 
-import 'dart:math';
-
+import 'package:carer/sql/db.dart';
 import 'package:carer/sql/statements/kv.dart';
-import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class KeyValueStore {
@@ -21,22 +18,16 @@ class KeyValueStore {
 
   KeyValueStore(this._db);
 
+  static Future<String> getPath() async {
+    return DB.getPath("kv");
+  }
+
   // Constructor
   static Future<KeyValueStore> _createInstance() async {
     final db = await openDatabaseAndCreateTables();
     var kvdb = KeyValueStore(db);
     await kvdb.internalPopulate();
     return kvdb;
-  }
-
-  static Future<String> getPath() async {
-    final databasePath = await getDatabasesPath();
-    var name = "kv.db";
-    if (Env.isTest) {
-      name = 'test_kvb_${Random().nextInt(999999999)}.db';
-    }
-    final path = join(databasePath, name);
-    return path;
   }
 
   // Open the database and create the tables

@@ -47,6 +47,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
             child: AWatch(
               (context) => getLayout(layoutType(context)),
               dependencies: UISettings().themeLayoutSignals,
+              debugLabel: "HomeLayout",
             ),
           ),
           const Positioned(

@@ -13,38 +13,42 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((_) {
-      List<Widget?> rowsMaybe = [
-        getIsSilentOnIcon(context),
-        getIsPluggedInIcon(context),
-        sensorChangeDay(context),
-        cannulaChangeDay(context),
-        uploaderPhoneLowPower(context),
-      ];
-      List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
+    return AWatch(
+      (_) {
+        List<Widget?> rowsMaybe = [
+          getIsSilentOnIcon(context),
+          getIsPluggedInIcon(context),
+          sensorChangeDay(context),
+          cannulaChangeDay(context),
+          uploaderPhoneLowPower(context),
+        ];
+        List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
 
-      if (rows.isEmpty) {
-        return const SizedBox.shrink();
-      }
+        if (rows.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-      return Container(
-        padding: const EdgeInsets.all(4), // Add padding inside the border
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: primaryColor(context), // Color of the border
-            width: 1, // Width of the border
+        return Container(
+          padding: const EdgeInsets.all(4), // Add padding inside the border
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: primaryColor(context), // Color of the border
+              width: 1, // Width of the border
+            ),
+            borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
           ),
-          borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
-        ),
-        child: Row(
-          children: rows,
-        ),
-      );
-    }, dependencies: [
-      TimerService().fiveSecondSignal,
-      PlatformInfoService().ringerMode,
-      PlatformInfoService().batteryMode,
-    ]);
+          child: Row(
+            children: rows,
+          ),
+        );
+      },
+      dependencies: [
+        TimerService().fiveSecondSignal,
+        PlatformInfoService().ringerMode,
+        PlatformInfoService().batteryMode,
+      ],
+      debugLabel: "StatusesBar",
+    );
   }
 
   Widget? getIsSilentOnIcon(BuildContext context) {

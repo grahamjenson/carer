@@ -21,16 +21,31 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
           value: Container(
             alignment: Alignment.centerRight,
             width: maxWidth,
-            child: AWatch((context) => Text(
-                  SecureSettings().nightscoutURL ?? "Not Set",
-                  overflow: TextOverflow.ellipsis,
-                )),
+            child: AWatch((context) {
+              var nsURL = SecureSettings().nightscoutURL;
+              var nsToken = SecureSettings().nightscoutToken;
+              if (nsURL == null || nsURL.isEmpty || nsToken == null || nsToken.isEmpty) {
+                return const Text("Not Set");
+              }
+
+              return Text(
+                "$nsURL/?token=$nsToken",
+                overflow: TextOverflow.ellipsis,
+              );
+            }),
           ),
           leading: const Icon(Icons.language),
           onPressed: (context) async {
             final url = await openTextDialog(context, "Nightscout URL", hint: "URL", value: SecureSettings().nightscoutURL ?? "");
             if (url == null || url.isEmpty) return;
-            SecureSettings().nightscoutURL = url;
+
+            var uri = Uri.parse(url);
+            var token = uri.queryParameters["token"];
+            token ??= '';
+            var base = '${uri.scheme}://${uri.host}';
+
+            SecureSettings().nightscoutURL = base.toString();
+            SecureSettings().nightscoutToken = token;
           },
         ),
       ],

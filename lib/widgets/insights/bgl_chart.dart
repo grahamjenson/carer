@@ -58,27 +58,27 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       return Window(
         title: "Chart",
         child: Expanded(
-            child: Padding(
-                padding: const EdgeInsets.only(
-                  right: 10,
-                  top: 5,
-                ),
-                child: AWatch((context) {
-                  return LineChart(
-                    buildlineChartData(
-                      minsAgo,
-                      maxBasal,
-                      bglSpotData,
-                      basalSpotData,
-                      lowTargets,
-                      highTargets,
-                      treatments,
-                      bglLineData,
-                      mainColor,
-                    ),
-                    duration: Duration.zero,
-                  );
-                }))),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              right: 10,
+              top: 5,
+            ),
+            child: LineChart(
+              buildlineChartData(
+                minsAgo,
+                maxBasal,
+                bglSpotData,
+                basalSpotData,
+                lowTargets,
+                highTargets,
+                treatments,
+                bglLineData,
+                mainColor,
+              ),
+              duration: Duration.zero,
+            ),
+          ),
+        ),
       );
     });
   }
@@ -368,9 +368,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             value.toInt() == TargetSettings().lowUrgent ||
             value.toInt() == TargetSettings().highTarget ||
             value.toInt() == TargetSettings().lowTarget) {
-          return AWatch((context) {
-            return Text(UISettings().unit.str(value), style: style, textAlign: TextAlign.right);
-          });
+          return Text(UISettings().unit.str(value), style: style, textAlign: TextAlign.right);
         }
         return const SizedBox();
       },

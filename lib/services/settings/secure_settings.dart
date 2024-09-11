@@ -1,8 +1,9 @@
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:signals/signals_flutter.dart';
 
-enum _SSNames { nightscoutUrl }
+enum _SSNames { nightscoutUrl, nightscoutToken }
 
 class SecureSettings {
   static final SecureSettings _singleton = SecureSettings._();
@@ -10,9 +11,9 @@ class SecureSettings {
 
   final Map<_SSNames, Signal> _signals = {
     _SSNames.nightscoutUrl: Signal<String?>(null, debugLabel: 'nightscoutUrl'),
+    _SSNames.nightscoutToken: Signal<String?>(null, debugLabel: 'nightscoutToken'),
   };
 
-  late Computed<(String, String)> _nightscoutURLAndTokenSignal;
   late FlutterSecureStorage store;
 
   SecureSettings._() {
@@ -20,36 +21,39 @@ class SecureSettings {
         aOptions: AndroidOptions(
       encryptedSharedPreferences: true,
     ));
-
-    _nightscoutURLAndTokenSignal = acomputed(() {
-      if (nightscoutURL == null || nightscoutURL!.isEmpty) {
-        return ('', '');
-      }
-
-      var uri = Uri.parse(nightscoutURL!);
-      var token = uri.queryParameters["token"];
-      token ??= '';
-      var base = '${uri.scheme}://${uri.host}';
-      return (base.toString(), token);
-    }, ('', ''), debugLabel: 'nightscoutURLAndToken');
   }
 
   String? get nightscoutURL => _signals[_SSNames.nightscoutUrl]!.value as String?;
   set nightscoutURL(String? value) => _signals[_SSNames.nightscoutUrl]!.value = value;
 
-  (String, String) get nightscoutURLAndToken => _nightscoutURLAndTokenSignal.value;
+  String? get nightscoutToken => _signals[_SSNames.nightscoutToken]!.value as String?;
+  set nightscoutToken(String? value) => _signals[_SSNames.nightscoutToken]!.value = value;
+
+  (String, String) get nightscoutURLAndToken {
+    return (nightscoutURL ?? "", nightscoutToken ?? "");
+  }
 
   setupDBPropagation() async {
     // https://github.com/mogol/flutter_secure_storage/issues/709
     // read errors, read all doesn't
     final allKeys = await store.readAll();
     nightscoutURL = allKeys[_SSNames.nightscoutUrl.name];
+    nightscoutToken = allKeys[_SSNames.nightscoutToken.name];
 
     aeffect(() {
       if (nightscoutURL == null) {
         return;
       }
+      ALogger().addCensoredString("NS_URL", nightscoutURL!);
       store.write(key: _SSNames.nightscoutUrl.name, value: nightscoutURL!);
+    });
+
+    aeffect(() {
+      if (nightscoutToken == null) {
+        return;
+      }
+      ALogger().addCensoredString("NS_TOKEN", nightscoutToken!);
+      store.write(key: _SSNames.nightscoutToken.name, value: nightscoutToken!);
     });
   }
 }

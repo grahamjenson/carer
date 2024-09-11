@@ -1,3 +1,4 @@
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +22,9 @@ class _LogErrorPageState extends State<LogErrorPage> {
       text.value = controller.text;
     });
     predictionsSignal = acomputed(() {
-      var _ = ALogger().signal.value;
       String logString = ALogger().getPrettyLogs();
       return logString.split('\n').where((line) => line.contains(text.value)).join('\n');
-    }, "", debugLabel: "DebugLogErrorPage");
+    }, "", debugLabel: "DebugLogErrorPage", dependencies: [TimerService().secondSignal]);
   }
 
   // on destroy dispose of the controller

@@ -29,7 +29,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
         padding: EdgeInsets.zero,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: rows),
       );
-    }, dependencies: [TimerService().tenSecondSignal, AlarmsService().sleepUntilSignal]);
+    }, dependencies: [TimerService().tenSecondSignal, AlarmsService().sleepUntilSignal], debugLabel: "SleepTextStatus");
   }
 
   bool isSleeping() {

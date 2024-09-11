@@ -5,6 +5,7 @@ import 'package:carer/services/background_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
@@ -83,6 +84,7 @@ class DebugSettingsWidget extends AbstractSettingsSection {
           // Add main DB and KV DB
           paths.add(await CarerDB.getPath());
           paths.add(await KeyValueStore.getPath());
+          paths.add(await LogDB.getPath());
 
           // Add logs
           paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));

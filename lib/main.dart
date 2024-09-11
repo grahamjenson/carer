@@ -22,8 +22,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
-  //databaseFactory = databaseFactory.debugQuickLoggerWrapper();
-
   await SentryFlutter.init(
     (options) {
       options.dsn = 'https://635c475aa48824327a23e3723e92a278@o4507178414243840.ingest.us.sentry.io/4507178416996352';
@@ -40,6 +38,9 @@ void main() async {
 
 void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Signals logging
+  setupSignalsLogging();
 
   // Load the settings from Shared Preferences before starting
   await executeWithRetry(Settings().setupDBPropagation);
