@@ -14,7 +14,7 @@ class LogErrorPage extends StatefulWidget {
 class _LogErrorPageState extends State<LogErrorPage> {
   final TextEditingController controller = TextEditingController();
 
-  final Signal<String> text = Signal<String>('');
+  final ASignal<String> text = ASignal<String>('');
   late Computed<String> predictionsSignal;
 
   _LogErrorPageState() {

@@ -1,7 +1,6 @@
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals.dart';
 
-Signal<Set<int>> a = Signal({});
+ASignal<Set<int>> a = ASignal({});
 
 void main() {
   a.value = {1, 2, 3};

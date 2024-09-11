@@ -4,7 +4,6 @@ import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
-import 'package:signals/signals_flutter.dart';
 
 class Treatment extends Model {
   @override
@@ -37,7 +36,7 @@ class Treatment extends Model {
   // Future Signals
   ////
 
-  static Signal<List<Treatment>> lastSixHours = Signal([], debugLabel: 'treatmentsLastSixHours');
+  static ASignal<List<Treatment>> lastSixHours = ASignal([], debugLabel: 'treatmentsLastSixHours');
 
   static setupSQLSignals() {
     signalAssign(lastSixHours, () => SQLToTreatment().lastMins(60 * 6),

@@ -39,9 +39,6 @@ void main() async {
 void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Signals logging
-  setupSignalsLogging();
-
   // Load the settings from Shared Preferences before starting
   await executeWithRetry(Settings().setupDBPropagation);
 

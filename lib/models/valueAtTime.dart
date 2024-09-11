@@ -8,7 +8,6 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
-import 'package:signals/signals_flutter.dart';
 
 class ValueAtTime extends Model {
   @override
@@ -90,7 +89,7 @@ class ValueAtTime extends Model {
     return v;
   }
 
-  static Signal<List<ValueAtTime>> lastSixHours = Signal([], debugLabel: 'valueAtTimeLastSixHours');
+  static ASignal<List<ValueAtTime>> lastSixHours = ASignal([], debugLabel: 'valueAtTimeLastSixHours');
 
   static Future<List<ValueAtTime>> updateValues() async {
     alog('ValueAtTime.updateValues');

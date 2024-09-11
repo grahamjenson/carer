@@ -2,7 +2,6 @@ import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 enum _UINames {
   unit,
@@ -48,19 +47,19 @@ enum ThemeLayout {
 
 class UIThemeLayout {
   final String baseName;
-  late Signal<UITheme> themeSignal;
-  late Signal<UILayout> horizonalLayoutSignal;
-  late Signal<UILayout> verticalLayoutSignal;
-  late Signal<bool> enabledSignal;
+  late ASignal<UITheme> themeSignal;
+  late ASignal<UILayout> horizonalLayoutSignal;
+  late ASignal<UILayout> verticalLayoutSignal;
+  late ASignal<bool> enabledSignal;
 
   UIThemeLayout(this.baseName) {
-    enabledSignal = Signal<bool>(true, debugLabel: enabledPref);
-    themeSignal = Signal<UITheme>(UITheme.normal, debugLabel: themePref);
-    horizonalLayoutSignal = Signal<UILayout>(UILayout.showBGL, debugLabel: horizonalLayoutPref);
-    verticalLayoutSignal = Signal<UILayout>(UILayout.showBGL, debugLabel: verticalLayoutPref);
+    enabledSignal = ASignal<bool>(true, debugLabel: enabledPref);
+    themeSignal = ASignal<UITheme>(UITheme.normal, debugLabel: themePref);
+    horizonalLayoutSignal = ASignal<UILayout>(UILayout.showBGL, debugLabel: horizonalLayoutPref);
+    verticalLayoutSignal = ASignal<UILayout>(UILayout.showBGL, debugLabel: verticalLayoutPref);
   }
 
-  List<Signal> get signals => [enabledSignal, themeSignal, horizonalLayoutSignal, verticalLayoutSignal];
+  List<ASignal> get signals => [enabledSignal, themeSignal, horizonalLayoutSignal, verticalLayoutSignal];
 
   String get enabledPref => "${baseName}Enabled";
   bool get enabled => enabledSignal.value;
@@ -106,11 +105,11 @@ class UISettings {
   static final UISettings _singleton = UISettings._();
   factory UISettings() => _singleton;
 
-  final Map<_UINames, Signal> _signals = {
-    _UINames.screenActive: Signal<bool>(false, debugLabel: 'screenActive'),
-    _UINames.nightStartTime: Signal<TimeOfDay>(const TimeOfDay(hour: 22, minute: 0), debugLabel: 'nightStartTime'),
-    _UINames.nightEndTime: Signal<TimeOfDay>(const TimeOfDay(hour: 6, minute: 0), debugLabel: 'nightEndTime'),
-    _UINames.unit: Signal<Unit>(Unit.mg, debugLabel: 'unit'),
+  final Map<_UINames, ASignal> _signals = {
+    _UINames.screenActive: ASignal<bool>(false, debugLabel: 'screenActive'),
+    _UINames.nightStartTime: ASignal<TimeOfDay>(const TimeOfDay(hour: 22, minute: 0), debugLabel: 'nightStartTime'),
+    _UINames.nightEndTime: ASignal<TimeOfDay>(const TimeOfDay(hour: 6, minute: 0), debugLabel: 'nightEndTime'),
+    _UINames.unit: ASignal<Unit>(Unit.mg, debugLabel: 'unit'),
   };
 
   Map<ThemeLayout, UIThemeLayout> themeLayouts = {
@@ -119,7 +118,7 @@ class UISettings {
     ThemeLayout.nightUI: UIThemeLayout(ThemeLayout.nightUI.name),
   };
 
-  List<Signal> get themeLayoutSignals => themeLayouts.values.expand((e) => e.signals).toList();
+  List<ASignal> get themeLayoutSignals => themeLayouts.values.expand((e) => e.signals).toList();
   UIThemeLayout get mainUIThemeLayout => themeLayouts[ThemeLayout.mainUI]!;
   UIThemeLayout get alarmUIThemeLayout => themeLayouts[ThemeLayout.alarmUI]!;
   UIThemeLayout get nightUIThemeLayout => themeLayouts[ThemeLayout.nightUI]!;
@@ -129,7 +128,7 @@ class UISettings {
   bool get screenActive => _signals[_UINames.screenActive]!.value as bool;
   set screenActive(bool value) => _signals[_UINames.screenActive]!.value = value;
 
-  Signal<TimeOfDay> get nightStartTimeSignal => _signals[_UINames.nightStartTime]! as Signal<TimeOfDay>;
+  ASignal<TimeOfDay> get nightStartTimeSignal => _signals[_UINames.nightStartTime]! as ASignal<TimeOfDay>;
   TimeOfDay get nightStartTime => nightStartTimeSignal.value;
   set nightStartTime(TimeOfDay value) {
     if (tODtoInt(value) < tODtoInt(nightEndTime)) {
@@ -138,7 +137,7 @@ class UISettings {
     nightStartTimeSignal.value = value;
   }
 
-  Signal<TimeOfDay> get nightEndTimeSignal => _signals[_UINames.nightEndTime]! as Signal<TimeOfDay>;
+  ASignal<TimeOfDay> get nightEndTimeSignal => _signals[_UINames.nightEndTime]! as ASignal<TimeOfDay>;
   TimeOfDay get nightEndTime => nightEndTimeSignal.value;
   set nightEndTime(TimeOfDay value) {
     if (tODtoInt(value) > tODtoInt(nightStartTime)) {

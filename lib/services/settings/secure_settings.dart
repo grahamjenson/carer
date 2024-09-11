@@ -1,7 +1,6 @@
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:signals/signals_flutter.dart';
 
 enum _SSNames { nightscoutUrl, nightscoutToken }
 
@@ -9,9 +8,9 @@ class SecureSettings {
   static final SecureSettings _singleton = SecureSettings._();
   factory SecureSettings() => _singleton;
 
-  final Map<_SSNames, Signal> _signals = {
-    _SSNames.nightscoutUrl: Signal<String?>(null, debugLabel: 'nightscoutUrl'),
-    _SSNames.nightscoutToken: Signal<String?>(null, debugLabel: 'nightscoutToken'),
+  final Map<_SSNames, ASignal> _signals = {
+    _SSNames.nightscoutUrl: ASignal<String?>(null, debugLabel: 'nightscoutUrl'),
+    _SSNames.nightscoutToken: ASignal<String?>(null, debugLabel: 'nightscoutToken'),
   };
 
   late FlutterSecureStorage store;

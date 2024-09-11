@@ -5,7 +5,6 @@ import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:collection/collection.dart';
-import 'package:signals/signals_flutter.dart';
 
 class PredictionService {
   static final PredictionService _singleton = PredictionService._();
@@ -16,8 +15,8 @@ class PredictionService {
 
   factory PredictionService() => _singleton;
 
-  late Signal<List<CleanSGV>> predictionsSignal = Signal<List<CleanSGV>>([], debugLabel: "Predictions");
-  late Signal<List<CleanSGV>> predictionsForReadingsSignal = Signal<List<CleanSGV>>([], debugLabel: "predictionsForReadings");
+  late ASignal<List<CleanSGV>> predictionsSignal = ASignal<List<CleanSGV>>([], debugLabel: "Predictions");
+  late ASignal<List<CleanSGV>> predictionsForReadingsSignal = ASignal<List<CleanSGV>>([], debugLabel: "predictionsForReadings");
 
   PredictionService._() {
     signalAssign(predictionsSignal, () {

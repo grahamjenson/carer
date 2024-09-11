@@ -3,7 +3,6 @@ import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class DataMapper<T1, T2> {
@@ -94,7 +93,7 @@ abstract class SQLReadMapper<T extends Model> extends DataMapper<SQLRow, T> {
 }
 
 abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
-  final Signal<int> writeSignal = Signal(0, debugLabel: "${T}Write");
+  final ASignal<int> writeSignal = ASignal(0, debugLabel: "${T}Write");
 
   Future<bool> saveRow(SQLRow row) {
     return save(aToB(row));

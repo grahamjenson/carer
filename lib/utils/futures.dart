@@ -62,6 +62,31 @@ Future<T> executeWithRetry<T>(
 // Signals Wrappers
 ////
 
+class ASignal<T> extends Signal<T> {
+  ASignal(
+    super.val, {
+    super.debugLabel,
+    super.autoDispose,
+  });
+
+  @override
+  bool set(T val, {bool force = false}) {
+    bool ret = super.set(val, force: force);
+    if (ret) {
+      alog("Signal $debugLabel set to $val");
+    }
+    return ret;
+  }
+}
+
+class ATimerSignal extends TimerSignal {
+  ATimerSignal({
+    required super.every,
+    required super.debugLabel,
+    super.autoDispose,
+  });
+}
+
 class AWatch<T extends Widget> extends StatelessWidget {
   final List<Signal> dependencies;
   final String debugLabel;
@@ -171,40 +196,4 @@ FutureSignal<T> acomputedAsync<T>(
       return initialValue;
     }
   }, initialValue: initialValue, debugLabel: debugLabel, autoDispose: autoDispose, dependencies: dependencies, lazy: lazy);
-}
-
-class SignalsObserverWrapper extends LoggingSignalsObserver {
-  bool isIniting = true;
-
-  /// Logs a message to the console.
-  @override
-  void log(String message) {
-    if (isIniting) return;
-    alog("Signal: $message");
-  }
-}
-
-class SignalsDevObserverWrapper extends DevToolsSignalsObserver {
-  @override
-  void log(String message) {
-    alog("SignalDev: $message");
-  }
-}
-
-void setupSignalsLogging() {
-  return;
-  // if kdebug is true, then it will be a DevToolsSignalsObserver
-  SignalsObserver? oldinstance = SignalsObserver.instance;
-
-  if (oldinstance != null && oldinstance is DevToolsSignalsObserver) {
-    oldinstance.enabled = false;
-
-    var newinstance = SignalsDevObserverWrapper();
-    SignalsObserver.instance = newinstance;
-    alog("Signal Logging setup");
-  } else {
-    var newinstance = SignalsDevObserverWrapper();
-    SignalsObserver.instance = newinstance;
-    alog("Signal Logging setup");
-  }
 }

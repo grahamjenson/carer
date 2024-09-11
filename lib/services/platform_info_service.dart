@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:sound_mode/sound_mode.dart';
 import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 
@@ -46,9 +45,9 @@ class PlatformInfoService {
     });
   }
 
-  Signal<RingerMode> ringerMode = Signal(RingerMode.unknown, debugLabel: "RingerMode");
-  Signal<BatteryMode> batteryMode = Signal(BatteryMode.unknown, debugLabel: "BatteryMode");
-  Signal<int> batteryLevel = Signal(100, debugLabel: "BatteryLevel");
+  ASignal<RingerMode> ringerMode = ASignal(RingerMode.unknown, debugLabel: "RingerMode");
+  ASignal<BatteryMode> batteryMode = ASignal(BatteryMode.unknown, debugLabel: "BatteryMode");
+  ASignal<int> batteryLevel = ASignal(100, debugLabel: "BatteryLevel");
 
   Future<RingerMode> getRingerMode() async {
     RingerMode ringerStatus = RingerMode.unknown;

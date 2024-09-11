@@ -6,7 +6,6 @@ import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
-import 'package:signals/signals_flutter.dart';
 
 class SGV extends Model {
   final int value;
@@ -159,13 +158,13 @@ class CleanSGV extends Model {
     return chainedSGVs;
   }
 
-  static Signal<List<CleanSGV>> last3Hours = Signal([], debugLabel: 'lastSGV3Hours');
-  static Signal<List<CleanSGV>> last3HoursChained = Signal([], debugLabel: 'lastSGVChained');
+  static ASignal<List<CleanSGV>> last3Hours = ASignal([], debugLabel: 'lastSGV3Hours');
+  static ASignal<List<CleanSGV>> last3HoursChained = ASignal([], debugLabel: 'lastSGVChained');
 
-  static Signal<CleanSGV?> lastSGV = Signal(null, debugLabel: 'lastSGV');
+  static ASignal<CleanSGV?> lastSGV = ASignal(null, debugLabel: 'lastSGV');
 
-  static Signal<double?> yesterdaysPercentage = Signal(0.0, debugLabel: 'yesterdaysPercentage');
-  static Signal<double?> todaysPercentage = Signal(0.0, debugLabel: 'todaysPercentage');
+  static ASignal<double?> yesterdaysPercentage = ASignal(0.0, debugLabel: 'yesterdaysPercentage');
+  static ASignal<double?> todaysPercentage = ASignal(0.0, debugLabel: 'todaysPercentage');
 
   static setupSQLSignals() {
     signalAssign(lastSGV, () => SQLToCleanSGV().query(limit: 1, name: "lastSGVQuery").then((value) => value.firstOrNull),

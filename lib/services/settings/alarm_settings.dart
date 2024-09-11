@@ -1,6 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals_flutter.dart';
 
 enum _AlarmNames {
   disableAlarms,
@@ -31,23 +30,23 @@ class AlarmSettings {
   static final AlarmSettings _singleton = AlarmSettings._();
   factory AlarmSettings() => _singleton;
 
-  final Map<_AlarmNames, Signal> _signals = {
-    _AlarmNames.disableAlarms: Signal<bool>(true, debugLabel: 'disableAlarms'),
-    _AlarmNames.urgentLowAlarm: Signal<bool>(false, debugLabel: 'urgentLowAlarm'),
-    _AlarmNames.lowAlarm: Signal<bool>(false, debugLabel: 'lowAlarm'),
-    _AlarmNames.lowMinutes: Signal<int>(5, debugLabel: 'lowMinutes'),
-    _AlarmNames.highAlarm: Signal<bool>(false, debugLabel: 'highAlarm'),
-    _AlarmNames.highMinutes: Signal<int>(5, debugLabel: 'highMinutes'),
-    _AlarmNames.urgentHighAlarm: Signal<bool>(false, debugLabel: 'urgentHighAlarm'),
-    _AlarmNames.fastDropAlarm: Signal<bool>(false, debugLabel: 'fastDropAlarm'),
-    _AlarmNames.fastDropAlarmMinutes: Signal<int>(5, debugLabel: 'fastDropAlarmMinutes'),
-    _AlarmNames.fastRiseAlarm: Signal<bool>(false, debugLabel: 'fastRiseAlarm'),
-    _AlarmNames.fastRiseAlarmMinutes: Signal<int>(5, debugLabel: 'fastRiseAlarmMinutes'),
-    _AlarmNames.noDataAlarmMinutes: Signal<int>(-1, debugLabel: 'noDataAlarmMinutes'),
-    _AlarmNames.lowPredictionAlarm: Signal<bool>(false, debugLabel: 'lowPredictionAlarm'),
-    _AlarmNames.lowPredictionMinutes: Signal<int>(5, debugLabel: 'lowPredictionMinutes'),
-    _AlarmNames.carerBatteryAlarm: Signal<bool>(false, debugLabel: 'carerBatteryAlarm'),
-    _AlarmNames.t1dBatteryAlarm: Signal<bool>(false, debugLabel: 't1dBatteryAlarm'),
+  final Map<_AlarmNames, ASignal> _signals = {
+    _AlarmNames.disableAlarms: ASignal<bool>(true, debugLabel: 'disableAlarms'),
+    _AlarmNames.urgentLowAlarm: ASignal<bool>(false, debugLabel: 'urgentLowAlarm'),
+    _AlarmNames.lowAlarm: ASignal<bool>(false, debugLabel: 'lowAlarm'),
+    _AlarmNames.lowMinutes: ASignal<int>(5, debugLabel: 'lowMinutes'),
+    _AlarmNames.highAlarm: ASignal<bool>(false, debugLabel: 'highAlarm'),
+    _AlarmNames.highMinutes: ASignal<int>(5, debugLabel: 'highMinutes'),
+    _AlarmNames.urgentHighAlarm: ASignal<bool>(false, debugLabel: 'urgentHighAlarm'),
+    _AlarmNames.fastDropAlarm: ASignal<bool>(false, debugLabel: 'fastDropAlarm'),
+    _AlarmNames.fastDropAlarmMinutes: ASignal<int>(5, debugLabel: 'fastDropAlarmMinutes'),
+    _AlarmNames.fastRiseAlarm: ASignal<bool>(false, debugLabel: 'fastRiseAlarm'),
+    _AlarmNames.fastRiseAlarmMinutes: ASignal<int>(5, debugLabel: 'fastRiseAlarmMinutes'),
+    _AlarmNames.noDataAlarmMinutes: ASignal<int>(-1, debugLabel: 'noDataAlarmMinutes'),
+    _AlarmNames.lowPredictionAlarm: ASignal<bool>(false, debugLabel: 'lowPredictionAlarm'),
+    _AlarmNames.lowPredictionMinutes: ASignal<int>(5, debugLabel: 'lowPredictionMinutes'),
+    _AlarmNames.carerBatteryAlarm: ASignal<bool>(false, debugLabel: 'carerBatteryAlarm'),
+    _AlarmNames.t1dBatteryAlarm: ASignal<bool>(false, debugLabel: 't1dBatteryAlarm'),
   };
 
   AlarmSettings._();
@@ -62,13 +61,13 @@ class AlarmSettings {
   set lowAlarm(bool value) => _signals[_AlarmNames.lowAlarm]!.value = value;
 
   int get lowMinutes => _signals[_AlarmNames.lowMinutes]!.value as int;
-  set lowMinutes(int value) => minutesSet(_signals[_AlarmNames.lowMinutes]! as Signal<int>, value);
+  set lowMinutes(int value) => minutesSet(_signals[_AlarmNames.lowMinutes]! as ASignal<int>, value);
 
   bool get highAlarm => _signals[_AlarmNames.highAlarm]!.value as bool;
   set highAlarm(bool value) => _signals[_AlarmNames.highAlarm]!.value = value;
 
   int get highMinutes => _signals[_AlarmNames.highMinutes]!.value as int;
-  set highMinutes(int value) => minutesSet(_signals[_AlarmNames.highMinutes]! as Signal<int>, value);
+  set highMinutes(int value) => minutesSet(_signals[_AlarmNames.highMinutes]! as ASignal<int>, value);
 
   bool get urgentHighAlarm => _signals[_AlarmNames.urgentHighAlarm]!.value as bool;
   set urgentHighAlarm(bool value) => _signals[_AlarmNames.urgentHighAlarm]!.value = value;
@@ -77,7 +76,7 @@ class AlarmSettings {
   set lowPredictionAlarm(bool value) => _signals[_AlarmNames.lowPredictionAlarm]!.value = value;
 
   int get lowPredictionMinutes => _signals[_AlarmNames.lowPredictionMinutes]!.value as int;
-  set lowPredictionMinutes(int value) => minutesSet(_signals[_AlarmNames.lowPredictionMinutes]! as Signal<int>, value);
+  set lowPredictionMinutes(int value) => minutesSet(_signals[_AlarmNames.lowPredictionMinutes]! as ASignal<int>, value);
 
   bool get fastDropAlarm => _signals[_AlarmNames.fastDropAlarm]!.value as bool;
   bool get fastDropAlarmPeek => _signals[_AlarmNames.fastDropAlarm]!.peek() as bool;
@@ -85,17 +84,17 @@ class AlarmSettings {
   set fastDropAlarm(bool value) => _signals[_AlarmNames.fastDropAlarm]!.value = value;
 
   int get fastDropAlarmMinutes => _signals[_AlarmNames.fastDropAlarmMinutes]!.value as int;
-  set fastDropAlarmMinutes(int value) => minutesSet(_signals[_AlarmNames.fastDropAlarmMinutes]! as Signal<int>, value);
+  set fastDropAlarmMinutes(int value) => minutesSet(_signals[_AlarmNames.fastDropAlarmMinutes]! as ASignal<int>, value);
 
   bool get fastRiseAlarm => _signals[_AlarmNames.fastRiseAlarm]!.value as bool;
   bool get fastRiseAlarmPeek => _signals[_AlarmNames.fastRiseAlarm]!.peek() as bool;
   set fastRiseAlarm(bool value) => _signals[_AlarmNames.fastRiseAlarm]!.value = value;
 
   int get fastRiseAlarmMinutes => _signals[_AlarmNames.fastRiseAlarmMinutes]!.value as int;
-  set fastRiseAlarmMinutes(int value) => minutesSet(_signals[_AlarmNames.fastRiseAlarmMinutes]! as Signal<int>, value);
+  set fastRiseAlarmMinutes(int value) => minutesSet(_signals[_AlarmNames.fastRiseAlarmMinutes]! as ASignal<int>, value);
 
   int get noDataAlarmMinutes => _signals[_AlarmNames.noDataAlarmMinutes]!.value as int;
-  set noDataAlarmMinutes(int value) => noDataAlarmSet(_signals[_AlarmNames.noDataAlarmMinutes]! as Signal<int>, value);
+  set noDataAlarmMinutes(int value) => noDataAlarmSet(_signals[_AlarmNames.noDataAlarmMinutes]! as ASignal<int>, value);
 
   bool get carerBatteryAlarm => _signals[_AlarmNames.carerBatteryAlarm]!.value as bool;
   set carerBatteryAlarm(bool value) => _signals[_AlarmNames.carerBatteryAlarm]!.value = value;
@@ -109,11 +108,11 @@ class AlarmSettings {
     }
   }
 
-  List<Signal> allSignals() {
+  List<ASignal> allSignals() {
     return _signals.values.toList();
   }
 
-  minutesSet(Signal<int> signal, value) {
+  minutesSet(ASignal<int> signal, value) {
     var validValues = [0, 5, 10, 15, 20, 30, 40, 45, 60];
     if (!validValues.contains(value)) {
       return false;
@@ -121,7 +120,7 @@ class AlarmSettings {
     signal.value = value;
   }
 
-  noDataAlarmSet(Signal<int> signal, value) {
+  noDataAlarmSet(ASignal<int> signal, value) {
     var validValues = [-1, 10, 20, 30];
     if (!validValues.contains(value)) {
       return false;
@@ -129,7 +128,7 @@ class AlarmSettings {
     signal.value = value;
   }
 
-  volumeOverrideValueSet(Signal<int> signal, value) {
+  volumeOverrideValueSet(ASignal<int> signal, value) {
     if (value < 0) {
       value = 0;
     } else if (value > 100) {
@@ -138,7 +137,7 @@ class AlarmSettings {
     signal.value = value;
   }
 
-  volumeProgressionSecondsSet(Signal<int> signal, value) {
+  volumeProgressionSecondsSet(ASignal<int> signal, value) {
     var validValues = [-1, 10, 20, 30, 60, 120];
     if (!validValues.contains(value)) {
       return false;

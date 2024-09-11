@@ -3,7 +3,6 @@ import 'package:carer/models/model.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
-import 'package:signals/signals_flutter.dart';
 
 class Profile extends DateRangeModel {
   final int dia;
@@ -68,7 +67,7 @@ class Profile extends DateRangeModel {
     return SQLToProfile().query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
   }
 
-  static Signal<Profile?> currentProfile = Signal<Profile?>(null, debugLabel: 'currentProfile');
+  static ASignal<Profile?> currentProfile = ASignal<Profile?>(null, debugLabel: 'currentProfile');
 
   static setupSQLSignals() {
     signalAssign(

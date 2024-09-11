@@ -1,7 +1,6 @@
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals_flutter.dart';
 
 enum PropertiesDataName {
   battery,
@@ -19,15 +18,15 @@ class PropertiesData {
   factory PropertiesData() => _singleton;
   PropertiesData._();
 
-  final Map<PropertiesDataName, Signal> _signals = {
-    PropertiesDataName.battery: Signal(100.0, debugLabel: "Battery"),
-    PropertiesDataName.batteryDisplay: Signal("", debugLabel: "BatteryDisplay"),
-    PropertiesDataName.iob: Signal(0.0, debugLabel: "IOB"),
-    PropertiesDataName.basaliob: Signal(0.0, debugLabel: "BasalIOB"),
-    PropertiesDataName.treatmentIob: Signal(0.0, debugLabel: "TreatmentIOB"),
-    PropertiesDataName.cob: Signal(0.0, debugLabel: "COB"),
-    PropertiesDataName.cage: Signal(0.0, debugLabel: "CannulaAge"),
-    PropertiesDataName.sage: Signal(0.0, debugLabel: "SensorAge"),
+  final Map<PropertiesDataName, ASignal> _signals = {
+    PropertiesDataName.battery: ASignal(100.0, debugLabel: "Battery"),
+    PropertiesDataName.batteryDisplay: ASignal("", debugLabel: "BatteryDisplay"),
+    PropertiesDataName.iob: ASignal(0.0, debugLabel: "IOB"),
+    PropertiesDataName.basaliob: ASignal(0.0, debugLabel: "BasalIOB"),
+    PropertiesDataName.treatmentIob: ASignal(0.0, debugLabel: "TreatmentIOB"),
+    PropertiesDataName.cob: ASignal(0.0, debugLabel: "COB"),
+    PropertiesDataName.cage: ASignal(0.0, debugLabel: "CannulaAge"),
+    PropertiesDataName.sage: ASignal(0.0, debugLabel: "SensorAge"),
   };
 
   // Constructor

@@ -23,7 +23,7 @@ class AlarmsService {
   factory AlarmsService() => _singleton;
   final AlarmPlayer player = AlarmPlayer();
 
-  final Signal<DateTime?> sleepUntilSignal = Signal(null, debugLabel: "sleepUntil");
+  final ASignal<DateTime?> sleepUntilSignal = ASignal(null, debugLabel: "sleepUntil");
 
   final Alarm _noDataAlarm = const NoDataAlarm();
   final Alarm _predictiveLowAlarm = const PredictiveLowAlarm();
@@ -56,15 +56,18 @@ class AlarmsService {
     _t1dBatteryAlarm,
   };
 
-  final Signal<bool> _testAlarmPlayingSignal = Signal<bool>(false, debugLabel: "TestAlarmPlaying");
+  final ASignal<bool> _testAlarmPlayingSignal = ASignal<bool>(false, debugLabel: "TestAlarmPlaying");
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
-  Signal<Set<Alarm>> triggeredAlarms = Signal<Set<Alarm>>({}, debugLabel: "TriggeredAlarms");
-  Signal<Set<Alarm>> activeAlarms = Signal<Set<Alarm>>({}, debugLabel: "ActiveAlarms");
+  ASignal<Set<Alarm>> triggeredAlarms = ASignal<Set<Alarm>>({}, debugLabel: "TriggeredAlarms");
+  ASignal<Set<Alarm>> activeAlarms = ASignal<Set<Alarm>>({}, debugLabel: "ActiveAlarms");
 
   AlarmsService._() {
-    List<Signal> allSettingsSignals = AlarmSettings().allSignals() + AlarmAlertSettings().allSignals() + TargetSettings().allSignals();
+    List<Signal> allSettingsSignals = [];
+    allSettingsSignals.addAll(AlarmSettings().allSignals());
+    allSettingsSignals.addAll(AlarmAlertSettings().allSignals());
+    allSettingsSignals.addAll(TargetSettings().allSignals());
 
     aeffect(() async {
       // Stop test alarm
@@ -73,12 +76,13 @@ class AlarmsService {
     }, debugLabel: "StopTestAlarmWhenSettingsChange", dependencies: allSettingsSignals);
 
     bool isCheckingAlarms = false;
-    List<Signal> checkAlarmsDependencies = allSettingsSignals +
-        [
-          TimerService().tenSecondSignal,
-          sleepUntilSignal,
-          SQLToSGV().writeSignal,
-        ];
+    List<Signal> additionalDeps = [
+      TimerService().tenSecondSignal,
+      sleepUntilSignal,
+      SQLToSGV().writeSignal,
+    ];
+
+    List<Signal> checkAlarmsDependencies = allSettingsSignals + additionalDeps;
 
     aeffect(() async {
       // Only execute this one at a time

@@ -1,6 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals_flutter.dart';
 
 enum _DeviceNames {
   cannulaDays,
@@ -11,9 +10,9 @@ class DeviceSettings {
   static final DeviceSettings _singleton = DeviceSettings._();
   factory DeviceSettings() => _singleton;
 
-  final Map<_DeviceNames, Signal> _signals = {
-    _DeviceNames.cannulaDays: Signal<int>(3, debugLabel: 'cannulaDays'),
-    _DeviceNames.sensorDays: Signal<int>(10, debugLabel: 'sensorDays'),
+  final Map<_DeviceNames, ASignal> _signals = {
+    _DeviceNames.cannulaDays: ASignal<int>(3, debugLabel: 'cannulaDays'),
+    _DeviceNames.sensorDays: ASignal<int>(10, debugLabel: 'sensorDays'),
   };
 
   DeviceSettings._();

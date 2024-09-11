@@ -1,6 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals_flutter.dart';
 
 enum _AANames {
   // Predictions
@@ -20,13 +19,13 @@ class AlarmAlertSettings {
   static final AlarmAlertSettings _singleton = AlarmAlertSettings._();
   factory AlarmAlertSettings() => _singleton;
 
-  final Map<_AANames, Signal> _signals = {
-    _AANames.smartSnooze: Signal<bool>(false, debugLabel: 'smartSnooze'),
-    _AANames.brightnessAdjust: Signal<bool>(false, debugLabel: 'brightnessAdjust'),
-    _AANames.volumeOveride: Signal<bool>(false, debugLabel: 'volumeOveride'),
-    _AANames.volumeOverrideValue: Signal<int>(10, debugLabel: 'volumeOverrideValue'),
-    _AANames.volumeProgressionSeconds: Signal<int>(10, debugLabel: 'volumeProgressionSeconds'),
-    _AANames.alarmAsset: Signal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
+  final Map<_AANames, ASignal> _signals = {
+    _AANames.smartSnooze: ASignal<bool>(false, debugLabel: 'smartSnooze'),
+    _AANames.brightnessAdjust: ASignal<bool>(false, debugLabel: 'brightnessAdjust'),
+    _AANames.volumeOveride: ASignal<bool>(false, debugLabel: 'volumeOveride'),
+    _AANames.volumeOverrideValue: ASignal<int>(10, debugLabel: 'volumeOverrideValue'),
+    _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
+    _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
   };
 
   AlarmAlertSettings._();
@@ -40,10 +39,10 @@ class AlarmAlertSettings {
   int get volumeOverrideValue => _signals[_AANames.volumeOverrideValue]!.value as int;
   int get volumeOverrideValuePeek => _signals[_AANames.volumeOverrideValue]!.peek() as int;
 
-  set volumeOverrideValue(int value) => volumeOverrideValueSet(_signals[_AANames.volumeOverrideValue]! as Signal<int>, value);
+  set volumeOverrideValue(int value) => volumeOverrideValueSet(_signals[_AANames.volumeOverrideValue]! as ASignal<int>, value);
 
   int get volumeProgressionSeconds => _signals[_AANames.volumeProgressionSeconds]!.value as int;
-  set volumeProgressionSeconds(int value) => volumeProgressionSecondsSet(_signals[_AANames.volumeProgressionSeconds]! as Signal<int>, value);
+  set volumeProgressionSeconds(int value) => volumeProgressionSecondsSet(_signals[_AANames.volumeProgressionSeconds]! as ASignal<int>, value);
 
   AlarmSounds get alarmAsset => _signals[_AANames.alarmAsset]!.value as AlarmSounds;
   set alarmAsset(AlarmSounds value) => _signals[_AANames.alarmAsset]!.value = value;
@@ -57,11 +56,11 @@ class AlarmAlertSettings {
     }
   }
 
-  List<Signal> allSignals() {
+  List<ASignal> allSignals() {
     return _signals.values.toList();
   }
 
-  minutesSet(Signal<int> signal, value) {
+  minutesSet(ASignal<int> signal, value) {
     var validValues = [0, 5, 10, 15, 20, 30, 45, 60];
     if (!validValues.contains(value)) {
       return false;
@@ -69,7 +68,7 @@ class AlarmAlertSettings {
     signal.value = value;
   }
 
-  noDataAlarmSet(Signal<int> signal, value) {
+  noDataAlarmSet(ASignal<int> signal, value) {
     var validValues = [-1, 10, 20, 30];
     if (!validValues.contains(value)) {
       return false;
@@ -77,7 +76,7 @@ class AlarmAlertSettings {
     signal.value = value;
   }
 
-  volumeOverrideValueSet(Signal<int> signal, value) {
+  volumeOverrideValueSet(ASignal<int> signal, value) {
     if (value < 0) {
       value = 0;
     } else if (value > 100) {
@@ -86,7 +85,7 @@ class AlarmAlertSettings {
     signal.value = value;
   }
 
-  volumeProgressionSecondsSet(Signal<int> signal, value) {
+  volumeProgressionSecondsSet(ASignal<int> signal, value) {
     var validValues = [-1, 10, 20, 30, 60, 120];
     if (!validValues.contains(value)) {
       return false;

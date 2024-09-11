@@ -12,7 +12,7 @@ class ThemeService {
     return _themeService;
   }
 
-  Signal<ThemeData> themeSignal = Signal(normalTheme, debugLabel: "Theme");
+  ASignal<ThemeData> themeSignal = ASignal(normalTheme, debugLabel: "Theme");
   late ValueNotifier<ThemeData> themeNotifier;
 
   UIThemeLayout getCurrentThemeLayout() {

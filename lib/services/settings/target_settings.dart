@@ -1,6 +1,5 @@
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:signals/signals.dart';
 
 // find where in the target range and by what proportion a number is
 // returns a tuple of (Targets, proportion)
@@ -18,13 +17,13 @@ class TargetSettings {
   static final TargetSettings _singleton = TargetSettings._();
   factory TargetSettings() => _singleton;
 
-  final Map<_TNames, Signal<int>> _signals = {
-    _TNames.highTarget: Signal<int>(180, debugLabel: 'highTarget'),
-    _TNames.lowTarget: Signal<int>(72, debugLabel: 'lowTarget'),
-    _TNames.highUrgent: Signal<int>(270, debugLabel: 'highUrgent'),
-    _TNames.lowUrgent: Signal<int>(55, debugLabel: 'lowUrgent'),
-    _TNames.fastDropDelta: Signal<int>(9, debugLabel: 'fastDropDelta'),
-    _TNames.fastRiseDelta: Signal<int>(-9, debugLabel: 'fastRiseDelta'),
+  final Map<_TNames, ASignal<int>> _signals = {
+    _TNames.highTarget: ASignal<int>(180, debugLabel: 'highTarget'),
+    _TNames.lowTarget: ASignal<int>(72, debugLabel: 'lowTarget'),
+    _TNames.highUrgent: ASignal<int>(270, debugLabel: 'highUrgent'),
+    _TNames.lowUrgent: ASignal<int>(55, debugLabel: 'lowUrgent'),
+    _TNames.fastDropDelta: ASignal<int>(9, debugLabel: 'fastDropDelta'),
+    _TNames.fastRiseDelta: ASignal<int>(-9, debugLabel: 'fastRiseDelta'),
   };
 
   TargetSettings._();
@@ -35,7 +34,7 @@ class TargetSettings {
     }
   }
 
-  List<Signal> allSignals() {
+  List<ASignal> allSignals() {
     return _signals.values.toList();
   }
 
@@ -90,14 +89,14 @@ class TargetSettings {
     return 9 <= lowUrgent && lowUrgent <= lowTarget && lowTarget <= highTarget && highTarget <= highUrgent && highUrgent <= 360;
   }
 
-  fastDropDeltaSet(Signal<int> signal, value) {
+  fastDropDeltaSet(ASignal<int> signal, value) {
     if (value > -8) {
       value = -8;
     }
     signal.value = value;
   }
 
-  fastRiseDeltaSet(Signal<int> signal, value) {
+  fastRiseDeltaSet(ASignal<int> signal, value) {
     if (value < 8) {
       value = 8;
     }
