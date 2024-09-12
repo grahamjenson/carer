@@ -299,6 +299,15 @@ class SQLToTempBasal extends SQLMapper<TempBasal> {
       "eid": model.eid!,
     });
   }
+
+  @override
+  bool equals(SQLRow row, TempBasal model) {
+    var modelRow = bToA(model);
+    return modelRow["start"] == row["start"] &&
+        modelRow["duration"] == row["duration"] &&
+        modelRow["value"] == row["value"] &&
+        modelRow["eid"] == row["eid"];
+  }
 }
 
 ////
@@ -349,6 +358,16 @@ class SQLToTempTarget extends SQLMapper<TempTarget> {
       "lowTarget": model.lowTarget,
       "eid": model.eid!,
     });
+  }
+
+  @override
+  bool equals(SQLRow row, TempTarget model) {
+    var modelRow = bToA(model);
+    return modelRow["start"] == row["start"] &&
+        modelRow["duration"] == row["duration"] &&
+        modelRow["highTarget"] == row["highTarget"] &&
+        modelRow["lowTarget"] == row["lowTarget"] &&
+        modelRow["eid"] == row["eid"];
   }
 }
 

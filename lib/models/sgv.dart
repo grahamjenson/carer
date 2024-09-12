@@ -67,7 +67,7 @@ class CleanSGV extends Model {
 
   @override
   String toString() {
-    return "SGV: $value@${date.hour}:${date.minute}";
+    return "SGV($value@${date.hour}:${date.minute})";
   }
 
   // STATIC FUNCTIONS

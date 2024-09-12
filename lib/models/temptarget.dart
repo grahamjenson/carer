@@ -28,4 +28,9 @@ class TempTarget extends DateRangeModel {
       "end >= ?": date.millisecondsSinceEpoch,
     });
   }
+
+  @override
+  String toString() {
+    return "TempTarget($eid, $startDate, $duration, $lowTarget, $highTarget)";
+  }
 }

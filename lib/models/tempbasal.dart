@@ -26,4 +26,9 @@ class TempBasal extends DateRangeModel {
       "end >= ?": date.millisecondsSinceEpoch,
     });
   }
+
+  @override
+  String toString() {
+    return "TempBasal($eid, $startDate, $duration, $value)";
+  }
 }

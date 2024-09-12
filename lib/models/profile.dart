@@ -77,6 +77,11 @@ class Profile extends DateRangeModel {
       dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
     );
   }
+
+  @override
+  String toString() {
+    return "Profile($eid, $startDate, $duration, $name, $percent%)";
+  }
 }
 
 const crKeys = [

@@ -18,6 +18,10 @@ abstract class DataMapper<T1, T2> {
   List<T2> mapBToA(List<T1> models) {
     return models.map(aToB).toList();
   }
+
+  bool equals(T1 a, T2 b) {
+    throw UnimplementedError();
+  }
 }
 
 abstract class SQLReadMapper<T extends Model> extends DataMapper<SQLRow, T> {
@@ -124,7 +128,7 @@ abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
     return ret;
   }
 
-  Future<int> saveAll(List<T> models) async {
+  Future<int> saveAll(List<T> models, {bool withSignal = true}) async {
     var cdb = await CarerDB.instance;
     var tb = tableName;
     var batch = cdb.db.batch();
@@ -155,30 +159,91 @@ abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
     }
 
     if (saves > 0) {
-      writeSignal.value = clock.now().millisecondsSinceEpoch;
+      if (withSignal) {
+        writeSignal.value = clock.now().millisecondsSinceEpoch;
+      }
     }
     return saves;
   }
 
   Future<int> upsertAll(List<T> models) async {
-    List<bool> modelsss = [];
+    var cdb = await CarerDB.instance;
+    var tb = tableName;
+
+    // Fetch all models with id or eid
+    Map<int, T> idMap = {};
+    Map<String, T> eidMap = {};
+
     for (var m in models) {
-      modelsss.add(await upsert(m, withSignal: false));
+      if (m.id != null) {
+        idMap[m.id!] = m;
+      } else if (m.eid != null) {
+        eidMap[m.eid!] = m;
+      }
     }
-    var total = modelsss.where((e) => e).length;
-    if (total > 0) {
-      writeSignal.value = clock.now().millisecondsSinceEpoch;
+
+    List<dynamic> ids = idMap.keys.toList();
+    List<dynamic> eids = eidMap.keys.toList();
+    List<dynamic> combinedList = [];
+    combinedList.addAll(ids);
+    combinedList.addAll(eids);
+
+    var (dbModels, err) = await go(cdb.db.query(
+      tb,
+      where: "id IN (${List.filled(ids.length, '?').join(',')}) OR eid IN (${List.filled(eids.length, '?').join(',')})",
+      whereArgs: combinedList,
+    ));
+    if (err != null || dbModels == null) {
+      return 0;
     }
-    return total;
+
+    // Match the models with their counter part in the db, also update model id
+    Map<T, Map<String, Object?>> dbModelMap = {};
+
+    for (var dbModel in dbModels) {
+      var id = dbModel["id"];
+      if (id != null && idMap.containsKey(id)) {
+        dbModelMap[idMap[id]!] = dbModel;
+        continue;
+      }
+
+      var eid = dbModel["eid"];
+      if (eid != null && eidMap.containsKey(eid)) {
+        dbModelMap[eidMap[eid]!] = dbModel;
+      }
+    }
+
+    List<T> saveOrUpdateModels = [];
+
+    // This checks to see if the model is different
+    for (var model in models) {
+      var dbModel = dbModelMap[model];
+      if (dbModel == null) {
+        // Add value to list that doesnt exist in the db
+        saveOrUpdateModels.add(model);
+        continue;
+      }
+
+      if (!equals(SQLRow(dbModel), model)) {
+        saveOrUpdateModels.add(model);
+        // Force update of model to make sure saveAll updates
+        model.id = dbModel["id"]! as int;
+      }
+    }
+
+    if (saveOrUpdateModels.isEmpty) {
+      return 0;
+    }
+
+    return saveAll(saveOrUpdateModels);
   }
 
-  Future<bool> upsert(T model, {bool withSignal = true}) async {
+  Future<bool> _upsert(T model, {bool withSignal = true}) async {
     var cdb = await CarerDB.instance;
     var tb = tableName;
 
     // We look for the model using the id, or eid
-    var modelSQL = bToA(model).toMap();
-    var keys = modelSQL.keys.toList();
+
     var where = "";
 
     List whereArgs = [];
@@ -193,7 +258,7 @@ abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
     }
 
     // Get current value
-    var (oldModels, err) = await go(cdb.db.query(tb, columns: keys, where: where, whereArgs: whereArgs, limit: 1));
+    var (oldModels, err) = await go(cdb.db.query(tb, where: where, whereArgs: whereArgs, limit: 1));
     if (err != null || oldModels == null) {
       return false;
     }
@@ -206,13 +271,13 @@ abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
     var oldModel = oldModels.first;
 
     // If current model and old model equal do nothing
-    if (bToA(model).equals(oldModel)) {
+    if (equals(SQLRow(oldModel), model)) {
       return false;
     }
 
     var (id, err2) = await go(cdb.db.update(
       tb,
-      modelSQL,
+      bToA(model).toMap(),
       where: where,
       whereArgs: whereArgs,
     ));
