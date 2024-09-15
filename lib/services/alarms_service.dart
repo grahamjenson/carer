@@ -5,7 +5,6 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
-import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -24,7 +23,7 @@ class AlarmsService {
   final AlarmPlayer player = AlarmPlayer();
 
   // Start with a sleep, to give time for the app to catch up
-  final ASignal<DateTime?> sleepUntilSignal = ASignal(clock.fromNow(seconds: 10), debugLabel: "sleepUntil");
+  final ASignal<DateTime?> sleepUntilSignal = ASignal(null, debugLabel: "sleepUntil");
 
   final Alarm _noDataAlarm = const NoDataAlarm();
   final Alarm _predictiveLowAlarm = const PredictiveLowAlarm();
@@ -101,15 +100,12 @@ class AlarmsService {
       }
       return true;
     }, debugLabel: "CheckAlarms", dependencies: checkAlarmsDependencies);
+
+    sleepDurationSeconds = 10;
   }
 
   Future<bool> _checkAlarms() async {
-    var (newTriggeredAlarms, newActiveAlarms) = await calculateAlarms();
-
-    if (tooSoon()) {
-      // If it was recently resumed it might cause bad alarm data
-      newActiveAlarms = {};
-    }
+    var (newTriggeredAlarms, newActiveAlarms) = calculateAlarms();
 
     triggeredAlarms.value = newTriggeredAlarms;
     activeAlarms.value = newActiveAlarms;
@@ -127,17 +123,7 @@ class AlarmsService {
     return true;
   }
 
-  bool tooSoon() {
-    var lastResumed = AppLifecycleService().lastResumed.peek();
-    // Skip if lastResumed less than 3 seconds ago
-    if (lastResumed.isAfter(clock.secondsAgo(1))) {
-      alog("CheckAlarms: Skipping since resumed less than 1 seconds ago");
-      return true;
-    }
-    return false;
-  }
-
-  Future<(Set<Alarm>, Set<Alarm>)> calculateAlarms() async {
+  (Set<Alarm>, Set<Alarm>) calculateAlarms() {
     var notSleeping = sleepUntilSignal.value == null;
 
     Set<Alarm> newTriggeredAlarms = {};
@@ -235,7 +221,13 @@ class AlarmsService {
     if (sleepUntilSignal.value == null) {
       return null;
     }
-    return sleepUntilSignal.value!.difference(clock.now());
+    var duration = sleepUntilSignal.value!.difference(clock.now());
+
+    if (duration.isNegative) {
+      return null;
+    }
+
+    return duration;
   }
 
   set sleepDurationSeconds(int? value) {

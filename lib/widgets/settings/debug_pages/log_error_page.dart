@@ -14,7 +14,7 @@ class LogErrorPage extends StatefulWidget {
 class _LogErrorPageState extends State<LogErrorPage> {
   final TextEditingController controller = TextEditingController();
 
-  final ASignal<String> text = ASignal<String>('');
+  final ASignal<String> text = ASignal<String>('', debugLabel: "LogSearchText");
   late Computed<String> predictionsSignal;
 
   _LogErrorPageState() {
@@ -63,7 +63,7 @@ class _LogErrorPageState extends State<LogErrorPage> {
                     fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ));
-              }),
+              }, debugLabel: "LogErrorPage"),
             )
           ],
         ),

@@ -22,6 +22,7 @@ class CurrentTimeWidget extends StatelessWidget with ThemeMixin {
         return Text(formattedDateTime, style: TextStyle(height: 0.5, fontSize: 32, fontWeight: FontWeight.bold, color: mainColor));
       },
       debugLabel: "CurrentTimeWidget",
+      doLog: false,
     );
   }
 }

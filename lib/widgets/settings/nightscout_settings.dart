@@ -32,7 +32,7 @@ class NightscoutSettingsWidget extends AbstractSettingsSection {
                 "$nsURL/?token=$nsToken",
                 overflow: TextOverflow.ellipsis,
               );
-            }),
+            }, debugLabel: "NightscoutSettingsWidget"),
           ),
           leading: const Icon(Icons.language),
           onPressed: (context) async {

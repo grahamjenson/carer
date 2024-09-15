@@ -13,32 +13,35 @@ class HighAlarmPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('High Alarm'),
       ),
-      body: AWatch((_) {
-        return SettingsList(sections: [
-          SettingsSection(tiles: [
-            SettingsTile.switchTile(
-              title: const Text("High Alarm"),
-              descriptionInlineIos: true,
-              description: const Text(
-                "High Alarm",
+      body: AWatch(
+        (_) {
+          return SettingsList(sections: [
+            SettingsSection(tiles: [
+              SettingsTile.switchTile(
+                title: const Text("High Alarm"),
+                descriptionInlineIos: true,
+                description: const Text(
+                  "High Alarm",
+                ),
+                initialValue: AlarmSettings().highAlarm,
+                onToggle: (value) {
+                  AlarmSettings().highAlarm = value;
+                },
               ),
-              initialValue: AlarmSettings().highAlarm,
-              onToggle: (value) {
-                AlarmSettings().highAlarm = value;
-              },
-            ),
-            SettingsTile(
-              title: const Text("Minutes"),
-              descriptionInlineIos: true,
-              description: const Text(
-                "Alarm after",
+              SettingsTile(
+                title: const Text("Minutes"),
+                descriptionInlineIos: true,
+                description: const Text(
+                  "Alarm after",
+                ),
+                trailing: ToggleButton.selectOne<int>(
+                    AlarmSettings().highMinutes, ["0m", "20m", "40m", "60m"], [0, 20, 40, 60], (value) => AlarmSettings().highMinutes = value),
               ),
-              trailing: ToggleButton.selectOne<int>(
-                  AlarmSettings().highMinutes, ["0m", "20m", "40m", "60m"], [0, 20, 40, 60], (value) => AlarmSettings().highMinutes = value),
-            ),
-          ]),
-        ]);
-      }),
+            ]),
+          ]);
+        },
+        debugLabel: "HighAlarmPage",
+      ),
     );
   }
 }

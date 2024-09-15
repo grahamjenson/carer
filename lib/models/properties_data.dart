@@ -35,37 +35,61 @@ class PropertiesData {
     var kvdb = KeyValueStore(db);
     await kvdb.internalPopulate();
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.battery.name, _signals[PropertiesDataName.battery]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.battery.name, _signals[PropertiesDataName.battery]!.value);
+      },
+      debugLabel: "Battery",
+    );
 
-    aeffect(() {
-      kvdb.setString(PropertiesDataName.batteryDisplay.name, _signals[PropertiesDataName.batteryDisplay]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setString(PropertiesDataName.batteryDisplay.name, _signals[PropertiesDataName.batteryDisplay]!.value);
+      },
+      debugLabel: "BatteryDisplay",
+    );
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.iob.name, _signals[PropertiesDataName.iob]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.iob.name, _signals[PropertiesDataName.iob]!.value);
+      },
+      debugLabel: "IOB",
+    );
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.basaliob.name, _signals[PropertiesDataName.basaliob]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.basaliob.name, _signals[PropertiesDataName.basaliob]!.value);
+      },
+      debugLabel: "BasalIOB",
+    );
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.treatmentIob.name, _signals[PropertiesDataName.treatmentIob]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.treatmentIob.name, _signals[PropertiesDataName.treatmentIob]!.value);
+      },
+      debugLabel: "TreatmentIOB",
+    );
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.cob.name, _signals[PropertiesDataName.cob]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.cob.name, _signals[PropertiesDataName.cob]!.value);
+      },
+      debugLabel: "COB",
+    );
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.cage.name, _signals[PropertiesDataName.cage]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.cage.name, _signals[PropertiesDataName.cage]!.value);
+      },
+      debugLabel: "CAGE",
+    );
 
-    aeffect(() {
-      kvdb.setDouble(PropertiesDataName.sage.name, _signals[PropertiesDataName.sage]!.value);
-    });
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.sage.name, _signals[PropertiesDataName.sage]!.value);
+      },
+      debugLabel: "SAGE",
+    );
 
     return true;
   }

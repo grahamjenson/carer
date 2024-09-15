@@ -67,7 +67,7 @@ class History extends StatelessWidget with ThemeMixin {
                       rows: history))),
         ),
       );
-    });
+    }, debugLabel: "History");
   }
 
   DataRow? historyRow(Treatment treatment, TextStyle row, TextStyle small) {

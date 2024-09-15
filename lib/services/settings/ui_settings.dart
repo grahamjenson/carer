@@ -85,19 +85,19 @@ class UIThemeLayout {
 
     aeffect(() {
       prefs.setBool(enabledPref, enabled);
-    });
+    }, debugLabel: enabledPref);
 
     aeffect(() {
       prefs.setString(themePref, theme.name);
-    });
+    }, debugLabel: themePref);
 
     aeffect(() {
       prefs.setString(horizonalLayoutPref, horizonalLayout.name);
-    });
+    }, debugLabel: horizonalLayoutPref);
 
     aeffect(() {
       prefs.setString(verticalLayoutPref, verticalLayout.name);
-    });
+    }, debugLabel: verticalLayoutPref);
   }
 }
 
@@ -176,18 +176,18 @@ class UISettings {
     }
     // Setup DB sync for when signalls change
 
-    aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()));
+    aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()), debugLabel: _UINames.unit.name);
 
     aeffect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);
-    });
+    }, debugLabel: _UINames.screenActive.name);
 
     aeffect(() {
       prefs.setInt(_UINames.nightStartTime.name, tODtoInt(nightStartTime));
-    });
+    }, debugLabel: _UINames.nightStartTime.name);
 
     aeffect(() {
       prefs.setInt(_UINames.nightEndTime.name, tODtoInt(nightEndTime));
-    });
+    }, debugLabel: _UINames.nightEndTime.name);
   }
 }

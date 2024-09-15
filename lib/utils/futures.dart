@@ -66,7 +66,7 @@ Future<T> executeWithRetry<T>(
 class ASignal<T> extends Signal<T> {
   ASignal(
     super.val, {
-    super.debugLabel,
+    required super.debugLabel,
     super.autoDispose,
   });
 
@@ -91,8 +91,9 @@ class ATimerSignal extends TimerSignal {
 class AWatch<T extends Widget> extends StatelessWidget {
   final List<Signal> dependencies;
   final String debugLabel;
+  final bool doLog;
 
-  const AWatch(this.builder, {super.key, this.dependencies = const [], this.debugLabel = "AWatch"});
+  const AWatch(this.builder, {super.key, this.dependencies = const [], required this.debugLabel, this.doLog = true});
 
   /// The widget to rebuild when any signals change
   final T Function(BuildContext context) builder;
@@ -104,6 +105,9 @@ class AWatch<T extends Widget> extends StatelessWidget {
         try {
           for (var dep in dependencies) {
             dep.value;
+          }
+          if (doLog) {
+            alog("AWatch: $debugLabel rebuild");
           }
           return builder(context);
         } catch (e, stackTrace) {
@@ -123,37 +127,47 @@ class AWatch<T extends Widget> extends StatelessWidget {
 }
 
 EffectCleanup signalAssign<T>(
-  Signal<T> signal,
+  ASignal<T> signal,
   FutureOr<T> Function() fn, {
-  String? debugLabel,
+  required String debugLabel,
   List<ReadonlySignal<dynamic>> dependencies = const [],
 }) {
-  return aeffect(() {
-    final result = fn();
-    if (result is Future) {
-      untracked(() async {
-        signal.value = await result;
-      });
-    } else {
-      untracked(() {
-        signal.value = result;
-      });
-    }
-  }, debugLabel: debugLabel, dependencies: dependencies);
+  return aeffect(
+    () {
+      final result = fn();
+      if (result is Future) {
+        untracked(() async {
+          signal.value = await result;
+        });
+      } else {
+        untracked(() {
+          signal.value = result;
+        });
+      }
+    },
+    debugLabel: debugLabel,
+    dependencies: dependencies,
+    doLog: false, // Dont log because signal should log
+  );
 }
 
 EffectCleanup aeffect(
   EffectCallback compute, {
-  String? debugLabel,
+  required String debugLabel,
   EffectCallback? onDispose,
   List<ReadonlySignal<dynamic>> dependencies = const [],
+  doLog = true,
 }) {
   return effect(() {
     try {
       for (var dep in dependencies) {
         dep.value;
       }
-      return compute();
+      var val = compute();
+      if (doLog) {
+        alog(truncateString("AEffect: $debugLabel set to $val", 100));
+      }
+      return val;
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
     }

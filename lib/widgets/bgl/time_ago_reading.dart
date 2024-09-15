@@ -62,6 +62,7 @@ class TimeAgoReading extends StatelessWidget {
         //   );
       },
       debugLabel: "TimeAgoReading",
+      doLog: false,
     );
   }
 }

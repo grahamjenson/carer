@@ -13,37 +13,40 @@ class PredictionAlarmPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Low Alarm'),
       ),
-      body: AWatch((_) {
-        return SettingsList(
-          sections: [
-            SettingsSection(
-              title: const Text('Predicted Low Alarm'),
-              tiles: [
-                SettingsTile.switchTile(
-                  title: const Text("Predicted Low Alarm"),
-                  descriptionInlineIos: true,
-                  description: const Text(
-                    "Low Alarm",
+      body: AWatch(
+        (_) {
+          return SettingsList(
+            sections: [
+              SettingsSection(
+                title: const Text('Predicted Low Alarm'),
+                tiles: [
+                  SettingsTile.switchTile(
+                    title: const Text("Predicted Low Alarm"),
+                    descriptionInlineIos: true,
+                    description: const Text(
+                      "Low Alarm",
+                    ),
+                    initialValue: AlarmSettings().lowPredictionAlarm,
+                    onToggle: (value) {
+                      AlarmSettings().lowPredictionAlarm = value;
+                    },
                   ),
-                  initialValue: AlarmSettings().lowPredictionAlarm,
-                  onToggle: (value) {
-                    AlarmSettings().lowPredictionAlarm = value;
-                  },
-                ),
-                SettingsTile(
-                  title: const Text("Minutes"),
-                  descriptionInlineIos: true,
-                  description: const Text(
-                    "Alarm after",
+                  SettingsTile(
+                    title: const Text("Minutes"),
+                    descriptionInlineIos: true,
+                    description: const Text(
+                      "Alarm after",
+                    ),
+                    trailing: ToggleButton.selectOne<int>(AlarmSettings().lowPredictionMinutes, ["5m", "10m", "15m", "20m", "30m"],
+                        [5, 10, 15, 20, 30], (value) => AlarmSettings().lowPredictionMinutes = value),
                   ),
-                  trailing: ToggleButton.selectOne<int>(AlarmSettings().lowPredictionMinutes, ["5m", "10m", "15m", "20m", "30m"], [5, 10, 15, 20, 30],
-                      (value) => AlarmSettings().lowPredictionMinutes = value),
-                ),
-              ],
-            ),
-          ],
-        );
-      }),
+                ],
+              ),
+            ],
+          );
+        },
+        debugLabel: "PredictionAlarmPage",
+      ),
     );
   }
 }

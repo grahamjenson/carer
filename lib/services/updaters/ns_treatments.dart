@@ -19,7 +19,7 @@ class NSTreatmentsUpdater extends Updater {
       // Check signal to register
       var _ = SecureSettings().nightscoutURL;
       addExternalReason("NS URL updated");
-    });
+    }, debugLabel: "NSTreatmentsUpdaterReason");
   }
 
   @override

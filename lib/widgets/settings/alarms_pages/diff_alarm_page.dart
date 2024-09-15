@@ -68,7 +68,7 @@ class DiffAlarmPage extends StatelessWidget {
             ),
           ],
         );
-      }),
+      }, debugLabel: "DiffAlarmPage"),
     );
   }
 }

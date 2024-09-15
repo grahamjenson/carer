@@ -14,24 +14,27 @@ class ThemePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Themes and Layout'),
       ),
-      body: AWatch((_) {
-        return SettingsList(
-          sections: [
-            SettingsSection(
-              title: const Text('Main Layout'),
-              tiles: getThemeLayoutSettings(UISettings().mainUIThemeLayout),
-            ),
-            SettingsSection(
-              title: const Text('Alarm Layout'),
-              tiles: getThemeLayoutSettings(UISettings().alarmUIThemeLayout),
-            ),
-            SettingsSection(
-              title: const Text('Night Layout'),
-              tiles: getThemeLayoutSettings(UISettings().nightUIThemeLayout) + [timeSettingTile(context)],
-            ),
-          ],
-        );
-      }),
+      body: AWatch(
+        (_) {
+          return SettingsList(
+            sections: [
+              SettingsSection(
+                title: const Text('Main Layout'),
+                tiles: getThemeLayoutSettings(UISettings().mainUIThemeLayout),
+              ),
+              SettingsSection(
+                title: const Text('Alarm Layout'),
+                tiles: getThemeLayoutSettings(UISettings().alarmUIThemeLayout),
+              ),
+              SettingsSection(
+                title: const Text('Night Layout'),
+                tiles: getThemeLayoutSettings(UISettings().nightUIThemeLayout) + [timeSettingTile(context)],
+              ),
+            ],
+          );
+        },
+        debugLabel: "ThemePage",
+      ),
     );
   }
 

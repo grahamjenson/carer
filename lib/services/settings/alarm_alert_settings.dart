@@ -104,22 +104,22 @@ class AlarmAlertSettings {
 
     brightnessAdjust = prefs.getBool(_AANames.brightnessAdjust.name, defaultValue: false)!;
 
-    aeffect(() => prefs.setBool(_AANames.smartSnooze.name, smartSnooze));
+    aeffect(() => prefs.setBool(_AANames.smartSnooze.name, smartSnooze), debugLabel: 'smartSnooze');
 
-    aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride));
+    aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride), debugLabel: 'volumeOveride');
 
-    aeffect(() => prefs.setInt(_AANames.volumeOverrideValue.name, volumeOverrideValue));
+    aeffect(() => prefs.setInt(_AANames.volumeOverrideValue.name, volumeOverrideValue), debugLabel: 'volumeOverrideValue');
 
-    aeffect(() => prefs.setInt(_AANames.volumeProgressionSeconds.name, volumeProgressionSeconds));
+    aeffect(() => prefs.setInt(_AANames.volumeProgressionSeconds.name, volumeProgressionSeconds), debugLabel: 'volumeProgressionSeconds');
 
     aeffect(() {
       var value = (alarmAsset).name;
       prefs.setString(_AANames.alarmAsset.name, value);
-    });
+    }, debugLabel: 'alarmAsset');
 
     aeffect(() {
       prefs.setBool(_AANames.brightnessAdjust.name, brightnessAdjust);
-    });
+    }, debugLabel: 'brightnessAdjust');
   }
 }
 

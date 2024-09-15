@@ -15,24 +15,27 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      double width = min(820, MediaQuery.of(context).size.width);
+    return AWatch(
+      (context) {
+        double width = min(820, MediaQuery.of(context).size.width);
 
-      List<SettingsTile> tiles = [
-        smartSnooze(),
-        brightnessAdjust(),
-        volumeOverride(context),
-        volumeSettings(context, width),
-        progressiveVolume(context),
-        alarmFileSelect(),
-        testAlert(context, width),
-      ].whereType<SettingsTile>().toList();
+        List<SettingsTile> tiles = [
+          smartSnooze(),
+          brightnessAdjust(),
+          volumeOverride(context),
+          volumeSettings(context, width),
+          progressiveVolume(context),
+          alarmFileSelect(),
+          testAlert(context, width),
+        ].whereType<SettingsTile>().toList();
 
-      return SettingsSection(
-        title: const Text('Alarm Alert'),
-        tiles: tiles,
-      );
-    });
+        return SettingsSection(
+          title: const Text('Alarm Alert'),
+          tiles: tiles,
+        );
+      },
+      debugLabel: "AlarmsAlertSettingsWidget",
+    );
   }
 
   SettingsTile? brightnessAdjust() {

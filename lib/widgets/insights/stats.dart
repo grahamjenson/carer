@@ -88,7 +88,7 @@ class Stats extends StatelessWidget with ThemeMixin {
           ),
         ),
       );
-    });
+    }, debugLabel: "Stats");
   }
 
   DataRow profileValues(TextStyle heading, TextStyle row, TextStyle small) {

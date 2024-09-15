@@ -34,6 +34,7 @@ class ThemeService {
         UIThemeLayout themeLayout = getCurrentThemeLayout();
         return selectTheme(themeLayout.theme);
       },
+      debugLabel: "ThemeSignalAssign",
       dependencies: [
             TimerService().minuteSignal,
             UISettings().nightStartTimeSignal,

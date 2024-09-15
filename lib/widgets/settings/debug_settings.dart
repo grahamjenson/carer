@@ -48,68 +48,71 @@ class DebugSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      var backgrounddo = SettingsTile.navigation(
-        title: const Text("Background Do"),
-        descriptionInlineIos: true,
-        leading: const Icon(UniconsLine.bug),
-        onPressed: (context) async {
-          // manually schedule the background task to be run
-          // print("Stargin Background Do");
-          // await BackgroundService().run();
-          // print("Done Background Do");
-          BackgroundService().onFetch("com.transistorsoft.fetch");
-        },
-      );
+    return AWatch(
+      (context) {
+        var backgrounddo = SettingsTile.navigation(
+          title: const Text("Background Do"),
+          descriptionInlineIos: true,
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            // manually schedule the background task to be run
+            // print("Stargin Background Do");
+            // await BackgroundService().run();
+            // print("Done Background Do");
+            BackgroundService().onFetch("com.transistorsoft.fetch");
+          },
+        );
 
-      var logError = SettingsTile.navigation(
-        title: const Text("Error Log"),
-        descriptionInlineIos: true,
-        leading: const Icon(UniconsLine.bug),
-        onPressed: (context) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const LogErrorPage()),
-          );
-        },
-      );
+        var logError = SettingsTile.navigation(
+          title: const Text("Error Log"),
+          descriptionInlineIos: true,
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LogErrorPage()),
+            );
+          },
+        );
 
-      var shareLogs = SettingsTile.navigation(
-        title: const Text("Share Debug Files"),
-        descriptionInlineIos: true,
-        leading: const Icon(UniconsLine.bug),
-        onPressed: (context) async {
-          List<String> paths = [];
+        var shareLogs = SettingsTile.navigation(
+          title: const Text("Share Debug Files"),
+          descriptionInlineIos: true,
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            List<String> paths = [];
 
-          // Add main DB and KV DB
-          paths.add(await CarerDB.getPath());
-          paths.add(await KeyValueStore.getPath());
-          paths.add(await LogDB.getPath());
+            // Add main DB and KV DB
+            paths.add(await CarerDB.getPath());
+            paths.add(await KeyValueStore.getPath());
+            paths.add(await LogDB.getPath());
 
-          // Add logs
-          paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));
+            // Add logs
+            paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));
 
-          // Add the last raw value from all updaters
-          for (var updater in UpdateService().updaters) {
-            paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));
-          }
+            // Add the last raw value from all updaters
+            for (var updater in UpdateService().updaters) {
+              paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));
+            }
 
-          zipAndShare(paths, "carer_debug_${clock.now().millisecondsSinceEpoch}");
-        },
-      );
+            zipAndShare(paths, "carer_debug_${clock.now().millisecondsSinceEpoch}");
+          },
+        );
 
-      var tiles = [
-        logError,
-        shareLogs,
-      ];
-      if (Platform.isIOS || Platform.isAndroid) {
-        tiles.add(backgrounddo);
-      }
+        var tiles = [
+          logError,
+          shareLogs,
+        ];
+        if (Platform.isIOS || Platform.isAndroid) {
+          tiles.add(backgrounddo);
+        }
 
-      return SettingsSection(
-        title: const Text('Debug'),
-        tiles: tiles,
-      );
-    });
+        return SettingsSection(
+          title: const Text('Debug'),
+          tiles: tiles,
+        );
+      },
+      debugLabel: "DebugSettingsWidget",
+    );
   }
 }

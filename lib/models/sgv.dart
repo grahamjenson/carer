@@ -173,7 +173,7 @@ class CleanSGV extends Model {
     signalAssign(last3Hours, () => SQLToCleanSGV().lastMins(60 * 3), debugLabel: 'last3HoursQuery', dependencies: [SQLToSGV().writeSignal]);
 
     signalAssign(yesterdaysPercentage, () async {
-      var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTarget, TargetSettings().highTarget));
+      var (value, err) = await go(_percentInRangeYesterday(TargetSettings().lowTargetPeek, TargetSettings().highTargetPeek));
 
       if (err != null || value == null) {
         alog("Error yesterdaysPercentage: $err");
@@ -184,7 +184,7 @@ class CleanSGV extends Model {
     }, debugLabel: 'yesterdaysPercentage', dependencies: [TimerService().minuteSignal]);
 
     signalAssign(todaysPercentage, () async {
-      var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTarget, TargetSettings().highTarget));
+      var (value, err) = await go(_percentInRangeToday(TargetSettings().lowTargetPeek, TargetSettings().highTargetPeek));
       if (err != null || value == null) {
         alog("Error todaysPercentage: $err");
         return 0.0;

@@ -111,16 +111,16 @@ class TargetSettings {
     fastDropDelta = prefs.getInt(_TNames.fastDropDelta.name, defaultValue: -20)!;
     fastRiseDelta = prefs.getInt(_TNames.fastRiseDelta.name, defaultValue: 20)!;
 
-    aeffect(() => prefs.setInt(_TNames.fastDropDelta.name, fastDropDelta));
+    aeffect(() => prefs.setInt(_TNames.fastDropDelta.name, fastDropDelta), debugLabel: 'fastDropDelta');
 
-    aeffect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta));
+    aeffect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta), debugLabel: 'fastRiseDelta');
 
-    aeffect(() => prefs.setInt(_TNames.highTarget.name, highTarget));
+    aeffect(() => prefs.setInt(_TNames.highTarget.name, highTarget), debugLabel: 'highTarget');
 
-    aeffect(() => prefs.setInt(_TNames.lowTarget.name, lowTarget));
+    aeffect(() => prefs.setInt(_TNames.lowTarget.name, lowTarget), debugLabel: 'lowTarget');
 
-    aeffect(() => prefs.setInt(_TNames.highUrgent.name, highUrgent));
+    aeffect(() => prefs.setInt(_TNames.highUrgent.name, highUrgent), debugLabel: 'highUrgent');
 
-    aeffect(() => prefs.setInt(_TNames.lowUrgent.name, lowUrgent));
+    aeffect(() => prefs.setInt(_TNames.lowUrgent.name, lowUrgent), debugLabel: 'lowUrgent');
   }
 }

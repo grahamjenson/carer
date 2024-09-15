@@ -9,11 +9,14 @@ import 'package:carer/utils/logs.dart';
 
 class NSEntriesUpdater extends Updater {
   NSEntriesUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(minutes: 1)) {
-    aeffect(() {
-      // Check signal to register
-      var _ = SecureSettings().nightscoutURL;
-      addExternalReason("NS URL updated");
-    });
+    aeffect(
+      () {
+        // Check signal to register
+        var _ = SecureSettings().nightscoutURL;
+        addExternalReason("NS URL updated");
+      },
+      debugLabel: "NSEntriesUpdaterReason",
+    );
   }
 
   @override

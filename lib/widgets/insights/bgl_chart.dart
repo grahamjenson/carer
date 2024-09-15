@@ -80,7 +80,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           ),
         ),
       );
-    });
+    }, debugLabel: "BGLChart");
   }
 
   LineChartData buildlineChartData(

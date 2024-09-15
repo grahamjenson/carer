@@ -19,7 +19,7 @@ class DeviceSettingsWidget extends AbstractSettingsSection {
         title: const Text('Device Settings'),
         tiles: tiles,
       );
-    });
+    }, debugLabel: "DeviceSettingsWidget");
   }
 
   SettingsTile cannulaAge(BuildContext context) {

@@ -43,8 +43,8 @@ class DeviceSettings {
 
     sensorDays = prefs.getInt(_DeviceNames.sensorDays.name, defaultValue: 10)!;
 
-    aeffect(() => prefs.setInt(_DeviceNames.cannulaDays.name, cannulaDays));
+    aeffect(() => prefs.setInt(_DeviceNames.cannulaDays.name, cannulaDays), debugLabel: 'cannulaDays');
 
-    aeffect(() => prefs.setInt(_DeviceNames.sensorDays.name, sensorDays));
+    aeffect(() => prefs.setInt(_DeviceNames.sensorDays.name, sensorDays), debugLabel: 'sensorDays');
   }
 }

@@ -56,7 +56,7 @@ class SecureSettings {
       }
 
       store.write(key: _SSNames.nightscoutUrl.name, value: nightscoutURL!);
-    });
+    }, debugLabel: 'nightscoutURL');
 
     aeffect(() {
       if (nightscoutToken == null) {
@@ -64,6 +64,6 @@ class SecureSettings {
       }
 
       store.write(key: _SSNames.nightscoutToken.name, value: nightscoutToken!);
-    });
+    }, debugLabel: 'nightscoutToken');
   }
 }
