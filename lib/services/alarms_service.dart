@@ -217,27 +217,23 @@ class AlarmsService {
 
     if (!TimeSettings().isNight()) {
       // Brightness only works at night
-      print("Brightness: Not night");
       BrightnessAlert().stop();
       return false;
     }
 
     if (!AlarmAlertSettings().brightnessAdjustAtNight) {
       alog("Stopping Brightness Alarms Turned off");
-      print("Brightness: Stopping not enabled");
       BrightnessAlert().stop();
       return false;
     }
 
     if (alarms.isEmpty) {
       alog("Stopping Brightness Alarms");
-      print("Brightness: empty");
       BrightnessAlert().stop();
       return false;
     }
 
     alog("Starting Brightness Alarms");
-    print("Brightness: starting");
     BrightnessAlert().start();
     return true;
   }
