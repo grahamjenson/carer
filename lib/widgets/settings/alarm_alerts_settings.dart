@@ -20,7 +20,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         double width = min(820, MediaQuery.of(context).size.width);
 
         List<SettingsTile> tiles = [
-          smartSnooze(),
           brightnessAdjust(),
           volumeOverride(context),
           volumeSettings(context, width),
@@ -46,25 +45,11 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       title: const Text("Brightness Adjust"),
       descriptionInlineIos: true,
       description: const Text(
-        "Adjust Screen Brightness on Alarm",
+        "Increase screen brightness when Alarming at night",
       ),
-      initialValue: AlarmAlertSettings().brightnessAdjust,
+      initialValue: AlarmAlertSettings().brightnessAdjustAtNight,
       onToggle: (bool value) {
-        AlarmAlertSettings().brightnessAdjust = value;
-      },
-    );
-  }
-
-  SettingsTile smartSnooze() {
-    return SettingsTile.switchTile(
-      title: const Text("Smart Snooze"),
-      descriptionInlineIos: true,
-      description: const Text(
-        "Ignore when  good direction",
-      ),
-      initialValue: AlarmAlertSettings().smartSnooze,
-      onToggle: (bool value) {
-        AlarmAlertSettings().smartSnooze = value;
+        AlarmAlertSettings().brightnessAdjustAtNight = value;
       },
     );
   }

@@ -1,13 +1,10 @@
 import 'package:carer/models/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:flutter/material.dart';
 
 enum _UINames {
   unit,
   screenActive,
-  nightStartTime,
-  nightEndTime,
 }
 
 enum UITheme {
@@ -107,8 +104,6 @@ class UISettings {
 
   final Map<_UINames, ASignal> _signals = {
     _UINames.screenActive: ASignal<bool>(false, debugLabel: 'screenActive'),
-    _UINames.nightStartTime: ASignal<TimeOfDay>(const TimeOfDay(hour: 22, minute: 0), debugLabel: 'nightStartTime'),
-    _UINames.nightEndTime: ASignal<TimeOfDay>(const TimeOfDay(hour: 6, minute: 0), debugLabel: 'nightEndTime'),
     _UINames.unit: ASignal<Unit>(Unit.mg, debugLabel: 'unit'),
   };
 
@@ -128,46 +123,12 @@ class UISettings {
   bool get screenActive => _signals[_UINames.screenActive]!.value as bool;
   set screenActive(bool value) => _signals[_UINames.screenActive]!.value = value;
 
-  ASignal<TimeOfDay> get nightStartTimeSignal => _signals[_UINames.nightStartTime]! as ASignal<TimeOfDay>;
-  TimeOfDay get nightStartTime => nightStartTimeSignal.value;
-  set nightStartTime(TimeOfDay value) {
-    if (tODtoInt(value) < tODtoInt(nightEndTime)) {
-      return;
-    }
-    nightStartTimeSignal.value = value;
-  }
-
-  ASignal<TimeOfDay> get nightEndTimeSignal => _signals[_UINames.nightEndTime]! as ASignal<TimeOfDay>;
-  TimeOfDay get nightEndTime => nightEndTimeSignal.value;
-  set nightEndTime(TimeOfDay value) {
-    if (tODtoInt(value) > tODtoInt(nightStartTime)) {
-      return;
-    }
-    nightEndTimeSignal.value = value;
-  }
-
   Unit get unit => _signals[_UINames.unit]!.value as Unit;
   set unit(Unit value) => _signals[_UINames.unit]!.value = value;
-
-  int tODtoInt(TimeOfDay myTime) => myTime.hour * 60 + myTime.minute;
-  TimeOfDay tODfromInt(int myTime) => TimeOfDay(hour: myTime ~/ 60, minute: myTime % 60);
-
-  bool isNightModeActive() {
-    final now = tODtoInt(TimeOfDay.now());
-    var start = tODtoInt(nightStartTime);
-    var end = tODtoInt(nightEndTime);
-
-    // start is always greater than end, e.g. 22:00 > 06:00.
-    return start < end ? now >= start && now < end : now >= start || now < end;
-  }
 
   setupDBPropagation(KeyValueStore prefs) {
     // Assign the values from the DB
     screenActive = prefs.getBool(_UINames.screenActive.name, defaultValue: true)!;
-
-    nightStartTime = tODfromInt(prefs.getInt(_UINames.nightStartTime.name, defaultValue: 22 * 60)!);
-
-    nightEndTime = tODfromInt(prefs.getInt(_UINames.nightEndTime.name, defaultValue: 6 * 60)!);
 
     unit = Unit.fromBool(prefs.getBool(_UINames.unit.name, defaultValue: true)!);
 
@@ -181,13 +142,5 @@ class UISettings {
     aeffect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);
     }, debugLabel: _UINames.screenActive.name);
-
-    aeffect(() {
-      prefs.setInt(_UINames.nightStartTime.name, tODtoInt(nightStartTime));
-    }, debugLabel: _UINames.nightStartTime.name);
-
-    aeffect(() {
-      prefs.setInt(_UINames.nightEndTime.name, tODtoInt(nightEndTime));
-    }, debugLabel: _UINames.nightEndTime.name);
   }
 }

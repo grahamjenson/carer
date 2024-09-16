@@ -2,11 +2,11 @@ import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sgv.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/prediction_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/math.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -209,12 +209,6 @@ class LowAlarm extends Alarm {
   bool active() {
     return AlarmSettings().lowAlarm;
   }
-
-  @override
-  bool smartSnooze() {
-    var range = PredictionService().getPredictionAtRange(clock.minutesFromNow(10));
-    return range == Range5.mid;
-  }
 }
 
 class HighAlarm extends Alarm {
@@ -224,7 +218,12 @@ class HighAlarm extends Alarm {
   IconData icon() => UniconsLine.temperature;
 
   @override
-  String status() => "High ${lastSGVStr()} > ${unitStr(TargetSettings().highTarget)}";
+  String status() {
+    if (smartSnooze()) {
+      return "High ${lastSGVStr()} > ${unitStr(TargetSettings().highTarget)} (Smart Snooze)";
+    }
+    return "High ${lastSGVStr()} > ${unitStr(TargetSettings().highTarget)}";
+  }
 
   @override
   List<String> properties() {
@@ -257,8 +256,14 @@ class HighAlarm extends Alarm {
 
   @override
   bool smartSnooze() {
-    var range = PredictionService().getPredictionAtRange(clock.minutesFromNow(10));
-    return range == Range5.mid;
+    // TODO: make readings ahead adjustable
+    CleanSGV? sgv = PredictionService().getReadingsAhead(3);
+    if (sgv == null) {
+      return false;
+    }
+
+    var (range, _) = targetRange(sgv.value);
+    return AlarmAlertSettings().smartSnoozeHigh && range == Range5.mid;
   }
 }
 

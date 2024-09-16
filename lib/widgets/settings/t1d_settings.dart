@@ -2,8 +2,11 @@ import 'dart:math';
 
 import 'package:carer/models/constants.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -163,10 +166,55 @@ class T1DSettingsWidget extends AbstractSettingsSection {
                 ),
               ]),
             ),
+            timeSettingTile(context),
           ],
         );
       },
       debugLabel: "T1DSettingsWidget",
+    );
+  }
+
+  SettingsTile timeSettingTile(BuildContext context) {
+    return SettingsTile(
+      title: const Text("Night Time"),
+      trailing: ToggleButtons(
+        constraints: const BoxConstraints(maxHeight: 50, maxWidth: 100),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
+        isSelected: const [
+          true,
+          true,
+        ],
+        onPressed: (int index) async {
+          switch (index) {
+            case 0:
+              TimeOfDay? value = await showTimePicker(context: context, initialTime: TimeSettings().nightStartTime);
+              if (value != null) {
+                TimeSettings().nightStartTime = value;
+              }
+              break;
+            case 1:
+              TimeOfDay? value = await showTimePicker(context: context, initialTime: TimeSettings().nightEndTime);
+              if (value != null) {
+                TimeSettings().nightEndTime = value;
+              }
+              break;
+          }
+        },
+        children: [
+          ToggleButton(
+            text: "Night Start\n${Dates.tODToString(TimeSettings().nightStartTime)}",
+            height: 50,
+            width: 70,
+          ),
+          ToggleButton(
+            text: "Night End\n${Dates.tODToString(TimeSettings().nightEndTime)}",
+            height: 50,
+            width: 70,
+          ),
+        ],
+      ),
     );
   }
 }

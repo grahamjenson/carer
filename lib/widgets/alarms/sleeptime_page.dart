@@ -81,6 +81,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
                   child: const Text("Cancel", style: textStyle),
                 ),
               ),
+              const Divider(),
             ],
           ),
         ],

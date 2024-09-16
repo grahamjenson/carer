@@ -9,6 +9,7 @@ import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -152,7 +153,7 @@ class AlarmsService {
     Set<Alarm> newActiveAlarms = {};
 
     var disabledAllAlarms = AlarmSettings().disableAlarms;
-    var smartSnoozeOn = AlarmAlertSettings().smartSnooze;
+
     for (var alarm in allAlarms) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
 
@@ -161,7 +162,7 @@ class AlarmsService {
         newTriggeredAlarms.add(alarm);
       }
 
-      var addToActive = !disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze);
+      var addToActive = !disabledAllAlarms && triggered && active && notSleeping && !(smartSnooze);
 
       // If Sleeping do not add
       if (addToActive) {
@@ -216,7 +217,12 @@ class AlarmsService {
       return false;
     }
 
-    if (!AlarmAlertSettings().brightnessAdjust) {
+    if (!TimeSettings().isNight()) {
+      // Brightness only works at night
+      return false;
+    }
+
+    if (!AlarmAlertSettings().brightnessAdjustAtNight) {
       alog("Stopping Brightness Alarms Turned off");
       BrightnessAlert().stop();
       return false;

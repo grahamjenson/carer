@@ -68,6 +68,7 @@ class PredictionService {
     if (sgv == null) {
       return null;
     }
+
     var (range, _) = targetRange(sgv.value);
 
     return range;

@@ -1,4 +1,5 @@
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -18,7 +19,7 @@ class ThemeService {
   UIThemeLayout getCurrentThemeLayout() {
     if (AlarmsService().activeAlarms.value.isNotEmpty && UISettings().alarmUIThemeLayout.enabled) {
       return UISettings().alarmUIThemeLayout;
-    } else if (UISettings().isNightModeActive() && UISettings().nightUIThemeLayout.enabled) {
+    } else if (TimeSettings().isNight() && UISettings().nightUIThemeLayout.enabled) {
       return UISettings().nightUIThemeLayout;
     } else {
       return UISettings().mainUIThemeLayout;
@@ -37,8 +38,6 @@ class ThemeService {
       debugLabel: "ThemeSignalAssign",
       dependencies: [
             TimerService().minuteSignal,
-            UISettings().nightStartTimeSignal,
-            UISettings().nightEndTimeSignal,
             AlarmsService().activeAlarms,
           ] +
           UISettings().themeLayoutSignals,

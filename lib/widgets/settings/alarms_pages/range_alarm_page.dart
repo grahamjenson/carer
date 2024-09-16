@@ -1,3 +1,4 @@
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
@@ -65,6 +66,7 @@ class RangeAlarmPage extends StatelessWidget {
                     trailing: ToggleButton.selectOne<int>(
                         AlarmSettings().highMinutes, ["0m", "20m", "40m", "60m"], [0, 20, 40, 60], (value) => AlarmSettings().highMinutes = value),
                   ),
+                  smartSnooze(),
                 ],
               ),
             ],
@@ -72,6 +74,20 @@ class RangeAlarmPage extends StatelessWidget {
         },
         debugLabel: "RangeAlarmPage",
       ),
+    );
+  }
+
+  SettingsTile smartSnooze() {
+    return SettingsTile.switchTile(
+      title: const Text("Smart Snooze"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Ignore when  good direction",
+      ),
+      initialValue: AlarmAlertSettings().smartSnoozeHigh,
+      onToggle: (bool value) {
+        AlarmAlertSettings().smartSnoozeHigh = value;
+      },
     );
   }
 }

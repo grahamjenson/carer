@@ -3,7 +3,7 @@ import 'package:carer/utils/futures.dart';
 
 enum _AANames {
   // Predictions
-  smartSnooze,
+  smartSnoozeHigh,
 
   // AUDIO SETTINGS
   volumeOveride,
@@ -12,7 +12,7 @@ enum _AANames {
   alarmAsset,
 
   // Other ALARM
-  brightnessAdjust,
+  brightnessAdjustAtNight,
 }
 
 class AlarmAlertSettings {
@@ -20,8 +20,8 @@ class AlarmAlertSettings {
   factory AlarmAlertSettings() => _singleton;
 
   final Map<_AANames, ASignal> _signals = {
-    _AANames.smartSnooze: ASignal<bool>(false, debugLabel: 'smartSnooze'),
-    _AANames.brightnessAdjust: ASignal<bool>(false, debugLabel: 'brightnessAdjust'),
+    _AANames.smartSnoozeHigh: ASignal<bool>(false, debugLabel: 'smartSnoozeHigh'),
+    _AANames.brightnessAdjustAtNight: ASignal<bool>(false, debugLabel: 'brightnessAdjustAtNight'),
     _AANames.volumeOveride: ASignal<bool>(false, debugLabel: 'volumeOveride'),
     _AANames.volumeOverrideValue: ASignal<int>(10, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
@@ -30,8 +30,8 @@ class AlarmAlertSettings {
 
   AlarmAlertSettings._();
 
-  bool get smartSnooze => _signals[_AANames.smartSnooze]!.value as bool;
-  set smartSnooze(bool value) => _signals[_AANames.smartSnooze]!.value = value;
+  bool get smartSnoozeHigh => _signals[_AANames.smartSnoozeHigh]!.value as bool;
+  set smartSnoozeHigh(bool value) => _signals[_AANames.smartSnoozeHigh]!.value = value;
 
   bool get volumeOveride => _signals[_AANames.volumeOveride]!.value as bool;
   set volumeOveride(bool value) => _signals[_AANames.volumeOveride]!.value = value;
@@ -47,8 +47,8 @@ class AlarmAlertSettings {
   AlarmSounds get alarmAsset => _signals[_AANames.alarmAsset]!.value as AlarmSounds;
   set alarmAsset(AlarmSounds value) => _signals[_AANames.alarmAsset]!.value = value;
 
-  bool get brightnessAdjust => _signals[_AANames.brightnessAdjust]!.value as bool;
-  set brightnessAdjust(bool value) => _signals[_AANames.brightnessAdjust]!.value = value;
+  bool get brightnessAdjustAtNight => _signals[_AANames.brightnessAdjustAtNight]!.value as bool;
+  set brightnessAdjustAtNight(bool value) => _signals[_AANames.brightnessAdjustAtNight]!.value = value;
 
   allValues() {
     for (var signal in _signals.values) {
@@ -94,7 +94,7 @@ class AlarmAlertSettings {
   }
 
   setupDBPropagation(KeyValueStore prefs) {
-    smartSnooze = prefs.getBool(_AANames.smartSnooze.name, defaultValue: false)!;
+    smartSnoozeHigh = prefs.getBool(_AANames.smartSnoozeHigh.name, defaultValue: false)!;
     volumeOveride = prefs.getBool(_AANames.volumeOveride.name, defaultValue: false)!;
     volumeOverrideValue = prefs.getInt(_AANames.volumeOverrideValue.name, defaultValue: 50)!;
     volumeProgressionSeconds = prefs.getInt(_AANames.volumeProgressionSeconds.name, defaultValue: 10)!;
@@ -102,9 +102,9 @@ class AlarmAlertSettings {
     var prefsAlarmAsset = prefs.getString(_AANames.alarmAsset.name, defaultValue: AlarmSounds.nightguard.name)!;
     alarmAsset = AlarmSounds.values.firstWhere((e) => e.name == prefsAlarmAsset, orElse: () => AlarmSounds.nightguard);
 
-    brightnessAdjust = prefs.getBool(_AANames.brightnessAdjust.name, defaultValue: false)!;
+    brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: false)!;
 
-    aeffect(() => prefs.setBool(_AANames.smartSnooze.name, smartSnooze), debugLabel: 'smartSnooze');
+    aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'smartSnoozeHigh');
 
     aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride), debugLabel: 'volumeOveride');
 
@@ -118,8 +118,8 @@ class AlarmAlertSettings {
     }, debugLabel: 'alarmAsset');
 
     aeffect(() {
-      prefs.setBool(_AANames.brightnessAdjust.name, brightnessAdjust);
-    }, debugLabel: 'brightnessAdjust');
+      prefs.setBool(_AANames.brightnessAdjustAtNight.name, brightnessAdjustAtNight);
+    }, debugLabel: 'brightnessAdjustAtNight');
   }
 }
 
