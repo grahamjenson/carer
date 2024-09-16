@@ -1,14 +1,44 @@
+import 'dart:async';
+
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
 
-class SleepTimePage extends StatelessWidget with ThemeMixin {
+class SleepTimePage extends StatefulWidget {
   const SleepTimePage({super.key});
   static const TextStyle textStyle = TextStyle(fontSize: 50);
 
   static const List<int> minutesTimes = [5, 10, 20, 30, 45];
   static const List<int> hoursTimes = [1, 2, 3];
   static const List<int> timeTimes = [6, 22];
+
+  @override
+  State<SleepTimePage> createState() => _SleepTimePageState();
+}
+
+class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    int sleepTime = 10;
+    if (AlarmsService().sleepDuration == null) {
+      AlarmsService().sleepDurationSeconds = sleepTime;
+    }
+
+    _timer = Timer(Duration(seconds: sleepTime), () {
+      Navigator.of(context).pop();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +108,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
                   onPressed: () {
                     Navigator.of(context).pop(null);
                   },
-                  child: const Text("Cancel", style: textStyle),
+                  child: const Text("Cancel", style: SleepTimePage.textStyle),
                 ),
               ),
               const Divider(),
@@ -92,7 +122,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
   List<Widget> getMinuteButtons(BuildContext context, ButtonStyle buttonStyle) {
     List<Widget> minuteButtons = [];
 
-    for (var time in minutesTimes) {
+    for (var time in SleepTimePage.minutesTimes) {
       minuteButtons.add(
         Container(
           padding: const EdgeInsets.all(5),
@@ -103,7 +133,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
             },
             child: Text(
               "${time}m",
-              style: textStyle,
+              style: SleepTimePage.textStyle,
             ),
           ),
         ),
@@ -116,7 +146,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
   List<Widget> getHourButtons(BuildContext context, ButtonStyle buttonStyle) {
     List<Widget> hourButtons = [];
 
-    for (var time in hoursTimes) {
+    for (var time in SleepTimePage.hoursTimes) {
       hourButtons.add(
         Container(
           padding: const EdgeInsets.all(5),
@@ -127,7 +157,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
             },
             child: Text(
               "${time}h",
-              style: textStyle,
+              style: SleepTimePage.textStyle,
             ),
           ),
         ),
@@ -140,7 +170,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
   List<Widget> getTimeButtons(BuildContext context, ButtonStyle buttonStyle) {
     List<Widget> timeButtons = [];
 
-    for (var time in timeTimes) {
+    for (var time in SleepTimePage.timeTimes) {
       timeButtons.add(Container(
         padding: const EdgeInsets.all(5),
         child: ElevatedButton(
@@ -150,7 +180,7 @@ class SleepTimePage extends StatelessWidget with ThemeMixin {
           },
           child: Text(
             Dates.stringOf24HourTime(time),
-            style: textStyle,
+            style: SleepTimePage.textStyle,
           ),
         ),
       ));

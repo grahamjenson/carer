@@ -92,9 +92,6 @@ class SleepButton extends StatelessWidget with ThemeMixin {
       var sleepTime = await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          if (AlarmsService().sleepDuration == null) {
-            AlarmsService().sleepDurationSeconds = 10;
-          }
           return const SleepTimePage();
         }),
       );
