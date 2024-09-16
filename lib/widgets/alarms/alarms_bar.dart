@@ -35,7 +35,7 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
     );
   }
 
-  List<Widget> getAlarmWidgets(Set<Alarm> triggeredAlarms, Color mainColor) {
+  List<Widget> getAlarmWidgets(AlarmSet triggeredAlarms, Color mainColor) {
     List<Widget> alarmWidgets = [];
     for (var alarm in triggeredAlarms) {
       alarmWidgets.add(getAlarmToolTip(alarm, mainColor));

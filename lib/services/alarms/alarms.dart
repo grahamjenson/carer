@@ -12,6 +12,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
 
+class AlarmSet extends Iterable<Alarm> {
+  final Set<Alarm> _alarms;
+
+  AlarmSet(this._alarms);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AlarmSet && runtimeType == other.runtimeType && _alarms.length == other._alarms.length && _alarms.containsAll(other._alarms);
+
+  @override
+  int get hashCode => _alarms.fold(0, (prev, alarm) => prev ^ alarm.hashCode);
+
+  @override
+  bool get isNotEmpty => _alarms.isNotEmpty;
+
+  @override
+  bool get isEmpty => _alarms.isEmpty;
+
+  @override
+  Iterator<Alarm> get iterator => _alarms.iterator;
+
+  @override
+  String toString() {
+    return _alarms.toString();
+  }
+}
+
 abstract class Alarm {
   const Alarm();
 

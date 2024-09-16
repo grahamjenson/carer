@@ -60,8 +60,8 @@ class AlarmsService {
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
-  ASignal<Set<Alarm>> triggeredAlarms = ASignal<Set<Alarm>>({}, debugLabel: "TriggeredAlarms");
-  ASignal<Set<Alarm>> activeAlarms = ASignal<Set<Alarm>>({}, debugLabel: "ActiveAlarms");
+  ASignal<AlarmSet> triggeredAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "TriggeredAlarms");
+  ASignal<AlarmSet> activeAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "ActiveAlarms");
 
   AlarmsService._() {
     List<Signal> allSettingsSignals = [];
@@ -84,48 +84,59 @@ class AlarmsService {
 
     List<Signal> checkAlarmsDependencies = allSettingsSignals + additionalDeps;
 
-    aeffect(() async {
-      // Only execute this one at a time
-      if (isCheckingAlarms) {
-        return false;
-      }
-      isCheckingAlarms = true;
-
+    aeffect(() {
       try {
-        await _checkAlarms();
+        var (newTriggeredAlarms, newActiveAlarms) = calculateAlarms();
+
+        triggeredAlarms.value = AlarmSet(newTriggeredAlarms);
+        activeAlarms.value = AlarmSet(newActiveAlarms);
       } catch (err) {
         alog("CheckAlarms: Error checking alarms: $err");
-      } finally {
-        isCheckingAlarms = false;
       }
       return true;
     }, debugLabel: "CheckAlarms", dependencies: checkAlarmsDependencies);
 
-    sleepDurationSeconds = 10;
-  }
+    aeffect(
+      () async {
+        if (isCheckingAlarms) {
+          return false;
+        }
+        isCheckingAlarms = true;
 
-  Future<bool> _checkAlarms() async {
-    var (newTriggeredAlarms, newActiveAlarms) = calculateAlarms();
+        try {
+          var audio = go(audioAlerts(activeAlarms.value));
+          var brightness = go(brightnessAlert(activeAlarms.value));
 
-    triggeredAlarms.value = newTriggeredAlarms;
-    activeAlarms.value = newActiveAlarms;
+          var (_, err) = await audio;
 
-    var (_, err) = await go(audioAlerts(newActiveAlarms));
-    if (err != null) {
-      alog("Error checking audio alarms: $err");
-    }
+          if (err != null) {
+            alog("Error playing audio alarms: $err");
+          }
 
-    (_, err) = await go(brightnessAlert(newActiveAlarms));
-    if (err != null) {
-      alog("Error checking brightness alarms: $err");
-    }
+          (_, err) = await brightness;
+          if (err != null) {
+            alog("Error playing brightness alarms: $err");
+          }
+        } catch (err) {
+          alog("AudioBrightnessAlarms: Error $err");
+        } finally {
+          isCheckingAlarms = false;
+        }
+        return true;
+      },
+      debugLabel: "AudioBrightnessAlarms",
+      dependencies: [
+        activeAlarms,
+        TimerService().tenSecondSignal,
+      ],
+    );
 
-    return true;
+    // Set to 15 seconds to offset the race condition on the 10 second timerSerivce signal
+    sleepDurationSeconds = 15;
   }
 
   (Set<Alarm>, Set<Alarm>) calculateAlarms() {
-    var notSleeping = sleepUntilSignal.value == null;
-
+    var notSleeping = sleepDuration == null;
     Set<Alarm> newTriggeredAlarms = {};
     Set<Alarm> newActiveAlarms = {};
 
@@ -139,8 +150,10 @@ class AlarmsService {
         newTriggeredAlarms.add(alarm);
       }
 
+      var addToActive = !disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze);
+
       // If Sleeping do not add
-      if (!disabledAllAlarms && triggered && active && notSleeping && !(smartSnoozeOn && smartSnooze)) {
+      if (addToActive) {
         newActiveAlarms.add(alarm);
       }
     }
@@ -148,12 +161,7 @@ class AlarmsService {
     newTriggeredAlarms = filterAlarms(newTriggeredAlarms);
     newActiveAlarms = filterAlarms(newActiveAlarms);
 
-    if (newTriggeredAlarms.isNotEmpty || newActiveAlarms.isNotEmpty) {
-      alog("Triggered Alarms: $newTriggeredAlarms\tActive Alarms: $newActiveAlarms");
-    }
-
     // Set alarms that have been triggered
-
     return (newTriggeredAlarms, newActiveAlarms);
   }
 
@@ -175,7 +183,7 @@ class AlarmsService {
     return alarms;
   }
 
-  Future<bool> audioAlerts(Set<Alarm> alarms) async {
+  Future<bool> audioAlerts(AlarmSet alarms) async {
     if (alarms.isEmpty) {
       var (playing, err) = await go(player.stopAlarm());
       if (playing == null || err != null) {
@@ -192,7 +200,7 @@ class AlarmsService {
     return true;
   }
 
-  Future<bool> brightnessAlert(Set<Alarm> alarms) async {
+  Future<bool> brightnessAlert(AlarmSet alarms) async {
     if (!Platform.isIOS && !Platform.isAndroid) {
       return false;
     }
@@ -224,6 +232,8 @@ class AlarmsService {
     var duration = sleepUntilSignal.value!.difference(clock.now());
 
     if (duration.isNegative) {
+      // Assign duration null to cause updates
+      sleepUntilSignal.value = null;
       return null;
     }
 
