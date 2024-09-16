@@ -139,7 +139,9 @@ class AlarmsService {
       () {
         // Sleep for a second or two when opened
         if (Platform.isAndroid || Platform.isIOS) {
-          sleepDurationSeconds = 5;
+          if (sleepDurationPeek == null) {
+            sleepDurationSeconds = 10;
+          }
         }
       },
       debugLabel: "SleepOnLastResumed",
@@ -219,22 +221,27 @@ class AlarmsService {
 
     if (!TimeSettings().isNight()) {
       // Brightness only works at night
+      print("Brightness: Not night");
+      BrightnessAlert().stop();
       return false;
     }
 
     if (!AlarmAlertSettings().brightnessAdjustAtNight) {
       alog("Stopping Brightness Alarms Turned off");
+      print("Brightness: Stopping not enabled");
       BrightnessAlert().stop();
       return false;
     }
 
     if (alarms.isEmpty) {
       alog("Stopping Brightness Alarms");
+      print("Brightness: empty");
       BrightnessAlert().stop();
       return false;
     }
 
     alog("Starting Brightness Alarms");
+    print("Brightness: starting");
     BrightnessAlert().start();
     return true;
   }
@@ -243,10 +250,18 @@ class AlarmsService {
 
   Timer? sleepTimer;
   Duration? get sleepDuration {
-    if (sleepUntilSignal.value == null) {
+    return _calculateSleepDuration(sleepUntilSignal.value);
+  }
+
+  Duration? get sleepDurationPeek {
+    return _calculateSleepDuration(sleepUntilSignal.peek());
+  }
+
+  Duration? _calculateSleepDuration(DateTime? sleepUntil) {
+    if (sleepUntil == null) {
       return null;
     }
-    var duration = sleepUntilSignal.value!.difference(clock.now());
+    var duration = sleepUntil.difference(clock.now());
 
     if (duration.isNegative) {
       // Assign duration null to cause updates
