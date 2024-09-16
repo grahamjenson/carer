@@ -6,7 +6,7 @@ class SleepTimePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const List<int> minutesTimes = [5, 20, 30, 45];
+    const List<int> minutesTimes = [5, 10, 20, 30, 45];
     const List<int> hoursTimes = [1, 2, 3];
     const List<int> timeTimes = [6, 7, 21, 22];
     const TextStyle textStyle = TextStyle(fontSize: 30);

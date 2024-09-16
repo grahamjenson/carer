@@ -11,9 +11,13 @@ class NSPropertiesUpdater extends Updater {
   NSPropertiesUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 15)) {
     aeffect(() {
       // Check signal to register
-      var _ = SecureSettings().nightscoutURL;
+      var _ = SecureSettings().nightscoutURLAndToken;
       addExternalReason("NS URL updated");
-    }, debugLabel: "NSPropertiesUpdaterReason");
+    }, debugLabel: "NSPropertiesUpdaterReason-NSURL");
+
+    aeffect(() {
+      addExternalReason("Resumed");
+    }, debugLabel: "NSPropertiesUpdaterReason-LastResumed");
   }
 
   @override

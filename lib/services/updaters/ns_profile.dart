@@ -13,9 +13,13 @@ class NSProfileUpdater extends Updater {
     lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
       // Check signal to register
-      var _ = SecureSettings().nightscoutURL;
+      var _ = SecureSettings().nightscoutURLAndToken;
       addExternalReason("NS URL updated");
-    }, debugLabel: "NSProfileUpdaterReason");
+    }, debugLabel: "NSProfileUpdaterReason-NSURL");
+
+    aeffect(() {
+      addExternalReason("Resumed");
+    }, debugLabel: "NSProfileUpdaterReason-LastResumed");
   }
 
   @override

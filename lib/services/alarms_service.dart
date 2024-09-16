@@ -5,6 +5,7 @@ import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -133,6 +134,16 @@ class AlarmsService {
 
     // Set to 15 seconds to offset the race condition on the 10 second timerSerivce signal
     sleepDurationSeconds = 15;
+    aeffect(
+      () {
+        // Sleep for a second or two when opened
+        if (Platform.isAndroid || Platform.isIOS) {
+          sleepDurationSeconds = 5;
+        }
+      },
+      debugLabel: "SleepOnLastResumed",
+      dependencies: [AppLifecycleService().lastResumed],
+    );
   }
 
   (Set<Alarm>, Set<Alarm>) calculateAlarms() {

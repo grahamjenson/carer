@@ -17,9 +17,13 @@ class NSTreatmentsUpdater extends Updater {
     lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
       // Check signal to register
-      var _ = SecureSettings().nightscoutURL;
+      var _ = SecureSettings().nightscoutURLAndToken;
       addExternalReason("NS URL updated");
-    }, debugLabel: "NSTreatmentsUpdaterReason");
+    }, debugLabel: "NSTreatmentsUpdaterReason-NSURL");
+
+    aeffect(() {
+      addExternalReason("Resumed");
+    }, debugLabel: "NSTreatmentsUpdaterReason-LastResumed");
   }
 
   @override

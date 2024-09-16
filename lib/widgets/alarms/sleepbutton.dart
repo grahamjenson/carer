@@ -91,7 +91,10 @@ class SleepButton extends StatelessWidget with ThemeMixin {
     openSleepDialog() async {
       var sleepTime = await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SleepTimePage()),
+        MaterialPageRoute(builder: (context) {
+          AlarmsService().sleepDurationSeconds = 10;
+          return const SleepTimePage();
+        }),
       );
       sleepTime ??= 0;
       AlarmsService().sleepDurationSeconds = sleepTime;

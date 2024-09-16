@@ -12,11 +12,15 @@ class NSEntriesUpdater extends Updater {
     aeffect(
       () {
         // Check signal to register
-        var _ = SecureSettings().nightscoutURL;
+        var _ = SecureSettings().nightscoutURLAndToken;
         addExternalReason("NS URL updated");
       },
-      debugLabel: "NSEntriesUpdaterReason",
+      debugLabel: "NSEntriesUpdaterReason-NSURL",
     );
+
+    aeffect(() {
+      addExternalReason("Resumed");
+    }, debugLabel: "NSEntriesUpdaterReason-LastResumed");
   }
 
   @override
