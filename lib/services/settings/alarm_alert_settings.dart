@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:clock/clock.dart';
 
 enum _AANames {
   // Predictions
@@ -13,6 +16,9 @@ enum _AANames {
 
   // Other ALARM
   brightnessAdjustAtNight,
+
+  // ephemeral
+  sleepUntil,
 }
 
 class AlarmAlertSettings {
@@ -26,6 +32,7 @@ class AlarmAlertSettings {
     _AANames.volumeOverrideValue: ASignal<int>(10, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
     _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
+    _AANames.sleepUntil: ASignal<DateTime?>(null, debugLabel: "sleepUntil"),
   };
 
   AlarmAlertSettings._();
@@ -49,6 +56,8 @@ class AlarmAlertSettings {
 
   bool get brightnessAdjustAtNight => _signals[_AANames.brightnessAdjustAtNight]!.value as bool;
   set brightnessAdjustAtNight(bool value) => _signals[_AANames.brightnessAdjustAtNight]!.value = value;
+
+  ASignal<DateTime?> get sleepUntilSignal => _signals[_AANames.sleepUntil]! as ASignal<DateTime?>;
 
   allValues() {
     for (var signal in _signals.values) {
@@ -120,6 +129,47 @@ class AlarmAlertSettings {
     aeffect(() {
       prefs.setBool(_AANames.brightnessAdjustAtNight.name, brightnessAdjustAtNight);
     }, debugLabel: 'brightnessAdjustAtNight');
+  }
+
+  Timer? sleepTimer;
+  Duration? get sleepDuration {
+    return _calculateSleepDuration(sleepUntilSignal.value);
+  }
+
+  Duration? get sleepDurationPeek {
+    return _calculateSleepDuration(sleepUntilSignal.peek());
+  }
+
+  Duration? _calculateSleepDuration(DateTime? sleepUntil) {
+    if (sleepUntil == null) {
+      return null;
+    }
+    var duration = sleepUntil.difference(clock.now());
+
+    if (duration.isNegative) {
+      // Assign duration null to cause updates
+      sleepUntilSignal.value = null;
+      return null;
+    }
+
+    return duration;
+  }
+
+  set sleepDurationSeconds(int? value) {
+    if (sleepTimer != null) {
+      sleepTimer!.cancel(); // Always cancel
+    }
+
+    if (value == null) {
+      sleepUntilSignal.value = null;
+      return;
+    }
+
+    sleepTimer = Timer(Duration(seconds: value), () {
+      sleepUntilSignal.value = null;
+    });
+
+    sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
   }
 }
 

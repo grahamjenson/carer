@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +25,8 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
     super.initState();
 
     int sleepTime = 10;
-    if (AlarmsService().sleepDuration == null) {
-      AlarmsService().sleepDurationSeconds = sleepTime;
+    if (AlarmAlertSettings().sleepDuration == null) {
+      AlarmAlertSettings().sleepDurationSeconds = sleepTime;
     }
 
     _timer = Timer(Duration(seconds: sleepTime), () {

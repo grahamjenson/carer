@@ -1,4 +1,5 @@
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -29,11 +30,11 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
         padding: EdgeInsets.zero,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: rows),
       );
-    }, dependencies: [TimerService().tenSecondSignal, AlarmsService().sleepUntilSignal], debugLabel: "SleepTextStatus");
+    }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().sleepUntilSignal], debugLabel: "SleepTextStatus");
   }
 
   bool isSleeping() {
-    var duration = AlarmsService().sleepDuration;
+    var duration = AlarmAlertSettings().sleepDuration;
     if (duration == null) {
       return false;
     }
@@ -48,7 +49,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     var big = const TextStyle(fontSize: 40, fontWeight: FontWeight.bold);
     var small = const TextStyle(fontSize: 20);
 
-    var duration = AlarmsService().sleepDuration!;
+    var duration = AlarmAlertSettings().sleepDuration!;
     var totalSeconds = duration.inSeconds;
 
     var hours = (totalSeconds / 3600).floor();

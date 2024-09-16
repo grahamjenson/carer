@@ -1,10 +1,14 @@
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
 enum _TimeSettingsNames {
   nightStartTime,
   nightEndTime,
+
+  // Ephemeral
+  nightModeUntil
 }
 
 class TimeSettings {
@@ -14,6 +18,7 @@ class TimeSettings {
   final Map<_TimeSettingsNames, ASignal> _signals = {
     _TimeSettingsNames.nightStartTime: ASignal<TimeOfDay>(const TimeOfDay(hour: 22, minute: 0), debugLabel: 'nightStartTime'),
     _TimeSettingsNames.nightEndTime: ASignal<TimeOfDay>(const TimeOfDay(hour: 6, minute: 0), debugLabel: 'nightEndTime'),
+    _TimeSettingsNames.nightModeUntil: ASignal<DateTime?>(null, debugLabel: "nightModeUntil"),
   };
 
   int tODtoInt(TimeOfDay myTime) => myTime.hour * 60 + myTime.minute;
@@ -21,6 +26,11 @@ class TimeSettings {
 
   bool isNight() {
     final now = tODtoInt(TimeOfDay.now());
+
+    if (isNightModeOverride()) {
+      return true;
+    }
+
     var start = tODtoInt(nightStartTime);
     var end = tODtoInt(nightEndTime);
 
@@ -48,6 +58,8 @@ class TimeSettings {
     nightEndTimeSignal.value = value;
   }
 
+  ASignal<DateTime?> get nightModeUntilSignal => _signals[_TimeSettingsNames.nightModeUntil]! as ASignal<DateTime?>;
+
   setupDBPropagation(KeyValueStore prefs) {
     // Assign the values from the DB
 
@@ -62,5 +74,27 @@ class TimeSettings {
     aeffect(() {
       prefs.setInt(_TimeSettingsNames.nightEndTime.name, tODtoInt(nightEndTime));
     }, debugLabel: _TimeSettingsNames.nightEndTime.name);
+  }
+
+  bool isNightModeOverride() {
+    if (nightModeUntilSignal.value == null) {
+      return false;
+    }
+
+    if (nightModeUntilSignal.value!.isBefore(clock.now())) {
+      nightModeUntilSignal.value = null;
+      return false;
+    }
+
+    return true;
+  }
+
+  void stopNightModeOverride() {
+    nightModeUntilSignal.value = null;
+  }
+
+  void nightModeOverride() {
+    // Set night mode to true until the TimeOfDay of end, which may be tomorrow
+    nightModeUntilSignal.value = clock.now().add(const Duration(hours: 8));
   }
 }

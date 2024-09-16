@@ -199,7 +199,7 @@ class AColors {
 
 extension ColorExtension on Color {
   Color get dim {
-    var amount = 0.6;
+    var amount = 0.7;
     return Color.fromARGB(
       alpha,
       (red * amount).round(),

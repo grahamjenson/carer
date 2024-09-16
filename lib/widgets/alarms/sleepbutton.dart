@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/sleep_text_status.dart';
@@ -52,7 +52,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
 
     return AWatch(
       (context) {
-        if (AlarmsService().sleepDuration == null) {
+        if (AlarmAlertSettings().sleepDuration == null) {
           return const SizedBox.shrink();
         }
 
@@ -70,12 +70,12 @@ class SleepButton extends StatelessWidget with ThemeMixin {
                 alignment: Alignment.center,
                 icon: cancelIcon,
                 onPressed: () {
-                  AlarmsService().sleepDurationSeconds = null;
+                  AlarmAlertSettings().sleepDurationSeconds = null;
                 },
               ),
             ));
       },
-      dependencies: [AlarmsService().sleepUntilSignal],
+      dependencies: [AlarmAlertSettings().sleepUntilSignal],
       debugLabel: "SleepCancel",
     );
   }
@@ -96,7 +96,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
         }),
       );
       sleepTime ??= 0;
-      AlarmsService().sleepDurationSeconds = sleepTime;
+      AlarmAlertSettings().sleepDurationSeconds = sleepTime;
       return true;
     }
 

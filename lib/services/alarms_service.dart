@@ -13,7 +13,6 @@ import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -23,9 +22,6 @@ class AlarmsService {
   static final AlarmsService _singleton = AlarmsService._();
   factory AlarmsService() => _singleton;
   final AlarmPlayer player = AlarmPlayer();
-
-  // Start with a sleep, to give time for the app to catch up
-  final ASignal<DateTime?> sleepUntilSignal = ASignal(null, debugLabel: "sleepUntil");
 
   final Alarm _noDataAlarm = const NoDataAlarm();
   final Alarm _predictiveLowAlarm = const PredictiveLowAlarm();
@@ -80,7 +76,7 @@ class AlarmsService {
     bool isCheckingAlarms = false;
     List<Signal> additionalDeps = [
       TimerService().tenSecondSignal,
-      sleepUntilSignal,
+      AlarmAlertSettings().sleepUntilSignal,
       SQLToSGV().writeSignal,
     ];
 
@@ -134,13 +130,13 @@ class AlarmsService {
     );
 
     // Set to 15 seconds to offset the race condition on the 10 second timerSerivce signal
-    sleepDurationSeconds = 15;
+    AlarmAlertSettings().sleepDurationSeconds = 15;
     aeffect(
       () {
         // Sleep for a second or two when opened
         if (Platform.isAndroid || Platform.isIOS) {
-          if (sleepDurationPeek == null) {
-            sleepDurationSeconds = 10;
+          if (AlarmAlertSettings().sleepDurationPeek == null) {
+            AlarmAlertSettings().sleepDurationSeconds = 10;
           }
         }
       },
@@ -150,7 +146,7 @@ class AlarmsService {
   }
 
   (Set<Alarm>, Set<Alarm>) calculateAlarms() {
-    var notSleeping = sleepDuration == null;
+    var notSleeping = AlarmAlertSettings().sleepDuration == null;
     Set<Alarm> newTriggeredAlarms = {};
     Set<Alarm> newActiveAlarms = {};
 
@@ -247,47 +243,6 @@ class AlarmsService {
   }
 
   // Sleep
-
-  Timer? sleepTimer;
-  Duration? get sleepDuration {
-    return _calculateSleepDuration(sleepUntilSignal.value);
-  }
-
-  Duration? get sleepDurationPeek {
-    return _calculateSleepDuration(sleepUntilSignal.peek());
-  }
-
-  Duration? _calculateSleepDuration(DateTime? sleepUntil) {
-    if (sleepUntil == null) {
-      return null;
-    }
-    var duration = sleepUntil.difference(clock.now());
-
-    if (duration.isNegative) {
-      // Assign duration null to cause updates
-      sleepUntilSignal.value = null;
-      return null;
-    }
-
-    return duration;
-  }
-
-  set sleepDurationSeconds(int? value) {
-    if (sleepTimer != null) {
-      sleepTimer!.cancel(); // Always cancel
-    }
-
-    if (value == null) {
-      sleepUntilSignal.value = null;
-      return;
-    }
-
-    sleepTimer = Timer(Duration(seconds: value), () {
-      sleepUntilSignal.value = null;
-    });
-
-    sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
-  }
 
   Future<void> stopTestAlarm() async {
     var (stopped, err) = await go(player.stopTestAlarm());
