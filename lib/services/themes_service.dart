@@ -102,6 +102,27 @@ mixin ThemeMixin {
       fontFeatures: [FontFeature.superscripts(), FontFeature.tabularFigures()],
     );
   }
+
+  TextStyle textStyleWithShadows() {
+    return const TextStyle(shadows: [
+      Shadow(
+          // bottomLeft
+          offset: Offset(-1, -1),
+          color: Colors.black),
+      Shadow(
+          // bottomRight
+          offset: Offset(1, -1),
+          color: Colors.black),
+      Shadow(
+          // topRight
+          offset: Offset(1, 1),
+          color: Colors.black),
+      Shadow(
+          // topLeft
+          offset: Offset(-1, 1),
+          color: Colors.black),
+    ]);
+  }
 }
 
 ThemeData normalTheme = ThemeData(
@@ -111,10 +132,10 @@ ThemeData normalTheme = ThemeData(
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
     primary: _primaryColor,
-    onPrimary: _primaryColor,
+    onPrimary: Colors.black,
     secondary: _primaryColor.dim.dim,
     onSecondary: Colors.black,
-    error: Colors.black,
+    error: Colors.red,
     onError: _primaryColor,
     surface: Colors.black,
     onSurface: _primaryColor,
@@ -129,7 +150,7 @@ ThemeData nightTheme = ThemeData(
     onPrimary: Colors.black,
     secondary: _primaryColor.dim.dim.dim,
     onSecondary: Colors.black,
-    error: Colors.black,
+    error: Colors.red,
     onError: _primaryColor,
     surface: Colors.black,
     onSurface: _primaryColor.dim.dim,

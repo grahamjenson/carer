@@ -3,71 +3,31 @@ import 'package:flutter/material.dart';
 
 class ToggleButton extends StatelessWidget with ThemeMixin {
   final String text;
-  final IconData? icon;
+
   final double height;
   final double width;
   final TextStyle textStyle;
   final GestureLongPressCallback? onLongPress;
 
   const ToggleButton(
-      {super.key,
-      required this.text,
-      this.icon,
-      this.height = 40,
-      this.width = 40,
-      this.textStyle = const TextStyle(fontSize: 10),
-      this.onLongPress});
+      {super.key, required this.text, this.height = 40, this.width = 40, this.textStyle = const TextStyle(fontSize: 10), this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onLongPress: onLongPress,
         child: SizedBox(
-            width: width,
-            height: height,
-            child: Stack(
-              children: [
-                Positioned(right: 0, child: buildIcon(primaryColor(context))),
-                Center(child: buildText()),
-              ],
-            )));
-  }
-
-  Widget buildIcon(Color mainColor) {
-    if (icon == null) {
-      return const SizedBox.shrink();
-    }
-    return Icon(
-      icon,
-      size: height / 3,
-      color: mainColor.withAlpha(100),
-    );
+          width: width,
+          height: height,
+          child: Center(child: buildText()),
+        ));
   }
 
   Widget buildText() {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: const TextStyle(
-        shadows: [
-          Shadow(
-              // bottomLeft
-              offset: Offset(-1, -1),
-              color: Colors.black),
-          Shadow(
-              // bottomRight
-              offset: Offset(1, -1),
-              color: Colors.black),
-          Shadow(
-              // topRight
-              offset: Offset(1, 1),
-              color: Colors.black),
-          Shadow(
-              // topLeft
-              offset: Offset(-1, 1),
-              color: Colors.black),
-        ],
-      ).merge(textStyle),
+      style: textStyleWithShadows().merge(textStyle),
     );
   }
 

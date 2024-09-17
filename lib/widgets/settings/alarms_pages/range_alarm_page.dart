@@ -12,7 +12,7 @@ class RangeAlarmPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Low Alarm'),
+        title: const Text('Range Alarm Settings'),
       ),
       body: AWatch(
         (_) {
@@ -38,8 +38,8 @@ class RangeAlarmPage extends StatelessWidget {
                     description: const Text(
                       "Alarm after",
                     ),
-                    trailing: ToggleButton.selectOne<int>(AlarmSettings().lowMinutes, ["0m", "5m", "10m", "15m", "20m", "30m"],
-                        [0, 5, 10, 15, 20, 30], (value) => AlarmSettings().lowMinutes = value),
+                    trailing: ToggleButton.selectOne<int>(AlarmSettings().lowMinutes, ["0m", "5m", "10m", "15m", "20m"], [0, 5, 10, 15, 20],
+                        (value) => AlarmSettings().lowMinutes = value),
                   ),
                 ],
               ),

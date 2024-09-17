@@ -2,10 +2,8 @@ import 'dart:math';
 
 import 'package:carer/models/constants.dart';
 import 'package:carer/services/settings/target_settings.dart';
-import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
-import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -166,81 +164,10 @@ class T1DSettingsWidget extends AbstractSettingsSection with ThemeMixin {
                 ),
               ]),
             ),
-            timeSettingTile(context),
           ],
         );
       },
       debugLabel: "T1DSettingsWidget",
-    );
-  }
-
-  SettingsTile timeSettingTile(BuildContext context) {
-    var isNightModeOverride = TimeSettings().isNightModeOverride();
-    String overrideText = "Start\nOverride";
-    if (isNightModeOverride) {
-      overrideText = "Stop\nOverride";
-    }
-
-    var buttonstyle = ElevatedButton.styleFrom(
-      padding: const EdgeInsets.all(5), // Remove padding
-      minimumSize: Size.zero, // Remove minimum size constraints
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Shrink the tap target size
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4)), // Remove rounded boundaries
-      ),
-    );
-
-    return SettingsTile(
-      title: const Text("Night Time"),
-      trailing: Row(
-        children: [
-          ElevatedButton(
-              style: buttonstyle,
-              onPressed: () async {
-                if (isNightModeOverride) {
-                  TimeSettings().stopNightModeOverride();
-                } else {
-                  TimeSettings().nightModeOverride();
-                }
-              },
-              child: Text(
-                overrideText,
-                style: getSmallTextStyle(),
-              )),
-          const SizedBox(
-            width: 20,
-          ),
-          ElevatedButton(
-            style: buttonstyle,
-            onPressed: () async {
-              TimeOfDay? value = await showTimePicker(context: context, initialTime: TimeSettings().nightStartTime);
-              if (value != null) {
-                TimeSettings().nightStartTime = value;
-              }
-            },
-            child: Text(
-              "Night Start\n${Dates.tODToString(TimeSettings().nightStartTime)}",
-              style: getSmallTextStyle(),
-            ),
-          ),
-          const SizedBox(
-            width: 5,
-          ),
-          ElevatedButton(
-            style: buttonstyle,
-            onPressed: () async {
-              TimeOfDay? value = await showTimePicker(context: context, initialTime: TimeSettings().nightEndTime);
-              if (value != null) {
-                TimeSettings().nightEndTime = value;
-              }
-            },
-            child: Text(
-              "Night End\n${Dates.tODToString(TimeSettings().nightEndTime)}",
-              style: getSmallTextStyle(),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

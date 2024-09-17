@@ -37,8 +37,8 @@ class PredictionAlarmPage extends StatelessWidget {
                     description: const Text(
                       "Alarm after",
                     ),
-                    trailing: ToggleButton.selectOne<int>(AlarmSettings().lowPredictionMinutes, ["5m", "10m", "15m", "20m", "30m"],
-                        [5, 10, 15, 20, 30], (value) => AlarmSettings().lowPredictionMinutes = value),
+                    trailing: ToggleButton.selectOne<int>(AlarmSettings().lowPredictionMinutes, ["5m", "10m", "15m", "20m"], [5, 10, 15, 20],
+                        (value) => AlarmSettings().lowPredictionMinutes = value),
                   ),
                 ],
               ),
