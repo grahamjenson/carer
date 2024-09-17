@@ -155,6 +155,10 @@ class AlarmAlertSettings {
     return duration;
   }
 
+  int? get sleepDurationSeconds {
+    return sleepDuration?.inSeconds;
+  }
+
   set sleepDurationSeconds(int? value) {
     if (sleepTimer != null) {
       sleepTimer!.cancel(); // Always cancel

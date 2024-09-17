@@ -7,30 +7,69 @@ import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
 class SleepTextStatus extends StatelessWidget with ThemeMixin {
-  const SleepTextStatus({super.key});
+  final double buttonRadias;
+  const SleepTextStatus(this.buttonRadias, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    var big = const TextStyle(
-      fontSize: 35,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-    var small = getSmallTextStyle();
-
     return AWatch((context) {
-      List<Widget> rows = [];
-      if (isSleeping()) {
-        rows = [sleepStringWidget(), alarmStringWidget(small)];
-      } else {
-        rows = [Text("Sleep", style: big), alarmStringWidget(small)];
-      }
+      Widget spacer = SizedBox(height: buttonRadias, width: buttonRadias);
+
+      List<Widget> rows = [
+        spacer,
+        Expanded(
+          child: ClipRect(
+            child: SizedBox(
+              height: buttonRadias,
+              child: Column(
+                children: getRows(),
+              ),
+            ),
+          ),
+        ),
+        spacer
+      ];
 
       return Container(
         alignment: Alignment.center,
         padding: EdgeInsets.zero,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: rows),
+        child: Row(children: rows),
       );
     }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().sleepUntilSignal], debugLabel: "SleepTextStatus");
+  }
+
+  List<Widget> getRows() {
+    var big = const TextStyle(
+      fontSize: 35,
+      height: 1,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
+
+    var small = const TextStyle(fontSize: 20);
+
+    if (isSleeping()) {
+      return [
+        const Spacer(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Sleep ", style: small),
+            Flexible(child: timeStringWidget()),
+          ],
+        ),
+        const Spacer(),
+        alarmStringWidget(),
+        const Spacer(),
+      ];
+    }
+
+    return [
+      const Spacer(),
+      Text("Sleep", style: big),
+      const Spacer(),
+      alarmStringWidget(),
+      const Spacer(),
+    ];
   }
 
   bool isSleeping() {
@@ -45,8 +84,8 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     return true;
   }
 
-  Widget sleepStringWidget() {
-    var big = const TextStyle(fontSize: 40, fontWeight: FontWeight.bold);
+  Widget timeStringWidget() {
+    var big = const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, height: 1);
     var small = const TextStyle(fontSize: 20);
 
     var duration = AlarmAlertSettings().sleepDuration!;
@@ -56,31 +95,32 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     var minutes = ((totalSeconds % 3600) / 60).floor();
 
     if (hours > 0) {
-      if (minutes == 0) {
-        return SmartText(texts: ["Sleep ", "$hours", "h"], styles: [small, big, small]);
-      }
-      return SmartText(texts: ["Sleep ", "$hours", "h", "$minutes", "m"], styles: [small, big, small, big, small]);
+      return SmartText(texts: ["$hours", "h"], styles: [big, small]);
     }
 
     if (minutes > 0) {
-      return SmartText(texts: ["Sleep ", " $minutes", "m"], styles: [small, big, small]);
+      return SmartText(texts: ["$minutes", "m"], styles: [big, small]);
     }
 
-    return SmartText(texts: const ["Sleep ", "<1m"], styles: [small, big]);
+    return SmartText(texts: const ["<1m"], styles: [big]);
   }
 
-  Widget alarmStringWidget(TextStyle style) {
+  Widget alarmStringWidget() {
+    var small = const TextStyle(
+      fontSize: 10,
+      height: 1,
+    );
+
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;
     if (triggeredAlarms.isEmpty) {
       return const SizedBox.shrink();
     }
-    List<String> texts = [];
-    List<TextStyle> styles = [];
+    List<Widget> texts = [];
+
     for (var alarm in triggeredAlarms) {
-      texts.add(alarm.status());
-      styles.add(style);
+      texts.add(Text(alarm.status(), style: small));
     }
 
-    return SmartText(texts: texts, styles: styles);
+    return Column(children: texts);
   }
 }

@@ -24,7 +24,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
         child: Stack(
           children: [
             getBackground(context, buttonRadias, width),
-            const SleepTextStatus(),
+            SleepTextStatus(buttonRadias),
             getDismissable(context, buttonRadias, width),
             getSleepCancel(context, buttonRadias),
           ],

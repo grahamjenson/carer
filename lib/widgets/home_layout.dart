@@ -67,11 +67,11 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     var horizontalLayout = tl.horizonalLayout;
     var verticalLayout = tl.verticalLayout;
 
-    final isHorizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
+    final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     final isSleepShown = !AlarmSettings().disableAlarms;
-    var layout = isHorizontal ? horizontalLayout : verticalLayout;
+    var layout = horizontal ? horizontalLayout : verticalLayout;
 
-    switch ((isHorizontal, isSleepShown, layout)) {
+    switch ((horizontal, isSleepShown, layout)) {
       case (false, false, UILayout.showBGL):
         return LayoutTypes.verticalBGL;
       case (false, true, UILayout.showBGL):
@@ -141,6 +141,9 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   }
 
   Widget getLayout(LayoutTypes layout) {
+    // We get super denormalized here so that if we change one thing
+    // we wont have to test 20 things to make sure nothing broke
+
     switch (layout) {
       case LayoutTypes.horizontalBGL:
         return flexListCol([4], [const BGL()]);

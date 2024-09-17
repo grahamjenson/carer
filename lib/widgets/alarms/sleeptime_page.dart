@@ -30,7 +30,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
     }
 
     _timer = Timer(Duration(seconds: sleepTime), () {
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(null);
     });
   }
 
@@ -54,11 +54,9 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
       padding: const EdgeInsets.all(10), // Remove default padding
     );
 
-    var mins = getMinuteButtons(context, buttonStyle);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Snooze'),
+        title: const Text('Sleep Alarms'),
       ),
       body: Stack(
         children: [
@@ -74,49 +72,74 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             // Generate 100 widgets that display their index in the List.
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [mins[0], mins[1], mins[2]],
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [mins[3], mins[4], const SizedBox.shrink()],
-                ),
-              ),
-              const Divider(),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: getHourButtons(context, buttonStyle),
-                ),
-              ),
-              const Divider(),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: getTimeButtons(context, buttonStyle),
-                ),
-              ),
-              const Divider(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(null);
-                  },
-                  child: const Text("Cancel", style: SleepTimePage.textStyle),
-                ),
-              ),
-              const Divider(),
-            ],
+            children: getSleepButtonsLayout(context, buttonStyle) +
+                [
+                  const Divider(),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(null);
+                      },
+                      child: const Text("Cancel", style: SleepTimePage.textStyle),
+                    ),
+                  ),
+                  const Divider(),
+                ],
           ),
         ],
       ),
     );
+  }
+
+  List<Widget> getSleepButtonsLayout(BuildContext context, ButtonStyle buttonStyle) {
+    final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
+    var mins = getMinuteButtons(context, buttonStyle);
+
+    if (horizontal) {
+      return [
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: mins,
+          ),
+        ),
+        const Divider(),
+        Expanded(
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: getHourButtons(context, buttonStyle) + [const VerticalDivider()] + getTimeButtons(context, buttonStyle)),
+        ),
+      ];
+    }
+    return [
+      Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [mins[0], mins[1], mins[2]],
+        ),
+      ),
+      Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [mins[3], mins[4], const SizedBox.shrink()],
+        ),
+      ),
+      const Divider(),
+      Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: getHourButtons(context, buttonStyle),
+        ),
+      ),
+      const Divider(),
+      Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: getTimeButtons(context, buttonStyle),
+        ),
+      ),
+    ];
   }
 
   List<Widget> getMinuteButtons(BuildContext context, ButtonStyle buttonStyle) {
