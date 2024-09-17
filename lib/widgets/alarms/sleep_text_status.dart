@@ -46,9 +46,10 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     );
 
     var small = const TextStyle(fontSize: 20);
-
+    List<Widget> rows = [];
+    var alarmWidget = alarmStringWidget();
     if (isSleeping()) {
-      return [
+      rows += [
         const Spacer(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -58,18 +59,23 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
           ],
         ),
         const Spacer(),
-        alarmStringWidget(),
+      ];
+    } else {
+      rows += [
+        const Spacer(),
+        Text("Sleep", style: big),
         const Spacer(),
       ];
     }
 
-    return [
-      const Spacer(),
-      Text("Sleep", style: big),
-      const Spacer(),
-      alarmStringWidget(),
-      const Spacer(),
-    ];
+    if (alarmWidget != null) {
+      rows += [
+        alarmWidget,
+        const Spacer(),
+      ];
+    }
+
+    return rows;
   }
 
   bool isSleeping() {
@@ -105,7 +111,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     return SmartText(texts: const ["<1m"], styles: [big]);
   }
 
-  Widget alarmStringWidget() {
+  Widget? alarmStringWidget() {
     var small = const TextStyle(
       fontSize: 10,
       height: 1,
@@ -113,7 +119,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
 
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;
     if (triggeredAlarms.isEmpty) {
-      return const SizedBox.shrink();
+      return null;
     }
     List<Widget> texts = [];
 
