@@ -1,15 +1,16 @@
 import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
-import 'package:carer/models/profile.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
+import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/models/sql/profile.dart';
+import 'package:carer/models/sql/tempbasal.dart';
+import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 
-class ValueAtTime extends Model {
+class ValueAtTime with DateMixin {
   @override
   final DateTime date;
 
@@ -28,7 +29,6 @@ class ValueAtTime extends Model {
   final bool isTempProfile;
 
   ValueAtTime({
-    required super.eid,
     required this.date,
     required this.lowTarget,
     required this.highTarget,
@@ -49,10 +49,9 @@ class ValueAtTime extends Model {
 
   static ValueAtTime createValueAtTime(List<Profile> profiles, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {
     int hourOfDay = date.hour;
-    int minutesSinceEpoch = date.millisecondsSinceEpoch ~/ 60000;
 
     // make date rounded to nearest minute
-    fon(DateRangeModel element) => element.isAtTime(date);
+    fon(DateRangeDBModel element) => element.isAtTime(date);
 
     Profile? profile = profiles.firstWhereOrNull(fon);
     TempBasal? tempBasal = tempBasals.firstWhereOrNull(fon);
@@ -72,7 +71,6 @@ class ValueAtTime extends Model {
     bool isTempTarget = tempTarget != null;
 
     ValueAtTime v = ValueAtTime(
-      eid: "MSE-$minutesSinceEpoch",
       date: date,
       lowTarget: lowTarget,
       highTarget: highTarget,

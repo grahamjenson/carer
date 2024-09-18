@@ -1,5 +1,5 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';

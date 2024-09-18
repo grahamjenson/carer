@@ -1,6 +1,6 @@
-import 'package:carer/models/model.dart';
+import 'package:carer/models/sql/db_model.dart';
 
-class Carbs extends Model {
+class Carbs extends DBModel {
   final int value;
   @override
   final DateTime date;

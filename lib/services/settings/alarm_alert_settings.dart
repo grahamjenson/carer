@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 enum _AANames {
@@ -147,8 +148,6 @@ class AlarmAlertSettings {
     var duration = sleepUntil.difference(clock.now());
 
     if (duration.isNegative) {
-      // Assign duration null to cause updates
-      sleepUntilSignal.value = null;
       return null;
     }
 
@@ -159,21 +158,25 @@ class AlarmAlertSettings {
     return sleepDuration?.inSeconds;
   }
 
-  set sleepDurationSeconds(int? value) {
+  void setSleepDurationSeconds(int? value, String reason) {
     if (sleepTimer != null) {
       sleepTimer!.cancel(); // Always cancel
     }
 
     if (value == null) {
+      alog("Alarm: Sleep: Sleep Duration Seconds set to null from ${sleepUntilSignal.peek} because $reason");
       sleepUntilSignal.value = null;
       return;
     }
 
     sleepTimer = Timer(Duration(seconds: value), () {
+      alog("Alarm: Sleep: Sleep Duration Seconds set to null from ${sleepUntilSignal.peek} because timer expired");
       sleepUntilSignal.value = null;
     });
 
-    sleepUntilSignal.value = clock.now().add(Duration(seconds: value));
+    var time = clock.now().add(Duration(seconds: value));
+    alog("Alarm: Sleep: Sleep Duration Seconds set to $time from ${sleepUntilSignal.peek} because timer expired");
+    sleepUntilSignal.value = time;
   }
 }
 

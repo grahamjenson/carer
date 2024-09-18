@@ -1,5 +1,5 @@
 import 'package:background_fetch/background_fetch.dart';
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -46,7 +46,7 @@ class BackgroundService {
       var x = await UpdateService().updateAll();
       alog("BackgroundFetch: updateALL $x");
 
-      var (newTriggeredAlarms, _) = await AlarmsService().calculateAlarms();
+      var (newTriggeredAlarms, _) = AlarmsService().calculateAlarms();
       if (newTriggeredAlarms.isNotEmpty) {
         CleanSGV? sgv = CleanSGV.lastSGV.value;
         var unit = UISettings().unit;

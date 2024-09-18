@@ -1,7 +1,7 @@
-import 'package:carer/models/constants.dart';
-import 'package:carer/models/profile.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/sql/constants.dart';
+import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/ui_settings.dart';

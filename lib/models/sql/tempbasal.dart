@@ -1,7 +1,7 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/model.dart';
+import 'package:carer/models/sql/db_model.dart';
 
-class TempBasal extends DateRangeModel {
+class TempBasal extends DateRangeDBModel {
   final double value;
 
   TempBasal({

@@ -46,12 +46,11 @@ class SleepButton extends StatelessWidget with ThemeMixin {
   }
 
   Widget getSleepCancel(BuildContext context, double buttonRadias) {
-    var mainColor = primaryColor(context);
-
-    var backgroundColor = mainColor.dim.dim.dim;
-
     return AWatch(
       (context) {
+        var mainColor = primaryColor(context);
+        var backgroundColor = mainColor.dim.dim.dim;
+
         if (AlarmAlertSettings().sleepDuration == null) {
           return const SizedBox.shrink();
         }
@@ -70,7 +69,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
                 alignment: Alignment.center,
                 icon: cancelIcon,
                 onPressed: () {
-                  AlarmAlertSettings().sleepDurationSeconds = null;
+                  AlarmAlertSettings().setSleepDurationSeconds(null, "CancelButtonPushed");
                 },
               ),
             ));
@@ -96,7 +95,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
         }),
       );
       sleepTime ??= 0;
-      AlarmAlertSettings().sleepDurationSeconds = sleepTime;
+      AlarmAlertSettings().setSleepDurationSeconds(sleepTime, "SleepDialogReturned");
       return true;
     }
 

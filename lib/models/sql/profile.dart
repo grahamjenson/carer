@@ -1,10 +1,10 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/model.dart';
+import 'package:carer/models/sql/db_model.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 
-class Profile extends DateRangeModel {
+class Profile extends DateRangeDBModel {
   final int dia;
   final String name;
   final String units;

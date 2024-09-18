@@ -26,7 +26,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
 
     int sleepTime = 10;
     if (AlarmAlertSettings().sleepDuration == null) {
-      AlarmAlertSettings().sleepDurationSeconds = sleepTime;
+      AlarmAlertSettings().setSleepDurationSeconds(sleepTime, "SleepDialogOpened");
     }
 
     _timer = Timer(Duration(seconds: sleepTime), () {

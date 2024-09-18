@@ -1,4 +1,4 @@
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bgl/magarrow.dart';

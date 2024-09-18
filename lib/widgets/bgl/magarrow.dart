@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';

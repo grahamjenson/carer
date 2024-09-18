@@ -130,13 +130,13 @@ class AlarmsService {
     );
 
     // Set to 15 seconds to offset the race condition on the 10 second timerSerivce signal
-    AlarmAlertSettings().sleepDurationSeconds = 15;
+    AlarmAlertSettings().setSleepDurationSeconds(15, "App Opened");
     aeffect(
       () {
         // Sleep for a second or two when opened
         if (Platform.isAndroid || Platform.isIOS) {
           if (AlarmAlertSettings().sleepDurationPeek == null) {
-            AlarmAlertSettings().sleepDurationSeconds = 10;
+            AlarmAlertSettings().setSleepDurationSeconds(10, "App Resumed");
           }
         }
       },

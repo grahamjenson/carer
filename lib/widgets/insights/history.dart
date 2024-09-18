@@ -108,16 +108,16 @@ class History extends StatelessWidget with ThemeMixin {
   }
 
   Widget insulinSmartText(Treatment treatment, TextStyle row, TextStyle small) {
-    if (treatment.insulin == 0 || treatment.insulin == null) {
+    if (treatment.insulin == 0) {
       return const SizedBox.shrink();
     }
-    return SmartText(texts: ["${toMax2dp(treatment.insulin!)}", "u"], styles: [row, small]);
+    return SmartText(texts: ["${toMax2dp(treatment.insulin)}", "u"], styles: [row, small]);
   }
 
   Widget carbsSmartText(Treatment treatment, TextStyle row, TextStyle small) {
-    if (treatment.carbs == 0 || treatment.carbs == null) {
+    if (treatment.carbs == 0) {
       return const SizedBox.shrink();
     }
-    return SmartText(texts: ["${treatment.carbs!.round()}", "g"], styles: [row, small]);
+    return SmartText(texts: ["${treatment.carbs.round()}", "g"], styles: [row, small]);
   }
 }

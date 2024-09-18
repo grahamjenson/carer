@@ -1,4 +1,4 @@
-import 'package:carer/models/model.dart';
+import 'package:carer/models/sql/db_model.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/utils/futures.dart';
@@ -24,7 +24,7 @@ abstract class DataMapper<T1, T2> {
   }
 }
 
-abstract class SQLReadMapper<T extends Model> extends DataMapper<SQLRow, T> {
+abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
   String get tableName;
   String get timestampField => "timestamp";
 
@@ -96,7 +96,7 @@ abstract class SQLReadMapper<T extends Model> extends DataMapper<SQLRow, T> {
   }
 }
 
-abstract class SQLMapper<T extends Model> extends SQLReadMapper<T> {
+abstract class SQLMapper<T extends DBModel> extends SQLReadMapper<T> {
   final ASignal<int> writeSignal = ASignal(0, debugLabel: "${T}Write");
 
   Future<bool> saveRow(SQLRow row) {

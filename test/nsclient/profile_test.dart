@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:carer/models/constants.dart';
+import 'package:carer/models/sql/constants.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:test/test.dart';
 

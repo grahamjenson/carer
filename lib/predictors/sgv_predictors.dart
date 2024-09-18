@@ -1,4 +1,4 @@
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/predictors/regressions.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
@@ -71,7 +71,7 @@ abstract class RegressionPredictor extends Predictor {
 
   @override
   init() {
-    List<CleanSGV> sgvs = CleanSGV.last3HoursChained.value;
+    List<CleanSGV> sgvs = CleanSGV.last3Hours.value;
 
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();
@@ -94,10 +94,10 @@ abstract class RegressionPredictor extends Predictor {
   CleanSGV? predictAt(double timestamp) {
     var pred = regression.predict(fnX(timestamp));
     if (pred.isNaN || pred.isInfinite) {
-      return CleanSGV(value: 0, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
+      return CleanSGV(0, DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
     }
     int limitedValue = pred.toInt().clamp(20, 500);
-    return CleanSGV(value: limitedValue, date: DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()), eid: 'predictor');
+    return CleanSGV(limitedValue, DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
   }
 }
 

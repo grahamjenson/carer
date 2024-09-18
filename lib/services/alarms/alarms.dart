@@ -1,5 +1,5 @@
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
-import 'package:carer/models/sgv.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
@@ -261,7 +261,6 @@ class HighAlarm extends Alarm {
     if (sgv == null) {
       return false;
     }
-
     var (range, _) = targetRange(sgv.value);
     return AlarmAlertSettings().smartSnoozeHigh && range == Range5.mid;
   }

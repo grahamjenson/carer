@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:carer/models/constants.dart';
+import 'package:carer/models/sql/constants.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';

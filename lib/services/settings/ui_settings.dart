@@ -1,4 +1,4 @@
-import 'package:carer/models/constants.dart';
+import 'package:carer/models/sql/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 

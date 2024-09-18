@@ -1,10 +1,10 @@
 import 'package:carer/mappers/ns_to_models.dart';
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/bolus.dart';
-import 'package:carer/models/carbs.dart';
-import 'package:carer/models/profile.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
+import 'package:carer/models/sql/bolus.dart';
+import 'package:carer/models/sql/carbs.dart';
+import 'package:carer/models/sql/profile.dart';
+import 'package:carer/models/sql/tempbasal.dart';
+import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';

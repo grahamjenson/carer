@@ -1,5 +1,5 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';

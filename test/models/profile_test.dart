@@ -1,5 +1,5 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/profile.dart';
+import 'package:carer/models/sql/profile.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';

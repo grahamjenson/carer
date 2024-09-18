@@ -1,5 +1,5 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/temptarget.dart';
+import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:flutter_test/flutter_test.dart';
 

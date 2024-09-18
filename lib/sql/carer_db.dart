@@ -34,7 +34,7 @@ class CarerDB {
   }
 
   static int getVersion() {
-    var dbScript = (dbTables + dbViews).map((e) => e.create).join("\n");
+    var dbScript = (dbTables).map((e) => e.create).join("\n");
     return dbScript.hashCode;
   }
 
@@ -120,10 +120,6 @@ class CarerDB {
 
     for (var table in dbTables) {
       batch.execute(table.create);
-    }
-
-    for (var view in dbViews) {
-      batch.execute(view.create);
     }
 
     await batch.commit();

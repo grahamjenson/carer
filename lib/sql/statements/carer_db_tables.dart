@@ -16,12 +16,6 @@ const dbTables = [
   profileTable,
 ];
 
-const dbViews = [
-  treatmentsView,
-  concatTreatmentsView,
-  sgvsCleanView,
-];
-
 // Used for key values like iob...
 const kvTable = DBTable(KVTables.kvTableName, KVTables.kvTable);
 
@@ -140,67 +134,4 @@ const profileTable = DBTable(profileTableName, '''
       thigh0 INTEGER, thigh1 INTEGER, thigh2 INTEGER, thigh3 INTEGER, thigh4 INTEGER, thigh5 INTEGER, thigh6 INTEGER, thigh7 INTEGER, thigh8 INTEGER, thigh9 INTEGER, thigh10 INTEGER, thigh11 INTEGER, thigh12 INTEGER, thigh13 INTEGER, thigh14 INTEGER, thigh15 INTEGER, thigh16 INTEGER, thigh17 INTEGER, thigh18 INTEGER, thigh19 INTEGER, thigh20 INTEGER, thigh21 INTEGER, thigh22 INTEGER, thigh23 INTEGER,
       UNIQUE(eid)
     )
-  ''');
-
-const String treatmentsViewName = 'treatments';
-const treatmentsView = DBTable(treatmentsViewName, '''
-    CREATE VIEW treatments AS
-    WITH 
-    b AS  (SELECT  timestamp, value AS insulin FROM bolus) ,
-    c AS  (SELECT timestamp, value AS carbs FROM carbs),
-    x AS (SELECT b.timestamp, b.insulin, null AS carbs  FROM b UNION SELECT c.timestamp, null AS insulin, c.carbs FROM c)
-    SELECT * FROM x ORDER by timestamp desc
-  ''');
-
-const String concatTreatmentsViewName = 'concatTreatments';
-const concatTreatmentsView = DBTable(concatTreatmentsViewName, '''
-    CREATE VIEW concatTreatments AS
-      SELECT
-        COUNT(*) AS count,
-        SUM(carbs) AS carbs,
-        SUM(insulin) AS insulin, 
-        MIN(timestamp) AS min_ts, 
-        MAX(timestamp) AS max_ts,
-        MAX(timestamp) AS timestamp,
-        datetime(MIN(timestamp) / 1000, 'unixepoch') AS min_datetime, 
-        datetime(MAX(timestamp) / 1000, 'unixepoch') AS max_datetime, 
-        strftime('%Y-%m-%d %H ', timestamp/1000, 'unixepoch')  ||  (Floor(strftime('%M', timestamp/1000, 'unixepoch')/5) * 5) AS window 
-      FROM treatments 
-      GROUP BY window
-      ORDER BY min_ts DESC
-  ''');
-
-// SGV clean view
-// CLEAN:
-// Link SVGS WITH the previous reading that is further than 4 minutes before.
-const String sgvsCleanViewName = 'sgvsClean';
-const sgvsCleanView = DBTable(sgvsCleanViewName, '''
-    CREATE VIEW sgvsClean AS
-    SELECT 
-      safter.id AS id,
-      safter.eid AS eid,
-      safter.value AS value, 
-      safter.timestamp timestamp, 
-      safter.datetime datetime,
-      safter.value - sbefore.value AS diff,
-      
-      safter.minute_timestamp - sbefore.minute_timestamp AS mins_diff,
-      ((safter.value - sbefore.value) / ((safter.minute_timestamp - sbefore.minute_timestamp) / 5)) AS rate5m,
-
-      sbefore.id AS id_before,
-      sbefore.value AS value_before,
-      sbefore.timestamp ts_before, 
-      sbefore.datetime dt_before
-    FROM
-      -- This joins the current reading with the previous reading that is more than 4 minutes before.
-      -- So that we can calculate rate of change.
-      sgvs safter LEFT JOIN  sgvs sbefore ON sbefore.id = (
-        SELECT x.id
-        FROM sgvs x 
-        WHERE 
-          (x.minute_timestamp + 4 < safter.minute_timestamp)
-        ORDER BY timestamp DESC LIMIT 1
-      )
-    ORDER BY
-      timestamp DESC
   ''');

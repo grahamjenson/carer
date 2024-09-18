@@ -1,10 +1,10 @@
 import 'package:carer/mappers/mapper.dart';
-import 'package:carer/models/bolus.dart';
-import 'package:carer/models/carbs.dart';
-import 'package:carer/models/profile.dart';
-import 'package:carer/models/sgv.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
+import 'package:carer/models/sql/bolus.dart';
+import 'package:carer/models/sql/carbs.dart';
+import 'package:carer/models/sql/profile.dart';
+import 'package:carer/models/sql/sgv.dart';
+import 'package:carer/models/sql/tempbasal.dart';
+import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';

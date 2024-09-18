@@ -1,6 +1,7 @@
 import 'package:carer/mappers/ns_to_models.dart';
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
+import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';

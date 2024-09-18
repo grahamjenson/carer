@@ -1,11 +1,10 @@
 import 'package:carer/mappers/mapper.dart';
-import 'package:carer/models/bolus.dart';
-import 'package:carer/models/carbs.dart';
-import 'package:carer/models/profile.dart';
-import 'package:carer/models/sgv.dart';
-import 'package:carer/models/tempbasal.dart';
-import 'package:carer/models/temptarget.dart';
-import 'package:carer/models/treatments.dart';
+import 'package:carer/models/sql/bolus.dart';
+import 'package:carer/models/sql/carbs.dart';
+import 'package:carer/models/sql/profile.dart';
+import 'package:carer/models/sql/sgv.dart';
+import 'package:carer/models/sql/tempbasal.dart';
+import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 
@@ -215,44 +214,6 @@ class SQLToSGV extends SQLMapper<SGV> {
   }
 }
 
-class SQLToCleanSGV extends SQLReadMapper<CleanSGV> {
-  static final SQLToCleanSGV _singleton = SQLToCleanSGV._();
-  factory SQLToCleanSGV() => _singleton;
-  SQLToCleanSGV._();
-
-  @override
-  String get tableName => sgvsCleanViewName;
-
-  @override
-  CleanSGV aToB(SQLRow row) {
-    List<String> errors = [];
-
-    errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid"]));
-    errors.addAll(row.validateTypes([
-      ("value", int),
-      ("timestamp", int),
-      ("eid", String),
-      ("rate5m", int),
-      ("diff", int),
-      ("id_before", int),
-    ]));
-
-    if (errors.isNotEmpty) {
-      throw ArgumentError("Invalid SVG Row: $row, Errors: $errors");
-    }
-
-    return CleanSGV(
-      id: row["id"] as int?,
-      eid: row["eid"] as String,
-      value: row["value"] as int,
-      date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
-      rate5m: row["rate5m"] as int?,
-      diff: row["diff"] as int?,
-      idBefore: row["id_before"] as int?,
-    );
-  }
-}
-
 ////
 // TempBasal
 ////
@@ -368,43 +329,5 @@ class SQLToTempTarget extends SQLMapper<TempTarget> {
         modelRow["highTarget"] == row["highTarget"] &&
         modelRow["lowTarget"] == row["lowTarget"] &&
         modelRow["eid"] == row["eid"];
-  }
-}
-
-////
-// Treatments
-////
-
-class SQLToTreatment extends SQLReadMapper<Treatment> {
-  static final SQLToTreatment _singleton = SQLToTreatment._();
-  factory SQLToTreatment() => _singleton;
-  SQLToTreatment._();
-
-  @override
-  String get tableName => concatTreatmentsViewName;
-
-  @override
-  Treatment aToB(SQLRow row) {
-    List<String> errors = [];
-
-    errors.addAll(row.validateRequiredAttributes(["count", "max_ts", "timestamp"]));
-    errors.addAll(row.validateTypes([
-      ("count", int),
-      ("max_ts", int),
-      ("timestamp", int),
-      ("carbs", int),
-      ("insulin", double),
-    ]));
-
-    if (errors.isNotEmpty) {
-      throw ArgumentError("Invalid Treatment Row: $row, Errors: $errors");
-    }
-
-    return Treatment(
-      count: row["count"] as int,
-      date: DateTime.fromMillisecondsSinceEpoch(row["max_ts"] as int),
-      carbs: row["carbs"] as int?,
-      insulin: row["insulin"] as double?,
-    );
   }
 }

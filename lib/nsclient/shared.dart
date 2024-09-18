@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:carer/models/constants.dart';
+import 'package:carer/models/sql/constants.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
 
