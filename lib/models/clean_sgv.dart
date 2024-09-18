@@ -69,7 +69,6 @@ class CleanSGV with DateMixin {
   bool get withinRange => value > TargetSettings().lowTarget && value < TargetSettings().highTarget;
 
   static List<CleanSGV> _makeChained(List<CleanSGV> sgvs) {
-    print("SGV: ${sgvs.length}");
     if (sgvs.isEmpty || sgvs.length == 1) {
       return sgvs;
     }
@@ -85,7 +84,6 @@ class CleanSGV with DateMixin {
         chainedSGVs.add(sgv);
       }
     }
-    print("SGV: ${chainedSGVs.length}");
     return chainedSGVs;
   }
 
