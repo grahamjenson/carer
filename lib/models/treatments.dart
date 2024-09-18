@@ -23,25 +23,41 @@ class Treatment with DateMixin {
     date = startDate;
   }
 
+  @override
+  int get minuteTimestamp => startDate.millisecondsSinceEpoch ~/ 60000;
+  @override
+  int get fiveMinsBucket => minuteTimestamp - (minuteTimestamp % 5);
+
   void addCarbModel(Carbs model) {
     if (model.value == 0) {
       return;
     }
+
     // Only add if carb model is between start and end date OR equal to endDate
-    if ((model.date.isAfter(startDate) && model.date.isBefore(endDate)) || model.date.isAtSameMomentAs(endDate)) {
+    if ((model.date.isAfter(startDate) && (model.date.isBefore(endDate))) || model.date.isAtSameMomentAs(endDate)) {
       carbsModels.add(model);
     }
+
     if (model.date.isAfter(date)) {
       date = model.date;
     }
+  }
+
+  @override
+  String toString() {
+    if (count == 0) {
+      return 'Treatment{empty}';
+    }
+    return 'Treatment{boluses: ${bolusModels.length}, carbs: ${carbsModels.length}';
   }
 
   void addBolusModel(Bolus model) {
     if (model.value == 0) {
       return;
     }
+
     // Only add if insulin model is between start and end date OR equal to endDate
-    if ((model.date.isAfter(startDate) && model.date.isBefore(endDate)) || model.date.isAtSameMomentAs(endDate)) {
+    if (((model.date.isAfter(startDate) && model.date.isBefore(endDate))) || model.date.isAtSameMomentAs(endDate)) {
       bolusModels.add(model);
     }
     if (model.date.isAfter(date)) {
@@ -81,7 +97,6 @@ class Treatment with DateMixin {
       var carbs = await SQLToCarbs().lastMins(360);
       var bolus = await SQLToBolus().lastMins(360);
 
-      print("Carbs: ${carbs.length}, Bolus: ${bolus.length}");
       // group and total all carbs and boluses to 5 minute windows that is based on hour,
       // e.g. 12:00:00 - 12:04:59, 12:05:00 - 12:09:59, 12:10:00 - 12:14:59
 
@@ -93,18 +108,19 @@ class Treatment with DateMixin {
       for (var i = 0; i < 73; i++) {
         var time = fiveMinutes.subtract(Duration(minutes: i * 5));
         var treatment = Treatment(time);
-        timeBuckets[treatment.fiveMinsAgoBucket] = Treatment(time);
+        timeBuckets[treatment.fiveMinsBucket] = Treatment(time);
       }
 
       for (var c in carbs) {
-        timeBuckets[c.fiveMinsAgoBucket]!.addCarbModel(c);
+        timeBuckets[c.fiveMinsBucket]!.addCarbModel(c);
       }
 
       for (var b in bolus) {
-        timeBuckets[b.fiveMinsAgoBucket]!.addBolusModel(b);
+        timeBuckets[b.fiveMinsBucket]!.addBolusModel(b);
       }
+      var treatments = timeBuckets.values.where((t) => t.count > 0).toList();
 
-      return timeBuckets.values.toList().where((t) => t.count > 0).toList();
+      return treatments;
       // merge two lists
     }, debugLabel: 'treatmentsLastSixHours', dependencies: [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal]);
   }

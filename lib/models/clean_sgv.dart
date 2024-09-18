@@ -65,30 +65,27 @@ class CleanSGV with DateMixin {
   }
 
   bool get withinLast3Hours => date.isAfter(clock.now().subtract(const Duration(hours: 3)));
-  bool get withinToday => date.isAfter(clock.now().subtract(const Duration(days: 1)));
-  bool get withinYesterday =>
-      date.isAfter(clock.now().subtract(const Duration(days: 2))) && date.isBefore(clock.now().subtract(const Duration(days: 1)));
 
   bool get withinRange => value > TargetSettings().lowTarget && value < TargetSettings().highTarget;
 
   static List<CleanSGV> _makeChained(List<CleanSGV> sgvs) {
-    // TODO Fix this method
+    print("SGV: ${sgvs.length}");
     if (sgvs.isEmpty || sgvs.length == 1) {
       return sgvs;
     }
 
     List<CleanSGV> chainedSGVs = [sgvs.first];
-    // Get the first id before
 
     var dateBefore = sgvs.first.date;
     for (var i = 1; i < sgvs.length; i++) {
       var sgv = sgvs[i];
-      if (sgv.date.difference(dateBefore).inMinutes > 3) {
+      if (sgv.date.difference(dateBefore).inMinutes < 3) {
         chainedSGVs.last.before = sgv;
         dateBefore = sgv.date;
         chainedSGVs.add(sgv);
       }
     }
+    print("SGV: ${chainedSGVs.length}");
     return chainedSGVs;
   }
 
@@ -117,22 +114,22 @@ class CleanSGV with DateMixin {
       return _makeChained(rawSGVs.map((e) => CleanSGV(e.value, e.date)).toList());
     }, debugLabel: "last2DaysQuery", dependencies: [SQLToSGV().writeSignal]);
 
-    signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours), debugLabel: 'last3HoursQuery');
+    signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours).toList(), debugLabel: 'last3HoursQuery');
 
     signalAssign(lastSGV, () => last2Days.value.firstOrNull, debugLabel: 'lastSGVQuery');
 
     signalAssign(todaysPercentage, () {
-      var todaysSGVs = last2Days.value.where((e) => e.withinToday);
+      var todaysSGVs = last2Days.value.where((e) => e.isDuringToday);
       var todaysSGVsInRange = todaysSGVs.where((e) => e.withinRange);
 
-      return todaysSGVs.isEmpty ? 0.0 : todaysSGVsInRange.length / todaysSGVs.length * 100.0;
+      return todaysSGVs.isEmpty ? 0.0 : (todaysSGVsInRange.length / todaysSGVs.length) * 100.0;
     }, debugLabel: 'todaysPercentage', dependencies: [last2Days]);
 
     signalAssign(yesterdaysPercentage, () {
-      var yesterdaysSGVs = last2Days.value.where((e) => e.withinYesterday);
+      var yesterdaysSGVs = last2Days.value.where((e) => e.isDuringYesterday);
       var yesterdaysSGVsInRange = yesterdaysSGVs.where((e) => e.withinRange);
 
-      return yesterdaysSGVs.isEmpty ? 0.0 : yesterdaysSGVsInRange.length / yesterdaysSGVs.length * 100.0;
+      return yesterdaysSGVs.isEmpty ? 0.0 : (yesterdaysSGVsInRange.length / yesterdaysSGVs.length) * 100.0;
     }, debugLabel: 'yesterdaysPercentage', dependencies: [last2Days]);
   }
 }

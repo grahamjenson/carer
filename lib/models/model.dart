@@ -13,5 +13,19 @@ mixin DateMixin {
   int get minuteTimestamp => date.millisecondsSinceEpoch ~/ 60000;
 
   // This returns the minsAgo bucket for last 5 mins
-  int get fiveMinsAgoBucket => minsAgo - (minsAgo % 5);
+  int get fiveMinsBucket => minuteTimestamp - (minuteTimestamp % 5);
+
+  bool get isDuringToday {
+    final now = clock.now();
+    final startOfToday = DateTime(now.year, now.month, now.day);
+    final startOfTomorrow = startOfToday.add(const Duration(days: 1));
+    return date.isAfter(startOfToday) && date.isBefore(startOfTomorrow);
+  }
+
+  bool get isDuringYesterday {
+    final now = clock.now();
+    final startOfYesterday = DateTime(now.year, now.month, now.day - 1);
+    final startOfToday = DateTime(now.year, now.month, now.day);
+    return date.isAfter(startOfYesterday) && date.isBefore(startOfToday);
+  }
 }
