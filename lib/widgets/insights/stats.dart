@@ -15,6 +15,32 @@ import 'package:flutter/material.dart';
 class Stats extends StatelessWidget with ThemeMixin {
   Stats({super.key});
 
+  TextStyle getHeadingTextStyle() {
+    return const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 15,
+      fontFeatures: [FontFeature.tabularFigures()],
+      height: 1,
+    );
+  }
+
+  TextStyle getRowTextStyle() {
+    return const TextStyle(
+      fontSize: 25,
+      fontWeight: FontWeight.w500,
+      fontFeatures: [FontFeature.tabularFigures()],
+      height: 1,
+    );
+  }
+
+  TextStyle getSmallTextStyle() {
+    return const TextStyle(
+      fontSize: 10,
+      fontFeatures: [FontFeature.tabularFigures()],
+      height: 1,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     TextStyle heading = getHeadingTextStyle();
@@ -56,7 +82,7 @@ class Stats extends StatelessWidget with ThemeMixin {
                 dividerThickness: 0.01,
                 headingRowHeight: 0,
                 dataRowMinHeight: 14,
-                dataRowMaxHeight: 20,
+                dataRowMaxHeight: 23,
                 horizontalMargin: 0,
                 columns: [
                   DataColumn(
@@ -71,17 +97,18 @@ class Stats extends StatelessWidget with ThemeMixin {
                 rows: [
                   iob(iobNow, heading, row, small),
                   cob(cobNow, heading, row, small),
-                  power(powerNow.toInt(), charging, heading, row, small),
                   basal(currentBasal, heading, row, small),
                   target(UISettings().unit, profileLowTarget, profileHighTarget, heading, row, small),
                   currentProfile(heading, row, small),
                   fifteenMinDiff(UISettings().unit, sgvs, heading, row, small),
+                  predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
+                  profileValues(heading, row, small),
+                  divider(),
                   todaysInRange(heading, row, small),
                   yesterdayInRange(heading, row, small),
-                  predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
                   cage(cageNow, heading, row, small),
                   sage(sageNow, heading, row, small),
-                  profileValues(heading, row, small),
+                  power(powerNow.toInt(), charging, heading, row, small),
                 ],
               ),
             ),
@@ -89,6 +116,16 @@ class Stats extends StatelessWidget with ThemeMixin {
         ),
       );
     }, debugLabel: "Stats");
+  }
+
+  DataRow divider() {
+    var style = const TextStyle(fontSize: 0);
+    return DataRow(
+      cells: [
+        DataCell(Text(" ", style: style)),
+        DataCell(Text(" ", style: style)),
+      ],
+    );
   }
 
   DataRow profileValues(TextStyle heading, TextStyle row, TextStyle small) {

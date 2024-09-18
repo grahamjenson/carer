@@ -13,6 +13,13 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
 
   static const double size = 50;
 
+  TextStyle getSmallTextStyle() {
+    return const TextStyle(
+      fontSize: 10,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AWatch(

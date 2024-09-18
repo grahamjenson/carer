@@ -136,8 +136,8 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   }
 
   Widget getMinimalInsights() {
-    // TODO this should be better
-    return History(minimal: true);
+    // TODO: This should be different widgets that are much cleaner
+    return History();
   }
 
   Widget getLayout(LayoutTypes layout) {

@@ -8,8 +8,24 @@ import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
 class History extends StatelessWidget with ThemeMixin {
-  final bool minimal;
-  History({super.key, this.minimal = false});
+  History({super.key});
+
+  TextStyle getRowTextStyle() {
+    return const TextStyle(
+      fontSize: 25,
+      fontWeight: FontWeight.w500,
+      fontFeatures: [FontFeature.tabularFigures()],
+      height: 1,
+    );
+  }
+
+  TextStyle getSmallTextStyle() {
+    return const TextStyle(
+      fontSize: 15,
+      height: 1,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +36,8 @@ class History extends StatelessWidget with ThemeMixin {
     double dividerThickness = 0.01;
     double headingRowHeight = 1;
     double dataRowMinHeight = 14;
-    double dataRowMaxHeight = 20;
+    double dataRowMaxHeight = 30;
     double horizontalMargin = 0;
-
-    if (minimal) {
-      //Increase Text Size
-      row = getRowTextStyle().copyWith(fontSize: 30);
-      small = getSmallTextStyle().copyWith(fontSize: 20);
-      timescale = const Duration(hours: 1);
-      columnSpacing = 10;
-      dividerThickness = 0.01;
-      headingRowHeight = 1;
-      dataRowMinHeight = 20;
-      dataRowMaxHeight = 35;
-      horizontalMargin = 5;
-    }
 
     return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute

@@ -73,28 +73,6 @@ mixin ThemeMixin {
     return Theme.of(context).colorScheme.secondary;
   }
 
-  TextStyle getHeadingTextStyle() {
-    return const TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 10,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-  }
-
-  TextStyle getRowTextStyle() {
-    return const TextStyle(
-      fontSize: 20,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-  }
-
-  TextStyle getSmallTextStyle() {
-    return const TextStyle(
-      fontSize: 10,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-  }
-
   TextStyle getSuperscriptTextStyle() {
     return const TextStyle(
       fontSize: 20,
