@@ -15,16 +15,17 @@ import 'package:flutter/material.dart';
 class Stats extends StatelessWidget with ThemeMixin {
   Stats({super.key});
 
-  TextStyle getHeadingTextStyle() {
-    return const TextStyle(
+  TextStyle getHeadingTextStyle(BuildContext context) {
+    return TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 15,
-      fontFeatures: [FontFeature.tabularFigures()],
+      fontFeatures: const [FontFeature.tabularFigures()],
       height: 1,
+      color: primaryColor(context).dim,
     );
   }
 
-  TextStyle getRowTextStyle() {
+  TextStyle getRowTextStyle(BuildContext context) {
     return const TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w500,
@@ -33,19 +34,20 @@ class Stats extends StatelessWidget with ThemeMixin {
     );
   }
 
-  TextStyle getSmallTextStyle() {
-    return const TextStyle(
+  TextStyle getSmallTextStyle(BuildContext context) {
+    return TextStyle(
       fontSize: 10,
-      fontFeatures: [FontFeature.tabularFigures()],
+      fontFeatures: const [FontFeature.tabularFigures()],
       height: 1,
+      color: primaryColor(context).dim,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    TextStyle heading = getHeadingTextStyle();
-    TextStyle row = getRowTextStyle();
-    TextStyle small = getSmallTextStyle();
+    TextStyle heading = getHeadingTextStyle(context);
+    TextStyle row = getRowTextStyle(context);
+    TextStyle small = getSmallTextStyle(context);
 
     return AWatch((context) {
       var valuesAtTime = ValueAtTime.lastSixHours.value;
@@ -101,7 +103,6 @@ class Stats extends StatelessWidget with ThemeMixin {
                   target(UISettings().unit, profileLowTarget, profileHighTarget, heading, row, small),
                   currentProfile(heading, row, small),
                   fifteenMinDiff(UISettings().unit, sgvs, heading, row, small),
-                  predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
                   profileValues(heading, row, small),
                   divider(),
                   todaysInRange(heading, row, small),
@@ -109,6 +110,8 @@ class Stats extends StatelessWidget with ThemeMixin {
                   cage(cageNow, heading, row, small),
                   sage(sageNow, heading, row, small),
                   power(powerNow.toInt(), charging, heading, row, small),
+                  divider(),
+                  predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
                 ],
               ),
             ),

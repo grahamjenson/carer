@@ -19,18 +19,20 @@ class History extends StatelessWidget with ThemeMixin {
     );
   }
 
-  TextStyle getSmallTextStyle() {
-    return const TextStyle(
+  TextStyle getSmallTextStyle(BuildContext context) {
+    return TextStyle(
       fontSize: 15,
       height: 1,
-      fontFeatures: [FontFeature.tabularFigures()],
+      fontFeatures: const [FontFeature.tabularFigures()],
+      color: primaryColor(context).dim,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     TextStyle row = getRowTextStyle();
-    TextStyle small = getSmallTextStyle();
+    TextStyle small = getSmallTextStyle(context);
+
     var timescale = const Duration(hours: 5);
     double columnSpacing = 5;
     double dividerThickness = 0.01;
