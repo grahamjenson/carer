@@ -10,35 +10,27 @@ import 'package:flutter/material.dart';
 class History extends StatelessWidget with ThemeMixin {
   History({super.key});
 
-  TextStyle getRowTextStyle() {
-    return const TextStyle(
+  @override
+  Widget build(BuildContext context) {
+    TextStyle row = const TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w500,
       fontFeatures: [FontFeature.tabularFigures()],
       height: 1,
     );
-  }
 
-  TextStyle getSmallTextStyle(BuildContext context) {
-    return TextStyle(
+    TextStyle small = const TextStyle(
       fontSize: 15,
       height: 1,
-      fontFeatures: const [FontFeature.tabularFigures()],
-      color: primaryColor(context).dim,
+      fontFeatures: [FontFeature.tabularFigures()],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    TextStyle row = getRowTextStyle();
-    TextStyle small = getSmallTextStyle(context);
 
     var timescale = const Duration(hours: 5);
     double columnSpacing = 5;
     double dividerThickness = 0.01;
     double headingRowHeight = 1;
     double dataRowMinHeight = 14;
-    double dataRowMaxHeight = 30;
+    double dataRowMaxHeight = 27;
     double horizontalMargin = 0;
 
     return AWatch((context) {

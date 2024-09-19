@@ -165,7 +165,7 @@ EffectCleanup aeffect(
       }
       var val = compute();
       if (doLog) {
-        alog(truncateString("AEffect: $debugLabel set to $val", 100));
+        alog(truncateString("AEffect: $debugLabel returned $val", 100));
       }
       return val;
     } catch (e, stackTrace) {

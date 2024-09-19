@@ -102,7 +102,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return LineChartData(
       rangeAnnotations: rangeAnnotations(mainColor),
       gridData: gridData(mainColor),
-      titlesData: titleData(maxBasal, mainColor),
+      titlesData: titleData(maxBasal),
       borderData: borderData(mainColor),
       maxX: maxX,
       minX: minX,
@@ -259,17 +259,17 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  FlTitlesData titleData(double maxBasal, Color mainColor) {
+  FlTitlesData titleData(double maxBasal) {
     return FlTitlesData(
       show: true,
-      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal, mainColor)),
+      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal)),
       topTitles: const AxisTitles(
         sideTitles: SideTitles(showTitles: false),
       ),
       bottomTitles: AxisTitles(
-        sideTitles: bottomTitleWidgets(mainColor),
+        sideTitles: bottomTitleWidgets(),
       ),
-      leftTitles: AxisTitles(sideTitles: leftTitleWidgets(mainColor)),
+      leftTitles: AxisTitles(sideTitles: leftTitleWidgets()),
     );
   }
 
@@ -311,13 +311,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  SideTitles bottomTitleWidgets(Color mainColor) {
+  SideTitles bottomTitleWidgets() {
     return SideTitles(
         showTitles: true,
         reservedSize: 17,
         interval: 30,
         getTitlesWidget: (double value, TitleMeta meta) {
-          var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 7, color: mainColor, height: 0.5);
+          var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 7, height: 0.5);
 
           //return Spacer if value is not mod 30
           if (value.toInt() % 30 != 0) {
@@ -331,13 +331,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         });
   }
 
-  SideTitles rightTitleWidgets(double maxBasal, Color mainColor) {
+  SideTitles rightTitleWidgets(double maxBasal) {
     return SideTitles(
       showTitles: true,
       interval: 1,
       reservedSize: 19,
       getTitlesWidget: (double value, TitleMeta meta) {
-        var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
+        var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 6, height: 0.5);
 
         bool drawTitle = (value == basalMultiplier.toDouble() || value == basalMultiplier.toDouble() / 2);
 
@@ -356,13 +356,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  SideTitles leftTitleWidgets(Color mainColor) {
+  SideTitles leftTitleWidgets() {
     return SideTitles(
       showTitles: true,
       interval: 1,
       reservedSize: 18,
       getTitlesWidget: (double value, TitleMeta meta) {
-        var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, color: mainColor, height: 0.5);
+        var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 6, height: 0.5);
 
         if (value.toInt() == TargetSettings().highUrgent ||
             value.toInt() == TargetSettings().lowUrgent ||

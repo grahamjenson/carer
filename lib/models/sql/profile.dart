@@ -43,6 +43,14 @@ class Profile extends DateRangeDBModel {
   get isTempProfile => duration != 0;
 
   @override
+  bool operator ==(Object other) {
+    return other is Profile && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
   DateTime get endDate {
     // A Profile with duration 0 means indefinite
     if (duration == 0) {

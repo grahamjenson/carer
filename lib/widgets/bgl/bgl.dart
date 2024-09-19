@@ -41,8 +41,7 @@ class BGL extends StatelessWidget {
                   heightFactor: 1,
                   child: FittedBox(
                     child: Text(sgv.sgvStr(unit),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         )),
                   ),
@@ -57,8 +56,7 @@ class BGL extends StatelessWidget {
                         child: FittedBox(
                             child: Text(
                           sgv.rate5mWithSign(unit),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         )),

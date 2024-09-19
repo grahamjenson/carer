@@ -4,7 +4,6 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
-import 'package:carer/widgets/settings/ui_pages/theme_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -12,13 +11,6 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
   const UISettingsWidget({super.key});
 
   static const double size = 50;
-
-  TextStyle getSmallTextStyle() {
-    return const TextStyle(
-      fontSize: 10,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,54 +26,30 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
                 UISettings().screenActive = value;
               },
             ),
-            timeSettingTile(context),
-            SettingsTile.navigation(
-              title: Container(alignment: Alignment.centerLeft, height: 40, child: const Text('Themes')),
-              leading: const Icon(Icons.palette),
-              trailing: ToggleButtons(
-                constraints: const BoxConstraints(maxHeight: size, maxWidth: size),
-                renderBorder: true,
-                borderRadius: BorderRadius.circular(10),
-                borderWidth: 0,
-                isSelected: [
-                  true,
-                  UISettings().alarmUIThemeLayout.enabled,
-                  UISettings().nightUIThemeLayout.enabled,
-                ],
-                onPressed: (int index) async {
-                  switch (index) {
-                    case 0:
-                      UISettings().mainUIThemeLayout.enabled = !UISettings().mainUIThemeLayout.enabled;
-                      break;
-                    case 1:
-                      UISettings().alarmUIThemeLayout.enabled = !UISettings().alarmUIThemeLayout.enabled;
-                      break;
-                    case 2:
-                      UISettings().nightUIThemeLayout.enabled = !UISettings().nightUIThemeLayout.enabled;
-                      break;
-                  }
-                },
-                children: [
-                  ToggleButton(
-                    text: "Main Layout\n${UISettings().mainUIThemeLayout.theme.viewName}",
-                    height: size,
-                    width: size,
-                  ),
-                  ToggleButton(
-                    text: "Alarm Layout\n${UISettings().alarmUIThemeLayout.theme.viewName}",
-                    height: size,
-                    width: size,
-                  ),
-                  ToggleButton(
-                    text: "Night Layout\n${UISettings().nightUIThemeLayout.theme.viewName}",
-                    height: size,
-                    width: size,
-                  ),
-                ],
-              ),
-              onPressed: (BuildContext context) {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ThemePage()));
+            SettingsTile.switchTile(
+              title: const Text('Enable Dim At Night'),
+              initialValue: UISettings().enableDim,
+              onToggle: (value) async {
+                UISettings().enableDim = value;
               },
+            ),
+            timeSettingTile(context),
+            SettingsTile(
+              title: const Text("Layout"),
+              trailing: DropdownButton(
+                alignment: Alignment.topLeft,
+                items: UILayout.values
+                    .map((e) => DropdownMenuItem(
+                          value: e,
+                          child: SizedBox(width: 130, child: Text(e.viewName)),
+                        ))
+                    .toList(),
+                value: UISettings().layout,
+                onChanged: (value) {
+                  if (value == null) return;
+                  UISettings().layout = value;
+                },
+              ),
             ),
           ],
         );
@@ -91,20 +59,46 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
   }
 
   SettingsTile timeSettingTile(BuildContext context) {
-    var isNightModeOverride = TimeSettings().isNightModeOverride();
-    String overrideText = "Start\nOverride";
-    if (isNightModeOverride) {
-      overrideText = "Stop\nOverride";
-    }
-
     var buttonstyle = ElevatedButton.styleFrom(
-      padding: const EdgeInsets.all(5), // Remove padding
-      minimumSize: Size.zero, // Remove minimum size constraints
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Shrink the tap target size
+      padding: const EdgeInsets.all(5),
+      backgroundColor: Colors.transparent, // Remove padding
+      minimumSize: const Size(50, 50), // Shrink the tap target size
+      // Shrink the tap target size
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(4)), // Remove rounded boundaries
       ),
     );
+
+    String overrideText = "Start Night";
+    bool isNightModeOverride = TimeSettings().isNightModeOverride();
+    List<Widget> overrideButtons = [const SizedBox.shrink()];
+    if (isNightModeOverride) {
+      overrideText = "Stop Night";
+    }
+    if (!TimeSettings().isNight() || TimeSettings().isNightModeOverride()) {
+      overrideButtons = [
+        SizedBox(
+            child: ElevatedButton(
+                style: buttonstyle,
+                onPressed: () async {
+                  if (isNightModeOverride) {
+                    TimeSettings().stopNightModeOverride();
+                  } else {
+                    TimeSettings().nightModeOverride();
+                  }
+                },
+                child: Text(
+                  overrideText,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ))),
+        const VerticalDivider(
+          width: 20,
+        ),
+      ];
+    }
 
     var timeSettings = ToggleButtons(
       renderBorder: true,
@@ -153,25 +147,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile(
       title: Container(alignment: Alignment.centerLeft, height: 40, child: const Text('Night')),
       trailing: Row(
-        children: [
-          ElevatedButton(
-              style: buttonstyle,
-              onPressed: () async {
-                if (isNightModeOverride) {
-                  TimeSettings().stopNightModeOverride();
-                } else {
-                  TimeSettings().nightModeOverride();
-                }
-              },
-              child: Text(
-                overrideText,
-                style: getSmallTextStyle(),
-              )),
-          const VerticalDivider(
-            width: 20,
-          ),
-          timeSettings
-        ],
+        children: overrideButtons + [timeSettings],
       ),
     );
   }

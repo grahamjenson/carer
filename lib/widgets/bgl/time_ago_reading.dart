@@ -17,36 +17,33 @@ class TimeAgoReading extends StatelessWidget {
         }
 
         var seconds = sgv.age.inSeconds % 300;
-        var additionalTX = const TextSpan(text: "");
+        var additionalTX = const Text("");
         if ((sgv.age.inSeconds > 300 && seconds < 15)) {
-          additionalTX = TextSpan(text: " (+${seconds}s)", style: const TextStyle(fontSize: 30));
+          additionalTX = Text(" (+${seconds}s)", style: const TextStyle(fontSize: 30));
         }
 
         Widget text;
         if (sgv.age.inMinutes == 0) {
-          text = Text(
+          text = const Text(
             "now",
             style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
               fontSize: 100,
             ),
           );
         } else {
-          text = RichText(
-            text: TextSpan(
-              text: "${sgv.age.inMinutes}",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
+          text = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(
+              "${sgv.age.inMinutes}",
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
+                height: 1,
                 fontSize: 110,
               ),
-              children: [
-                const TextSpan(text: "min", style: TextStyle(fontSize: 40)),
-                additionalTX,
-              ],
             ),
-          );
+            const Text("min", style: TextStyle(fontSize: 40)),
+            additionalTX
+          ]);
         }
 
         return text;

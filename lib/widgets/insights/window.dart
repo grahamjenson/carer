@@ -23,15 +23,10 @@ class Window extends StatelessWidget with ThemeMixin {
           Container(
             alignment: Alignment.center,
             child: Text(title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: mainColor,
                   fontSize: 10,
                 )),
-          ),
-          Container(
-            height: 1,
-            color: mainColor.dim, // Color of the bottom line
           ),
           child
         ],

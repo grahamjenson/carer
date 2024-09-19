@@ -24,6 +24,12 @@ class TimeSettings {
   int tODtoInt(TimeOfDay myTime) => myTime.hour * 60 + myTime.minute;
   TimeOfDay tODfromInt(int myTime) => TimeOfDay(hour: myTime ~/ 60, minute: myTime % 60);
 
+  DateTime? get nightModeUntil => nightModeUntilSignal.value;
+
+  bool isNightModeOverride() {
+    return nightModeUntil != null && clock.now().isBefore(nightModeUntil!);
+  }
+
   bool isNight() {
     final now = tODtoInt(TimeOfDay.now());
 
@@ -76,25 +82,19 @@ class TimeSettings {
     }, debugLabel: _TimeSettingsNames.nightEndTime.name);
   }
 
-  bool isNightModeOverride() {
-    if (nightModeUntilSignal.value == null) {
-      return false;
-    }
-
-    if (nightModeUntilSignal.value!.isBefore(clock.now())) {
-      nightModeUntilSignal.value = null;
-      return false;
-    }
-
-    return true;
-  }
-
   void stopNightModeOverride() {
     nightModeUntilSignal.value = null;
   }
 
   void nightModeOverride() {
-    // Set night mode to true until the TimeOfDay of end, which may be tomorrow
-    nightModeUntilSignal.value = clock.now().add(const Duration(hours: 8));
+    // Set night mode until sunrise the next day
+    var tod = nightEndTime;
+    var now = clock.now();
+    var nextTime = nightModeUntilSignal.value = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    if (nextTime.isBefore(now)) {
+      nextTime = nextTime.add(const Duration(days: 1));
+    }
+
+    nightModeUntilSignal.value = nextTime;
   }
 }

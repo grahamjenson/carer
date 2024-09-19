@@ -15,39 +15,26 @@ import 'package:flutter/material.dart';
 class Stats extends StatelessWidget with ThemeMixin {
   Stats({super.key});
 
-  TextStyle getHeadingTextStyle(BuildContext context) {
-    return TextStyle(
+  @override
+  Widget build(BuildContext context) {
+    TextStyle heading = const TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 15,
-      fontFeatures: const [FontFeature.tabularFigures()],
+      fontFeatures: [FontFeature.tabularFigures()],
       height: 1,
-      color: primaryColor(context).dim,
     );
-  }
-
-  TextStyle getRowTextStyle(BuildContext context) {
-    return const TextStyle(
+    TextStyle row = const TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w500,
       fontFeatures: [FontFeature.tabularFigures()],
       height: 1,
     );
-  }
 
-  TextStyle getSmallTextStyle(BuildContext context) {
-    return TextStyle(
+    TextStyle small = const TextStyle(
       fontSize: 10,
-      fontFeatures: const [FontFeature.tabularFigures()],
+      fontFeatures: [FontFeature.tabularFigures()],
       height: 1,
-      color: primaryColor(context).dim,
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    TextStyle heading = getHeadingTextStyle(context);
-    TextStyle row = getRowTextStyle(context);
-    TextStyle small = getSmallTextStyle(context);
 
     return AWatch((context) {
       var valuesAtTime = ValueAtTime.lastSixHours.value;

@@ -16,42 +16,32 @@ class ThemeService {
   ASignal<ThemeData> themeSignal = ASignal(normalTheme, debugLabel: "Theme");
   late ValueNotifier<ThemeData> themeNotifier;
 
-  UIThemeLayout getCurrentThemeLayout() {
-    if (AlarmsService().activeAlarms.value.isNotEmpty && UISettings().alarmUIThemeLayout.enabled) {
-      return UISettings().alarmUIThemeLayout;
-    } else if (TimeSettings().isNight() && UISettings().nightUIThemeLayout.enabled) {
-      return UISettings().nightUIThemeLayout;
-    } else {
-      return UISettings().mainUIThemeLayout;
-    }
-  }
-
   ThemeService._internal() {
     themeNotifier = themeSignal.toValueNotifier();
 
     signalAssign(
       themeSignal,
-      () {
-        UIThemeLayout themeLayout = getCurrentThemeLayout();
-        return selectTheme(themeLayout.theme);
-      },
+      selectTheme,
       debugLabel: "ThemeSignalAssign",
       dependencies: [
             TimerService().minuteSignal,
             AlarmsService().activeAlarms,
           ] +
-          UISettings().themeLayoutSignals,
+          UISettings().allSignals,
     );
   }
 
   ThemeData get theme => themeSignal.value;
 
-  static ThemeData selectTheme(UITheme uitheme) {
-    switch (uitheme) {
-      case UITheme.normal:
-        return normalTheme;
-      case UITheme.dim:
-        return nightTheme;
+  static ThemeData selectTheme() {
+    if (AlarmsService().activeAlarms.value.isNotEmpty) {
+      return normalTheme;
+    }
+
+    if (TimeSettings().isNight() && UISettings().enableDim) {
+      return dimTheme;
+    } else {
+      return normalTheme;
     }
   }
 }
@@ -59,17 +49,11 @@ class ThemeService {
 Color _primaryColor = const Color.fromARGB(255, 199, 210, 172);
 
 mixin ThemeMixin {
-  Color primaryColor(BuildContext? context) {
-    if (context == null) {
-      return _primaryColor;
-    }
+  Color primaryColor(BuildContext context) {
     return Theme.of(context).colorScheme.primary;
   }
 
-  Color secondaryColor(BuildContext? context) {
-    if (context == null) {
-      return _primaryColor;
-    }
+  Color secondaryColor(BuildContext context) {
     return Theme.of(context).colorScheme.secondary;
   }
 
@@ -103,16 +87,43 @@ mixin ThemeMixin {
   }
 }
 
+const TextStyle defaultTextStyle = TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.w500,
+  fontFeatures: [FontFeature.tabularFigures()],
+  color: Colors.purple,
+);
+
 ThemeData normalTheme = ThemeData(
   useMaterial3: true,
+
+  textTheme: const TextTheme(
+    displayLarge: defaultTextStyle,
+    displayMedium: defaultTextStyle,
+    displaySmall: defaultTextStyle,
+    headlineLarge: defaultTextStyle,
+    headlineMedium: defaultTextStyle,
+    //headlineSmall: defaultTextStyle,
+    //titleLarge: defaultTextStyle,
+    //titleMedium: defaultTextStyle,
+    //titleSmall: defaultTextStyle,
+    //bodyLarge: defaultTextStyle,
+    bodyMedium: defaultTextStyle,
+    bodySmall: defaultTextStyle,
+    labelLarge: defaultTextStyle,
+    labelMedium: defaultTextStyle,
+    labelSmall: defaultTextStyle,
+  ),
 
   // Define the default brightness and colors.
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: _primaryColor,
+    primary: Colors.purple,
     onPrimary: Colors.black,
-    secondary: _primaryColor.dim.dim,
+    secondary: Colors.purple,
     onSecondary: Colors.black,
+    tertiary: Colors.purple,
+    onTertiary: Colors.black,
     error: Colors.red,
     onError: _primaryColor,
     surface: Colors.black,
@@ -120,11 +131,11 @@ ThemeData normalTheme = ThemeData(
   ),
 );
 
-ThemeData nightTheme = ThemeData(
+ThemeData dimTheme = ThemeData(
   useMaterial3: true,
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: _primaryColor.dim.dim,
+    primary: Colors.purple,
     onPrimary: Colors.black,
     secondary: _primaryColor.dim.dim.dim,
     onSecondary: Colors.black,
