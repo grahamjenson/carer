@@ -66,6 +66,7 @@ class Stats extends StatelessWidget with ThemeMixin {
               child: DataTable(
                 border: TableBorder(
                   verticalInside: BorderSide(color: primaryColor(context)),
+                  horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
                 ),
                 columnSpacing: 10,
                 dividerThickness: 0.01,

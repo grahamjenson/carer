@@ -47,8 +47,8 @@ class History extends StatelessWidget with ThemeMixin {
                   alignment: Alignment.center,
                   child: DataTable(
                       border: TableBorder(
-                        verticalInside: BorderSide(color: primaryColor(context), width: 0.2),
-                        horizontalInside: BorderSide(color: primaryColor(context), width: 0.2),
+                        verticalInside: BorderSide(color: primaryColor(context).dim, width: 0.2),
+                        horizontalInside: BorderSide(color: primaryColor(context).dim, width: 0.2),
                       ),
                       columnSpacing: columnSpacing,
                       dividerThickness: dividerThickness,
