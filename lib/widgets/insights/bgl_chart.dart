@@ -55,7 +55,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       );
 
       return Window(
-        title: "Chart",
+        title: "",
         child: Expanded(
           child: Padding(
             padding: const EdgeInsets.only(

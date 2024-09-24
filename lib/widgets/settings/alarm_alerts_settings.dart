@@ -45,7 +45,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       title: const Text("Brightness Adjust"),
       descriptionInlineIos: true,
       description: const Text(
-        "Increase screen brightness when Alarming at night",
+        "Up screen brightness with alarms at night",
       ),
       initialValue: AlarmAlertSettings().brightnessAdjustAtNight,
       onToggle: (bool value) {

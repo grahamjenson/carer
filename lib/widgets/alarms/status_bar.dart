@@ -2,6 +2,7 @@ import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/device_settings.dart';
+import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -22,6 +23,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
           sensorChangeDay(context),
           cannulaChangeDay(context),
           uploaderPhoneLowPower(context),
+          isNightMode(context),
         ];
         List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
 
@@ -139,6 +141,21 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.battery_empty,
+          color: tertiaryColor(context),
+        ),
+      );
+    }
+    return null;
+  }
+
+  Widget? isNightMode(BuildContext context) {
+    var isNight = TimeSettings().isNight();
+    if (isNight) {
+      return Tooltip(
+        message: "Night Mode",
+        triggerMode: TooltipTriggerMode.tap,
+        child: Icon(
+          UniconsLine.moon,
           color: tertiaryColor(context),
         ),
       );

@@ -71,35 +71,51 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
       ),
     );
 
-    String overrideText = "Start Night";
     bool isNightModeOverride = TimeSettings().isNightModeOverride();
-    List<Widget> overrideButtons = [const SizedBox.shrink()];
-    if (isNightModeOverride) {
-      overrideText = "Stop Night";
-    }
-    if (!TimeSettings().isNight() || TimeSettings().isNightModeOverride()) {
-      overrideButtons = [
-        SizedBox(
-            child: ElevatedButton(
-                style: buttonstyle,
-                onPressed: () async {
-                  if (isNightModeOverride) {
-                    TimeSettings().stopNightModeOverride();
-                  } else {
-                    TimeSettings().nightModeOverride();
-                  }
-                },
-                child: Text(
-                  overrideText,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ))),
-        const VerticalDivider(
-          width: 20,
+    bool isDayModeOverride = TimeSettings().isDayModeOverride();
+
+    Widget overrideButton = const SizedBox.shrink();
+    // Cancel The Override
+    if (isNightModeOverride || isDayModeOverride) {
+      overrideButton = SizedBox(
+        child: ElevatedButton(
+          style: buttonstyle,
+          onPressed: () async {
+            TimeSettings().removeNightOverride();
+          },
+          child: Text(
+            "Cancel Override",
+            style: labelSmall(context),
+          ),
         ),
-      ];
+      );
+    } else if (TimeSettings().isDay()) {
+      // Set Night Time until Sunrise
+      overrideButton = SizedBox(
+        child: ElevatedButton(
+          style: buttonstyle,
+          onPressed: () async {
+            TimeSettings().nightModeOverride();
+          },
+          child: Text(
+            "Night Until Sunrise",
+            style: labelSmall(context),
+          ),
+        ),
+      );
+    } else if (TimeSettings().isNight()) {
+      overrideButton = SizedBox(
+        child: ElevatedButton(
+          style: buttonstyle,
+          onPressed: () async {
+            TimeSettings().dayModeOverride();
+          },
+          child: Text(
+            "Day Until Sunset",
+            style: labelSmall(context),
+          ),
+        ),
+      );
     }
 
     var timeSettings = ToggleButtons(
@@ -113,33 +129,33 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
           case 0:
             TimeOfDay? value = await showTimePicker(
               context: context,
-              initialTime: TimeSettings().nightStartTime,
+              initialTime: TimeSettings().nightSunsetTime,
               initialEntryMode: TimePickerEntryMode.inputOnly,
             );
             if (value != null) {
-              TimeSettings().nightStartTime = value;
+              TimeSettings().nightSunsetTime = value;
             }
             break;
           case 1:
             TimeOfDay? value = await showTimePicker(
               context: context,
-              initialTime: TimeSettings().nightEndTime,
+              initialTime: TimeSettings().nightSunriseTime,
               initialEntryMode: TimePickerEntryMode.inputOnly,
             );
             if (value != null) {
-              TimeSettings().nightEndTime = value;
+              TimeSettings().nightSunriseTime = value;
             }
             break;
         }
       },
       children: [
         ToggleButton(
-          text: "Start\n${Dates.tODToString(TimeSettings().nightStartTime)}",
+          text: "Start\n${Dates.tODToString(TimeSettings().nightSunsetTime)}",
           height: size,
           width: size,
         ),
         ToggleButton(
-          text: "End\n${Dates.tODToString(TimeSettings().nightEndTime)}",
+          text: "End\n${Dates.tODToString(TimeSettings().nightSunriseTime)}",
           height: size,
           width: size,
         ),
@@ -149,7 +165,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile(
       title: Container(alignment: Alignment.centerLeft, height: 40, child: const Text('Night')),
       trailing: Row(
-        children: overrideButtons + [timeSettings],
+        children: [overrideButton, const VerticalDivider(width: 20)] + [timeSettings],
       ),
     );
   }
