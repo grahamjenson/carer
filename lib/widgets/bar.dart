@@ -1,4 +1,6 @@
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/alarms_bar.dart';
 import 'package:carer/widgets/alarms/status_bar.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
@@ -9,33 +11,38 @@ class Bar extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> tiles = [
-      const StatusesBar(),
-      AlarmsBarIcons(),
-      const Expanded(
-        child: SizedBox.shrink(),
-      ),
-      getSettingsButton(context),
-    ];
+    return AWatch(
+      (context) {
+        List<Widget> tiles = [
+          const StatusesBar(),
+          AlarmsBarIcons(),
+          const Expanded(
+            child: SizedBox.shrink(),
+          ),
+          getSettingsButton(context),
+        ];
 
-    return BottomAppBar(
-      color: Colors.transparent,
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      height: 40,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: tiles,
-      ),
+        return BottomAppBar(
+          color: Colors.transparent,
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          height: 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: tiles,
+          ),
+        );
+      },
+      debugLabel: "Bar",
+      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().sleepUntilSignal],
     );
   }
 
   Widget getSettingsButton(BuildContext context) {
-    var mainColor = primaryColor(context);
     return IconButton(
       padding: EdgeInsets.zero,
       icon: Icon(
         Icons.settings,
-        color: mainColor,
+        color: primaryColor(context),
       ),
       onPressed: () {
         Navigator.push(

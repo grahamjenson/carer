@@ -1,15 +1,17 @@
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/bar.dart';
 import 'package:carer/widgets/home_layout.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatelessWidget with ThemeMixin {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: surfaceColor(context),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => RefreshIndicator(

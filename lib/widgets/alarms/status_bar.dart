@@ -1,5 +1,6 @@
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/device_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
@@ -14,7 +15,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return AWatch(
-      (_) {
+      (context) {
         List<Widget?> rowsMaybe = [
           getIsSilentOnIcon(context),
           getIsPluggedInIcon(context),
@@ -32,7 +33,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
           padding: const EdgeInsets.all(4), // Add padding inside the border
           decoration: BoxDecoration(
             border: Border.all(
-              color: primaryColor(context), // Color of the border
+              color: tertiaryColor(context), // Color of the border
               width: 1, // Width of the border
             ),
             borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
@@ -43,6 +44,8 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         );
       },
       dependencies: [
+        ThemeService().themeSignal,
+        AlarmAlertSettings().sleepUntilSignal,
         TimerService().fiveSecondSignal,
         PlatformInfoService().ringerMode,
         PlatformInfoService().batteryMode,
@@ -59,7 +62,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bell_slash,
-          color: primaryColor(context),
+          color: tertiaryColor(context),
         ),
       );
     }
@@ -74,7 +77,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bolt_slash,
-          color: primaryColor(context),
+          color: tertiaryColor(context),
         ),
       );
     }
@@ -97,7 +100,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.processor,
-          color: primaryColor(context),
+          color: tertiaryColor(context),
         ),
       );
     }
@@ -120,7 +123,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.mobile_android,
-          color: primaryColor(context),
+          color: tertiaryColor(context),
         ),
       );
     }
@@ -136,7 +139,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.battery_empty,
-          color: primaryColor(context),
+          color: tertiaryColor(context),
         ),
       );
     }

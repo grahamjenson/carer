@@ -92,20 +92,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeData>(
-      valueListenable: ThemeService().themeNotifier,
-      builder: (context, theme, _) {
-        return TweenAnimationBuilder<ThemeData>(
-            tween: ThemeDataTween(begin: theme, end: theme),
-            duration: const Duration(seconds: 1), // Increase duration here
-            builder: (context, theme, _) {
-              return MaterialApp(
-                title: 'Carer',
-                debugShowCheckedModeBanner: false,
-                theme: theme,
-                home: const HomePage(),
-              );
-            });
-      },
-    );
+        valueListenable: ThemeService().themeNotifier,
+        builder: (context, theme, _) {
+          return MaterialApp(
+            title: 'Carer',
+            debugShowCheckedModeBanner: false,
+            theme: theme,
+            home: const HomePage(),
+          );
+        });
   }
 }

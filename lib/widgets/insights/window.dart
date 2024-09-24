@@ -8,7 +8,6 @@ class Window extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    Color mainColor = primaryColor(context);
     return Container(
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,

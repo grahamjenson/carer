@@ -78,12 +78,14 @@ class CleanSGV with DateMixin {
     var dateBefore = sgvs.first.date;
     for (var i = 1; i < sgvs.length; i++) {
       var sgv = sgvs[i];
-      if (sgv.date.difference(dateBefore).inMinutes < 3) {
+
+      if (dateBefore.difference(sgv.date).inMinutes > 3) {
         chainedSGVs.last.before = sgv;
         dateBefore = sgv.date;
         chainedSGVs.add(sgv);
       }
     }
+
     return chainedSGVs;
   }
 

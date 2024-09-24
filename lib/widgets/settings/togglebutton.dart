@@ -24,10 +24,29 @@ class ToggleButton extends StatelessWidget with ThemeMixin {
   }
 
   Widget buildText() {
+    var shadowns = const TextStyle(shadows: [
+      Shadow(
+          // bottomLeft
+          offset: Offset(-1, -1),
+          color: Colors.black),
+      Shadow(
+          // bottomRight
+          offset: Offset(1, -1),
+          color: Colors.black),
+      Shadow(
+          // topRight
+          offset: Offset(1, 1),
+          color: Colors.black),
+      Shadow(
+          // topLeft
+          offset: Offset(-1, 1),
+          color: Colors.black),
+    ]);
+
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: textStyleWithShadows().merge(textStyle),
+      style: shadowns.merge(textStyle),
     );
   }
 

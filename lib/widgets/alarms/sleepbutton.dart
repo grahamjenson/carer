@@ -13,30 +13,37 @@ class SleepButton extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      var width = constraints.maxWidth - 50;
-      var height = constraints.maxHeight;
-      double buttonRadias = min(height, min(75, width));
+    return AWatch(
+      (context) {
+        var mainColor = primaryColor(context);
+        var backgroundColor = mainColor.dim.dim.dim;
+        var buttonColor = mainColor.dim.dim;
 
-      return SizedBox(
-        width: width,
-        height: buttonRadias,
-        child: Stack(
-          children: [
-            getBackground(context, buttonRadias, width),
-            SleepTextStatus(buttonRadias),
-            getDismissable(context, buttonRadias, width),
-            getSleepCancel(context, buttonRadias),
-          ],
-        ),
-      );
-    });
+        return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+          var width = constraints.maxWidth - 50;
+          var height = constraints.maxHeight;
+          double buttonRadias = min(height, min(75, width));
+
+          return SizedBox(
+            width: width,
+            height: buttonRadias,
+            child: Stack(
+              children: [
+                getBackground(context, buttonRadias, width, backgroundColor),
+                SleepTextStatus(buttonRadias),
+                getDismissable(context, buttonRadias, width, mainColor, buttonColor),
+                getSleepCancel(context, buttonRadias, mainColor, backgroundColor),
+              ],
+            ),
+          );
+        });
+      },
+      debugLabel: "SleepButton",
+      dependencies: [AlarmAlertSettings().sleepUntilSignal],
+    );
   }
 
-  Widget getBackground(BuildContext context, double buttonRadias, double width) {
-    var mainColor = primaryColor(context);
-
-    var backgroundColor = mainColor.dim.dim.dim;
+  Widget getBackground(BuildContext context, double buttonRadias, double width, Color backgroundColor) {
     return Container(
       height: buttonRadias,
       width: width,
@@ -45,53 +52,43 @@ class SleepButton extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget getSleepCancel(BuildContext context, double buttonRadias) {
-    return AWatch(
-      (context) {
-        var mainColor = primaryColor(context);
-        var backgroundColor = mainColor.dim.dim.dim;
+  Widget getSleepCancel(BuildContext context, double buttonRadias, Color mainColor, Color backgroundColor) {
+    if (AlarmAlertSettings().sleepDuration == null) {
+      return const SizedBox.shrink();
+    }
 
-        if (AlarmAlertSettings().sleepDuration == null) {
-          return const SizedBox.shrink();
-        }
+    var cancelIcon = Icon(UniconsLine.times, color: mainColor, size: buttonRadias);
 
-        var cancelIcon = Icon(UniconsLine.times, color: mainColor, size: buttonRadias);
-
-        return Align(
-            alignment: Alignment.topRight,
-            child: Container(
-              alignment: Alignment.center,
-              height: buttonRadias,
-              width: buttonRadias,
-              decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                alignment: Alignment.center,
-                icon: cancelIcon,
-                onPressed: () {
-                  AlarmAlertSettings().setSleepDurationSeconds(null, "CancelButtonPushed");
-                },
-              ),
-            ));
-      },
-      dependencies: [AlarmAlertSettings().sleepUntilSignal],
-      debugLabel: "SleepCancel",
-    );
+    return Align(
+        alignment: Alignment.topRight,
+        child: Container(
+          alignment: Alignment.center,
+          height: buttonRadias,
+          width: buttonRadias,
+          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            alignment: Alignment.center,
+            icon: cancelIcon,
+            onPressed: () {
+              AlarmAlertSettings().setSleepDurationSeconds(null, "CancelButtonPushed");
+            },
+          ),
+        ));
   }
 
-  Widget getDismissable(BuildContext context, double buttonRadias, double width) {
-    var mainColor = primaryColor(context);
-
-    var backgroundColor = mainColor.dim.dim.dim;
-    var buttonColor = mainColor.dim.dim;
-
+  Widget getDismissable(BuildContext context, double buttonRadias, double width, Color mainColor, Color buttonColor) {
     Icon dismissibleIcon = Icon(UniconsLine.angle_right, color: mainColor, size: buttonRadias);
 
     openSleepDialog() async {
+      var popTime = 10;
+      if (AlarmAlertSettings().sleepDuration == null) {
+        AlarmAlertSettings().setSleepDurationSeconds(popTime, "SleepDialogOpened");
+      }
       var sleepTime = await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return const SleepTimePage();
+          return SleepTimePage(popTime);
         }),
       );
       sleepTime ??= 0;

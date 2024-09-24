@@ -22,7 +22,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
             child: SizedBox(
               height: buttonRadias,
               child: Column(
-                children: getRows(),
+                children: getRows(context),
               ),
             ),
           ),
@@ -38,7 +38,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().sleepUntilSignal], debugLabel: "SleepTextStatus");
   }
 
-  List<Widget> getRows() {
+  List<Widget> getRows(BuildContext context) {
     var big = const TextStyle(
       fontSize: 35,
       height: 1,
@@ -47,7 +47,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
 
     var small = const TextStyle(fontSize: 20);
     List<Widget> rows = [];
-    var alarmWidget = alarmStringWidget();
+    var alarmWidget = alarmStringWidget(context);
     if (isSleeping()) {
       rows += [
         const Spacer(),
@@ -111,10 +111,11 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     return SmartText(texts: const ["<1m"], styles: [big]);
   }
 
-  Widget? alarmStringWidget() {
-    var small = const TextStyle(
+  Widget? alarmStringWidget(BuildContext context) {
+    var small = TextStyle(
       fontSize: 10,
       height: 1,
+      color: tertiaryColor(context),
     );
 
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;

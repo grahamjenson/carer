@@ -47,12 +47,11 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       var (lowTargets, highTargets) = targetSpots(targets);
       var treatments = treatmentsSpots(lastTreatments);
 
-      var mainColor = primaryColor(context);
       var bglLineData = LineChartBarData(
-        color: mainColor,
+        color: secondaryColor(context),
         spots: bglSpotData,
         barWidth: 1,
-        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(mainColor)),
+        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(secondaryColor(context))),
       );
 
       return Window(
@@ -65,6 +64,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             ),
             child: LineChart(
               buildlineChartData(
+                context,
                 minsAgo,
                 maxBasal,
                 bglSpotData,
@@ -73,7 +73,6 @@ class BGLChart extends StatelessWidget with ThemeMixin {
                 highTargets,
                 treatments,
                 bglLineData,
-                mainColor,
               ),
               duration: Duration.zero,
             ),
@@ -84,6 +83,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   }
 
   LineChartData buildlineChartData(
+    BuildContext context,
     int minsAgo,
     double maxBasal,
     List<FlSpot> bglSpotData,
@@ -92,18 +92,22 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     List<FlSpot> highTargets,
     List<FlSpot> treatments,
     LineChartBarData bglLineData,
-    Color mainColor,
   ) {
     double maxY = 306;
     double minY = 0;
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now
 
+    Color pColor = primaryColor(context);
+    Color opColor = onPrimaryColor(context);
+    Color sColor = secondaryColor(context);
+    Color tColor = tertiaryColor(context);
+
     return LineChartData(
-      rangeAnnotations: rangeAnnotations(mainColor),
-      gridData: gridData(mainColor),
+      rangeAnnotations: rangeAnnotations(pColor.withAlpha(30)),
+      gridData: gridData(opColor.withAlpha(20)),
       titlesData: titleData(maxBasal),
-      borderData: borderData(mainColor),
+      borderData: borderData(opColor.withAlpha(20)),
       maxX: maxX,
       minX: minX,
       minY: minY,
@@ -111,20 +115,20 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       lineBarsData: [
         // These are rendered first to last
         LineChartBarData(
-          color: mainColor.dim,
+          color: pColor.dim,
           spots: lowTargets,
           barWidth: 2,
           dotData: const FlDotData(show: false),
         ),
         LineChartBarData(
-          color: mainColor.dim,
+          color: pColor.dim,
           spots: highTargets,
           barWidth: 2,
           dotData: const FlDotData(show: false),
         ),
         bglLineData,
         LineChartBarData(
-          color: mainColor,
+          color: sColor,
           spots: basalSpotData,
           barWidth: 2,
           dotData: const FlDotData(show: false),
@@ -132,12 +136,12 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         LineChartBarData(
           spots: treatments,
           barWidth: 0,
-          dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter(mainColor)),
+          dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter(sColor)),
         ),
       ],
-      lineTouchData: lineTouchData(UISettings().unit, mainColor),
+      lineTouchData: lineTouchData(UISettings().unit, tColor),
       betweenBarsData: [
-        BetweenBarsData(fromIndex: 0, toIndex: 1, color: mainColor.dim.dim.withAlpha(120)),
+        BetweenBarsData(fromIndex: 0, toIndex: 1, color: pColor.dim.withAlpha(120)),
       ],
     );
   }
@@ -208,7 +212,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return (lowTargets, highTargets);
   }
 
-  LineTouchData lineTouchData(Unit unit, Color mainColor) {
+  LineTouchData lineTouchData(Unit unit, Color color) {
     return LineTouchData(
       enabled: true,
       touchTooltipData: LineTouchTooltipData(
@@ -224,13 +228,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             var spot = barData.spots[index];
             if (spot is BGLSpot) {
               var line = FlLine(
-                color: mainColor.dim.dim,
+                color: color.dim.dim,
                 strokeWidth: 1,
                 dashArray: [2, 4],
               );
               return TouchedSpotIndicatorData(
                 line,
-                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, mainColor)),
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, color)),
               );
             }
 
@@ -241,7 +245,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
               );
               return TouchedSpotIndicatorData(
                 line,
-                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, mainColor)),
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, color)),
               );
             }
 
@@ -252,10 +256,10 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  FlBorderData borderData(Color mainColor) {
+  FlBorderData borderData(Color color) {
     return FlBorderData(
       show: true,
-      border: Border.all(color: mainColor.dim.dim.dim, width: 1),
+      border: Border.all(color: color, width: 1),
     );
   }
 
@@ -273,7 +277,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  FlGridData gridData(Color mainColor) {
+  FlGridData gridData(Color color) {
     return FlGridData(
       show: true,
       drawVerticalLine: true,
@@ -281,31 +285,31 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       verticalInterval: 10,
       getDrawingHorizontalLine: (value) {
         return FlLine(
-          color: mainColor.dim.dim,
+          color: color,
           strokeWidth: 1,
         );
       },
       getDrawingVerticalLine: (value) {
         return FlLine(
-          color: mainColor.dim.dim,
+          color: color,
           strokeWidth: 1,
         );
       },
     );
   }
 
-  RangeAnnotations rangeAnnotations(Color mainColor) {
+  RangeAnnotations rangeAnnotations(Color color) {
     return RangeAnnotations(
       horizontalRangeAnnotations: [
         HorizontalRangeAnnotation(
           y1: TargetSettings().highUrgent.toDouble(),
           y2: TargetSettings().lowUrgent.toDouble(),
-          color: mainColor.dim.dim.dim.dim,
+          color: color.dim,
         ),
         HorizontalRangeAnnotation(
           y1: TargetSettings().highTarget.toDouble(),
           y2: TargetSettings().lowTarget.toDouble(),
-          color: mainColor.dim.dim.dim,
+          color: color,
         ),
       ],
     );
@@ -375,7 +379,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  GetDotPainterCallback bglDotPainter(Color mainColor) {
+  GetDotPainterCallback bglDotPainter(Color color) {
     return (
       FlSpot spot,
       double xPercentage,
@@ -385,13 +389,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     }) {
       return FlDotCirclePainter(
         radius: 2,
-        color: mainColor,
-        strokeColor: mainColor,
+        color: color,
+        strokeColor: color,
       );
     };
   }
 
-  GetDotPainterCallback bglHighlightPainter(Unit unit, Color mainColor) {
+  GetDotPainterCallback bglHighlightPainter(Unit unit, Color color) {
     return (
       FlSpot spot,
       double xPercentage,
@@ -404,7 +408,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           spot.sgv.sgvStr(unit),
           strokeColor: Colors.black,
           size: 12,
-          color: mainColor,
+          color: color,
           align: Alignment.topCenter,
         );
       }
@@ -414,15 +418,15 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           "${toMax2dp(spot.basal)}",
           strokeColor: Colors.black,
           size: 8,
-          color: mainColor,
+          color: color,
           align: Alignment.topCenter,
         );
       }
 
       return FlDotCirclePainter(
         radius: 0,
-        color: mainColor,
-        strokeColor: mainColor,
+        color: color,
+        strokeColor: color,
       );
     };
   }
@@ -434,7 +438,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return Alignment.bottomCenter;
   }
 
-  GetDotPainterCallback treatmentsDotPainter(Color mainColor) {
+  GetDotPainterCallback treatmentsDotPainter(Color color) {
     return (
       FlSpot spot,
       double xPercentage,
@@ -449,7 +453,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             align: flipAlignment(index),
             strokeColor: Colors.black,
             size: 8,
-            color: mainColor,
+            color: color,
           );
         } else if (spot.treatment.insulin != 0) {
           return FlTextPainterPainter(
@@ -457,7 +461,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             align: flipAlignment(index),
             strokeColor: Colors.black,
             size: 8,
-            color: mainColor,
+            color: color,
           );
         } else if (spot.treatment.carbs != 0) {
           return FlTextPainterPainter(
@@ -465,14 +469,14 @@ class BGLChart extends StatelessWidget with ThemeMixin {
             align: flipAlignment(index),
             strokeColor: Colors.black,
             size: 8,
-            color: mainColor,
+            color: color,
           );
         }
       }
       return FlDotCirclePainter(
         radius: 0,
-        color: mainColor,
-        strokeColor: mainColor,
+        color: color,
+        strokeColor: color,
       );
     };
   }

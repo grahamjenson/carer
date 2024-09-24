@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
 
 class SleepTimePage extends StatefulWidget {
-  const SleepTimePage({super.key});
+  const SleepTimePage(this.popTime, {super.key});
   static const TextStyle textStyle = TextStyle(fontSize: 50);
 
+  final int popTime;
   static const List<int> minutesTimes = [5, 10, 20, 30, 45];
   static const List<int> hoursTimes = [1, 2, 3];
   static const List<int> timeTimes = [6, 22];
@@ -24,12 +24,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
   void initState() {
     super.initState();
 
-    int sleepTime = 10;
-    if (AlarmAlertSettings().sleepDuration == null) {
-      AlarmAlertSettings().setSleepDurationSeconds(sleepTime, "SleepDialogOpened");
-    }
-
-    _timer = Timer(Duration(seconds: sleepTime), () {
+    _timer = Timer(Duration(seconds: widget.popTime), () {
       Navigator.of(context).pop(null);
     });
   }

@@ -45,6 +45,7 @@ class _MagArrowState extends State<MagArrow> with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
+        var color = displayLarge(context).color!;
         var mag = findMagnitude();
         int? value = mag;
         if (mag == null) {
@@ -64,7 +65,7 @@ class _MagArrowState extends State<MagArrow> with ThemeMixin {
         return AspectRatio(
           aspectRatio: 0.3,
           child: CustomPaint(
-            painter: MyPainter(value, primaryColor(context)),
+            painter: MyPainter(value, color),
           ),
         );
       },
