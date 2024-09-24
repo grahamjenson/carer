@@ -2,7 +2,6 @@ import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/bgl/magarrow.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +28,7 @@ class BGL extends StatelessWidget with ThemeMixin {
             child: Stack(
               children: [
                 const Align(
-                  alignment: Alignment(0, -1.05),
+                  alignment: Alignment(0, -0.8),
                   child: FractionallySizedBox(
                     widthFactor: 1,
                     heightFactor: 0.2,
@@ -40,10 +39,10 @@ class BGL extends StatelessWidget with ThemeMixin {
                   ),
                 ),
                 Align(
-                    alignment: const Alignment(0, 0),
+                    alignment: const Alignment(0, 0.6),
                     child: FractionallySizedBox(
                       widthFactor: 1,
-                      heightFactor: 0.90,
+                      heightFactor: 0.85,
                       child: FittedBox(
                         child: Text(
                           sgv.sgvStr(unit),
@@ -52,7 +51,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                       ),
                     )),
                 Align(
-                  alignment: const Alignment(0.4, 1.05),
+                  alignment: const Alignment(-0.2, 1.06),
                   child: FractionallySizedBox(
                     widthFactor: .5,
                     heightFactor: 0.2,
@@ -64,7 +63,6 @@ class BGL extends StatelessWidget with ThemeMixin {
                           style: displayLarge(context).merge(shadows()).copyWith(color: dColor),
                         )),
                       ),
-                      const Flexible(child: FractionallySizedBox(heightFactor: 1, child: MagArrow())),
                     ]),
                   ),
                 ),

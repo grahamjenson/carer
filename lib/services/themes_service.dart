@@ -365,8 +365,6 @@ ThemeData dimTheme = normalTheme.copyWith(
   ),
 );
 
-// TODO make this proper
-
 extension ColorExtension on Color {
   Color get dim {
     var amount = 0.7;
