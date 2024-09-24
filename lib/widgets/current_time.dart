@@ -16,9 +16,10 @@ class CurrentTimeWidget extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
+        TextStyle style = displaySmall(context);
         var _ = TimerService().secondSignal.value;
         final String formattedDateTime = _formatDateTime(clock.now());
-        return Text(formattedDateTime, style: const TextStyle(height: 0.5, fontSize: 32, fontWeight: FontWeight.bold));
+        return Text(formattedDateTime, style: style.copyWith(color: style.color!.dim.dim));
       },
       debugLabel: "CurrentTimeWidget",
       doLog: false,

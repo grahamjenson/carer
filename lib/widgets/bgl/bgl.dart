@@ -28,7 +28,7 @@ class BGL extends StatelessWidget with ThemeMixin {
             child: Stack(
               children: [
                 const Align(
-                  alignment: Alignment(0, -0.8),
+                  alignment: Alignment(0, -0.9),
                   child: FractionallySizedBox(
                     widthFactor: 1,
                     heightFactor: 0.2,

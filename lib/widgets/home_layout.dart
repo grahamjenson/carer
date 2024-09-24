@@ -51,8 +51,8 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
             ),
           ),
           const Positioned(
-            top: 10, // Adjust these values as needed
-            left: 10,
+            top: 0, // Adjust these values as needed
+            left: 5,
             child: FittedBox(child: CurrentTimeWidget()),
           ),
         ],

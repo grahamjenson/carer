@@ -13,7 +13,7 @@ Color blueColorConst = const Color(0xFF00BAEF);
 Color redColorConst = const Color.fromARGB(255, 227, 63, 63);
 Color yellowColorConst = const Color(0xFFFFCD36);
 Color plainTextColorConst = const Color(0xFFEEEEEE);
-Color dimTextColorConst = const Color(0xFF999999);
+Color dimTextColorConst = const Color(0xFF555555);
 
 class ThemeService {
   static final ThemeService _themeService = ThemeService._internal();
