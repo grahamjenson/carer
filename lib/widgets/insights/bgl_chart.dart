@@ -51,7 +51,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         color: tertiaryColor(context),
         spots: bglSpotData,
         barWidth: 1,
-        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(tertiaryColor(context))),
+        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(tertiaryColor(context), secondaryColor(context))),
       );
 
       return Window(
@@ -100,7 +100,6 @@ class BGLChart extends StatelessWidget with ThemeMixin {
 
     Color pColor = primaryColor(context);
     Color opColor = onPrimaryColor(context);
-    Color sColor = secondaryColor(context);
     Color tColor = tertiaryColor(context);
 
     return LineChartData(
@@ -383,7 +382,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  GetDotPainterCallback bglDotPainter(Color color) {
+  GetDotPainterCallback bglDotPainter(Color color, Color outOfRangeColor) {
     return (
       FlSpot spot,
       double xPercentage,
@@ -391,10 +390,22 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       int index, {
       double? size,
     }) {
+      BGLSpot bglspot = spot as BGLSpot;
+      var useColor = color;
+      var useStrokeColor = color;
+      var useStokeWidth = 0.0;
+      var useRadius = 2.0;
+      if (!bglspot.sgv.isNormal) {
+        useColor = outOfRangeColor;
+        useRadius = 2.5;
+        useStokeWidth = 1.0;
+        useStrokeColor = color;
+      }
       return FlDotCirclePainter(
-        radius: 2,
-        color: color,
-        strokeColor: color,
+        radius: useRadius,
+        color: useColor,
+        strokeColor: useStrokeColor,
+        strokeWidth: useStokeWidth,
       );
     };
   }

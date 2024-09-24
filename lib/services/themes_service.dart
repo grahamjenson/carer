@@ -10,7 +10,7 @@ import 'package:signals/signals_flutter.dart';
 
 // Trying to define the colour scehem based on diabetes action month colours
 Color blueColorConst = const Color(0xFF00BAEF);
-Color greenColorConst = const Color(0xFF1ca7ab);
+Color redColorConst = const Color.fromARGB(255, 227, 63, 63);
 Color yellowColorConst = const Color(0xFFFFCD36);
 Color plainTextColorConst = const Color(0xFFEEEEEE);
 Color dimTextColorConst = const Color(0xFF999999);
@@ -186,7 +186,10 @@ mixin ThemeMixin {
     if (sgv.isNormal) {
       return null;
     }
-    return tertiaryColor(context);
+    if (sgv.isLow || sgv.isHigh) {
+      return tertiaryColor(context);
+    }
+    return secondaryColor(context);
   }
 
   Color? diffColor(BuildContext context) {
@@ -200,7 +203,10 @@ mixin ThemeMixin {
     if (diffRange == Range7.mid) {
       return null;
     }
-    return tertiaryColor(context);
+    if (diffRange == Range7.low || diffRange == Range7.high) {
+      return tertiaryColor(context);
+    }
+    return secondaryColor(context);
   }
 
   Color? ageColor(BuildContext context) {
@@ -282,7 +288,7 @@ ThemeData normalTheme = ThemeData(
     brightness: Brightness.dark,
     primary: blueColorConst,
     onPrimary: Colors.white,
-    secondary: greenColorConst,
+    secondary: redColorConst,
     onSecondary: Colors.white,
     tertiary: yellowColorConst,
     onTertiary: Colors.white,
