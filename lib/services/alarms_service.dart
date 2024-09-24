@@ -78,6 +78,8 @@ class AlarmsService {
       TimerService().tenSecondSignal,
       AlarmAlertSettings().sleepUntilSignal,
       SQLToSGV().writeSignal,
+      AppLifecycleService().lastResumed,
+      AppLifecycleService().lastChangeScreen
     ];
 
     List<Signal> checkAlarmsDependencies = allSettingsSignals + additionalDeps;
@@ -85,6 +87,12 @@ class AlarmsService {
     aeffect(() {
       try {
         var (newTriggeredAlarms, newActiveAlarms) = calculateAlarms();
+
+        // If the app has only recently been resumed or a screen changed, we wipe all the active alarms
+        // because we want to give the app some time ot "warm up" and if the user is doing something give them time to finish
+        if (AppLifecycleService().wasRecentlyResumed || AppLifecycleService().wasRecentlyScreenChanged) {
+          newActiveAlarms = <Alarm>{};
+        }
 
         triggeredAlarms.value = AlarmSet(newTriggeredAlarms);
         activeAlarms.value = AlarmSet(newActiveAlarms);
@@ -127,21 +135,6 @@ class AlarmsService {
         activeAlarms,
         TimerService().tenSecondSignal,
       ],
-    );
-
-    // Set to 15 seconds to offset the race condition on the 10 second timerSerivce signal
-    AlarmAlertSettings().setSleepDurationSeconds(15, "App Opened");
-    aeffect(
-      () {
-        // Sleep for a second or two when opened
-        if (Platform.isAndroid || Platform.isIOS) {
-          if (AlarmAlertSettings().sleepDurationPeek == null) {
-            AlarmAlertSettings().setSleepDurationSeconds(10, "App Resumed");
-          }
-        }
-      },
-      debugLabel: "SleepOnLastResumed",
-      dependencies: [AppLifecycleService().lastResumed],
     );
   }
 

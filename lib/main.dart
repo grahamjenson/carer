@@ -95,10 +95,12 @@ class _MyAppState extends State<MyApp> {
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
           return MaterialApp(
+            navigatorObservers: [NavigationChangeObserver(), SentryNavigatorObserver()],
             title: 'Carer',
             debugShowCheckedModeBanner: false,
             theme: theme,
             home: const HomePage(),
+            initialRoute: '/',
           );
         });
   }
