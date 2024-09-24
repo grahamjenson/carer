@@ -79,10 +79,8 @@ abstract class Alarm {
     if (lastSGV == null) {
       return Range5.mid;
     }
-    // Calculating Target Range
-    var (tr, _) = targetRange(lastSGV.value);
 
-    return tr;
+    return lastSGV.range;
   }
 
   List<Range5> targetRange5ForMins(int minsAgo) {

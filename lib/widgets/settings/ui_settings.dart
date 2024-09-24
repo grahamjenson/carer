@@ -27,7 +27,9 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
               },
             ),
             SettingsTile.switchTile(
-              title: const Text('Enable Dim At Night'),
+              title: const Text('Dull At Night'),
+              description: const Text('Dull screen Colors at night'),
+              descriptionInlineIos: true,
               initialValue: UISettings().enableDim,
               onToggle: (value) async {
                 UISettings().enableDim = value;

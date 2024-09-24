@@ -69,9 +69,7 @@ class PredictionService {
       return null;
     }
 
-    var (range, _) = targetRange(sgv.value);
-
-    return range;
+    return sgv.range;
   }
 
   // Get values ahead of the current reading
@@ -92,7 +90,7 @@ class PredictionService {
     if (sgv == null) {
       return null;
     }
-    var (range, _) = targetRange(sgv.value);
-    return range;
+
+    return sgv.range;
   }
 }

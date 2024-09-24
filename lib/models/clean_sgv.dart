@@ -4,6 +4,7 @@ import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
 class CleanSGV with DateMixin {
@@ -26,6 +27,17 @@ class CleanSGV with DateMixin {
     }
     return ((diff! / (minuteTimestamp - before!.minuteTimestamp)) * 5).toInt();
   }
+
+  (Range5, double) get rangeProporation => targetRange(value);
+  Range5 get range => rangeProporation.$1;
+
+  bool get isUrgentLow => range == Range5.veryLow;
+  bool get isLow => range == Range5.low;
+  bool get isNormal => range == Range5.mid;
+  bool get isHigh => range == Range5.high;
+  bool get isUrgentHigh => range == Range5.veryHigh;
+
+  Range7 get diffRange => diffRange7(rate5m ?? 0);
 
   int? get diff {
     if (before == null) {

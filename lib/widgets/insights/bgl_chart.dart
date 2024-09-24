@@ -48,10 +48,10 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       var treatments = treatmentsSpots(lastTreatments);
 
       var bglLineData = LineChartBarData(
-        color: secondaryColor(context),
+        color: tertiaryColor(context),
         spots: bglSpotData,
         barWidth: 1,
-        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(secondaryColor(context))),
+        dotData: FlDotData(show: true, getDotPainter: bglDotPainter(tertiaryColor(context))),
       );
 
       return Window(
@@ -128,7 +128,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         ),
         bglLineData,
         LineChartBarData(
-          color: sColor,
+          color: tColor.dim,
           spots: basalSpotData,
           barWidth: 2,
           dotData: const FlDotData(show: false),
@@ -136,7 +136,11 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         LineChartBarData(
           spots: treatments,
           barWidth: 0,
-          dotData: FlDotData(show: true, getDotPainter: treatmentsDotPainter(sColor)),
+          dotData: FlDotData(
+              show: true,
+              getDotPainter: treatmentsDotPainter(
+                tColor.dim,
+              )),
         ),
       ],
       lineTouchData: lineTouchData(UISettings().unit, tColor),
@@ -483,7 +487,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
 }
 
 /// This class is an implementation of a [FlDotPainter] that draws Text on a canvas
-class FlTextPainterPainter extends FlDotPainter {
+class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
   late FlDotCirclePainter circle;
 
   /// The color of the square is determined determined by [color],
@@ -523,24 +527,15 @@ class FlTextPainterPainter extends FlDotPainter {
   double strokeWidth;
 
   TextStyle get style {
-    return TextStyle(fontSize: size, height: 0.6, fontWeight: FontWeight.w700, color: color, shadows: [
-      Shadow(
-          // bottomLeft
-          offset: Offset(-strokeWidth, -strokeWidth),
-          color: strokeColor),
-      Shadow(
-          // bottomRight
-          offset: Offset(strokeWidth, -strokeWidth),
-          color: strokeColor),
-      Shadow(
-          // topRight
-          offset: Offset(strokeWidth, strokeWidth),
-          color: strokeColor),
-      Shadow(
-          // topLeft
-          offset: Offset(-strokeWidth, strokeWidth),
-          color: strokeColor),
-    ]);
+    return TextStyle(
+      fontSize: size,
+      height: 0.6,
+      fontWeight: FontWeight.w700,
+      color: color,
+    ).merge(shadows(
+      color: strokeColor,
+      width: strokeWidth,
+    ));
   }
 
   /// Implementation of the parent class to draw the square

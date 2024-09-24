@@ -17,7 +17,17 @@ enum Range7 { veryVeryLow, veryLow, low, mid, high, veryHigh, veryVeryHigh }
   return range5(veryLow, low, high, veryHigh, sgv);
 }
 
-(Range7, double) diffRange(int fastDrop, int fastRise, int diff) {
+Range7 diffRange7(num diff) {
+  var (dr, _) = diffRange(
+    TargetSettings().fastDropDelta,
+    TargetSettings().fastRiseDelta,
+    diff,
+  );
+
+  return dr;
+}
+
+(Range7, double) diffRange(num fastDrop, num fastRise, num diff) {
   // This is bases on percentage of the current sgv because the closer to low the more important it is
   return range7(fastDrop.toDouble(), fastDrop / 2, fastDrop / 3, fastRise / 3, fastRise / 2, fastRise.toDouble(), diff.toDouble());
 }

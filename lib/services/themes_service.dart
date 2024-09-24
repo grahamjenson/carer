@@ -1,10 +1,19 @@
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
+
+// Trying to define the colour scehem based on diabetes action month colours
+Color blueColorConst = const Color(0xFF00BAEF);
+Color greenColorConst = const Color(0xFF1ca7ab);
+Color yellowColorConst = const Color(0xFFFFCD36);
+Color plainTextColorConst = const Color(0xFFEEEEEE);
+Color dimTextColorConst = const Color(0xFF999999);
 
 class ThemeService {
   static final ThemeService _themeService = ThemeService._internal();
@@ -145,19 +154,75 @@ mixin ThemeMixin {
   TextStyle labelSmall(BuildContext context) {
     return Theme.of(context).textTheme.labelSmall!;
   }
+
+  TextStyle shadows({Color color = Colors.black, double width = 1}) {
+    return TextStyle(shadows: [
+      Shadow(
+          // bottomLeft
+          offset: Offset(-width, -width),
+          color: color),
+      Shadow(
+          // bottomRight
+          offset: Offset(width, -width),
+          color: color),
+      Shadow(
+          // topRight
+          offset: Offset(width, width),
+          color: color),
+      Shadow(
+          // topLeft
+          offset: Offset(-width, width),
+          color: color),
+    ]);
+  }
+
+  Color? rangeColor(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+
+    CleanSGV? sgv = CleanSGV.lastSGV.value;
+    if (sgv == null) {
+      return theme.error;
+    }
+    if (sgv.isNormal) {
+      return null;
+    }
+    return tertiaryColor(context);
+  }
+
+  Color? diffColor(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+
+    CleanSGV? sgv = CleanSGV.lastSGV.value;
+    if (sgv == null) {
+      return theme.error;
+    }
+    var diffRange = sgv.diffRange;
+    if (diffRange == Range7.mid) {
+      return null;
+    }
+    return tertiaryColor(context);
+  }
+
+  Color? ageColor(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+
+    var sgv = CleanSGV.lastSGV.value;
+    if (sgv == null) {
+      return theme.error;
+    }
+
+    var seconds = sgv.age.inSeconds % 300;
+    if (seconds < 300) {
+      return null;
+    }
+    return tertiaryColor(context);
+  }
 }
 
-Color primaryColorConst = const Color(0xFF00BAEF);
-Color secondaryColorConst = const Color(0xFF3A9A4D);
-Color tertiaryColorConst = const Color(0xFFFFCD36);
-Color plainTextColorConst = const Color(0xFFBBBBBB);
-Color dimTextColorConst = plainTextColorConst.dim;
-Color outofRangeTsextColor = Colors.red;
-Color urgentRangeTextColor = Colors.red[900]!;
-
+var defaultTextTheme = Typography.material2018().white;
 ThemeData normalTheme = ThemeData(
   useMaterial3: true,
-  textTheme: Typography.whiteMountainView.merge(TextTheme(
+  textTheme: defaultTextTheme.merge(TextTheme(
     displayLarge: TextStyle(
       fontWeight: FontWeight.bold,
       color: plainTextColorConst,
@@ -213,15 +278,13 @@ ThemeData normalTheme = ThemeData(
       color: plainTextColorConst,
     ),
   )),
-
-  // Trying to define the colour scehem based on diabetes action month colours
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: primaryColorConst,
+    primary: blueColorConst,
     onPrimary: Colors.white,
-    secondary: secondaryColorConst,
+    secondary: greenColorConst,
     onSecondary: Colors.white,
-    tertiary: tertiaryColorConst,
+    tertiary: yellowColorConst,
     onTertiary: Colors.white,
     error: Colors.red,
     onError: Colors.white,

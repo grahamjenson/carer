@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:carer/models/clean_sgv.dart';
-import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
@@ -76,7 +75,7 @@ class _MagArrowState extends State<MagArrow> with ThemeMixin {
 
 int? findMagnitude() {
   var mag = 0;
-  switch (diffRange7()) {
+  switch (diffRange()) {
     case Range7.veryVeryLow:
       mag = -3;
       break;
@@ -102,25 +101,23 @@ int? findMagnitude() {
   return mag;
 }
 
-Range7 diffRange7() {
+Range7 diffRange() {
   var lastSGV = CleanSGV.lastSGV.value;
   if (lastSGV == null) {
     return Range7.mid;
   }
-  var (dr, _) = diffRange(TargetSettings().fastDropDelta, TargetSettings().fastRiseDelta, lastSGV.rate5m ?? 0);
-
-  return dr;
+  return diffRange7(lastSGV.rate5m ?? 0);
 }
 
 class MyPainter extends CustomPainter {
   int? magnitutude;
-  Color primaryColor;
-  MyPainter(this.magnitutude, this.primaryColor);
+  Color color;
+  MyPainter(this.magnitutude, this.color);
 
   @override
   void paint(Canvas canvas, Size size) {
-    Color main = primaryColor;
-    Color dim = primaryColor.dim.dim.dim;
+    Color main = color;
+    Color dim = color.dim.dim.dim;
 
     Paint paint = Paint();
     double minV = min(size.height, size.width);

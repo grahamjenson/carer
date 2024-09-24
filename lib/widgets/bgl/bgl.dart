@@ -22,6 +22,8 @@ class BGL extends StatelessWidget with ThemeMixin {
         }
         var unit = UISettings().unit;
 
+        var rColor = rangeColor(context);
+        var dColor = diffColor(context);
         return AspectRatio(
             aspectRatio: 1.5,
             child: Stack(
@@ -45,7 +47,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                       child: FittedBox(
                         child: Text(
                           sgv.sgvStr(unit),
-                          style: displayLarge(context).copyWith(height: 1),
+                          style: displayLarge(context).merge(shadows()).copyWith(color: rColor),
                         ),
                       ),
                     )),
@@ -59,7 +61,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                         child: FittedBox(
                             child: Text(
                           sgv.rate5mWithSign(unit),
-                          style: displayLarge(context).copyWith(height: 1),
+                          style: displayLarge(context).merge(shadows()).copyWith(color: dColor),
                         )),
                       ),
                       const Flexible(child: FractionallySizedBox(heightFactor: 1, child: MagArrow())),
