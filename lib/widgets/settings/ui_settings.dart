@@ -36,27 +36,63 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
               },
             ),
             timeSettingTile(context),
-            SettingsTile(
-              title: const Text("Layout"),
-              trailing: DropdownButton(
-                alignment: Alignment.topLeft,
-                items: UILayout.values
-                    .map((e) => DropdownMenuItem(
-                          value: e,
-                          child: SizedBox(width: 130, child: Text(e.viewName)),
-                        ))
-                    .toList(),
-                value: UISettings().layout,
-                onChanged: (value) {
-                  if (value == null) return;
-                  UISettings().layout = value;
-                },
-              ),
-            ),
+            layoutTile(context),
           ],
         );
       },
       debugLabel: "UISettingsWidget",
+    );
+  }
+
+  SettingsTile layoutTile(BuildContext context) {
+    var size = 50.0;
+    return SettingsTile(
+      title: const Text("Layout"),
+      descriptionInlineIos: true,
+      trailing: ToggleButtons(
+        constraints: BoxConstraints(
+          maxHeight: size * 0.8,
+          maxWidth: size * 1.2,
+        ),
+        renderBorder: true,
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 4,
+        isSelected: [
+          UISettings().layout == UILayout.showBGLChartHistoryStats,
+          UISettings().layout == UILayout.showBGL,
+          UISettings().layout == UILayout.showMinimal,
+        ],
+        onPressed: (int index) {
+          switch (index) {
+            case 0:
+              UISettings().layout = UILayout.showBGLChartHistoryStats;
+              break;
+            case 1:
+              UISettings().layout = UILayout.showBGL;
+              break;
+            case 2:
+              UISettings().layout = UILayout.showMinimal;
+              break;
+          }
+        },
+        children: [
+          ToggleButton(
+            text: "Everything",
+            height: size * 0.8,
+            width: size * 1.2,
+          ),
+          ToggleButton(
+            text: "BGL",
+            height: size * 0.8,
+            width: size * 1.2,
+          ),
+          ToggleButton(
+            text: "Minimal",
+            height: size * 0.8,
+            width: size * 1.2,
+          ),
+        ],
+      ),
     );
   }
 
