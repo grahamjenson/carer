@@ -40,8 +40,54 @@ class AlarmSet extends Iterable<Alarm> {
   }
 }
 
-abstract class Alarm {
-  const Alarm();
+// TODO this is a step towards having all alarms as static
+enum Alarm {
+  predictiveLow(PredictiveLowAlarm()),
+  urgentLow(UrgentLowAlarm()),
+  low(LowAlarm()),
+  high(HighAlarm()),
+  urgentHigh(UrgentHighAlarm()),
+  fastRise(FastRiseAlarm()),
+  fastDrop(FastDropAlarm()),
+  noData(NoDataAlarm()),
+  carerPhoneLowBattery(CarerPhoneLowBatteryAlarm()),
+  t1DPhoneLowBattery(T1DPhoneLowBatteryAlarm());
+
+  final AlarmMethods methods;
+
+  const Alarm(this.methods);
+
+  bool trigger() {
+    return methods.trigger();
+  }
+
+  bool active() {
+    return methods.active();
+  }
+
+  bool smartSnooze() {
+    return methods.smartSnooze();
+  }
+
+  List<String> properties() {
+    return methods.properties();
+  }
+
+  String status() {
+    return methods.status();
+  }
+
+  IconData icon() {
+    return methods.icon();
+  }
+
+  (bool, bool, bool) alarmStatus() {
+    return methods.alarmStatus();
+  }
+}
+
+abstract class AlarmMethods {
+  const AlarmMethods();
 
   bool trigger();
   bool active();
@@ -111,7 +157,7 @@ abstract class Alarm {
   }
 }
 
-class PredictiveLowAlarm extends Alarm {
+class PredictiveLowAlarm extends AlarmMethods {
   const PredictiveLowAlarm();
 
   @override
@@ -152,7 +198,7 @@ class PredictiveLowAlarm extends Alarm {
   }
 }
 
-class UrgentLowAlarm extends Alarm {
+class UrgentLowAlarm extends AlarmMethods {
   const UrgentLowAlarm();
 
   @override
@@ -172,7 +218,7 @@ class UrgentLowAlarm extends Alarm {
   }
 }
 
-class LowAlarm extends Alarm {
+class LowAlarm extends AlarmMethods {
   const LowAlarm();
 
   @override
@@ -209,7 +255,7 @@ class LowAlarm extends Alarm {
   }
 }
 
-class HighAlarm extends Alarm {
+class HighAlarm extends AlarmMethods {
   const HighAlarm();
 
   @override
@@ -264,7 +310,7 @@ class HighAlarm extends Alarm {
   }
 }
 
-class UrgentHighAlarm extends Alarm {
+class UrgentHighAlarm extends AlarmMethods {
   const UrgentHighAlarm();
 
   @override
@@ -284,7 +330,7 @@ class UrgentHighAlarm extends Alarm {
   }
 }
 
-class FastRiseAlarm extends Alarm {
+class FastRiseAlarm extends AlarmMethods {
   const FastRiseAlarm();
 
   @override
@@ -329,7 +375,7 @@ class FastRiseAlarm extends Alarm {
   }
 }
 
-class FastDropAlarm extends Alarm {
+class FastDropAlarm extends AlarmMethods {
   const FastDropAlarm();
 
   @override
@@ -376,7 +422,7 @@ class FastDropAlarm extends Alarm {
   }
 }
 
-class NoDataAlarm extends Alarm {
+class NoDataAlarm extends AlarmMethods {
   const NoDataAlarm();
 
   @override
@@ -426,7 +472,7 @@ class NoDataAlarm extends Alarm {
   }
 }
 
-class CarerPhoneLowBatteryAlarm extends Alarm {
+class CarerPhoneLowBatteryAlarm extends AlarmMethods {
   const CarerPhoneLowBatteryAlarm();
 
   @override
@@ -456,7 +502,7 @@ class CarerPhoneLowBatteryAlarm extends Alarm {
   }
 }
 
-class T1DPhoneLowBatteryAlarm extends Alarm {
+class T1DPhoneLowBatteryAlarm extends AlarmMethods {
   const T1DPhoneLowBatteryAlarm();
 
   @override

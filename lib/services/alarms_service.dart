@@ -23,37 +23,6 @@ class AlarmsService {
   factory AlarmsService() => _singleton;
   final AlarmPlayer player = AlarmPlayer();
 
-  final Alarm _noDataAlarm = const NoDataAlarm();
-  final Alarm _predictiveLowAlarm = const PredictiveLowAlarm();
-  final Alarm _lowAlarm = const LowAlarm();
-  final Alarm _urgentLowAlarm = const UrgentLowAlarm();
-  final Alarm _highAlarm = const HighAlarm();
-  final Alarm _urgentHighAlarm = const UrgentHighAlarm();
-  final Alarm _fastDropAlarm = const FastDropAlarm();
-  final Alarm _fastRiseAlarm = const FastRiseAlarm();
-
-  final Alarm _carerBatteryAlarm = const CarerPhoneLowBatteryAlarm();
-  final Alarm _t1dBatteryAlarm = const T1DPhoneLowBatteryAlarm();
-
-  late final Set<Alarm> allAlarms = {
-    // Target Alarms
-    _urgentLowAlarm,
-    _lowAlarm,
-    _highAlarm,
-    _urgentHighAlarm,
-    // Rate Alarms
-    _fastDropAlarm,
-    _fastRiseAlarm,
-    // No Data Alarm
-    _noDataAlarm,
-    // Predictive Alarms
-    _predictiveLowAlarm,
-
-    // Battery Alarms
-    _carerBatteryAlarm,
-    _t1dBatteryAlarm,
-  };
-
   final ASignal<bool> _testAlarmPlayingSignal = ASignal<bool>(false, debugLabel: "TestAlarmPlaying");
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
@@ -145,7 +114,7 @@ class AlarmsService {
 
     var disabledAllAlarms = AlarmSettings().disableAlarms;
 
-    for (var alarm in allAlarms) {
+    for (var alarm in Alarm.values) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
 
       // Build the lists
@@ -170,18 +139,18 @@ class AlarmsService {
 
   Set<Alarm> filterAlarms(Set<Alarm> alarms) {
     // Remove predictive low if actually low
-    if (alarms.contains(_lowAlarm) && alarms.contains(_predictiveLowAlarm)) {
-      alarms.remove(_predictiveLowAlarm);
+    if (alarms.contains(Alarm.low) && alarms.contains(Alarm.predictiveLow)) {
+      alarms.remove(Alarm.predictiveLow);
     }
 
     // remove low if urgent low
-    if (alarms.contains(_lowAlarm) && alarms.contains(_urgentLowAlarm)) {
-      alarms.remove(_lowAlarm);
+    if (alarms.contains(Alarm.low) && alarms.contains(Alarm.urgentLow)) {
+      alarms.remove(Alarm.low);
     }
 
     // remove high if urgent high
-    if (alarms.contains(_highAlarm) && alarms.contains(_urgentHighAlarm)) {
-      alarms.remove(_highAlarm);
+    if (alarms.contains(Alarm.high) && alarms.contains(Alarm.urgentHigh)) {
+      alarms.remove(Alarm.high);
     }
     return alarms;
   }

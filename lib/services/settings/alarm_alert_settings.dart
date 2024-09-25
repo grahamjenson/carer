@@ -175,7 +175,7 @@ class AlarmAlertSettings {
     });
 
     var time = clock.now().add(Duration(seconds: value));
-    alog("Alarm: Sleep: Sleep Duration Seconds set to $time from ${sleepUntilSignal.peek} because timer expired");
+    alog("Alarm: Sleep: Sleep Duration Seconds set to $time from ${sleepUntilSignal.peek}");
     sleepUntilSignal.value = time;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +26,14 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
     super.initState();
 
     _timer = Timer(Duration(seconds: widget.popTime), () {
-      Navigator.of(context).pop(null);
+      setSleep(null);
     });
+  }
+
+  setSleep(int? sleepTime) {
+    sleepTime ??= 0;
+    AlarmAlertSettings().setSleepDurationSeconds(sleepTime, "SleepDialogReturned");
+    Navigator.of(context).pop();
   }
 
   @override
@@ -57,7 +64,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.of(context).pop(null);
+              setSleep(null);
             },
             child: Container(
               color: Colors.transparent, // Ensure the container is transparent
@@ -74,7 +81,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop(null);
+                        setSleep(null);
                       },
                       child: const Text("Cancel", style: SleepTimePage.textStyle),
                     ),
@@ -147,7 +154,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
           child: ElevatedButton(
             style: buttonStyle,
             onPressed: () {
-              Navigator.of(context).pop(time * 60);
+              setSleep(time * 60);
             },
             child: Text(
               "${time}m",
@@ -171,7 +178,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
           child: ElevatedButton(
             style: buttonStyle,
             onPressed: () {
-              Navigator.of(context).pop(time * 60 * 60);
+              setSleep(time * 60 * 60);
             },
             child: Text(
               "${time}h",
@@ -194,7 +201,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
         child: ElevatedButton(
           style: buttonStyle,
           onPressed: () {
-            Navigator.of(context).pop(Dates.secondsTillNext24HourTime(time));
+            setSleep(Dates.secondsTillNext24HourTime(time));
           },
           child: Text(
             Dates.stringOf24HourTime(time),
