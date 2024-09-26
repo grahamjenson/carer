@@ -1,8 +1,14 @@
+import 'package:carer/services/alarms/alarms.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/alarms_pages/diff_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/prediction_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/range_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/urgent_high_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/urgent_low_page.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -22,8 +28,10 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         if (!AlarmSettings().disableAlarms) {
           tiles = [
             disableAlarms(context),
-            rangeAlarms(context),
-            predictionAlarms(context),
+            urgentLowAlarm(context),
+            lowAlarm(context),
+            highAlarm(context),
+            urgentHighAlarm(context),
             diffSettings(context),
             noDataAlarmSettings(),
             batteryAlarms(),
@@ -35,6 +43,80 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
         );
       },
       debugLabel: "AlarmsSettingsWidget",
+      dependencies: AlarmSettings().allSignals() + TargetSettings().allSignals() + AlarmAlertSettings().allSignals(),
+    );
+  }
+
+  SettingsTile urgentLowAlarm(BuildContext context) {
+    var unit = UISettings().unit;
+    String description = "Alarm Below ${unit.str(TargetSettings().lowUrgent)}";
+    if (!AlarmSettings().urgentLowAlarm) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("Urgent Low Alarm"),
+      leading: Icon(Alarm.urgentLow.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const UrgentAlarmLowSettingsPage())),
+    );
+  }
+
+  SettingsTile lowAlarm(BuildContext context) {
+    var unit = UISettings().unit;
+    String description = "Alarm Below ${unit.str(TargetSettings().lowTarget)}";
+    if (AlarmSettings().lowPredictionAlarm) {
+      description += " (w/ Predictive Low in ${AlarmSettings().lowPredictionMinutes}m)";
+    }
+    if (!AlarmSettings().lowAlarm) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("Low Alarm"),
+      leading: Icon(Alarm.low.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const LowAlarmSettingsPage())),
+    );
+  }
+
+  SettingsTile highAlarm(BuildContext context) {
+    var unit = UISettings().unit;
+    String description = "Alarm Above ${unit.str(TargetSettings().highTarget)}";
+    if (AlarmSettings().highMinutes > 0) {
+      description += " for ${AlarmSettings().highMinutes}m";
+    }
+    if (AlarmAlertSettings().smartSnoozeHigh) {
+      description += " (w/ Smart Snooze)";
+    }
+    if (!AlarmSettings().highAlarm) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("High Alarm"),
+      leading: Icon(Alarm.high.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const HighAlarmSettingsPage())),
+    );
+  }
+
+  SettingsTile urgentHighAlarm(BuildContext context) {
+    var unit = UISettings().unit;
+    String description = "Alarm Above ${unit.str(TargetSettings().highUrgent)}";
+    if (!AlarmSettings().urgentHighAlarm) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("Urgent High Alarm"),
+      leading: Icon(Alarm.urgentHigh.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const UrgentAlarmHighSettingsPage())),
     );
   }
 
@@ -83,73 +165,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           AlarmSettings().disableAlarms = true;
         }
       },
-    );
-  }
-
-  SettingsTile rangeAlarms(BuildContext context) {
-    return SettingsTile.navigation(
-      title: const Text("Range"),
-      enabled: !AlarmSettings().disableAlarms,
-      descriptionInlineIos: true,
-      description: const Text(
-        "Out of range",
-      ),
-      onPressed: (context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RangeAlarmPage()),
-        );
-      },
-      trailing: ToggleButtons(
-        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
-        renderBorder: true,
-        borderRadius: BorderRadius.circular(10),
-        borderWidth: 0,
-        isSelected: [
-          AlarmSettings().urgentLowAlarm,
-          AlarmSettings().lowAlarm,
-          AlarmSettings().highAlarm,
-          AlarmSettings().urgentHighAlarm,
-        ],
-        onPressed: (int index) async {
-          switch (index) {
-            case 0:
-              AlarmSettings().urgentLowAlarm = !AlarmSettings().urgentLowAlarm;
-              break;
-            case 1:
-              AlarmSettings().lowAlarm = !AlarmSettings().lowAlarm;
-              break;
-            case 2:
-              AlarmSettings().highAlarm = !AlarmSettings().highAlarm;
-              break;
-            case 3:
-              AlarmSettings().urgentHighAlarm = !AlarmSettings().urgentHighAlarm;
-              break;
-          }
-        },
-        children: [
-          const ToggleButton(
-            text: "Urgent Low",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "Low\n${AlarmSettings().lowMinutes}m",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "High\n${AlarmSettings().highMinutes}m",
-            height: _size,
-            width: _size,
-          ),
-          const ToggleButton(
-            text: "Urgent High",
-            height: _size,
-            width: _size,
-          ),
-        ],
-      ),
     );
   }
 
@@ -286,41 +301,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
           ),
         ],
       ),
-    );
-  }
-
-  SettingsTile predictionAlarms(BuildContext context) {
-    return SettingsTile.navigation(
-      title: const Text("Prediciton alarms"),
-      descriptionInlineIos: true,
-      onPressed: (context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PredictionAlarmPage()),
-        );
-      },
-      trailing: ToggleButtons(
-          constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
-          renderBorder: true,
-          borderRadius: BorderRadius.circular(10),
-          borderWidth: 0,
-          isSelected: [
-            AlarmSettings().lowPredictionAlarm,
-          ],
-          onPressed: (int index) {
-            switch (index) {
-              case 0:
-                AlarmSettings().lowPredictionAlarm = !AlarmSettings().lowPredictionAlarm;
-                break;
-            }
-          },
-          children: [
-            ToggleButton(
-              text: "Low\n${AlarmSettings().lowPredictionMinutes}m",
-              height: _size,
-              width: _size,
-            ),
-          ]),
     );
   }
 }

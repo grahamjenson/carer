@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
@@ -19,6 +20,9 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       (context) {
         double width = min(820, MediaQuery.of(context).size.width);
 
+        if (AlarmSettings().disableAlarms) {
+          return const SizedBox.shrink();
+        }
         List<SettingsTile> tiles = [
           brightnessAdjust(),
           volumeOverride(context),

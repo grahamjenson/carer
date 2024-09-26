@@ -138,11 +138,6 @@ class AlarmsService {
   }
 
   Set<Alarm> filterAlarms(Set<Alarm> alarms) {
-    // Remove predictive low if actually low
-    if (alarms.contains(Alarm.low) && alarms.contains(Alarm.predictiveLow)) {
-      alarms.remove(Alarm.predictiveLow);
-    }
-
     // remove low if urgent low
     if (alarms.contains(Alarm.low) && alarms.contains(Alarm.urgentLow)) {
       alarms.remove(Alarm.low);

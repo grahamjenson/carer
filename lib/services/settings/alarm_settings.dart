@@ -6,7 +6,6 @@ enum _AlarmNames {
 
   urgentLowAlarm,
   lowAlarm,
-  lowMinutes,
   highAlarm,
   highMinutes,
   urgentHighAlarm,
@@ -34,7 +33,6 @@ class AlarmSettings {
     _AlarmNames.disableAlarms: ASignal<bool>(true, debugLabel: 'disableAlarms'),
     _AlarmNames.urgentLowAlarm: ASignal<bool>(false, debugLabel: 'urgentLowAlarm'),
     _AlarmNames.lowAlarm: ASignal<bool>(false, debugLabel: 'lowAlarm'),
-    _AlarmNames.lowMinutes: ASignal<int>(5, debugLabel: 'lowMinutes'),
     _AlarmNames.highAlarm: ASignal<bool>(false, debugLabel: 'highAlarm'),
     _AlarmNames.highMinutes: ASignal<int>(5, debugLabel: 'highMinutes'),
     _AlarmNames.urgentHighAlarm: ASignal<bool>(false, debugLabel: 'urgentHighAlarm'),
@@ -59,9 +57,6 @@ class AlarmSettings {
 
   bool get lowAlarm => _signals[_AlarmNames.lowAlarm]!.value as bool;
   set lowAlarm(bool value) => _signals[_AlarmNames.lowAlarm]!.value = value;
-
-  int get lowMinutes => _signals[_AlarmNames.lowMinutes]!.value as int;
-  set lowMinutes(int value) => minutesSet(_signals[_AlarmNames.lowMinutes]! as ASignal<int>, value);
 
   bool get highAlarm => _signals[_AlarmNames.highAlarm]!.value as bool;
   set highAlarm(bool value) => _signals[_AlarmNames.highAlarm]!.value = value;
@@ -150,7 +145,7 @@ class AlarmSettings {
     urgentLowAlarm = prefs.getBool(_AlarmNames.urgentLowAlarm.name, defaultValue: false)!;
     lowAlarm = prefs.getBool(_AlarmNames.lowAlarm.name, defaultValue: false)!;
     highAlarm = prefs.getBool(_AlarmNames.highAlarm.name, defaultValue: false)!;
-    lowMinutes = prefs.getInt(_AlarmNames.lowMinutes.name, defaultValue: 30)!;
+
     highMinutes = prefs.getInt(_AlarmNames.highMinutes.name, defaultValue: 30)!;
     urgentHighAlarm = prefs.getBool(_AlarmNames.urgentHighAlarm.name, defaultValue: false)!;
     lowPredictionAlarm = prefs.getBool(_AlarmNames.lowPredictionAlarm.name, defaultValue: false)!;
@@ -170,8 +165,6 @@ class AlarmSettings {
     aeffect(() => prefs.setBool(_AlarmNames.urgentLowAlarm.name, urgentLowAlarm), debugLabel: 'urgentLowAlarm');
 
     aeffect(() => prefs.setBool(_AlarmNames.lowAlarm.name, lowAlarm), debugLabel: 'lowAlarm');
-
-    aeffect(() => prefs.setInt(_AlarmNames.lowMinutes.name, lowMinutes), debugLabel: 'lowMinutes');
 
     aeffect(() => prefs.setBool(_AlarmNames.highAlarm.name, highAlarm), debugLabel: 'highAlarm');
 

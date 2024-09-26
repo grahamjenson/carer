@@ -50,7 +50,7 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
       message: alarm.status(),
       triggerMode: TooltipTriggerMode.tap,
       child: Icon(
-        alarm.icon(),
+        alarm.icon,
         color: color,
       ),
     );

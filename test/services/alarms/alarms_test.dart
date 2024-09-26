@@ -66,7 +66,7 @@ void main() async {
       expect(smartSnooze, false);
 
       AlarmSettings().lowAlarm = true;
-      AlarmSettings().lowMinutes = 10;
+
       TargetSettings().lowTarget = 72;
 
       expect(await SQLToSGV().save(SGV(value: 70, date: clock.now(), eid: "1")), true);
@@ -187,14 +187,14 @@ void main() async {
     });
 
     test("PredictiveLowAlarm", () async {
-      AlarmMethods alarm = const PredictiveLowAlarm();
+      AlarmMethods alarm = const LowAlarm();
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
       expect(smartSnooze, false);
 
       AlarmSettings().lowPredictionAlarm = true;
-      AlarmSettings().lowMinutes = 10;
+
       TargetSettings().lowTarget = 72;
 
       expect(await SQLToSGV().save(SGV(value: 80, date: clock.now(), eid: "1")), true);

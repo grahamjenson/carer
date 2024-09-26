@@ -3,6 +3,7 @@ import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
@@ -74,6 +75,10 @@ class CleanSGV with DateMixin {
   @override
   String toString() {
     return "SGV($value@${date.hour}:${date.minute})";
+  }
+
+  String unitStr() {
+    return UISettings().unit.str(value);
   }
 
   bool get withinLast3Hours => date.isAfter(clock.now().subtract(const Duration(hours: 3)));

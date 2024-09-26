@@ -95,6 +95,13 @@ mixin ThemeMixin {
     return Theme.of(context).colorScheme.onError;
   }
 
+  Color outlineColor(BuildContext context) {
+    return Theme.of(context).colorScheme.outline;
+  }
+
+  ///
+  // Text Styles
+  ///
   TextStyle displayLarge(BuildContext context) {
     return Theme.of(context).textTheme.displayLarge!;
   }
@@ -285,18 +292,18 @@ ThemeData normalTheme = ThemeData(
     ),
   )),
   colorScheme: ColorScheme(
-    brightness: Brightness.dark,
-    primary: blueColorConst,
-    onPrimary: Colors.white,
-    secondary: redColorConst,
-    onSecondary: Colors.white,
-    tertiary: yellowColorConst,
-    onTertiary: Colors.white,
-    error: Colors.red,
-    onError: Colors.white,
-    surface: Colors.grey[900]!,
-    onSurface: Colors.white,
-  ),
+      brightness: Brightness.dark,
+      primary: blueColorConst,
+      onPrimary: Colors.white,
+      secondary: redColorConst,
+      onSecondary: Colors.white,
+      tertiary: yellowColorConst,
+      onTertiary: Colors.white,
+      error: Colors.red,
+      onError: Colors.white,
+      surface: Colors.grey[900]!,
+      onSurface: Colors.white,
+      outline: blueColorConst.dim),
 );
 
 ThemeData dimTheme = normalTheme.copyWith(

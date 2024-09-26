@@ -42,7 +42,6 @@ class AlarmSet extends Iterable<Alarm> {
 
 // TODO this is a step towards having all alarms as static
 enum Alarm {
-  predictiveLow(PredictiveLowAlarm()),
   urgentLow(UrgentLowAlarm()),
   low(LowAlarm()),
   high(HighAlarm()),
@@ -77,7 +76,7 @@ enum Alarm {
     return methods.status();
   }
 
-  IconData icon() {
+  IconData get icon {
     return methods.icon();
   }
 
@@ -111,14 +110,6 @@ abstract class AlarmMethods {
     return (trigger(), active(), smartSnooze());
   }
 
-  int lastSgvReading() {
-    var lastSGV = CleanSGV.lastSGV.value;
-    if (lastSGV == null) {
-      return 0;
-    }
-    return lastSGV.value;
-  }
-
   Range5 get targetRange5 {
     var lastSGV = CleanSGV.lastSGV.value;
 
@@ -149,52 +140,15 @@ abstract class AlarmMethods {
   }
 
   String lastSGVStr() {
-    return unitStr(lastSgvReading());
+    var lastSGV = CleanSGV.lastSGV.value;
+    if (lastSGV == null) {
+      return "?";
+    }
+    return lastSGV.unitStr();
   }
 
   String unitStr(int value) {
     return UISettings().unit.str(value);
-  }
-}
-
-class PredictiveLowAlarm extends AlarmMethods {
-  const PredictiveLowAlarm();
-
-  @override
-  List<String> properties() {
-    return [
-      "${PredictionService().getReadingsAhead(numberOfReadings)}",
-      "pRange($range)",
-    ];
-  }
-
-  @override
-  IconData icon() => UniconsLine.windsock;
-
-  @override
-  String status() =>
-      "Predictive Low ${unitStr(PredictionService().getReadingsAheadValue(numberOfReadings))} < ${unitStr(TargetSettings().lowTarget)}";
-
-  int get numberOfReadings => AlarmSettings().lowPredictionMinutes ~/ 5;
-
-  Range5? get range {
-    CleanSGV? sgv = PredictionService().getReadingsAhead(numberOfReadings);
-    if (sgv == null) {
-      return null;
-    }
-    var (range, _) = targetRange(sgv.value);
-    return range;
-  }
-
-  @override
-  bool trigger() {
-    var r = range;
-    return r == Range5.veryLow || r == Range5.low;
-  }
-
-  @override
-  bool active() {
-    return AlarmSettings().lowPredictionAlarm;
   }
 }
 
@@ -222,7 +176,19 @@ class LowAlarm extends AlarmMethods {
   const LowAlarm();
 
   @override
-  String status() => "Low ${lastSGVStr()} < ${unitStr(TargetSettings().lowTarget)}";
+  String status() {
+    if (_lowTrigger()) {
+      return "Low ${lastSGVStr()} < ${unitStr(TargetSettings().lowTarget)}";
+    }
+    if (_predictiveTrigger()) {
+      var sgv = PredictionService().getReadingsAhead(numberOfReadings);
+      if (sgv == null) {
+        return "?";
+      }
+      return "Predicted Low ${sgv.unitStr()} < ${unitStr(TargetSettings().lowTarget)}";
+    }
+    return "?";
+  }
 
   @override
   IconData icon() => UniconsLine.temperature_empty;
@@ -230,23 +196,35 @@ class LowAlarm extends AlarmMethods {
   @override
   List<String> properties() {
     return [
-      "mins($mins)",
+      "prediction(${PredictionService().getReadingsAhead(numberOfReadings)})",
     ];
   }
 
-  int get mins => AlarmSettings().lowMinutes;
+  bool _lowTrigger() {
+    return targetRange5 == Range5.low || targetRange5 == Range5.veryLow;
+  }
 
   @override
   bool trigger() {
-    var latest = targetRange5 == Range5.low || targetRange5 == Range5.veryLow;
-    if (!latest) {
+    return _lowTrigger() || _predictiveTrigger();
+  }
+
+  ///
+  // Predictive Bit of the Alarm
+  ///
+
+  int get numberOfReadings => AlarmSettings().lowPredictionMinutes ~/ 5;
+
+  bool _predictiveTrigger() {
+    if (!AlarmSettings().lowPredictionAlarm) {
       return false;
     }
-    List<Range5> targets = targetRange5ForMins(AlarmSettings().lowMinutes);
-    if (targets.isEmpty) {
-      return true;
+    CleanSGV? sgv = PredictionService().getReadingsAhead(numberOfReadings);
+    if (sgv == null) {
+      return false;
     }
-    return targets.every((e) => e == Range5.low || e == Range5.veryLow);
+
+    return sgv.range == Range5.veryLow || sgv.range == Range5.low;
   }
 
   @override
@@ -305,7 +283,7 @@ class HighAlarm extends AlarmMethods {
     if (sgv == null) {
       return false;
     }
-    var (range, _) = targetRange(sgv.value);
+    var range = sgv.range;
     return AlarmAlertSettings().smartSnoozeHigh && range == Range5.mid;
   }
 }

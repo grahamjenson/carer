@@ -12,7 +12,7 @@ class Window extends StatelessWidget with ThemeMixin {
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        border: Border.all(width: 0, color: primaryColor(context)),
+        border: Border.all(width: 0, color: outlineColor(context)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

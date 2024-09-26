@@ -4,19 +4,35 @@ import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class PredictionAlarmPage extends StatelessWidget {
-  const PredictionAlarmPage({super.key});
+class LowAlarmSettingsPage extends StatelessWidget {
+  const LowAlarmSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Low Alarm'),
+        title: const Text('Low Alarm Settings'),
       ),
       body: AWatch(
-        (_) {
+        (context) {
           return SettingsList(
             sections: [
+              SettingsSection(
+                title: const Text('Low Alarm'),
+                tiles: [
+                  SettingsTile.switchTile(
+                    title: const Text("Low Alarm"),
+                    descriptionInlineIos: true,
+                    description: const Text(
+                      "Low Alarm",
+                    ),
+                    initialValue: AlarmSettings().lowAlarm,
+                    onToggle: (value) {
+                      AlarmSettings().lowAlarm = value;
+                    },
+                  ),
+                ],
+              ),
               SettingsSection(
                 title: const Text('Predicted Low Alarm'),
                 tiles: [
@@ -45,7 +61,7 @@ class PredictionAlarmPage extends StatelessWidget {
             ],
           );
         },
-        debugLabel: "PredictionAlarmPage",
+        debugLabel: "LowAlarmSettingsPage",
       ),
     );
   }
