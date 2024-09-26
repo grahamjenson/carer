@@ -301,7 +301,7 @@ ThemeData normalTheme = ThemeData(
     onTertiary: Colors.white,
     error: Colors.red,
     onError: Colors.white,
-    surface: Colors.grey[900]!,
+    surface: Colors.grey[850]!,
     onSurface: Colors.white,
     outline: blueColorConst.dim,
   ),

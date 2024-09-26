@@ -87,15 +87,16 @@ class ValueAtTime with DateMixin {
     return v;
   }
 
+  static ASignal<List<ValueAtTime>> last2Days = ASignal([], debugLabel: 'valueAtTimeLast2Days');
   static ASignal<List<ValueAtTime>> lastSixHours = ASignal([], debugLabel: 'valueAtTimeLastSixHours');
 
-  static Future<List<ValueAtTime>> updateValues() async {
+  static Future<List<ValueAtTime>> updateValues(int hoursAgo) async {
     alog('ValueAtTime.updateValues');
     var now = clock.now();
     // rounded to nearest minute
     now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
 
-    var start = now.subtract(const Duration(hours: 6));
+    var start = now.subtract(Duration(hours: hoursAgo));
 
     var profiles = await Profile.after(start);
     var tempTargets = await TempTarget.after(start);
@@ -103,7 +104,7 @@ class ValueAtTime with DateMixin {
 
     // go over the last 6 hours and for every minute generate a new ValueAtTime
     List<ValueAtTime> vats = [];
-    for (var i = 0; i < 120; i++) {
+    for (var i = 0; i < hoursAgo * 60; i++) {
       var d = now.subtract(Duration(minutes: i));
       vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
     }
@@ -112,11 +113,8 @@ class ValueAtTime with DateMixin {
   }
 
   static setupSQLSignals() {
-    signalAssign(lastSixHours, updateValues, debugLabel: 'valueAtTimeLastSixHours', dependencies: [
-      TimerService().minuteSignal,
-      SQLToProfile().writeSignal,
-      SQLToTempBasal().writeSignal,
-      SQLToTempTarget().writeSignal,
-    ]);
+    var dependencies = [TimerService().minuteSignal, SQLToProfile().writeSignal, SQLToTempBasal().writeSignal, SQLToTempTarget().writeSignal];
+    signalAssign(lastSixHours, () async => await updateValues(6), debugLabel: 'valueAtTimeLastSixHours', dependencies: dependencies);
+    signalAssign(last2Days, () async => await updateValues(48), debugLabel: 'valueAtTimeLast2Days', dependencies: dependencies);
   }
 }

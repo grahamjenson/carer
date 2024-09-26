@@ -90,38 +90,44 @@ class Treatment with DateMixin {
   // Future Signals
   ////
 
+  static ASignal<List<Treatment>> last2days = ASignal([], debugLabel: 'treatmentsLast2Days');
   static ASignal<List<Treatment>> lastSixHours = ASignal([], debugLabel: 'treatmentsLastSixHours');
 
+  static _getLastTime(int minsAgo) async {
+    var carbs = await SQLToCarbs().lastMins(minsAgo);
+    var bolus = await SQLToBolus().lastMins(minsAgo);
+
+    // group and total all carbs and boluses to 5 minute windows that is based on hour,
+    // e.g. 12:00:00 - 12:04:59, 12:05:00 - 12:09:59, 12:10:00 - 12:14:59
+
+    // This is in minutes since epoch
+    Map<int, Treatment> timeBuckets = {};
+    DateTime now = clock.now();
+    DateTime fiveMinutes = now.subtract(Duration(minutes: now.minute % 5, seconds: now.second, milliseconds: now.millisecond));
+
+    var numberOfBuckets = minsAgo / 5;
+    for (var i = 0; i < numberOfBuckets + 2; i++) {
+      var time = fiveMinutes.subtract(Duration(minutes: i * 5));
+      var treatment = Treatment(time);
+      timeBuckets[treatment.fiveMinsBucket] = Treatment(time);
+    }
+
+    for (var c in carbs) {
+      timeBuckets[c.fiveMinsBucket]!.addCarbModel(c);
+    }
+
+    for (var b in bolus) {
+      timeBuckets[b.fiveMinsBucket]!.addBolusModel(b);
+    }
+    var treatments = timeBuckets.values.where((t) => t.count > 0).toList();
+
+    return treatments;
+  }
+
   static setupSQLSignals() {
-    signalAssign(lastSixHours, () async {
-      var carbs = await SQLToCarbs().lastMins(360);
-      var bolus = await SQLToBolus().lastMins(360);
+    var dependencies = [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal];
+    signalAssign(lastSixHours, () async => await _getLastTime(360), debugLabel: 'treatmentsLastSixHours', dependencies: dependencies);
 
-      // group and total all carbs and boluses to 5 minute windows that is based on hour,
-      // e.g. 12:00:00 - 12:04:59, 12:05:00 - 12:09:59, 12:10:00 - 12:14:59
-
-      // This is in minutes since epoch
-      Map<int, Treatment> timeBuckets = {};
-      DateTime now = clock.now();
-      DateTime fiveMinutes = now.subtract(Duration(minutes: now.minute % 5, seconds: now.second, milliseconds: now.millisecond));
-
-      for (var i = 0; i < 73; i++) {
-        var time = fiveMinutes.subtract(Duration(minutes: i * 5));
-        var treatment = Treatment(time);
-        timeBuckets[treatment.fiveMinsBucket] = Treatment(time);
-      }
-
-      for (var c in carbs) {
-        timeBuckets[c.fiveMinsBucket]!.addCarbModel(c);
-      }
-
-      for (var b in bolus) {
-        timeBuckets[b.fiveMinsBucket]!.addBolusModel(b);
-      }
-      var treatments = timeBuckets.values.where((t) => t.count > 0).toList();
-
-      return treatments;
-      // merge two lists
-    }, debugLabel: 'treatmentsLastSixHours', dependencies: [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal]);
+    signalAssign(last2days, () async => await _getLastTime(2880), debugLabel: 'treatmentsLast2days', dependencies: dependencies);
   }
 }

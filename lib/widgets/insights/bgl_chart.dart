@@ -27,6 +27,8 @@ class BasalSpot extends FlSpot {
   BasalSpot(super.x, super.y, this.basal);
 }
 
+ASignal<int> _chartMinsAgo = ASignal<int>(120, debugLabel: "BGLChartminsAgo");
+
 class BGLChart extends StatelessWidget with ThemeMixin {
   final basalMultiplier = 18 * 3;
 
@@ -35,11 +37,11 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      int minsAgo = 120;
+      int minsAgo = _chartMinsAgo.value;
 
-      List<ValueAtTime> targets = ValueAtTime.lastSixHours.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<CleanSGV> sgvs = CleanSGV.last3Hours.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<Treatment> lastTreatments = Treatment.lastSixHours.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<CleanSGV> sgvs = CleanSGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<Treatment> lastTreatments = Treatment.last2days.value.where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);
@@ -57,26 +59,56 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       return Window(
         title: "",
         child: Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              right: 10,
-              top: 5,
-            ),
-            child: LineChart(
-              buildlineChartData(
-                context,
-                minsAgo,
-                maxBasal,
-                bglSpotData,
-                basalSpotData,
-                lowTargets,
-                highTargets,
-                treatments,
-                bglLineData,
+          child: Column(children: [
+            Flexible(
+                flex: 10,
+                child: ToggleButtons(
+                    constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
+                    isSelected: [
+                      _chartMinsAgo.value == 120,
+                      _chartMinsAgo.value == 360,
+                      _chartMinsAgo.value == 720,
+                      _chartMinsAgo.value == 1440,
+                      _chartMinsAgo.value == 2880,
+                    ],
+                    onPressed: (int index) {
+                      if (index == 0) {
+                        _chartMinsAgo.value = 120;
+                      } else if (index == 1) {
+                        _chartMinsAgo.value = 360;
+                      } else if (index == 2) {
+                        _chartMinsAgo.value = 720;
+                      } else if (index == 3) {
+                        _chartMinsAgo.value = 1440;
+                      } else if (index == 4) {
+                        _chartMinsAgo.value = 2880;
+                      }
+                    },
+                    children: const [
+                      Text("3h"),
+                      Text("6h"),
+                      Text("12h"),
+                      Text("24h"),
+                      Text("48h"),
+                    ])),
+            Expanded(
+              flex: 90,
+              child: LineChart(
+                buildlineChartData(
+                  context,
+                  minsAgo,
+                  maxBasal,
+                  bglSpotData,
+                  basalSpotData,
+                  lowTargets,
+                  highTargets,
+                  treatments,
+                  bglLineData,
+                ),
+                duration: Duration.zero,
               ),
-              duration: Duration.zero,
             ),
-          ),
+          ]),
         ),
       );
     }, debugLabel: "BGLChart");

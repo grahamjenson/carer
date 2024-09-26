@@ -19,7 +19,16 @@ class CurrentTimeWidget extends StatelessWidget with ThemeMixin {
         TextStyle style = displaySmall(context);
         var _ = TimerService().secondSignal.value;
         final String formattedDateTime = _formatDateTime(clock.now());
-        return Text(formattedDateTime, style: style.copyWith(color: style.color!));
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: outlineColor(context), // Border color
+              width: 4.0, // Border width
+            ),
+            borderRadius: BorderRadius.circular(12.0), // Adjust the radius as needed
+          ),
+          child: Text(formattedDateTime, style: style.copyWith(color: style.color!)),
+        );
       },
       debugLabel: "CurrentTimeWidget",
       doLog: false,
