@@ -49,11 +49,9 @@ enum Alarm {
   fastRise(FastRiseAlarm()),
   fastDrop(FastDropAlarm()),
   noData(NoDataAlarm()),
-  carerPhoneLowBattery(CarerPhoneLowBatteryAlarm()),
-  t1DPhoneLowBattery(T1DPhoneLowBatteryAlarm());
+  lowBattery(LowBatteryAlarm());
 
   final AlarmMethods methods;
-
   const Alarm(this.methods);
 
   bool trigger() {
@@ -349,7 +347,7 @@ class FastRiseAlarm extends AlarmMethods {
 
   @override
   bool active() {
-    return AlarmSettings().fastRiseAlarm;
+    return AlarmSettings().fastRiseAlarmMinutes > 0;
   }
 }
 
@@ -396,7 +394,7 @@ class FastDropAlarm extends AlarmMethods {
 
   @override
   bool active() {
-    return AlarmSettings().fastDropAlarm;
+    return AlarmSettings().fastDropAlarmMinutes > 0;
   }
 }
 
@@ -429,7 +427,7 @@ class NoDataAlarm extends AlarmMethods {
 
   @override
   bool trigger() {
-    if (AlarmSettings().noDataAlarmMinutes == -1) {
+    if (AlarmSettings().noDataAlarmMinutes > 0) {
       return false;
     }
 
@@ -446,28 +444,50 @@ class NoDataAlarm extends AlarmMethods {
 
   @override
   bool active() {
-    return AlarmSettings().noDataAlarmMinutes != -1;
+    return AlarmSettings().noDataAlarmMinutes > 0;
   }
 }
 
-class CarerPhoneLowBatteryAlarm extends AlarmMethods {
-  const CarerPhoneLowBatteryAlarm();
+class LowBatteryAlarm extends AlarmMethods {
+  const LowBatteryAlarm();
 
   @override
   IconData icon() => UniconsLine.battery_empty;
 
   @override
-  String status() => "This Phones Battery ${carerBatteryLevel()}% < 30%";
+  String status() {
+    var statusStr = "";
+    if (_carerTrigger()) {
+      statusStr += "This Battery < 10%";
+    }
+    if (_t1DTrigger()) {
+      statusStr += "T1D Battery(${t1dBatteryLevel()}%) < 10%";
+    }
+    return statusStr;
+  }
 
   @override
   bool trigger() {
-    // Less than 30% and not charging
-    return carerBatteryLevel() < 30 && !carerBatteryCharging();
+    return _carerTrigger() || _t1DTrigger();
+  }
+
+  bool _carerTrigger() {
+    if (!AlarmSettings().carerBatteryAlarm) {
+      return false;
+    }
+    return carerBatteryLevel() < 10 && !carerBatteryCharging();
+  }
+
+  bool _t1DTrigger() {
+    if (!AlarmSettings().t1dBatteryAlarm) {
+      return false;
+    }
+    return t1dBatteryLevel() < 10 && !t1dBatteryCharning();
   }
 
   @override
   bool active() {
-    return AlarmSettings().carerBatteryAlarm;
+    return AlarmSettings().carerBatteryAlarm || AlarmSettings().t1dBatteryAlarm;
   }
 
   int carerBatteryLevel() {
@@ -478,21 +498,6 @@ class CarerPhoneLowBatteryAlarm extends AlarmMethods {
     var bm = PlatformInfoService().batteryMode.value;
     return bm == BatteryMode.charging;
   }
-}
-
-class T1DPhoneLowBatteryAlarm extends AlarmMethods {
-  const T1DPhoneLowBatteryAlarm();
-
-  @override
-  IconData icon() => UniconsLine.battery_empty;
-
-  @override
-  String status() => "Uploader/T1D Phones Battery  ${t1dBatteryLevel()}% < 30";
-
-  @override
-  bool trigger() {
-    return t1dBatteryLevel() < 30 && !t1dBatteryCharning();
-  }
 
   int t1dBatteryLevel() {
     return PropertiesData().battery.toInt();
@@ -500,10 +505,5 @@ class T1DPhoneLowBatteryAlarm extends AlarmMethods {
 
   bool t1dBatteryCharning() {
     return PropertiesData().isCharging;
-  }
-
-  @override
-  bool active() {
-    return AlarmSettings().t1dBatteryAlarm;
   }
 }

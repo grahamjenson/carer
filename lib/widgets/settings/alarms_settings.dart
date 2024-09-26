@@ -4,12 +4,14 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/settings/alarms_pages/diff_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/battery_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/fast_fall_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/fast_rise_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
+import 'package:carer/widgets/settings/alarms_pages/no_data_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/urgent_high_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/urgent_low_page.dart';
-import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -32,7 +34,8 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
             lowAlarm(context),
             highAlarm(context),
             urgentHighAlarm(context),
-            diffSettings(context),
+            fastRiseSettings(context),
+            fastFallSettings(context),
             noDataAlarmSettings(),
             batteryAlarms(),
           ];
@@ -120,6 +123,36 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
+  SettingsTile fastFallSettings(BuildContext context) {
+    var description = "Fast Drop Alarm after ${AlarmSettings().fastDropAlarmMinutes}m";
+    if (AlarmSettings().fastDropAlarmMinutes < 0) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("Fast Drop Alarm"),
+      leading: Icon(Alarm.fastDrop.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const FastFallAlarmSettingsPage())),
+    );
+  }
+
+  SettingsTile fastRiseSettings(BuildContext context) {
+    var description = "Fast Rise Alarm after ${AlarmSettings().fastRiseAlarmMinutes}m";
+    if (AlarmSettings().fastRiseAlarmMinutes < 0) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("Fast Rise Alarm"),
+      leading: Icon(Alarm.fastRise.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const FastRiseAlarmSettingsPage())),
+    );
+  }
+
   SettingsTile disableAlarms(BuildContext context) {
     return SettingsTile.switchTile(
       title: const Text("Disable Alarms"),
@@ -168,139 +201,42 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
     );
   }
 
-  SettingsTile diffSettings(BuildContext context) {
-    return SettingsTile.navigation(
-      title: const Text("Rise/Drop"),
-      onPressed: (context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DiffAlarmPage()),
-        );
-      },
-      descriptionInlineIos: true,
-      description: const Text("Rising or dropping quickly"),
-      trailing: ToggleButtons(
-        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
-        renderBorder: true,
-        borderRadius: BorderRadius.circular(10),
-        borderWidth: 0,
-        isSelected: [
-          AlarmSettings().fastDropAlarm,
-          AlarmSettings().fastRiseAlarm,
-        ],
-        onPressed: (int index) {
-          switch (index) {
-            case 0:
-              AlarmSettings().fastDropAlarm = !AlarmSettings().fastDropAlarmPeek;
-              break;
-            case 1:
-              AlarmSettings().fastRiseAlarm = !AlarmSettings().fastRiseAlarmPeek;
-              break;
-          }
-        },
-        children: [
-          ToggleButton(
-            height: _size,
-            width: _size,
-            text: "Fast Drop\n${AlarmSettings().fastDropAlarmMinutes}m",
-          ),
-          ToggleButton(
-            text: "Fast Rise\n${AlarmSettings().fastRiseAlarmMinutes}m",
-            height: _size,
-            width: _size,
-          ),
-        ],
-      ),
-    );
-  }
-
   SettingsTile noDataAlarmSettings() {
-    return SettingsTile(
-      title: const Text("No Data"),
-      trailing: ToggleButtons(
-        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size),
-        renderBorder: true,
-        borderRadius: BorderRadius.circular(10),
-        borderWidth: 0,
-        isSelected: [
-          10 == AlarmSettings().noDataAlarmMinutes,
-          20 == AlarmSettings().noDataAlarmMinutes,
-          30 == AlarmSettings().noDataAlarmMinutes,
-        ],
-        onPressed: (int index) {
-          var value = -1;
-          switch (index) {
-            case 0:
-              value = 10;
-              break;
-            case 1:
-              value = 20;
-              break;
-            case 2:
-              value = 30;
-              break;
-          }
-          if (value == AlarmSettings().noDataAlarmMinutes) {
-            value = -1; // disable
-          }
-          AlarmSettings().noDataAlarmMinutes = value;
-        },
-        children: const [
-          ToggleButton(
-            text: "10m",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "20m",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "30m",
-            height: _size,
-            width: _size,
-          ),
-        ],
-      ),
+    var description = "No Data Alarm after ${AlarmSettings().noDataAlarmMinutes}m";
+    if (AlarmSettings().noDataAlarmMinutes < 0) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
+      title: const Text("No Data Alarm"),
+      leading: Icon(Alarm.noData.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const NoDataAlarmSettingsPage())),
     );
   }
 
   SettingsTile batteryAlarms() {
-    return SettingsTile(
+    String description = "Battery below 10%(";
+    List<String> phones = [];
+    if (AlarmSettings().t1dBatteryAlarm) {
+      phones.add("T1D Phone");
+    }
+    if (AlarmSettings().carerBatteryAlarm) {
+      phones.add("This Phone");
+    }
+    description += "${phones.join(", ")})";
+
+    if (!AlarmSettings().t1dBatteryAlarm && !AlarmSettings().carerBatteryAlarm) {
+      description = "Off";
+    }
+
+    return SettingsTile.navigation(
       title: const Text("Low Battery Alarm"),
-      trailing: ToggleButtons(
-        constraints: const BoxConstraints(maxHeight: _size, maxWidth: _size * 2),
-        renderBorder: true,
-        borderRadius: BorderRadius.circular(10),
-        borderWidth: 0,
-        isSelected: [
-          AlarmSettings().carerBatteryAlarm,
-          AlarmSettings().t1dBatteryAlarm,
-        ],
-        onPressed: (int index) {
-          switch (index) {
-            case 0:
-              AlarmSettings().carerBatteryAlarm = !AlarmSettings().carerBatteryAlarm;
-              break;
-            case 1:
-              AlarmSettings().t1dBatteryAlarm = !AlarmSettings().t1dBatteryAlarm;
-              break;
-          }
-        },
-        children: const [
-          ToggleButton(
-            text: "Carer Phone\n< 30%",
-            height: _size,
-            width: _size * 1.5,
-          ),
-          ToggleButton(
-            text: "T1D Phone\n< 30%",
-            height: _size,
-            width: _size * 1.5,
-          ),
-        ],
-      ),
+      leading: Icon(Alarm.lowBattery.icon),
+      description: Text(description),
+      descriptionInlineIos: true,
+      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const BatteryAlarmSettingsPage())),
     );
   }
 }
