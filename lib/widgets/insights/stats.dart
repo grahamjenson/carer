@@ -17,10 +17,10 @@ class Stats extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle heading = const TextStyle(
+    TextStyle heading = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 15,
-      fontFeatures: [FontFeature.tabularFigures()],
+      fontSize: 12,
+      color: primaryColor(context).dim,
       height: 1,
     );
     TextStyle row = const TextStyle(

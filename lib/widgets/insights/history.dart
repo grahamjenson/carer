@@ -12,19 +12,6 @@ class History extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle row = const TextStyle(
-      fontSize: 25,
-      fontWeight: FontWeight.w500,
-      fontFeatures: [FontFeature.tabularFigures()],
-      height: 1,
-    );
-
-    TextStyle small = const TextStyle(
-      fontSize: 15,
-      height: 1,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-
     var timescale = const Duration(hours: 5);
     double columnSpacing = 5;
     double dividerThickness = 0.01;
@@ -37,7 +24,7 @@ class History extends StatelessWidget with ThemeMixin {
       var _ = TimerService().minuteSignal.value; // Refresh every minute
       var treatments = Treatment.lastSixHours.value;
       treatments = treatments.where((e) => e.age < timescale).toList();
-      var history = [for (var t in treatments) historyRow(t, row, small)].where((row) => row != null).map((row) => row as DataRow).toList();
+      var history = [for (var t in treatments) historyRow(context, t)].where((row) => row != null).map((row) => row as DataRow).toList();
 
       return Window(
         child: Expanded(
@@ -66,9 +53,36 @@ class History extends StatelessWidget with ThemeMixin {
     }, debugLabel: "History");
   }
 
-  DataRow? historyRow(Treatment treatment, TextStyle row, TextStyle small) {
+  DataRow? historyRow(BuildContext context, Treatment treatment) {
+    TextStyle heading = TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w300,
+      color: primaryColor(context),
+      height: 1,
+    );
+
+    TextStyle headingSmall = TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w200,
+      color: primaryColor(context),
+      height: 1,
+    );
+
+    TextStyle row = const TextStyle(
+      fontSize: 25,
+      fontWeight: FontWeight.w500,
+      fontFeatures: [FontFeature.tabularFigures()],
+      height: 1,
+    );
+
+    TextStyle small = const TextStyle(
+      fontSize: 15,
+      height: 1,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
+
     return DataRow(cells: [
-      DataCell(dateAgoShort(treatment, row, small)),
+      DataCell(dateAgoShort(treatment, heading, headingSmall)),
       DataCell(insulinSmartText(treatment, row, small)),
       DataCell(carbsSmartText(treatment, row, small)),
     ]);
