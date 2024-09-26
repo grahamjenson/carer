@@ -120,13 +120,14 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   }
 
   Widget getInsights() {
-    var children = [const Flexible(child: BGLChart())];
+    var children = [const Flexible(flex: 6, child: BGLChart())];
 
     children.add(Flexible(
+        flex: 4,
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      Expanded(child: History()),
-      Expanded(child: Stats()),
-    ])));
+          Expanded(child: History()),
+          Expanded(child: Stats()),
+        ])));
 
     return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
   }

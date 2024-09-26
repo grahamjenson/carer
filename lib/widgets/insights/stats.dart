@@ -58,14 +58,13 @@ class Stats extends StatelessWidget with ThemeMixin {
       var exp2preds = PredictionService().predictionsForReadings;
 
       return Window(
-        title: "Stats",
         child: Expanded(
           child: SingleChildScrollView(
             child: Container(
               alignment: Alignment.center,
               child: DataTable(
                 border: TableBorder(
-                  verticalInside: BorderSide(color: primaryColor(context)),
+                  verticalInside: BorderSide(color: outlineColor(context)),
                   horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
                 ),
                 columnSpacing: 10,

@@ -57,12 +57,12 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       );
 
       return Window(
-        title: "",
         child: Expanded(
           child: Column(children: [
             Flexible(
-                flex: 10,
+                flex: 15,
                 child: ToggleButtons(
+                    selectedColor: primaryColor(context),
                     constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
                     isSelected: [
                       _chartMinsAgo.value == 120,
@@ -84,14 +84,14 @@ class BGLChart extends StatelessWidget with ThemeMixin {
                         _chartMinsAgo.value = 2880;
                       }
                     },
-                    children: const [
-                      Text("3h"),
-                      Text("6h"),
-                      Text("12h"),
-                      Text("24h"),
-                      Text("48h"),
+                    children: [
+                      Text("3h", style: labelLarge(context)),
+                      Text("6h", style: labelLarge(context)),
+                      Text("12h", style: labelLarge(context)),
+                      Text("24h", style: labelLarge(context)),
+                      Text("48h", style: labelLarge(context)),
                     ])),
-            Expanded(
+            Flexible(
               flex: 90,
               child: LineChart(
                 buildlineChartData(
