@@ -292,18 +292,19 @@ ThemeData normalTheme = ThemeData(
     ),
   )),
   colorScheme: ColorScheme(
-      brightness: Brightness.dark,
-      primary: blueColorConst,
-      onPrimary: Colors.white,
-      secondary: redColorConst,
-      onSecondary: Colors.white,
-      tertiary: yellowColorConst,
-      onTertiary: Colors.white,
-      error: Colors.red,
-      onError: Colors.white,
-      surface: Colors.grey[900]!,
-      onSurface: Colors.white,
-      outline: blueColorConst.dim),
+    brightness: Brightness.dark,
+    primary: blueColorConst,
+    onPrimary: Colors.white,
+    secondary: redColorConst,
+    onSecondary: Colors.white,
+    tertiary: yellowColorConst,
+    onTertiary: Colors.white,
+    error: Colors.red,
+    onError: Colors.white,
+    surface: Colors.grey[900]!,
+    onSurface: Colors.white,
+    outline: blueColorConst.dim,
+  ),
 );
 
 ThemeData dimTheme = normalTheme.copyWith(
@@ -375,6 +376,7 @@ ThemeData dimTheme = normalTheme.copyWith(
     onError: Colors.white,
     surface: Colors.black,
     onSurface: Colors.white,
+    outline: Colors.black,
   ),
 );
 

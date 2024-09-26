@@ -103,7 +103,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     Color tColor = tertiaryColor(context);
 
     return LineChartData(
-      rangeAnnotations: rangeAnnotations(pColor.withAlpha(30)),
+      rangeAnnotations: rangeAnnotations(pColor.withAlpha(45)),
       gridData: gridData(opColor.withAlpha(20)),
       titlesData: titleData(maxBasal),
       borderData: borderData(opColor.withAlpha(20)),
@@ -138,7 +138,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           dotData: FlDotData(
               show: true,
               getDotPainter: treatmentsDotPainter(
-                tColor.dim,
+                tColor,
               )),
         ),
       ],
