@@ -8,6 +8,103 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
+class TreatmentList {
+  final List<Bolus> bolusModels = [];
+  final List<Carbs> carbsModels = [];
+
+  // As late as it can be
+  DateTime startDate = clock.now();
+  // As early as it can be
+  DateTime endDate = clock.now().subtract(const Duration(days: 365));
+
+  TreatmentList();
+
+  void addCarbModel(Carbs model) {
+    if (model.value == 0) {
+      return;
+    }
+    carbsModels.add(model);
+    _updateDate(model.date);
+  }
+
+  void addBolusModel(Bolus model) {
+    if (model.value == 0) {
+      return;
+    }
+    bolusModels.add(model);
+    _updateDate(model.date);
+  }
+
+  void _updateDate(DateTime date) {
+    if (date.isBefore(startDate)) {
+      startDate = date;
+    }
+    if (date.isAfter(endDate)) {
+      endDate = date;
+    }
+  }
+
+  List<Treatment> getWindows(int windowMins) {
+    Map<int, Treatment> timeBuckets = {};
+    DateTime now = clock.now();
+
+    Duration windowDuration = Duration(minutes: windowMins);
+    DateTime startTime = now.subtract(Duration(minutes: now.minute % windowMins, seconds: now.second, milliseconds: now.millisecond));
+    DateTime endTime = startTime.add(windowDuration);
+
+    var numberOfBuckets = clock.now().difference(startDate).inMinutes / windowMins;
+
+    var treatment = Treatment(startTime, endTime);
+    timeBuckets[treatment.bucketFor(windowMins)] = treatment;
+
+    for (var i = 0; i < numberOfBuckets + 2; i++) {
+      startTime = startTime.subtract(windowDuration);
+      endTime = endTime.subtract(windowDuration);
+      treatment = Treatment(startTime, endTime);
+      timeBuckets[treatment.bucketFor(windowMins)] = treatment;
+    }
+
+    for (var c in carbsModels) {
+      timeBuckets[c.bucketFor(windowMins)]!.addCarbModel(c);
+    }
+
+    for (var b in bolusModels) {
+      timeBuckets[b.bucketFor(windowMins)]!.addBolusModel(b);
+    }
+    var treatments = timeBuckets.values.where((t) => t.count > 0).toList();
+
+    return treatments;
+  }
+
+  ////
+  // Signals
+  ////
+  static ASignal<TreatmentList> last2days = ASignal(TreatmentList(), debugLabel: 'treatmentsLast2Days');
+  static ASignal<TreatmentList> lastSixHours = ASignal(TreatmentList(), debugLabel: 'treatmentsLastSixHours');
+
+  static setupSQLSignals() {
+    var dependencies = [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal];
+    signalAssign(lastSixHours, () async => _getLastTime(360), debugLabel: 'treatmentsLastSixHours', dependencies: dependencies);
+
+    signalAssign(last2days, () async => _getLastTime(2880), debugLabel: 'treatmentsLast2days', dependencies: dependencies);
+  }
+
+  static Future<TreatmentList> _getLastTime(int minsAgo) async {
+    var carbs = await SQLToCarbs().lastMins(minsAgo);
+    var bolus = await SQLToBolus().lastMins(minsAgo);
+    var tl = TreatmentList();
+
+    for (var c in carbs) {
+      tl.addCarbModel(c);
+    }
+
+    for (var b in bolus) {
+      tl.addBolusModel(b);
+    }
+    return tl;
+  }
+}
+
 class Treatment with DateMixin {
   DateTime startDate;
   late DateTime endDate;
@@ -18,15 +115,14 @@ class Treatment with DateMixin {
   List<Bolus> bolusModels = [];
   List<Carbs> carbsModels = [];
 
-  Treatment(this.startDate) {
-    endDate = startDate.add(const Duration(minutes: 5));
+  Treatment(this.startDate, this.endDate) {
     date = startDate;
   }
 
   @override
   int get minuteTimestamp => startDate.millisecondsSinceEpoch ~/ 60000;
   @override
-  int get fiveMinsBucket => minuteTimestamp - (minuteTimestamp % 5);
+  int bucketFor(int window) => minuteTimestamp - (minuteTimestamp % window);
 
   void addCarbModel(Carbs model) {
     if (model.value == 0) {
@@ -84,50 +180,5 @@ class Treatment with DateMixin {
     } else {
       return "";
     }
-  }
-
-  ////
-  // Future Signals
-  ////
-
-  static ASignal<List<Treatment>> last2days = ASignal([], debugLabel: 'treatmentsLast2Days');
-  static ASignal<List<Treatment>> lastSixHours = ASignal([], debugLabel: 'treatmentsLastSixHours');
-
-  static _getLastTime(int minsAgo) async {
-    var carbs = await SQLToCarbs().lastMins(minsAgo);
-    var bolus = await SQLToBolus().lastMins(minsAgo);
-
-    // group and total all carbs and boluses to 5 minute windows that is based on hour,
-    // e.g. 12:00:00 - 12:04:59, 12:05:00 - 12:09:59, 12:10:00 - 12:14:59
-
-    // This is in minutes since epoch
-    Map<int, Treatment> timeBuckets = {};
-    DateTime now = clock.now();
-    DateTime fiveMinutes = now.subtract(Duration(minutes: now.minute % 5, seconds: now.second, milliseconds: now.millisecond));
-
-    var numberOfBuckets = minsAgo / 5;
-    for (var i = 0; i < numberOfBuckets + 2; i++) {
-      var time = fiveMinutes.subtract(Duration(minutes: i * 5));
-      var treatment = Treatment(time);
-      timeBuckets[treatment.fiveMinsBucket] = Treatment(time);
-    }
-
-    for (var c in carbs) {
-      timeBuckets[c.fiveMinsBucket]!.addCarbModel(c);
-    }
-
-    for (var b in bolus) {
-      timeBuckets[b.fiveMinsBucket]!.addBolusModel(b);
-    }
-    var treatments = timeBuckets.values.where((t) => t.count > 0).toList();
-
-    return treatments;
-  }
-
-  static setupSQLSignals() {
-    var dependencies = [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal];
-    signalAssign(lastSixHours, () async => await _getLastTime(360), debugLabel: 'treatmentsLastSixHours', dependencies: dependencies);
-
-    signalAssign(last2days, () async => await _getLastTime(2880), debugLabel: 'treatmentsLast2days', dependencies: dependencies);
   }
 }

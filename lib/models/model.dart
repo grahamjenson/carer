@@ -12,8 +12,8 @@ mixin DateMixin {
 
   int get minuteTimestamp => date.millisecondsSinceEpoch ~/ 60000;
 
-  // This returns the minsAgo bucket for last 5 mins
-  int get fiveMinsBucket => minuteTimestamp - (minuteTimestamp % 5);
+  // This returns the minsAgo window for last 5 mins
+  int bucketFor(int window) => minuteTimestamp - (minuteTimestamp % window);
 
   bool get isDuringToday {
     final now = clock.now();

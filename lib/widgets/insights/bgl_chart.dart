@@ -39,10 +39,20 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch((context) {
       int minsAgo = _chartMinsAgo.value;
+      var windowSize = 5;
+      if (minsAgo > 300) {
+        windowSize = 30;
+      }
+      if (minsAgo > 600) {
+        windowSize = 120;
+      }
+      if (minsAgo > 1000) {
+        windowSize = 240;
+      }
 
       List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
       List<CleanSGV> sgvs = CleanSGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<Treatment> lastTreatments = Treatment.last2days.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<Treatment> lastTreatments = TreatmentList.last2days.value.getWindows(windowSize).where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);

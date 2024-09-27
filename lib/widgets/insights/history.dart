@@ -22,7 +22,7 @@ class History extends StatelessWidget with ThemeMixin {
 
     return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute
-      var treatments = Treatment.lastSixHours.value;
+      var treatments = TreatmentList.lastSixHours.value.getWindows(5);
       treatments = treatments.where((e) => e.age < timescale).toList();
       var history = [for (var t in treatments) historyRow(context, t)].where((row) => row != null).map((row) => row as DataRow).toList();
 

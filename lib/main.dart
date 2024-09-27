@@ -71,7 +71,7 @@ void runCarer() async {
   ////
   CleanSGV.setupSQLSignals();
   Profile.setupSQLSignals();
-  Treatment.setupSQLSignals();
+  TreatmentList.setupSQLSignals();
   ValueAtTime.setupSQLSignals();
 
   runApp(const MyApp());
