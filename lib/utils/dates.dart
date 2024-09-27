@@ -30,6 +30,10 @@ class Dates {
     return "${diff.inMinutes}m";
   }
 
+  static String dateShort(DateTime date) {
+    return "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
+  }
+
   static final DateTime earliest = DateTime.fromMillisecondsSinceEpoch(0);
 
   static int secondsTillNext24HourTime(int timeAsHour) {

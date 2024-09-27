@@ -18,9 +18,9 @@ class Stats extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     TextStyle heading = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 12,
-      color: primaryColor(context).dim,
+      fontWeight: FontWeight.normal,
+      fontSize: 15,
+      color: primaryColor(context),
       height: 1,
     );
     TextStyle row = const TextStyle(
@@ -58,6 +58,7 @@ class Stats extends StatelessWidget with ThemeMixin {
       var exp2preds = PredictionService().predictionsForReadings;
 
       return Window(
+        title: "Stats",
         child: Expanded(
           child: SingleChildScrollView(
             child: Container(

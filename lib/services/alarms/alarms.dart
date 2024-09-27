@@ -183,7 +183,7 @@ class LowAlarm extends AlarmMethods {
       if (sgv == null) {
         return "?";
       }
-      return "Predicted Low ${sgv.unitStr()} < ${unitStr(TargetSettings().lowTarget)}";
+      return "Predicted Low ${sgv.unitStr()} (in $numberOfReadings readings) < ${unitStr(TargetSettings().lowTarget)}";
     }
     return "?";
   }

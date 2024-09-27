@@ -9,6 +9,7 @@ import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/insights/window.dart';
+import 'package:clock/clock.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -66,30 +67,30 @@ class BGLChart extends StatelessWidget with ThemeMixin {
                     constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
                     isSelected: [
                       _chartMinsAgo.value == 120,
+                      _chartMinsAgo.value == 240,
                       _chartMinsAgo.value == 360,
                       _chartMinsAgo.value == 720,
                       _chartMinsAgo.value == 1440,
-                      _chartMinsAgo.value == 2880,
                     ],
                     onPressed: (int index) {
                       if (index == 0) {
                         _chartMinsAgo.value = 120;
                       } else if (index == 1) {
-                        _chartMinsAgo.value = 360;
+                        _chartMinsAgo.value = 240;
                       } else if (index == 2) {
-                        _chartMinsAgo.value = 720;
+                        _chartMinsAgo.value = 360;
                       } else if (index == 3) {
-                        _chartMinsAgo.value = 1440;
+                        _chartMinsAgo.value = 720;
                       } else if (index == 4) {
-                        _chartMinsAgo.value = 2880;
+                        _chartMinsAgo.value = 1440;
                       }
                     },
                     children: [
-                      Text("3h", style: labelLarge(context)),
+                      Text("2h", style: labelLarge(context)),
+                      Text("4h", style: labelLarge(context)),
                       Text("6h", style: labelLarge(context)),
                       Text("12h", style: labelLarge(context)),
                       Text("24h", style: labelLarge(context)),
-                      Text("48h", style: labelLarge(context)),
                     ])),
             Flexible(
               flex: 90,
@@ -351,21 +352,40 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   }
 
   SideTitles bottomTitleWidgets() {
+    double interval = 30;
+    bool showTime = false;
+    if (_chartMinsAgo.value > 300) {
+      interval = 60;
+    }
+    if (_chartMinsAgo.value > 600) {
+      interval = 1;
+      showTime = true;
+    }
     return SideTitles(
         showTitles: true,
         reservedSize: 17,
-        interval: 30,
+        interval: interval,
         getTitlesWidget: (double value, TitleMeta meta) {
           var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 7, height: 0.5);
 
-          //return Spacer if value is not mod 30
-          if (value.toInt() % 30 != 0) {
-            return const SizedBox();
+          var duration = Duration(minutes: value.toInt().abs());
+          var date = clock.now().subtract(duration);
+
+          //return Spacer if value is not mod 30 or on the hour if time
+          if (showTime && (date.minute != 0 || date.hour % 2 != 0)) {
+            return const SizedBox.shrink();
+          } else if (!showTime && (value.toInt() % 30 != 0)) {
+            return const SizedBox.shrink();
+          }
+
+          var str = Dates.dateAgoShort(duration);
+          if (showTime) {
+            str = Dates.dateShort(date);
           }
 
           return SideTitleWidget(
             axisSide: meta.axisSide,
-            child: Text(Dates.dateAgoShort(Duration(minutes: value.toInt().abs())), style: style),
+            child: Text(str, style: style),
           );
         });
   }

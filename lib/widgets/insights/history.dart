@@ -27,14 +27,15 @@ class History extends StatelessWidget with ThemeMixin {
       var history = [for (var t in treatments) historyRow(context, t)].where((row) => row != null).map((row) => row as DataRow).toList();
 
       return Window(
+        title: "History",
         child: Expanded(
           child: SingleChildScrollView(
               child: Container(
                   alignment: Alignment.center,
                   child: DataTable(
                       border: TableBorder(
-                        verticalInside: BorderSide(color: outlineColor(context).dim, width: 0.2),
-                        horizontalInside: BorderSide(color: outlineColor(context).dim, width: 0.2),
+                        verticalInside: BorderSide(color: outlineColor(context).dim, width: 0.5),
+                        horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.2),
                       ),
                       columnSpacing: columnSpacing,
                       dividerThickness: dividerThickness,
@@ -56,14 +57,14 @@ class History extends StatelessWidget with ThemeMixin {
   DataRow? historyRow(BuildContext context, Treatment treatment) {
     TextStyle heading = TextStyle(
       fontSize: 18,
-      fontWeight: FontWeight.w300,
+      fontWeight: FontWeight.normal,
       color: primaryColor(context),
       height: 1,
     );
 
     TextStyle headingSmall = TextStyle(
       fontSize: 15,
-      fontWeight: FontWeight.w200,
+      fontWeight: FontWeight.normal,
       color: primaryColor(context),
       height: 1,
     );
