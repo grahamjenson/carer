@@ -19,7 +19,7 @@ enum _AANames {
   brightnessAdjustAtNight,
 
   // ephemeral
-  sleepUntil,
+  snoozeUntil,
 }
 
 class AlarmAlertSettings {
@@ -33,7 +33,7 @@ class AlarmAlertSettings {
     _AANames.volumeOverrideValue: ASignal<int>(10, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
     _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
-    _AANames.sleepUntil: ASignal<DateTime?>(null, debugLabel: "sleepUntil"),
+    _AANames.snoozeUntil: ASignal<DateTime?>(null, debugLabel: "snoozeUntil"),
   };
 
   AlarmAlertSettings._();
@@ -58,7 +58,7 @@ class AlarmAlertSettings {
   bool get brightnessAdjustAtNight => _signals[_AANames.brightnessAdjustAtNight]!.value as bool;
   set brightnessAdjustAtNight(bool value) => _signals[_AANames.brightnessAdjustAtNight]!.value = value;
 
-  ASignal<DateTime?> get sleepUntilSignal => _signals[_AANames.sleepUntil]! as ASignal<DateTime?>;
+  ASignal<DateTime?> get snoozeUntilSignal => _signals[_AANames.snoozeUntil]! as ASignal<DateTime?>;
 
   allValues() {
     for (var signal in _signals.values) {
@@ -132,20 +132,20 @@ class AlarmAlertSettings {
     }, debugLabel: 'brightnessAdjustAtNight');
   }
 
-  Timer? sleepTimer;
-  Duration? get sleepDuration {
-    return _calculateSleepDuration(sleepUntilSignal.value);
+  Timer? snoozeTimer;
+  Duration? get snoozeDuration {
+    return _calculateSnoozeDuration(snoozeUntilSignal.value);
   }
 
-  Duration? get sleepDurationPeek {
-    return _calculateSleepDuration(sleepUntilSignal.peek());
+  Duration? get snoozeDurationPeek {
+    return _calculateSnoozeDuration(snoozeUntilSignal.peek());
   }
 
-  Duration? _calculateSleepDuration(DateTime? sleepUntil) {
-    if (sleepUntil == null) {
+  Duration? _calculateSnoozeDuration(DateTime? snoozeUntil) {
+    if (snoozeUntil == null) {
       return null;
     }
-    var duration = sleepUntil.difference(clock.now());
+    var duration = snoozeUntil.difference(clock.now());
 
     if (duration.isNegative) {
       return null;
@@ -154,29 +154,29 @@ class AlarmAlertSettings {
     return duration;
   }
 
-  int? get sleepDurationSeconds {
-    return sleepDuration?.inSeconds;
+  int? get snoozeDurationSeconds {
+    return snoozeDuration?.inSeconds;
   }
 
-  void setSleepDurationSeconds(int? value, String reason) {
-    if (sleepTimer != null) {
-      sleepTimer!.cancel(); // Always cancel
+  void setSnoozeDurationSeconds(int? value, String reason) {
+    if (snoozeTimer != null) {
+      snoozeTimer!.cancel(); // Always cancel
     }
 
     if (value == null) {
-      alog("Alarm: Sleep: Sleep Duration Seconds set to null from ${sleepUntilSignal.peek} because $reason");
-      sleepUntilSignal.value = null;
+      alog("Alarm: Snooze: Snooze Duration Seconds set to null from ${snoozeUntilSignal.peek} because $reason");
+      snoozeUntilSignal.value = null;
       return;
     }
 
-    sleepTimer = Timer(Duration(seconds: value), () {
-      alog("Alarm: Sleep: Sleep Duration Seconds set to null from ${sleepUntilSignal.peek} because timer expired");
-      sleepUntilSignal.value = null;
+    snoozeTimer = Timer(Duration(seconds: value), () {
+      alog("Alarm: Snooze: Snooze Duration Seconds set to null from ${snoozeUntilSignal.peek} because timer expired");
+      snoozeUntilSignal.value = null;
     });
 
     var time = clock.now().add(Duration(seconds: value));
-    alog("Alarm: Sleep: Sleep Duration Seconds set to $time from ${sleepUntilSignal.peek}");
-    sleepUntilSignal.value = time;
+    alog("Alarm: Snooze: Snooze Duration Seconds set to $time from ${snoozeUntilSignal.peek}");
+    snoozeUntilSignal.value = time;
   }
 }
 

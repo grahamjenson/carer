@@ -45,7 +45,7 @@ class AlarmsService {
     bool isCheckingAlarms = false;
     List<Signal> additionalDeps = [
       TimerService().tenSecondSignal,
-      AlarmAlertSettings().sleepUntilSignal,
+      AlarmAlertSettings().snoozeUntilSignal,
       SQLToSGV().writeSignal,
       AppLifecycleService().lastResumed,
       AppLifecycleService().lastChangeScreen
@@ -108,7 +108,7 @@ class AlarmsService {
   }
 
   (Set<Alarm>, Set<Alarm>) calculateAlarms() {
-    var notSleeping = AlarmAlertSettings().sleepDuration == null;
+    var notSnoozing = AlarmAlertSettings().snoozeDuration == null;
     Set<Alarm> newTriggeredAlarms = {};
     Set<Alarm> newActiveAlarms = {};
 
@@ -122,9 +122,8 @@ class AlarmsService {
         newTriggeredAlarms.add(alarm);
       }
 
-      var addToActive = !disabledAllAlarms && triggered && active && notSleeping && !(smartSnooze);
+      var addToActive = !disabledAllAlarms && triggered && active && notSnoozing && !(smartSnooze);
 
-      // If Sleeping do not add
       if (addToActive) {
         newActiveAlarms.add(alarm);
       }
@@ -194,8 +193,6 @@ class AlarmsService {
     BrightnessAlert().start();
     return true;
   }
-
-  // Sleep
 
   Future<void> stopTestAlarm() async {
     var (stopped, err) = await go(player.stopTestAlarm());

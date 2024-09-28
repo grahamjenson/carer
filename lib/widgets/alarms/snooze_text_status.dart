@@ -6,9 +6,9 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
-class SleepTextStatus extends StatelessWidget with ThemeMixin {
+class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
   final double buttonRadias;
-  const SleepTextStatus(this.buttonRadias, {super.key});
+  const SnoozeTextStatus(this.buttonRadias, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
         padding: EdgeInsets.zero,
         child: Row(children: rows),
       );
-    }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().sleepUntilSignal], debugLabel: "SleepTextStatus");
+    }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().snoozeUntilSignal], debugLabel: "SnoozeTextStatus");
   }
 
   List<Widget> getRows(BuildContext context) {
@@ -48,13 +48,13 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     var small = const TextStyle(fontSize: 20);
     List<Widget> rows = [];
     var alarmWidget = alarmStringWidget(context);
-    if (isSleeping()) {
+    if (isSnoozing()) {
       rows += [
         const Spacer(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Sleep ", style: small),
+            Text("Snooze ", style: small),
             Flexible(child: timeStringWidget()),
           ],
         ),
@@ -63,7 +63,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     } else {
       rows += [
         const Spacer(),
-        Text("Sleep", style: big),
+        Text("Snooze", style: big),
         const Spacer(),
       ];
     }
@@ -78,8 +78,8 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     return rows;
   }
 
-  bool isSleeping() {
-    var duration = AlarmAlertSettings().sleepDuration;
+  bool isSnoozing() {
+    var duration = AlarmAlertSettings().snoozeDuration;
     if (duration == null) {
       return false;
     }
@@ -94,7 +94,7 @@ class SleepTextStatus extends StatelessWidget with ThemeMixin {
     var big = const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, height: 1);
     var small = const TextStyle(fontSize: 20);
 
-    var duration = AlarmAlertSettings().sleepDuration!;
+    var duration = AlarmAlertSettings().snoozeDuration!;
     var totalSeconds = duration.inSeconds;
 
     var hours = (totalSeconds / 3600).floor();

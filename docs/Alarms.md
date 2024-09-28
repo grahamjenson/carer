@@ -19,7 +19,7 @@ Other alerts
 3. Technical Alert
 
 Additional featuers
-Quiet modes (basically sleep all but maybe still vibrate, something like an exam setting)
+Quiet modes (basically snooze all but maybe still vibrate, something like an exam setting)
 Adding second alert profiles
 
 ### Dexcom Follow

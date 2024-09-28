@@ -45,7 +45,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
       },
       dependencies: [
         ThemeService().themeSignal,
-        AlarmAlertSettings().sleepUntilSignal,
+        AlarmAlertSettings().snoozeUntilSignal,
         TimerService().fiveSecondSignal,
         PlatformInfoService().ringerMode,
         PlatformInfoService().batteryMode,

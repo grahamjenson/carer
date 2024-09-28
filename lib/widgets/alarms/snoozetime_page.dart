@@ -5,8 +5,8 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
 
-class SleepTimePage extends StatefulWidget {
-  const SleepTimePage(this.popTime, {super.key});
+class SnoozeTimePage extends StatefulWidget {
+  const SnoozeTimePage(this.popTime, {super.key});
   static const TextStyle textStyle = TextStyle(fontSize: 50);
 
   final int popTime;
@@ -15,10 +15,10 @@ class SleepTimePage extends StatefulWidget {
   static const List<int> timeTimes = [6, 22];
 
   @override
-  State<SleepTimePage> createState() => _SleepTimePageState();
+  State<SnoozeTimePage> createState() => _SnoozeTimePageState();
 }
 
-class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
+class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
   late Timer _timer;
 
   @override
@@ -26,13 +26,13 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
     super.initState();
 
     _timer = Timer(Duration(seconds: widget.popTime), () {
-      setSleep(null);
+      setSnooze(null);
     });
   }
 
-  setSleep(int? sleepTime) {
-    sleepTime ??= 0;
-    AlarmAlertSettings().setSleepDurationSeconds(sleepTime, "SleepDialogReturned");
+  setSnooze(int? snoozeTime) {
+    snoozeTime ??= 0;
+    AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, "SnoozeDialogReturned");
     Navigator.of(context).pop();
   }
 
@@ -58,13 +58,13 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sleep Alarms'),
+        title: const Text('Snooze Alarms'),
       ),
       body: Stack(
         children: [
           GestureDetector(
             onTap: () {
-              setSleep(null);
+              setSnooze(null);
             },
             child: Container(
               color: Colors.transparent, // Ensure the container is transparent
@@ -74,16 +74,16 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             // Generate 100 widgets that display their index in the List.
-            children: getSleepButtonsLayout(context, buttonStyle) +
+            children: getSnoozeButtonsLayout(context, buttonStyle) +
                 [
                   const Divider(),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        setSleep(null);
+                        setSnooze(null);
                       },
-                      child: const Text("Cancel", style: SleepTimePage.textStyle),
+                      child: const Text("Cancel", style: SnoozeTimePage.textStyle),
                     ),
                   ),
                   const Divider(),
@@ -94,7 +94,7 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
     );
   }
 
-  List<Widget> getSleepButtonsLayout(BuildContext context, ButtonStyle buttonStyle) {
+  List<Widget> getSnoozeButtonsLayout(BuildContext context, ButtonStyle buttonStyle) {
     final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     var mins = getMinuteButtons(context, buttonStyle);
 
@@ -147,18 +147,18 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
   List<Widget> getMinuteButtons(BuildContext context, ButtonStyle buttonStyle) {
     List<Widget> minuteButtons = [];
 
-    for (var time in SleepTimePage.minutesTimes) {
+    for (var time in SnoozeTimePage.minutesTimes) {
       minuteButtons.add(
         Container(
           padding: const EdgeInsets.all(5),
           child: ElevatedButton(
             style: buttonStyle,
             onPressed: () {
-              setSleep(time * 60);
+              setSnooze(time * 60);
             },
             child: Text(
               "${time}m",
-              style: SleepTimePage.textStyle,
+              style: SnoozeTimePage.textStyle,
             ),
           ),
         ),
@@ -171,18 +171,18 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
   List<Widget> getHourButtons(BuildContext context, ButtonStyle buttonStyle) {
     List<Widget> hourButtons = [];
 
-    for (var time in SleepTimePage.hoursTimes) {
+    for (var time in SnoozeTimePage.hoursTimes) {
       hourButtons.add(
         Container(
           padding: const EdgeInsets.all(5),
           child: ElevatedButton(
             style: buttonStyle,
             onPressed: () {
-              setSleep(time * 60 * 60);
+              setSnooze(time * 60 * 60);
             },
             child: Text(
               "${time}h",
-              style: SleepTimePage.textStyle,
+              style: SnoozeTimePage.textStyle,
             ),
           ),
         ),
@@ -195,17 +195,17 @@ class _SleepTimePageState extends State<SleepTimePage> with ThemeMixin {
   List<Widget> getTimeButtons(BuildContext context, ButtonStyle buttonStyle) {
     List<Widget> timeButtons = [];
 
-    for (var time in SleepTimePage.timeTimes) {
+    for (var time in SnoozeTimePage.timeTimes) {
       timeButtons.add(Container(
         padding: const EdgeInsets.all(5),
         child: ElevatedButton(
           style: buttonStyle,
           onPressed: () {
-            setSleep(Dates.secondsTillNext24HourTime(time));
+            setSnooze(Dates.secondsTillNext24HourTime(time));
           },
           child: Text(
             Dates.stringOf24HourTime(time),
-            style: SleepTimePage.textStyle,
+            style: SnoozeTimePage.textStyle,
           ),
         ),
       ));

@@ -33,7 +33,7 @@ class Bar extends StatelessWidget with ThemeMixin {
         );
       },
       debugLabel: "Bar",
-      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().sleepUntilSignal],
+      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().snoozeUntilSignal],
     );
   }
 

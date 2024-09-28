@@ -3,13 +3,13 @@ import 'dart:math';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/alarms/sleep_text_status.dart';
-import 'package:carer/widgets/alarms/sleeptime_page.dart';
+import 'package:carer/widgets/alarms/snooze_text_status.dart';
+import 'package:carer/widgets/alarms/snoozetime_page.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class SleepButton extends StatelessWidget with ThemeMixin {
-  const SleepButton({super.key});
+class SnoozeButton extends StatelessWidget with ThemeMixin {
+  const SnoozeButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +30,16 @@ class SleepButton extends StatelessWidget with ThemeMixin {
             child: Stack(
               children: [
                 getBackground(context, buttonRadias, width, backgroundColor),
-                SleepTextStatus(buttonRadias),
+                SnoozeTextStatus(buttonRadias),
                 getDismissable(context, buttonRadias, width, mainColor, buttonColor),
-                getSleepCancel(context, buttonRadias, mainColor, backgroundColor),
+                getSnoozeCancel(context, buttonRadias, mainColor, backgroundColor),
               ],
             ),
           );
         });
       },
-      debugLabel: "SleepButton",
-      dependencies: [AlarmAlertSettings().sleepUntilSignal],
+      debugLabel: "SnoozeButton",
+      dependencies: [AlarmAlertSettings().snoozeUntilSignal],
     );
   }
 
@@ -52,8 +52,8 @@ class SleepButton extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget getSleepCancel(BuildContext context, double buttonRadias, Color mainColor, Color backgroundColor) {
-    if (AlarmAlertSettings().sleepDuration == null) {
+  Widget getSnoozeCancel(BuildContext context, double buttonRadias, Color mainColor, Color backgroundColor) {
+    if (AlarmAlertSettings().snoozeDuration == null) {
       return const SizedBox.shrink();
     }
 
@@ -71,7 +71,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
             alignment: Alignment.center,
             icon: cancelIcon,
             onPressed: () {
-              AlarmAlertSettings().setSleepDurationSeconds(null, "CancelButtonPushed");
+              AlarmAlertSettings().setSnoozeDurationSeconds(null, "CancelButtonPushed");
             },
           ),
         ));
@@ -80,13 +80,13 @@ class SleepButton extends StatelessWidget with ThemeMixin {
   Widget getDismissable(BuildContext context, double buttonRadias, double width, Color mainColor, Color buttonColor) {
     Icon dismissibleIcon = Icon(UniconsLine.angle_right, color: mainColor, size: buttonRadias);
 
-    openSleepDialog() async {
+    openSnoozeDialog() async {
       var popTime = 10;
 
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return SleepTimePage(popTime);
+          return SnoozeTimePage(popTime);
         }),
       );
 
@@ -98,7 +98,7 @@ class SleepButton extends StatelessWidget with ThemeMixin {
       direction: DismissDirection.startToEnd,
       dismissThresholds: const {DismissDirection.startToEnd: 0.5},
       confirmDismiss: (_) async {
-        await go(openSleepDialog());
+        await go(openSnoozeDialog());
         return false;
       },
       child: Container(

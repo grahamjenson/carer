@@ -33,7 +33,7 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
         );
       },
       debugLabel: "AlarmsBarIcons",
-      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().sleepUntilSignal],
+      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().snoozeUntilSignal],
     );
   }
 
