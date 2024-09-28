@@ -4,7 +4,7 @@ import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/device_settings.dart';
-import 'package:carer/widgets/settings/nightscout_settings.dart';
+import 'package:carer/widgets/settings/services_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +28,7 @@ class SettingsPage extends StatelessWidget {
         ),
         body: SettingsList(
           sections: [
-            NightscoutSettingsWidget(),
+            ServicesSettingsWidget(),
             const T1DSettingsWidget(),
             const UISettingsWidget(),
             const AlarmsSettingsWidget(),

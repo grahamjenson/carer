@@ -5,7 +5,9 @@ import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 String toNSDateString(DateTime dt) {
   dt = dt.toUtc();
@@ -35,23 +37,26 @@ Uri propertiesEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties.json
 
 // Singleton
 class NSClient {
+  static final NSClient _singleton = NSClient._internal();
+  factory NSClient() => _singleton;
+  NSClient._internal();
+
+  ASignal<DateTime?> lastError = ASignal<DateTime?>(null, debugLabel: "NSClientLastError");
+  ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
+
   Future<NSEntries> getEntries(String nsURL, String token, DateTime gteCreateAt) async {
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
       return NSEntries.empty();
     }
     var ep = entryEndpoint(nsURL, token, gteCreateAt);
+
     final (response, err) = await go(http.get(ep));
-    if (err != null || response == null) {
-      return NSEntries.empty();
-    }
-    alog("FETCHED ${ep.toString()}");
-    if (response.statusCode != 200) {
-      alog("NON 200 responce code ${response.statusCode}");
+    if (_handleResponseError(ep, response, err)) {
       return NSEntries.empty();
     }
 
-    return NSEntries.fromJson(response.body);
+    return NSEntries.fromJson(response!.body);
   }
 
   Future<NSTreatments> getTreatments(String nsURL, String token, DateTime gteCreateAt) async {
@@ -60,16 +65,11 @@ class NSClient {
     }
     var ep = treatmentsEndpoint(nsURL, token, gteCreateAt);
     final (response, err) = await go(http.get(ep));
-    if (err != null || response == null) {
-      return NSTreatments.empty();
-    }
-    alog("FETCHED ${ep.toString()}");
-    if (response.statusCode != 200) {
-      alog("NON 200 responce code ${response.statusCode}");
+    if (_handleResponseError(ep, response, err)) {
       return NSTreatments.empty();
     }
 
-    return NSTreatments.fromJson(response.body);
+    return NSTreatments.fromJson(response!.body);
   }
 
   Future<Summary?> getSummary(String nsURL, String token) async {
@@ -79,15 +79,10 @@ class NSClient {
     }
     var ep = summaryEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (err != null || response == null) {
+    if (_handleResponseError(ep, response, err)) {
       return null;
     }
-    alog("FETCHED ${ep.toString()}");
-    if (response.statusCode != 200) {
-      alog("NON 200 responce code ${response.statusCode}");
-      return null;
-    }
-    return Summary.fromJson(response.body);
+    return Summary.fromJson(response!.body);
   }
 
   Future<NSProfile?> getCurrentProfile(String nsURL, String token) async {
@@ -97,16 +92,11 @@ class NSClient {
     }
     var ep = currentProfile(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (err != null || response == null) {
-      return null;
-    }
-    alog("FETCHED ${ep.toString()}");
-    if (response.statusCode != 200) {
-      alog("NON 200 responce code ${response.statusCode}");
+    if (_handleResponseError(ep, response, err)) {
       return null;
     }
 
-    return NSProfile.fromCurrentJson(response.body);
+    return NSProfile.fromCurrentJson(response!.body);
   }
 
   Future<NSProperties?> getProperties(String nsURL, String token) async {
@@ -116,15 +106,25 @@ class NSClient {
     }
     var ep = propertiesEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (err != null || response == null) {
-      return null;
-    }
-    alog("FETCHED ${ep.toString()}");
-    if (response.statusCode != 200) {
-      alog("NON 200 responce code ${response.statusCode}");
+    if (_handleResponseError(ep, response, err)) {
       return null;
     }
 
-    return NSProperties.fromJson(response.body);
+    return NSProperties.fromJson(response!.body);
+  }
+
+  bool _handleResponseError(Uri uri, Response? response, Object? err) {
+    if (err != null || response == null) {
+      lastError.value = clock.now();
+      return true;
+    }
+    alog("FETCHED ${uri.toString()}");
+    if (response.statusCode != 200) {
+      lastError.value = clock.now();
+      alog("NON 200 responce code ${response.statusCode}");
+      return true;
+    }
+    lastFetched.value = clock.now();
+    return false;
   }
 }

@@ -19,6 +19,10 @@ class Dates {
     return "${days}days";
   }
 
+  static String dateAgoShortFromNow(DateTime date) {
+    return dateAgoShort(clock.now().difference(date));
+  }
+
   static String dateAgoShort(Duration diff, {hours = true}) {
     if (diff.inMinutes == 0) {
       return "now";
