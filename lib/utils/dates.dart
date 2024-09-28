@@ -3,7 +3,11 @@ import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 
 class Dates {
-  static String dateAgoFromMills(Duration? diff) {
+  static String dateAgoLongFromNow(DateTime date) {
+    return dateAgoLong(clock.now().difference(date));
+  }
+
+  static String dateAgoLong(Duration? diff) {
     if (diff == null) {
       return "";
     }

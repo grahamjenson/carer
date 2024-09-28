@@ -22,6 +22,16 @@ class SecureSettings {
     ));
   }
 
+  void setNSValuesFromURL(String url) {
+    var uri = Uri.parse(url);
+    var token = uri.queryParameters["token"];
+    token ??= '';
+    var base = '${uri.scheme}://${uri.host}';
+
+    nightscoutURL = base.toString();
+    nightscoutToken = token;
+  }
+
   String? get nightscoutURL => _signals[_SSNames.nightscoutUrl]!.value as String?;
   set nightscoutURL(String? value) {
     if (value != null) {

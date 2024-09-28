@@ -8,7 +8,8 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
-class CleanSGV with DateMixin {
+class CleanSGV with DateMixin implements ASGV {
+  @override
   final int value;
 
   @override
@@ -30,12 +31,18 @@ class CleanSGV with DateMixin {
   }
 
   (Range5, double) get rangeProporation => targetRange(value);
+  @override
   Range5 get range => rangeProporation.$1;
 
+  @override
   bool get isUrgentLow => range == Range5.veryLow;
+  @override
   bool get isLow => range == Range5.low;
+  @override
   bool get isNormal => range == Range5.mid;
+  @override
   bool get isHigh => range == Range5.high;
+  @override
   bool get isUrgentHigh => range == Range5.veryHigh;
 
   Range7 get diffRange => diffRange7(rate5m ?? 0);
@@ -51,6 +58,7 @@ class CleanSGV with DateMixin {
     return unit.val(value);
   }
 
+  @override
   String sgvStr(Unit unit) {
     switch (unit) {
       case Unit.mg:
@@ -111,25 +119,21 @@ class CleanSGV with DateMixin {
   }
 
   // This is the root signal that caches and filters all SGVs from the last two days
-  static ASignal<List<CleanSGV>> last2Days = ASignal([], debugLabel: 'last2Days');
+  static ASignal<List<CleanSGV>> last2Days = ASignal([], debugLabel: 'CleanSGVLast2Days');
 
-  static ASignal<List<CleanSGV>> last3Hours = ASignal([], debugLabel: 'lastSGV3Hours');
+  static ASignal<List<CleanSGV>> last3Hours = ASignal([], debugLabel: 'CleanSGVlastSGV3Hours');
 
-  static ASignal<CleanSGV?> lastSGV = ASignal(null, debugLabel: 'lastSGV');
+  static ASignal<CleanSGV?> lastSGV = ASignal(null, debugLabel: 'CleanSGVlastSGV');
 
   static ASignal<double?> todaysPercentage = ASignal(0.0, debugLabel: 'todaysPercentage');
   static ASignal<double?> yesterdaysPercentage = ASignal(0.0, debugLabel: 'yesterdaysPercentage');
 
   static setupSQLSignals() {
     signalAssign(last2Days, () async {
-      DateTime now = clock.now();
-      DateTime startOfYesterday = DateTime(now.year, now.month, now.day - 1);
-      int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
-
-      List<SGV> rawSGVs = await SQLToSGV().query(after: startOfYesterdayEpoch);
+      List<SGV> rawSGVs = await SQLToSGV().last2Days();
 
       return _makeChained(rawSGVs.map((e) => CleanSGV(e.value, e.date)).toList());
-    }, debugLabel: "last2DaysQuery", dependencies: [SQLToSGV().writeSignal]);
+    }, debugLabel: "Clean2DaysQuery", dependencies: [SQLToSGV().writeSignal]);
 
     signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours).toList(), debugLabel: 'last3HoursQuery');
 

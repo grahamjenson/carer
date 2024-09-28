@@ -27,17 +27,18 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
       var lastError = NSClient().lastError.value;
       var times = [];
       if (lastFetched != null) {
-        times.add("Fetched: ${Dates.dateAgoShortFromNow(lastFetched)}");
-      }
-      if (lastError != null) {
-        times.add("Errored: ${Dates.dateAgoShortFromNow(lastError)}");
+        times.add("Fetched ${Dates.dateAgoLongFromNow(lastFetched)} ago");
+      } else {
+        times.add("Not Fetched Yet");
       }
 
-      if (times.isNotEmpty) {
-        description = times.join(", ");
+      if (lastError != null) {
+        times.add("Errored ${Dates.dateAgoLongFromNow(lastError)} ago");
       } else {
-        description = "Not Called Yet";
+        times.add("No Errors");
       }
+
+      description = times.join(", ");
     }
 
     return SettingsTile.navigation(

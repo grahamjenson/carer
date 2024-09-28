@@ -19,6 +19,13 @@ class NightscoutSettingsPage extends StatelessWidget {
       ),
       body: AWatch(
         (context) {
+          var nsURL = SecureSettings().nightscoutURL;
+          var nsToken = SecureSettings().nightscoutToken;
+          var currentURL = "Not Set";
+          if (nsURL != null && nsURL.isNotEmpty && nsToken != null && nsToken.isNotEmpty) {
+            currentURL = "$nsURL/?token=$nsToken";
+          }
+
           return SettingsList(
             sections: [
               SettingsSection(
@@ -26,34 +33,12 @@ class NightscoutSettingsPage extends StatelessWidget {
                 tiles: [
                   SettingsTile.navigation(
                     title: const Text('URL'),
-                    value: Container(
-                      alignment: Alignment.centerRight,
-                      width: maxWidth,
-                      child: AWatch((context) {
-                        var nsURL = SecureSettings().nightscoutURL;
-                        var nsToken = SecureSettings().nightscoutToken;
-                        if (nsURL == null || nsURL.isEmpty || nsToken == null || nsToken.isEmpty) {
-                          return const Text("Not Set");
-                        }
-
-                        return Text(
-                          "$nsURL/?token=$nsToken",
-                          overflow: TextOverflow.ellipsis,
-                        );
-                      }, debugLabel: "NightscoutSettingsWidget"),
-                    ),
+                    value: Container(alignment: Alignment.centerRight, width: maxWidth, child: Text(currentURL, overflow: TextOverflow.ellipsis)),
                     leading: const Icon(Icons.language),
                     onPressed: (context) async {
-                      final url = await openTextDialog(context, "Nightscout URL", hint: "URL", value: SecureSettings().nightscoutURL ?? "");
+                      final url = await openTextDialog(context, "Nightscout URL", hint: "URL", value: currentURL);
                       if (url == null || url.isEmpty) return;
-
-                      var uri = Uri.parse(url);
-                      var token = uri.queryParameters["token"];
-                      token ??= '';
-                      var base = '${uri.scheme}://${uri.host}';
-
-                      SecureSettings().nightscoutURL = base.toString();
-                      SecureSettings().nightscoutToken = token;
+                      SecureSettings().setNSValuesFromURL(url);
                     },
                   ),
                 ],

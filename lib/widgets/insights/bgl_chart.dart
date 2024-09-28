@@ -1,5 +1,5 @@
-import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/constants.dart';
+import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatments.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -19,7 +19,7 @@ class TreatmentSpot extends FlSpot {
 }
 
 class BGLSpot extends FlSpot {
-  final CleanSGV sgv;
+  final ASGV sgv;
   BGLSpot(super.x, super.y, this.sgv);
 }
 
@@ -51,7 +51,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       }
 
       List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<CleanSGV> sgvs = CleanSGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
+      List<ASGV> sgvs = SGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
       List<Treatment> lastTreatments = TreatmentList.last2days.value.getWindows(windowSize).where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
@@ -214,7 +214,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return spots;
   }
 
-  List<FlSpot> bglSpots(List<CleanSGV> sgvs) {
+  List<FlSpot> bglSpots(List<ASGV> sgvs) {
     List<FlSpot> spots = [];
     for (var i = 0; i < sgvs.length; i++) {
       var sgv = sgvs[i];

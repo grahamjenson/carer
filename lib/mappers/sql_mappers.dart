@@ -7,6 +7,7 @@ import 'package:carer/models/sql/tempbasal.dart';
 import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:clock/clock.dart';
 
 ////
 // Bolus
@@ -211,6 +212,14 @@ class SQLToSGV extends SQLMapper<SGV> {
       "timestamp": model.date.millisecondsSinceEpoch,
       "eid": model.eid!,
     });
+  }
+
+  Future<List<SGV>> last2Days() {
+    DateTime now = clock.now();
+    DateTime startOfYesterday = DateTime(now.year, now.month, now.day - 1);
+    int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
+
+    return SQLToSGV().query(after: startOfYesterdayEpoch);
   }
 }
 
