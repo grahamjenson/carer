@@ -49,6 +49,14 @@ class PlatformInfoService {
   ASignal<BatteryMode> batteryMode = ASignal(BatteryMode.unknown, debugLabel: "BatteryMode");
   ASignal<int> batteryLevel = ASignal(100, debugLabel: "BatteryLevel");
 
+  bool thisPhoneIsCharging() {
+    return batteryMode.value == BatteryMode.charging || batteryMode.value == BatteryMode.connectedNotCharging;
+  }
+
+  int thisPhonesBatteryLevel() {
+    return batteryLevel.value;
+  }
+
   Future<RingerMode> getRingerMode() async {
     RingerMode ringerStatus = RingerMode.unknown;
     if (!Platform.isIOS) {

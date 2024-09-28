@@ -129,7 +129,6 @@ void main() async {
       expect(active, false);
       expect(smartSnooze, false);
 
-      AlarmSettings().fastRiseAlarm = true;
       AlarmSettings().fastRiseAlarmMinutes = 10;
       TargetSettings().fastRiseDelta = 10;
 
@@ -151,7 +150,6 @@ void main() async {
       expect(active, false);
       expect(smartSnooze, false);
 
-      AlarmSettings().fastDropAlarm = true;
       AlarmSettings().fastDropAlarmMinutes = 10;
       TargetSettings().fastDropDelta = -10;
 

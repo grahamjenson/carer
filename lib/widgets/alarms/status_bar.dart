@@ -18,10 +18,10 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
       (context) {
         List<Widget?> rowsMaybe = [
           getIsSilentOnIcon(context),
-          getIsPluggedInIcon(context),
           sensorChangeDay(context),
           cannulaChangeDay(context),
-          uploaderPhoneLowPower(context),
+          getIsPluggedInIcon(context),
+          getPhoneLowPower(context),
         ];
         List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
 
@@ -62,21 +62,6 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bell_slash,
-          color: tertiaryColor(context),
-        ),
-      );
-    }
-    return null;
-  }
-
-  Widget? getIsPluggedInIcon(BuildContext context) {
-    var battery = PlatformInfoService().batteryMode.value;
-    if (battery == BatteryMode.discharging) {
-      return Tooltip(
-        message: "Battery Discharging",
-        triggerMode: TooltipTriggerMode.tap,
-        child: Icon(
-          UniconsLine.bolt_slash,
           color: tertiaryColor(context),
         ),
       );
@@ -130,12 +115,51 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
     return null;
   }
 
-  // TODO: Maybe this should be an alarm
-  Widget? uploaderPhoneLowPower(BuildContext context) {
-    var battery = PropertiesData().battery.toInt();
-    if (battery < 30) {
+  Widget? getIsPluggedInIcon(BuildContext context) {
+    var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
+    var t1dPhonesCharging = PropertiesData().t1dPhoneIsCharging();
+
+    List<String> tooltip = [];
+
+    if (!thisPhonesCharging) {
+      tooltip.add("This Phone Not Charging");
+    }
+    if (!t1dPhonesCharging) {
+      tooltip.add("T1D Phone Not Charging");
+    }
+
+    if (tooltip.isNotEmpty) {
       return Tooltip(
-        message: "Uploader Phone Low Battery $battery%",
+        message: tooltip.join(", "),
+        triggerMode: TooltipTriggerMode.tap,
+        child: Icon(
+          UniconsLine.bolt_slash,
+          color: tertiaryColor(context),
+        ),
+      );
+    }
+    return null;
+  }
+
+  Widget? getPhoneLowPower(BuildContext context) {
+    var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
+    var t1dPhonesCharging = PropertiesData().t1dPhoneIsCharging();
+
+    var thisPhonesBattery = PlatformInfoService().thisPhonesBatteryLevel();
+    var t1dPhonesBatteryLevel = PropertiesData().t1dPhonesBatteryLevel();
+
+    List<String> tooltip = [];
+
+    if (!thisPhonesCharging && thisPhonesBattery < 30) {
+      tooltip.add("This Phones Battery < 30%($thisPhonesBattery%)");
+    }
+    if (!t1dPhonesCharging && t1dPhonesBatteryLevel < 30) {
+      tooltip.add("T1D Phones Battery < 30%($t1dPhonesBatteryLevel%)");
+    }
+
+    if (tooltip.isNotEmpty) {
+      return Tooltip(
+        message: tooltip.join(", "),
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.battery_empty,

@@ -11,6 +11,7 @@ import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class Stats extends StatelessWidget with ThemeMixin {
   Stats({super.key});
@@ -23,10 +24,11 @@ class Stats extends StatelessWidget with ThemeMixin {
       color: primaryColor(context),
       height: 1,
     );
-    TextStyle row = const TextStyle(
+    TextStyle row = TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w500,
-      fontFeatures: [FontFeature.tabularFigures()],
+      fontFeatures: const [FontFeature.tabularFigures()],
+      color: labelSmall(context).color!,
       height: 1,
     );
 
@@ -51,7 +53,7 @@ class Stats extends StatelessWidget with ThemeMixin {
       var cobNow = PropertiesData().cob;
       var cageNow = PropertiesData().cage;
       var powerNow = PropertiesData().battery;
-      var charging = PropertiesData().isCharging;
+      var charging = PropertiesData().t1dPhoneIsCharging();
       var sageNow = PropertiesData().sage;
 
       var sgvs = CleanSGV.last3Hours.value;
@@ -241,17 +243,19 @@ class Stats extends StatelessWidget with ThemeMixin {
   }
 
   DataRow power(int battery, bool charging, TextStyle heading, TextStyle row, TextStyle small) {
-    List<String> chargingList = [];
-    List<TextStyle> chargingStyles = [];
+    Widget chargingW = const SizedBox.shrink();
+
     if (charging) {
-      chargingList = ["⚡"];
-      chargingStyles = [row];
+      chargingW = Icon(UniconsLine.bolt, color: row.color!, size: row.fontSize);
     }
     return DataRow(
       cells: [
         DataCell(Text("Power", style: heading)),
         DataCell(
-          SmartText(texts: ["$battery", "%"] + chargingList, styles: [row, small] + chargingStyles),
+          Row(children: [
+            SmartText(texts: ["$battery", "%"], styles: [row, small]),
+            chargingW,
+          ]),
         ),
       ],
     );

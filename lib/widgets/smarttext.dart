@@ -9,13 +9,12 @@ class SmartText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var childrenTextSpans = <TextSpan>[for (var i = 0; i < texts.length; i++) TextSpan(text: texts[i], style: styles[i])];
-
+    List<TextSpan> spans = [];
+    for (int i = 0; i < texts.length; i++) {
+      spans.add(TextSpan(text: texts[i], style: styles[i]));
+    }
     return RichText(
-      textAlign: textAlign,
-      overflow: TextOverflow.visible,
-      softWrap: false,
-      text: TextSpan(children: childrenTextSpans, style: DefaultTextStyle.of(context).style),
+      text: TextSpan(children: spans, style: DefaultTextStyle.of(context).style),
     );
   }
 }

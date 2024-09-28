@@ -461,7 +461,7 @@ class LowBatteryAlarm extends AlarmMethods {
       statusStr += "This Battery < 10%";
     }
     if (_t1DTrigger()) {
-      statusStr += "T1D Battery(${t1dBatteryLevel()}%) < 10%";
+      statusStr += "T1D Battery(${PropertiesData().t1dPhonesBatteryLevel()}%) < 10%";
     }
     return statusStr;
   }
@@ -475,35 +475,18 @@ class LowBatteryAlarm extends AlarmMethods {
     if (!AlarmSettings().carerBatteryAlarm) {
       return false;
     }
-    return carerBatteryLevel() < 10 && !carerBatteryCharging();
+    return PlatformInfoService().thisPhonesBatteryLevel() < 10 && !PlatformInfoService().thisPhoneIsCharging();
   }
 
   bool _t1DTrigger() {
     if (!AlarmSettings().t1dBatteryAlarm) {
       return false;
     }
-    return t1dBatteryLevel() < 10 && !t1dBatteryCharning();
+    return PropertiesData().t1dPhonesBatteryLevel() < 10 && !PropertiesData().t1dPhoneIsCharging();
   }
 
   @override
   bool active() {
     return AlarmSettings().carerBatteryAlarm || AlarmSettings().t1dBatteryAlarm;
-  }
-
-  int carerBatteryLevel() {
-    return PlatformInfoService().batteryLevel.value;
-  }
-
-  bool carerBatteryCharging() {
-    var bm = PlatformInfoService().batteryMode.value;
-    return bm == BatteryMode.charging;
-  }
-
-  int t1dBatteryLevel() {
-    return PropertiesData().battery.toInt();
-  }
-
-  bool t1dBatteryCharning() {
-    return PropertiesData().isCharging;
   }
 }
