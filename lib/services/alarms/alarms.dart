@@ -194,6 +194,8 @@ class LowAlarm extends AlarmMethods {
   @override
   List<String> properties() {
     return [
+      "sgv(${lastSGVStr()})",
+      "number($numberOfReadings)",
       "prediction(${PredictionService().getReadingsAhead(numberOfReadings)})",
     ];
   }

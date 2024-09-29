@@ -5,23 +5,8 @@ import 'package:carer/utils/futures.dart';
 enum _UINames {
   unit,
   screenActive,
-  layout,
+
   enableDim,
-}
-
-enum UILayout {
-  // NS Settings
-  showBGLChartHistoryStats("Everything"),
-  showBGL("BGL"),
-  showMinimal("Minimal");
-
-  final String viewName;
-
-  const UILayout(this.viewName);
-
-  static UILayout fromString(String? value) {
-    return UILayout.values.firstWhere((e) => e.name == value, orElse: () => UILayout.showBGL);
-  }
 }
 
 class UISettings {
@@ -31,7 +16,6 @@ class UISettings {
   final Map<_UINames, ASignal> _signals = {
     _UINames.screenActive: ASignal<bool>(false, debugLabel: 'screenActive'),
     _UINames.unit: ASignal<Unit>(Unit.mg, debugLabel: 'unit'),
-    _UINames.layout: ASignal<UILayout>(UILayout.showBGLChartHistoryStats, debugLabel: 'layout'),
     _UINames.enableDim: ASignal<bool>(true, debugLabel: 'enableDim'),
   };
 
@@ -45,9 +29,6 @@ class UISettings {
   Unit get unit => _signals[_UINames.unit]!.value as Unit;
   set unit(Unit value) => _signals[_UINames.unit]!.value = value;
 
-  UILayout get layout => _signals[_UINames.layout]!.value as UILayout;
-  set layout(UILayout value) => _signals[_UINames.layout]!.value = value;
-
   bool get enableDim => _signals[_UINames.enableDim]!.value as bool;
   set enableDim(bool value) => _signals[_UINames.enableDim]!.value = value;
 
@@ -57,8 +38,6 @@ class UISettings {
 
     unit = Unit.fromBool(prefs.getBool(_UINames.unit.name, defaultValue: true)!);
 
-    layout = UILayout.fromString(prefs.getString(_UINames.layout.name, defaultValue: UILayout.showBGLChartHistoryStats.name)!);
-
     enableDim = prefs.getBool(_UINames.enableDim.name, defaultValue: true)!;
 
     aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()), debugLabel: _UINames.unit.name);
@@ -66,10 +45,6 @@ class UISettings {
     aeffect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);
     }, debugLabel: _UINames.screenActive.name);
-
-    aeffect(() {
-      prefs.setString(_UINames.layout.name, layout.name);
-    }, debugLabel: _UINames.layout.name);
 
     aeffect(() {
       prefs.setBool(_UINames.enableDim.name, enableDim);

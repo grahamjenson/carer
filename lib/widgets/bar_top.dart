@@ -3,27 +3,30 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/alarms_bar.dart';
 import 'package:carer/widgets/alarms/status_bar.dart';
-import 'package:carer/widgets/pages/settingspage.dart';
+import 'package:carer/widgets/current_time.dart';
 import 'package:flutter/material.dart';
 
-class Bar extends StatelessWidget with ThemeMixin {
-  const Bar({super.key});
+class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWidget {
+  const BarTop({super.key});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(40);
 
   @override
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
         List<Widget> tiles = [
-          const StatusesBar(),
-          AlarmsBarIcons(),
+          const CurrentTimeWidget(),
           const Expanded(
             child: SizedBox.shrink(),
           ),
-          getSettingsButton(context),
+          const StatusesBar(),
+          AlarmsBarIcons(),
         ];
 
         return BottomAppBar(
-          color: Colors.transparent,
+          color: const Color.fromRGBO(0, 0, 0, 0),
           padding: const EdgeInsets.only(left: 8, right: 8),
           height: 40,
           child: Row(
@@ -32,24 +35,8 @@ class Bar extends StatelessWidget with ThemeMixin {
           ),
         );
       },
-      debugLabel: "Bar",
+      debugLabel: "BarTop",
       dependencies: [ThemeService().themeSignal, AlarmAlertSettings().snoozeUntilSignal],
-    );
-  }
-
-  Widget getSettingsButton(BuildContext context) {
-    return IconButton(
-      padding: EdgeInsets.zero,
-      icon: Icon(
-        Icons.settings,
-        color: primaryColor(context),
-      ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SettingsPage()),
-        );
-      },
     );
   }
 }

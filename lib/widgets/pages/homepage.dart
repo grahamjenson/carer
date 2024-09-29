@@ -1,7 +1,8 @@
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/bar.dart';
+import 'package:carer/widgets/bar_bottom.dart';
+import 'package:carer/widgets/bar_top.dart';
 import 'package:carer/widgets/home_layout.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,8 @@ class HomePage extends StatelessWidget with ThemeMixin {
           ),
         ),
       ),
-      bottomNavigationBar: const Bar(),
+      appBar: const BarTop(),
+      bottomNavigationBar: const BarBottom(),
     );
   }
 }

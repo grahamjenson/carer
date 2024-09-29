@@ -302,7 +302,7 @@ ThemeData normalTheme = ThemeData(
     error: Colors.red,
     onError: Colors.white,
     surface: Colors.grey[850]!,
-    onSurface: Colors.white,
+    onSurface: Colors.grey[850]!.dim,
     outline: blueColorConst.dim,
   ),
 );

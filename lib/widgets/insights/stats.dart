@@ -60,7 +60,6 @@ class Stats extends StatelessWidget with ThemeMixin {
       var exp2preds = PredictionService().predictionsForReadings;
 
       return Window(
-        title: "Stats",
         child: Expanded(
           child: SingleChildScrollView(
             child: Container(

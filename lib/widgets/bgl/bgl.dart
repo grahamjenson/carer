@@ -3,6 +3,7 @@ import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
+import 'package:carer/widgets/insights/window.dart';
 import 'package:flutter/material.dart';
 
 //copied from https://xdrip.readthedocs.io/en/latest/use/mainUI/#trend-arrow
@@ -23,7 +24,7 @@ class BGL extends StatelessWidget with ThemeMixin {
 
         var rColor = rangeColor(context);
         var dColor = diffColor(context);
-        return Container(
+        return Window(
             child: AspectRatio(
                 aspectRatio: 1.5,
                 child: Stack(

@@ -4,7 +4,6 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snoozebutton.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
-import 'package:carer/widgets/current_time.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
 import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/stats.dart';
@@ -13,23 +12,11 @@ import 'package:flutter/material.dart';
 // Enumeration of all layout types
 // I dont want to do anything funky here, easier to enumnerate and build individually with limited blast radias for errors
 enum LayoutTypes {
-  horizontalBGL,
-  horizontalBGLWithSnooze,
-
   horizonalBGLWithInsights,
   horizonalBGLWithInsightsAndSnooze,
 
-  horizontalMinimal,
-  horizontalMinimalWithSnooze,
-
-  verticalBGL,
-  verticalBGLWithSnooze,
-
   verticalBGLWithInsights,
   verticalBGLWithInsightsAndSnooze,
-
-  verticalMinimal,
-  verticalMinimalWithSnooze,
 }
 
 class HomeLayout extends StatelessWidget with ThemeMixin {
@@ -50,11 +37,6 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
               debugLabel: "HomeLayout",
             ),
           ),
-          const Positioned(
-            top: 0, // Adjust these values as needed
-            left: 5,
-            child: FittedBox(child: CurrentTimeWidget()),
-          ),
         ],
       ),
     );
@@ -62,38 +44,18 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
 
   // All layout selection logic here, try figure out what needs to be seen outside of the rendering
   LayoutTypes layoutType(BuildContext context) {
-    var layout = UISettings().layout;
-
     final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     final isSnoozeShown = !AlarmSettings().disableAlarms;
 
-    switch ((horizontal, isSnoozeShown, layout)) {
-      case (false, false, UILayout.showBGL):
-        return LayoutTypes.verticalBGL;
-      case (false, true, UILayout.showBGL):
-        return LayoutTypes.verticalBGLWithSnooze;
-      case (true, false, UILayout.showBGL):
-        return LayoutTypes.horizontalBGL;
-      case (true, true, UILayout.showBGL):
-        return LayoutTypes.horizontalBGLWithSnooze;
-
-      case (false, false, UILayout.showBGLChartHistoryStats):
+    switch ((horizontal, isSnoozeShown)) {
+      case (false, false):
         return LayoutTypes.verticalBGLWithInsights;
-      case (false, true, UILayout.showBGLChartHistoryStats):
+      case (false, true):
         return LayoutTypes.verticalBGLWithInsightsAndSnooze;
-      case (true, false, UILayout.showBGLChartHistoryStats):
+      case (true, false):
         return LayoutTypes.horizonalBGLWithInsights;
-      case (true, true, UILayout.showBGLChartHistoryStats):
+      case (true, true):
         return LayoutTypes.horizonalBGLWithInsightsAndSnooze;
-
-      case (false, false, UILayout.showMinimal):
-        return LayoutTypes.verticalMinimal;
-      case (false, true, UILayout.showMinimal):
-        return LayoutTypes.verticalMinimalWithSnooze;
-      case (true, false, UILayout.showMinimal):
-        return LayoutTypes.horizontalMinimal;
-      case (true, true, UILayout.showMinimal):
-        return LayoutTypes.horizontalMinimalWithSnooze;
     }
   }
 
@@ -142,10 +104,6 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     // we wont have to test 20 things to make sure nothing broke
 
     switch (layout) {
-      case LayoutTypes.horizontalBGL:
-        return flexListCol([4], [const BGL()]);
-      case LayoutTypes.horizontalBGLWithSnooze:
-        return flexListCol([4, 1], [const BGL(), const SnoozeButton()]);
       case LayoutTypes.horizonalBGLWithInsights:
         return flexListRow([
           5,
@@ -162,10 +120,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
           flexListCol([20, 5], [const BGL(), const SnoozeButton()]),
           getInsights()
         ]);
-      case LayoutTypes.verticalBGL:
-        return flexListRow([4], [const BGL()]);
-      case LayoutTypes.verticalBGLWithSnooze:
-        return flexListCol([-1, 4, -1, 1], [const SizedBox.shrink(), const BGL(), const SizedBox.shrink(), const SnoozeButton()]);
+
       case LayoutTypes.verticalBGLWithInsights:
         return flexListCol([
           5,
@@ -183,42 +138,6 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
         ], [
           flexListRow([4], [const BGL()]),
           getInsights(),
-          const SizedBox.shrink(),
-          const SnoozeButton(),
-        ]);
-      case LayoutTypes.horizontalMinimal:
-        return flexListRow([
-          5,
-          5
-        ], [
-          flexListCol([4], [const BGL()]),
-          getMinimalInsights(),
-        ]);
-      case LayoutTypes.horizontalMinimalWithSnooze:
-        return flexListRow([
-          5,
-          5
-        ], [
-          flexListCol([20, 5], [const BGL(), const SnoozeButton()]),
-          getMinimalInsights(),
-        ]);
-      case LayoutTypes.verticalMinimal:
-        return flexListCol([
-          5,
-          5
-        ], [
-          flexListRow([4], [const BGL()]),
-          getMinimalInsights()
-        ]);
-      case LayoutTypes.verticalMinimalWithSnooze:
-        return flexListCol([
-          10,
-          12,
-          -1,
-          3,
-        ], [
-          flexListRow([4], [const BGL()]),
-          getMinimalInsights(),
           const SizedBox.shrink(),
           const SnoozeButton(),
         ]);

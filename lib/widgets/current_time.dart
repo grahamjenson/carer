@@ -17,18 +17,18 @@ class CurrentTimeWidget extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        TextStyle style = displaySmall(context).copyWith(fontSize: 30);
+        TextStyle style = displaySmall(context).copyWith(fontSize: 24);
         var _ = TimerService().secondSignal.value;
         final String formattedDateTime = _formatDateTime(clock.now());
         return Container(
           decoration: BoxDecoration(
-            border: Border.all(
-              color: outlineColor(context), // Border color
-              width: 2.0, // Border width
-            ),
-            borderRadius: BorderRadius.circular(12), // Adjust the radius as needed
-            color: surfaceColor(context),
-          ),
+              border: Border.all(
+                color: onSurfaceColor(context), // Border color
+                width: 2.0, // Border width
+              ),
+              borderRadius: BorderRadius.circular(12), // Adjust the radius as needed
+              color: onSurfaceColor(context)),
+          padding: const EdgeInsets.all(5),
           child: Text(formattedDateTime, style: style.copyWith(color: style.color!)),
         );
       },

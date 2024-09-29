@@ -20,12 +20,19 @@ class Window extends StatelessWidget with ThemeMixin {
       ));
     }
     children.add(child);
+    var color = onSurfaceColor(context);
     return Container(
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        border: Border.all(width: 0, color: outlineColor(context)),
+        border: Border.all(
+          width: 0,
+          color: color,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        color: color,
       ),
+      padding: const EdgeInsets.all(5),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,

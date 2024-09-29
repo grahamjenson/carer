@@ -27,7 +27,6 @@ class History extends StatelessWidget with ThemeMixin {
       var history = [for (var t in treatments) historyRow(context, t)].where((row) => row != null).map((row) => row as DataRow).toList();
 
       return Window(
-        title: "History",
         child: Expanded(
           child: SingleChildScrollView(
               child: Container(
