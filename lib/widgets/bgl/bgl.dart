@@ -25,51 +25,48 @@ class BGL extends StatelessWidget with ThemeMixin {
         var rColor = rangeColor(context);
         var dColor = diffColor(context);
         return Window(
-            child: AspectRatio(
-                aspectRatio: 1.5,
-                child: Stack(
-                  children: [
-                    const Align(
-                      alignment: Alignment(0, -0.9),
-                      child: FractionallySizedBox(
-                        widthFactor: 1,
-                        heightFactor: 0.2,
-                        child: FittedBox(
-                          alignment: Alignment(0, 0),
-                          child: TimeAgoReading(),
+          child: AspectRatio(
+            aspectRatio: 1.5,
+            child: Stack(
+              children: [
+                const Align(
+                  alignment: Alignment(0, -1.1),
+                  child: FractionallySizedBox(
+                    widthFactor: 1,
+                    heightFactor: 0.2,
+                    child: FittedBox(
+                      alignment: Alignment(0, 0),
+                      child: TimeAgoReading(),
+                    ),
+                  ),
+                ),
+                Align(
+                    alignment: const Alignment(0, 0),
+                    child: FractionallySizedBox(
+                      widthFactor: 1,
+                      heightFactor: 0.85,
+                      child: FittedBox(
+                        child: Text(
+                          sgv.sgvStr(unit),
+                          style: displayLarge(context).merge(shadows()).copyWith(color: rColor),
                         ),
                       ),
+                    )),
+                Align(
+                  alignment: const Alignment(0.38, 1),
+                  child: FractionallySizedBox(
+                    widthFactor: .5,
+                    heightFactor: 0.2,
+                    child: Text(
+                      sgv.rate5mWithSign(unit),
+                      style: displayMedium(context).merge(shadows()).copyWith(color: dColor),
                     ),
-                    Align(
-                        alignment: const Alignment(0, 0.6),
-                        child: FractionallySizedBox(
-                          widthFactor: 1,
-                          heightFactor: 0.85,
-                          child: FittedBox(
-                            child: Text(
-                              sgv.sgvStr(unit),
-                              style: displayLarge(context).merge(shadows()).copyWith(color: rColor),
-                            ),
-                          ),
-                        )),
-                    Align(
-                      alignment: const Alignment(-0.2, 1.06),
-                      child: FractionallySizedBox(
-                        widthFactor: .5,
-                        heightFactor: 0.2,
-                        child: Row(children: [
-                          Expanded(
-                            child: FittedBox(
-                                child: Text(
-                              sgv.rate5mWithSign(unit),
-                              style: displayLarge(context).merge(shadows()).copyWith(color: dColor),
-                            )),
-                          ),
-                        ]),
-                      ),
-                    ),
-                  ],
-                )));
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
       debugLabel: "BGL",
     );

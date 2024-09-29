@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -9,16 +11,6 @@ import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/stats.dart';
 import 'package:flutter/material.dart';
 
-// Enumeration of all layout types
-// I dont want to do anything funky here, easier to enumnerate and build individually with limited blast radias for errors
-enum LayoutTypes {
-  horizonalBGLWithInsights,
-  horizonalBGLWithInsightsAndSnooze,
-
-  verticalBGLWithInsights,
-  verticalBGLWithInsightsAndSnooze,
-}
-
 class HomeLayout extends StatelessWidget with ThemeMixin {
   HomeLayout({super.key});
 
@@ -26,37 +18,22 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     // This needs hardcoding because the scrollable outer widget
 
-    return LayoutBuilder(
-      builder: (context, constraints) => Stack(
+    return LayoutBuilder(builder: (context, constraints) {
+      double minHeight = max(0, constraints.maxHeight);
+      double maxHeight = max(100, constraints.maxHeight);
+      return Stack(
         children: [
           ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight, maxHeight: constraints.maxHeight),
+            constraints: BoxConstraints(minHeight: minHeight, maxHeight: maxHeight),
             child: AWatch(
-              (context) => getLayout(layoutType(context)),
+              (context) => getLayout(context),
               dependencies: UISettings().allSignals,
               debugLabel: "HomeLayout",
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // All layout selection logic here, try figure out what needs to be seen outside of the rendering
-  LayoutTypes layoutType(BuildContext context) {
-    final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
-    final isSnoozeShown = !AlarmSettings().disableAlarms;
-
-    switch ((horizontal, isSnoozeShown)) {
-      case (false, false):
-        return LayoutTypes.verticalBGLWithInsights;
-      case (false, true):
-        return LayoutTypes.verticalBGLWithInsightsAndSnooze;
-      case (true, false):
-        return LayoutTypes.horizonalBGLWithInsights;
-      case (true, true):
-        return LayoutTypes.horizonalBGLWithInsightsAndSnooze;
-    }
+      );
+    });
   }
 
   List<Flexible> flexList(List<int> flexes, List<Widget> widgets) {
@@ -74,11 +51,17 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   }
 
   Column flexListCol(List<int> flexes, List<Widget> widgets) {
-    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: flexList(flexes, widgets));
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: flexList(flexes, widgets),
+    );
   }
 
   Row flexListRow(List<int> flexes, List<Widget> widgets) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: flexList(flexes, widgets));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: flexList(flexes, widgets),
+    );
   }
 
   Widget getInsights() {
@@ -94,53 +77,37 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
   }
 
-  Widget getMinimalInsights() {
-    // TODO: This should be different widgets that are much cleaner
-    return History();
-  }
-
-  Widget getLayout(LayoutTypes layout) {
+  Widget getLayout(BuildContext context) {
     // We get super denormalized here so that if we change one thing
     // we wont have to test 20 things to make sure nothing broke
+    final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
+    final isSnoozeShown = !AlarmSettings().disableAlarms;
 
-    switch (layout) {
-      case LayoutTypes.horizonalBGLWithInsights:
-        return flexListRow([
-          5,
-          5
-        ], [
-          flexListCol([4], [const BGL()]),
-          getInsights()
-        ]);
-      case LayoutTypes.horizonalBGLWithInsightsAndSnooze:
-        return flexListRow([
-          5,
-          5
-        ], [
-          flexListCol([20, 5], [const BGL(), const SnoozeButton()]),
-          getInsights()
-        ]);
+    Widget snoozeBtn = const SizedBox.shrink();
+    if (isSnoozeShown) {
+      snoozeBtn = const SnoozeButton();
+    }
 
-      case LayoutTypes.verticalBGLWithInsights:
-        return flexListCol([
-          5,
-          5
-        ], [
-          flexListRow([4], [const BGL()]),
-          getInsights()
-        ]);
-      case LayoutTypes.verticalBGLWithInsightsAndSnooze:
-        return flexListCol([
-          10,
-          12,
-          -1,
-          3,
-        ], [
-          flexListRow([4], [const BGL()]),
-          getInsights(),
-          const SizedBox.shrink(),
-          const SnoozeButton(),
-        ]);
+    if (horizontal) {
+      return flexListRow([
+        5,
+        5
+      ], [
+        flexListCol([20, 5], [const BGL(), snoozeBtn]),
+        getInsights()
+      ]);
+    } else {
+      return flexListCol([
+        10,
+        12,
+        -1,
+        3,
+      ], [
+        flexListRow([4], [const BGL()]),
+        getInsights(),
+        const SizedBox.shrink(),
+        snoozeBtn,
+      ]);
     }
   }
 }

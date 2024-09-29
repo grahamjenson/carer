@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   battery_plus
+  desktop_window
   flutter_secure_storage_windows
   flutter_volume_controller
   screen_brightness_windows

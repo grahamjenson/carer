@@ -8,6 +8,7 @@
 
 #include <audioplayers_windows/audioplayers_windows_plugin.h>
 #include <battery_plus/battery_plus_windows_plugin.h>
+#include <desktop_window/desktop_window_plugin.h>
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 #include <flutter_volume_controller/flutter_volume_controller_plugin_c_api.h>
 #include <screen_brightness_windows/screen_brightness_windows_plugin.h>
@@ -20,6 +21,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("AudioplayersWindowsPlugin"));
   BatteryPlusWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("BatteryPlusWindowsPlugin"));
+  DesktopWindowPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("DesktopWindowPlugin"));
   FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
   FlutterVolumeControllerPluginCApiRegisterWithRegistrar(

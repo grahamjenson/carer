@@ -68,6 +68,7 @@ dependencies:
   sound_mode: ^3.0.0
   battery_plus: ^6.0.2
   sqflite_common: ^2.5.4
+  desktop_window: ^0.4.0
 
   
 

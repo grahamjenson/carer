@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
+  desktop_window
   flutter_secure_storage_linux
   flutter_volume_controller
   sentry_flutter

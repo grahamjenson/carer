@@ -8,12 +8,24 @@ import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
-// Trying to define the colour scehem based on diabetes action month colours
+class ColorPair {
+  final Color day;
+  final Color night;
+
+  ColorPair(
+    this.day,
+    this.night,
+  );
+}
+
+// Try and define all colors at this point, as a means of centralizing the color scheme
+ColorPair backgroundColorConst = ColorPair(Colors.grey[850]!, Colors.black);
+ColorPair textColorConst = ColorPair(const Color(0xFFEEEEEE), const Color(0xFF555555));
+ColorPair widgetBackgroundColorConst = ColorPair(const Color(0xFF555555), const Color(0xFFEEEEEE));
+
 Color blueColorConst = const Color(0xFF00BAEF);
 Color redColorConst = const Color.fromARGB(255, 227, 63, 63);
 Color yellowColorConst = const Color(0xFFFFCD36);
-Color plainTextColorConst = const Color(0xFFEEEEEE);
-Color dimTextColorConst = const Color(0xFF555555);
 
 class ThemeService {
   static final ThemeService _themeService = ThemeService._internal();
@@ -81,6 +93,10 @@ mixin ThemeMixin {
 
   Color surfaceColor(BuildContext context) {
     return Theme.of(context).colorScheme.surface;
+  }
+
+  Color surfaceColorDim(BuildContext context) {
+    return Theme.of(context).colorScheme.surface.dim;
   }
 
   Color onSurfaceColor(BuildContext context) {
@@ -238,57 +254,57 @@ ThemeData normalTheme = ThemeData(
   textTheme: defaultTextTheme.merge(TextTheme(
     displayLarge: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     displayMedium: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     displaySmall: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     headlineLarge: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     headlineMedium: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     headlineSmall: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     titleLarge: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     titleMedium: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     titleSmall: TextStyle(
       fontWeight: FontWeight.bold,
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     bodyLarge: TextStyle(
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     bodyMedium: TextStyle(
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     bodySmall: TextStyle(
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     labelLarge: TextStyle(
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     labelMedium: TextStyle(
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
     labelSmall: TextStyle(
-      color: plainTextColorConst,
+      color: textColorConst.day,
     ),
   )),
   colorScheme: ColorScheme(
@@ -301,8 +317,8 @@ ThemeData normalTheme = ThemeData(
     onTertiary: Colors.white,
     error: Colors.red,
     onError: Colors.white,
-    surface: Colors.grey[850]!,
-    onSurface: Colors.grey[850]!.dim,
+    surface: backgroundColorConst.day,
+    onSurface: textColorConst.day,
     outline: blueColorConst.dim,
   ),
 );
@@ -311,70 +327,70 @@ ThemeData dimTheme = normalTheme.copyWith(
   textTheme: normalTheme.textTheme.merge(TextTheme(
     displayLarge: TextStyle(
       fontWeight: FontWeight.w600,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     displayMedium: TextStyle(
       fontWeight: FontWeight.w600,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     displaySmall: TextStyle(
       fontWeight: FontWeight.w600,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     headlineLarge: TextStyle(
       fontWeight: FontWeight.w500,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     headlineMedium: TextStyle(
       fontWeight: FontWeight.w500,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     headlineSmall: TextStyle(
       fontWeight: FontWeight.w500,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     titleLarge: TextStyle(
       fontWeight: FontWeight.w400,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     titleMedium: TextStyle(
       fontWeight: FontWeight.w400,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     titleSmall: TextStyle(
       fontWeight: FontWeight.w400,
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     bodyLarge: TextStyle(
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     bodyMedium: TextStyle(
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     bodySmall: TextStyle(
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     labelLarge: TextStyle(
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     labelMedium: TextStyle(
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
     labelSmall: TextStyle(
-      color: dimTextColorConst,
+      color: textColorConst.night,
     ),
   )),
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: dimTextColorConst,
+    primary: textColorConst.night,
     onPrimary: Colors.black,
-    secondary: dimTextColorConst,
+    secondary: textColorConst.night,
     onSecondary: Colors.black,
-    tertiary: dimTextColorConst,
+    tertiary: textColorConst.night,
     onTertiary: Colors.black,
     error: Colors.red,
     onError: Colors.white,
-    surface: Colors.black,
+    surface: backgroundColorConst.night,
     onSurface: Colors.white,
     outline: Colors.black,
   ),

@@ -18,6 +18,7 @@ import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/pages/homepage.dart';
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -39,6 +40,9 @@ void main() async {
 
 void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+    await DesktopWindow.setMinWindowSize(const Size(800, 450));
+  }
 
   // Signals logging
   setupSignalsLogging();

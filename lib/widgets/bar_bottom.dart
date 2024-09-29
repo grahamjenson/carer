@@ -38,7 +38,7 @@ class BarBottom extends StatelessWidget with ThemeMixin {
       color: Colors.white,
       highlightColor: Colors.white,
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(onSurfaceColor(context)),
+        backgroundColor: WidgetStateProperty.all<Color>(surfaceColorDim(context)),
       ),
       padding: EdgeInsets.zero,
       icon: Icon(

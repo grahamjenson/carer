@@ -37,7 +37,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
               width: 1, // Width of the border
             ),
             borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
-            color: onSurfaceColor(context),
+            color: surfaceColorDim(context),
           ),
           child: Row(
             children: rows,
