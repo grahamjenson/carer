@@ -14,38 +14,37 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.blue,
-      child: AWatch(
-        (context) {
-          var mainColor = primaryColor(context);
-          var backgroundColor = mainColor.dim.dim.dim;
-          var buttonColor = mainColor.dim.dim;
+    return AWatch(
+      (context) {
+        var mainColor = primaryColor(context);
+        var backgroundColor = mainColor.dim.dim.dim;
+        var buttonColor = mainColor.dim.dim;
 
-          return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-            var width = constraints.maxWidth - 20;
-            var height = constraints.maxHeight - 25;
-            double buttonRadias = min(height, min(75, width));
-            double betweenButtons = width - (2 * buttonRadias) - 10;
-            return Window(
+        return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+          var width = constraints.maxWidth;
+          var height = constraints.maxHeight - 15;
+          double buttonRadias = min(height, min(75, width));
+          double betweenButtons = width - (2 * buttonRadias) - 10;
+          return Window(
+            child: Center(
               child: Container(
-                height: height,
+                height: buttonRadias,
                 width: width,
                 decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
                 child: Stack(
                   children: [
                     Center(child: SizedBox(width: betweenButtons, child: const SnoozeTextStatus())),
                     getDismissable(context, buttonRadias, width, mainColor, buttonColor),
-                    getSnoozeCancel(context, buttonRadias, mainColor, backgroundColor),
+                    getSnoozeCancel(context, buttonRadias, mainColor, buttonColor),
                   ],
                 ),
               ),
-            );
-          });
-        },
-        debugLabel: "SnoozeButton",
-        dependencies: [AlarmAlertSettings().snoozeUntilSignal],
-      ),
+            ),
+          );
+        });
+      },
+      debugLabel: "SnoozeButton",
+      dependencies: [AlarmAlertSettings().snoozeUntilSignal],
     );
   }
 
@@ -62,8 +61,15 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
           alignment: Alignment.center,
           height: buttonRadias,
           width: buttonRadias,
-          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
           child: IconButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(backgroundColor),
+              shape: WidgetStateProperty.all<OutlinedBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
+            ),
             padding: EdgeInsets.zero,
             alignment: Alignment.center,
             icon: cancelIcon,
