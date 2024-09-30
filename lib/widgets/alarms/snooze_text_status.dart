@@ -25,7 +25,7 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
     ];
 
     if (isSnoozing()) {
-      rows.add(timeStringWidget());
+      rows.add(timeStringWidget(context));
     }
 
     var alarmWidget = alarmStringWidget(context);
@@ -48,9 +48,9 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
     return true;
   }
 
-  Widget timeStringWidget() {
-    var big = const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, height: 1);
-    var small = const TextStyle(fontSize: 20);
+  Widget timeStringWidget(BuildContext context) {
+    var big = labelLarge(context);
+    var small = labelSmall(context);
 
     var duration = AlarmAlertSettings().snoozeDuration!;
     var totalSeconds = duration.inSeconds;

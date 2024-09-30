@@ -68,7 +68,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(flex: 3, child: BGL()),
+                const Flexible(flex: 3, child: BGL()),
                 Flexible(flex: 1, child: snoozeBtn),
               ],
             ),
@@ -96,7 +96,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Flexible(flex: 6, child: BGL()),
-          const Expanded(flex: 4, child: BGLChart()),
+          const Flexible(flex: 4, child: BGLChart()),
           Flexible(
             flex: 2,
             child: Row(
