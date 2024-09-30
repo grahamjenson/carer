@@ -60,49 +60,47 @@ class Stats extends StatelessWidget with ThemeMixin {
       var exp2preds = PredictionService().predictionsForReadings;
 
       return Window(
-        child: Expanded(
-          child: SingleChildScrollView(
-            child: Container(
-              alignment: Alignment.center,
-              child: DataTable(
-                border: TableBorder(
-                  verticalInside: BorderSide(color: outlineColor(context)),
-                  horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
-                ),
-                columnSpacing: 10,
-                dividerThickness: 0.01,
-                headingRowHeight: 0,
-                dataRowMinHeight: 14,
-                dataRowMaxHeight: 23,
-                horizontalMargin: 0,
-                columns: [
-                  DataColumn(
-                    numeric: true,
-                    label: SizedBox(
-                      width: 50,
-                      child: Text('name', style: heading),
-                    ),
-                  ),
-                  DataColumn(label: SizedBox(width: 50, child: Text('stat', style: heading))),
-                ],
-                rows: [
-                  iob(iobNow, heading, row, small),
-                  cob(cobNow, heading, row, small),
-                  basal(currentBasal, heading, row, small),
-                  target(UISettings().unit, profileLowTarget, profileHighTarget, heading, row, small),
-                  currentProfile(heading, row, small),
-                  fifteenMinDiff(UISettings().unit, sgvs, heading, row, small),
-                  profileValues(heading, row, small),
-                  divider(),
-                  todaysInRange(heading, row, small),
-                  yesterdayInRange(heading, row, small),
-                  cage(cageNow, heading, row, small),
-                  sage(sageNow, heading, row, small),
-                  power(powerNow.toInt(), charging, heading, row, small),
-                  divider(),
-                  predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
-                ],
+        child: SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.center,
+            child: DataTable(
+              border: TableBorder(
+                verticalInside: BorderSide(color: outlineColor(context)),
+                horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
               ),
+              columnSpacing: 10,
+              dividerThickness: 0.01,
+              headingRowHeight: 0,
+              dataRowMinHeight: 14,
+              dataRowMaxHeight: 23,
+              horizontalMargin: 0,
+              columns: [
+                DataColumn(
+                  numeric: true,
+                  label: SizedBox(
+                    width: 50,
+                    child: Text('name', style: heading),
+                  ),
+                ),
+                DataColumn(label: SizedBox(width: 50, child: Text('stat', style: heading))),
+              ],
+              rows: [
+                iob(iobNow, heading, row, small),
+                cob(cobNow, heading, row, small),
+                basal(currentBasal, heading, row, small),
+                target(UISettings().unit, profileLowTarget, profileHighTarget, heading, row, small),
+                currentProfile(heading, row, small),
+                fifteenMinDiff(UISettings().unit, sgvs, heading, row, small),
+                profileValues(heading, row, small),
+                divider(),
+                todaysInRange(heading, row, small),
+                yesterdayInRange(heading, row, small),
+                cage(cageNow, heading, row, small),
+                sage(sageNow, heading, row, small),
+                power(powerNow.toInt(), charging, heading, row, small),
+                divider(),
+                predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
+              ],
             ),
           ),
         ),

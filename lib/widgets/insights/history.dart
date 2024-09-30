@@ -27,28 +27,26 @@ class History extends StatelessWidget with ThemeMixin {
       var history = [for (var t in treatments) historyRow(context, t)].where((row) => row != null).map((row) => row as DataRow).toList();
 
       return Window(
-        child: Expanded(
-          child: SingleChildScrollView(
-              child: Container(
-                  alignment: Alignment.center,
-                  child: DataTable(
-                      border: TableBorder(
-                        verticalInside: BorderSide(color: outlineColor(context).dim, width: 0.5),
-                        horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.2),
-                      ),
-                      columnSpacing: columnSpacing,
-                      dividerThickness: dividerThickness,
-                      headingRowHeight: headingRowHeight,
-                      dataRowMinHeight: dataRowMinHeight,
-                      dataRowMaxHeight: dataRowMaxHeight,
-                      horizontalMargin: horizontalMargin,
-                      columns: [
-                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
-                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
-                        DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
-                      ],
-                      rows: history))),
-        ),
+        child: SingleChildScrollView(
+            child: Container(
+                alignment: Alignment.center,
+                child: DataTable(
+                    border: TableBorder(
+                      verticalInside: BorderSide(color: outlineColor(context).dim, width: 0.5),
+                      horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.2),
+                    ),
+                    columnSpacing: columnSpacing,
+                    dividerThickness: dividerThickness,
+                    headingRowHeight: headingRowHeight,
+                    dataRowMinHeight: dataRowMinHeight,
+                    dataRowMaxHeight: dataRowMaxHeight,
+                    horizontalMargin: horizontalMargin,
+                    columns: [
+                      DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
+                      DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
+                      DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
+                    ],
+                    rows: history))),
       );
     }, debugLabel: "History");
   }

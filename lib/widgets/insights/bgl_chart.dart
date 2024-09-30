@@ -68,59 +68,57 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       );
 
       return Window(
-        child: Expanded(
-          child: Column(children: [
-            Flexible(
-                flex: 15,
-                child: ToggleButtons(
-                    selectedColor: primaryColor(context),
-                    constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
-                    isSelected: [
-                      _chartMinsAgo.value == 120,
-                      _chartMinsAgo.value == 240,
-                      _chartMinsAgo.value == 360,
-                      _chartMinsAgo.value == 720,
-                      _chartMinsAgo.value == 1440,
-                    ],
-                    onPressed: (int index) {
-                      if (index == 0) {
-                        _chartMinsAgo.value = 120;
-                      } else if (index == 1) {
-                        _chartMinsAgo.value = 240;
-                      } else if (index == 2) {
-                        _chartMinsAgo.value = 360;
-                      } else if (index == 3) {
-                        _chartMinsAgo.value = 720;
-                      } else if (index == 4) {
-                        _chartMinsAgo.value = 1440;
-                      }
-                    },
-                    children: [
-                      Text("2h", style: labelLarge(context)),
-                      Text("4h", style: labelLarge(context)),
-                      Text("6h", style: labelLarge(context)),
-                      Text("12h", style: labelLarge(context)),
-                      Text("24h", style: labelLarge(context)),
-                    ])),
-            Flexible(
-              flex: 90,
-              child: LineChart(
-                buildlineChartData(
-                  context,
-                  minsAgo,
-                  maxBasal,
-                  bglSpotData,
-                  basalSpotData,
-                  lowTargets,
-                  highTargets,
-                  treatments,
-                  bglLineData,
-                ),
-                duration: Duration.zero,
+        child: Column(children: [
+          Flexible(
+              flex: 15,
+              child: ToggleButtons(
+                  selectedColor: primaryColor(context),
+                  constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
+                  isSelected: [
+                    _chartMinsAgo.value == 120,
+                    _chartMinsAgo.value == 240,
+                    _chartMinsAgo.value == 360,
+                    _chartMinsAgo.value == 720,
+                    _chartMinsAgo.value == 1440,
+                  ],
+                  onPressed: (int index) {
+                    if (index == 0) {
+                      _chartMinsAgo.value = 120;
+                    } else if (index == 1) {
+                      _chartMinsAgo.value = 240;
+                    } else if (index == 2) {
+                      _chartMinsAgo.value = 360;
+                    } else if (index == 3) {
+                      _chartMinsAgo.value = 720;
+                    } else if (index == 4) {
+                      _chartMinsAgo.value = 1440;
+                    }
+                  },
+                  children: [
+                    Text("2h", style: labelLarge(context)),
+                    Text("4h", style: labelLarge(context)),
+                    Text("6h", style: labelLarge(context)),
+                    Text("12h", style: labelLarge(context)),
+                    Text("24h", style: labelLarge(context)),
+                  ])),
+          Flexible(
+            flex: 90,
+            child: LineChart(
+              buildlineChartData(
+                context,
+                minsAgo,
+                maxBasal,
+                bglSpotData,
+                basalSpotData,
+                lowTargets,
+                highTargets,
+                treatments,
+                bglLineData,
               ),
+              duration: Duration.zero,
             ),
-          ]),
-        ),
+          ),
+        ]),
       );
     }, debugLabel: "BGLChart");
   }

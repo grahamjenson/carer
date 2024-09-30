@@ -23,6 +23,8 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
       height: 1,
       fontSize: 30,
     );
+
+    var alarmText = alarmStringWidget(context);
     List<Widget> rows = [
       Expanded(
         flex: 10,
@@ -34,17 +36,12 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
           ),
         ),
       ),
-      const Spacer(),
-      Expanded(
-        flex: 10,
-        child: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-          child: alarmStringWidget(context),
-        ),
-      ),
     ];
 
+    if (alarmText != null) {
+      rows.add(const Spacer());
+      rows.add(alarmText);
+    }
     return rows;
   }
 
@@ -79,7 +76,7 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
     return "<1m";
   }
 
-  Widget alarmStringWidget(BuildContext context) {
+  Widget? alarmStringWidget(BuildContext context) {
     var small = TextStyle(
       fontSize: 10,
       height: 1,
@@ -88,7 +85,7 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
 
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;
     if (triggeredAlarms.isEmpty) {
-      return const SizedBox.shrink();
+      return null;
     }
 
     var alarmStrings = [];
