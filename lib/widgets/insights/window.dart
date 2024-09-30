@@ -7,8 +7,6 @@ class Window extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [child];
-
     var color = surfaceColorDim(context);
     return Container(
       margin: const EdgeInsets.all(2),
@@ -22,12 +20,7 @@ class Window extends StatelessWidget with ThemeMixin {
         color: color,
       ),
       padding: const EdgeInsets.all(5),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
+      child: child,
     );
   }
 }

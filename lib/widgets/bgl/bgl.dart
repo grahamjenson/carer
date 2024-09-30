@@ -26,11 +26,12 @@ class BGL extends StatelessWidget with ThemeMixin {
         var dColor = diffColor(context);
         return Window(
           child: AspectRatio(
-            aspectRatio: 1.5,
+            aspectRatio: 2,
             child: Stack(
               children: [
                 const Align(
                   alignment: Alignment(0, -1.1),
+                  heightFactor: 0.1,
                   child: FractionallySizedBox(
                     widthFactor: 1,
                     heightFactor: 0.2,
@@ -53,15 +54,16 @@ class BGL extends StatelessWidget with ThemeMixin {
                       ),
                     )),
                 Align(
-                  alignment: const Alignment(0.38, 1),
+                  alignment: const Alignment(0, 0.9),
                   child: FractionallySizedBox(
-                    widthFactor: .5,
-                    heightFactor: 0.2,
-                    child: Text(
-                      sgv.rate5mWithSign(unit),
-                      style: displayMedium(context).merge(shadows()).copyWith(color: dColor),
-                    ),
-                  ),
+                      widthFactor: 0.4,
+                      heightFactor: 0.2,
+                      child: Center(
+                        child: Text(
+                          sgv.rate5mWithSign(unit),
+                          style: displayMedium(context).merge(shadows()).copyWith(fontSize: 35, color: dColor),
+                        ),
+                      )),
                 ),
               ],
             ),

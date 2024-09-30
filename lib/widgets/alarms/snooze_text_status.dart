@@ -3,7 +3,6 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
@@ -20,16 +19,31 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
   }
 
   List<Widget> getRows(BuildContext context) {
+    var large = labelLarge(context).copyWith(
+      height: 1,
+      fontSize: 30,
+    );
     List<Widget> rows = [
-      const Text("Snooze"),
+      Expanded(
+        flex: 10,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: Text(
+            "Snooze\n${snoozeString()}",
+            style: large,
+          ),
+        ),
+      ),
+      const Spacer(),
+      Expanded(
+        flex: 10,
+        child: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+          child: alarmStringWidget(context),
+        ),
+      ),
     ];
-
-    if (isSnoozing()) {
-      rows.add(timeStringWidget(context));
-    }
-
-    var alarmWidget = alarmStringWidget(context);
-    rows.add(alarmWidget);
 
     return rows;
   }
@@ -46,25 +60,23 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
     return true;
   }
 
-  Widget timeStringWidget(BuildContext context) {
-    var big = labelLarge(context);
-    var small = labelSmall(context);
-
+  String snoozeString() {
+    if (!isSnoozing()) {
+      return "";
+    }
     var duration = AlarmAlertSettings().snoozeDuration!;
-    var totalSeconds = duration.inSeconds;
-
-    var hours = (totalSeconds / 3600).floor();
-    var minutes = ((totalSeconds % 3600) / 60).floor();
+    var minutes = duration.inMinutes;
+    var hours = duration.inHours;
 
     if (hours > 0) {
-      return SmartText(texts: ["$hours", "h"], styles: [big, small]);
+      return "${hours}h";
     }
 
     if (minutes > 0) {
-      return SmartText(texts: ["$minutes", "m"], styles: [big, small]);
+      return "${minutes}m";
     }
 
-    return SmartText(texts: const ["<1m"], styles: [big]);
+    return "<1m";
   }
 
   Widget alarmStringWidget(BuildContext context) {

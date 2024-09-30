@@ -56,9 +56,11 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     final isSnoozeShown = !AlarmSettings().disableAlarms;
 
-    Widget snoozeBtn = const SizedBox.shrink();
+    Widget? snoozeBtn = const SizedBox.shrink();
+    var snoozeFlex = 0;
     if (isSnoozeShown) {
       snoozeBtn = const SnoozeButton();
+      snoozeFlex = 1;
     }
 
     if (horizontal) {
@@ -68,8 +70,11 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Flexible(flex: 3, child: BGL()),
-                Flexible(flex: 1, child: snoozeBtn),
+                const Expanded(
+                  flex: 3,
+                  child: SizedBox.expand(child: BGL()),
+                ),
+                Flexible(flex: snoozeFlex, child: snoozeBtn),
               ],
             ),
           ),
@@ -79,6 +84,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
               children: [
                 const Flexible(flex: 3, child: BGLChart()),
                 Flexible(
+                  flex: 2,
                   child: Row(
                     children: [
                       Flexible(child: History()),
@@ -95,7 +101,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Flexible(flex: 6, child: BGL()),
+          const Expanded(flex: 6, child: SizedBox.expand(child: BGL())),
           const Flexible(flex: 4, child: BGLChart()),
           Flexible(
             flex: 2,
@@ -106,7 +112,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
               ],
             ),
           ),
-          Flexible(child: snoozeBtn),
+          Flexible(flex: snoozeFlex * 2, child: snoozeBtn),
         ],
       );
     }

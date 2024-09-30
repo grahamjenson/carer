@@ -2,6 +2,7 @@ import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
 class TimeAgoReading extends StatelessWidget with ThemeMixin {
@@ -18,31 +19,22 @@ class TimeAgoReading extends StatelessWidget with ThemeMixin {
 
         var aColor = ageColor(context);
         var baseFont = labelLarge(context).copyWith(height: 1).merge(shadows());
+        var countdownFont = baseFont.copyWith(fontFeatures: [const FontFeature.superscripts()]);
         var seconds = sgv.age.inSeconds % 300;
 
-        var additionalTX = const Text("");
+        var additionalTX = "";
         if ((sgv.age.inSeconds > 300 && seconds < 20)) {
-          additionalTX = Text(" (+${seconds}s)", style: baseFont.copyWith(fontFeatures: [const FontFeature.superscripts()]));
+          additionalTX = " (+${seconds}s)";
         }
 
-        var mediumTS = baseFont.copyWith(fontSize: 20, color: aColor);
-        var smallTS = baseFont.copyWith(color: aColor);
+        var mediumTS = baseFont.copyWith(fontSize: 30, color: aColor);
+        var smallTS = baseFont.copyWith(color: aColor, fontSize: 10);
 
         Widget text;
         if (sgv.age.inMinutes == 0) {
           text = Text("now", style: mediumTS);
         } else {
-          text = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text(
-              "${sgv.age.inMinutes}",
-              style: mediumTS,
-            ),
-            Text(
-              "min",
-              style: smallTS,
-            ),
-            additionalTX
-          ]);
+          text = SmartText(texts: ["${sgv.age.inMinutes}", "min", additionalTX], styles: [mediumTS, smallTS, countdownFont]);
         }
 
         return text;
