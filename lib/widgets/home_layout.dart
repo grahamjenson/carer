@@ -19,63 +19,36 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     // This needs hardcoding because the scrollable outer widget
 
     return LayoutBuilder(builder: (context, constraints) {
-      double minHeight = max(0, constraints.maxHeight);
-      double maxHeight = max(100, constraints.maxHeight);
-      return Stack(
-        children: [
-          ConstrainedBox(
-            constraints: BoxConstraints(minHeight: minHeight, maxHeight: maxHeight),
-            child: AWatch(
-              (context) => getLayout(context),
-              dependencies: UISettings().allSignals,
-              debugLabel: "HomeLayout",
-            ),
+      double minHeight = max(400, constraints.maxHeight);
+      double maxHeight = max(400, constraints.maxHeight);
+      double minWidth = max(400, constraints.maxWidth);
+      double maxWidth = max(400, constraints.maxWidth);
+
+      return Container(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: minHeight, maxHeight: maxHeight, minWidth: minWidth, maxWidth: maxWidth),
+          child: AWatch(
+            (context) => getLayout(context),
+            dependencies: UISettings().allSignals,
+            debugLabel: "HomeLayout",
           ),
-        ],
+        ),
       );
     });
   }
 
-  List<Flexible> flexList(List<int> flexes, List<Widget> widgets) {
-    assert(flexes.length == widgets.length);
-    var list = <Flexible>[];
-    for (var i = 0; i < flexes.length; i++) {
-      var child = widgets[i];
-      if (flexes[i] == -1) {
-        list.add(Expanded(child: child));
-        continue;
-      }
-      list.add(Flexible(flex: flexes[i], child: child));
-    }
-    return list;
-  }
+  // Widget getInsights() {
+  //   var children = [const Flexible(flex: 6, child: BGLChart())];
 
-  Column flexListCol(List<int> flexes, List<Widget> widgets) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: flexList(flexes, widgets),
-    );
-  }
+  //   children.add(Flexible(
+  //       flex: 4,
+  //       child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+  //         Expanded(child: History()),
+  //         Expanded(child: Stats()),
+  //       ])));
 
-  Row flexListRow(List<int> flexes, List<Widget> widgets) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: flexList(flexes, widgets),
-    );
-  }
-
-  Widget getInsights() {
-    var children = [const Flexible(flex: 6, child: BGLChart())];
-
-    children.add(Flexible(
-        flex: 4,
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          Expanded(child: History()),
-          Expanded(child: Stats()),
-        ])));
-
-    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
-  }
+  //   return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: children);
+  // }
 
   Widget getLayout(BuildContext context) {
     // We get super denormalized here so that if we change one thing
@@ -89,25 +62,53 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     }
 
     if (horizontal) {
-      return flexListRow([
-        5,
-        5
-      ], [
-        flexListCol([20, 5], [const BGL(), snoozeBtn]),
-        getInsights()
-      ]);
+      return Row(
+        children: [
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(flex: 3, child: BGL()),
+                Flexible(flex: 1, child: snoozeBtn),
+              ],
+            ),
+          ),
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Flexible(flex: 3, child: BGLChart()),
+                Flexible(
+                  child: Row(
+                    children: [
+                      Flexible(child: History()),
+                      Flexible(child: Stats()),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      );
     } else {
-      return flexListCol([
-        10,
-        12,
-        -1,
-        3,
-      ], [
-        flexListRow([4], [const BGL()]),
-        getInsights(),
-        const SizedBox.shrink(),
-        snoozeBtn,
-      ]);
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Flexible(flex: 6, child: BGL()),
+          const Expanded(flex: 4, child: BGLChart()),
+          Flexible(
+            flex: 2,
+            child: Row(
+              children: [
+                Flexible(child: History()),
+                Flexible(child: Stats()),
+              ],
+            ),
+          ),
+          Flexible(child: snoozeBtn),
+        ],
+      );
     }
   }
 }

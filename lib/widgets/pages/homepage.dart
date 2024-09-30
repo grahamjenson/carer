@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
@@ -18,8 +16,6 @@ class HomePage extends StatelessWidget with ThemeMixin {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            double minHeight = max(0, constraints.maxHeight);
-            double maxHeight = max(100, constraints.maxHeight);
             return RefreshIndicator(
               onRefresh: () async {
                 alog("Forcing Update");
@@ -32,7 +28,7 @@ class HomePage extends StatelessWidget with ThemeMixin {
                 physics: const StickyRefreshPhysics(),
                 padding: EdgeInsets.zero,
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: minHeight, maxHeight: maxHeight),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight, maxHeight: constraints.maxHeight),
                   child: HomeLayout(),
                 ),
               ),

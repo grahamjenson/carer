@@ -7,72 +7,30 @@ import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
-  final double buttonRadias;
-  const SnoozeTextStatus(this.buttonRadias, {super.key});
+  const SnoozeTextStatus({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      Widget spacer = SizedBox(height: buttonRadias, width: buttonRadias);
-
-      List<Widget> rows = [
-        spacer,
-        Expanded(
-          child: ClipRect(
-            child: SizedBox(
-              height: buttonRadias,
-              child: Column(
-                children: getRows(context),
-              ),
-            ),
-          ),
-        ),
-        spacer
-      ];
-
-      return Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.zero,
-        child: Row(children: rows),
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: getRows(context),
       );
     }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().snoozeUntilSignal], debugLabel: "SnoozeTextStatus");
   }
 
   List<Widget> getRows(BuildContext context) {
-    var big = const TextStyle(
-      fontSize: 35,
-      height: 1,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
+    List<Widget> rows = [
+      const Text("Snooze"),
+    ];
 
-    var small = const TextStyle(fontSize: 20);
-    List<Widget> rows = [];
-    var alarmWidget = alarmStringWidget(context);
     if (isSnoozing()) {
-      rows += [
-        const Spacer(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Snooze ", style: small),
-            Flexible(child: timeStringWidget()),
-          ],
-        ),
-        const Spacer(),
-      ];
-    } else {
-      rows += [
-        const Spacer(),
-        Text("Snooze", style: big),
-        const Spacer(),
-      ];
+      rows.add(timeStringWidget());
     }
 
+    var alarmWidget = alarmStringWidget(context);
     if (alarmWidget != null) {
-      rows += [
-        alarmWidget,
-        const Spacer(),
-      ];
+      rows.add(alarmWidget);
     }
 
     return rows;

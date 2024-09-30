@@ -5,6 +5,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snooze_text_status.dart';
 import 'package:carer/widgets/alarms/snoozetime_page.dart';
+import 'package:carer/widgets/insights/window.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -13,42 +14,38 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch(
-      (context) {
-        var mainColor = primaryColor(context);
-        var backgroundColor = mainColor.dim.dim.dim;
-        var buttonColor = mainColor.dim.dim;
-
-        return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-          var width = constraints.maxWidth - 50;
-          var height = constraints.maxHeight;
-          double buttonRadias = min(height, min(75, width));
-
-          return SizedBox(
-            width: width,
-            height: buttonRadias,
-            child: Stack(
-              children: [
-                getBackground(context, buttonRadias, width, backgroundColor),
-                SnoozeTextStatus(buttonRadias),
-                getDismissable(context, buttonRadias, width, mainColor, buttonColor),
-                getSnoozeCancel(context, buttonRadias, mainColor, backgroundColor),
-              ],
-            ),
-          );
-        });
-      },
-      debugLabel: "SnoozeButton",
-      dependencies: [AlarmAlertSettings().snoozeUntilSignal],
-    );
-  }
-
-  Widget getBackground(BuildContext context, double buttonRadias, double width, Color backgroundColor) {
     return Container(
-      height: buttonRadias,
-      width: width,
-      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
-      alignment: Alignment.centerLeft,
+      color: Colors.blue,
+      child: AWatch(
+        (context) {
+          var mainColor = primaryColor(context);
+          var backgroundColor = mainColor.dim.dim.dim;
+          var buttonColor = mainColor.dim.dim;
+
+          return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+            var width = constraints.maxWidth - 20;
+            var height = constraints.maxHeight - 25;
+            double buttonRadias = min(height, min(75, width));
+            double betweenButtons = width - (2 * buttonRadias) - 10;
+            return Window(
+              child: Container(
+                height: height,
+                width: width,
+                decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+                child: Stack(
+                  children: [
+                    Center(child: SizedBox(width: betweenButtons, child: const SnoozeTextStatus())),
+                    getDismissable(context, buttonRadias, width, mainColor, buttonColor),
+                    getSnoozeCancel(context, buttonRadias, mainColor, backgroundColor),
+                  ],
+                ),
+              ),
+            );
+          });
+        },
+        debugLabel: "SnoozeButton",
+        dependencies: [AlarmAlertSettings().snoozeUntilSignal],
+      ),
     );
   }
 
