@@ -1,4 +1,5 @@
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/alarms_bar.dart';
@@ -39,11 +40,14 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
         );
       },
       debugLabel: "BarTop",
-      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().snoozeUntilSignal],
+      dependencies: [ThemeService().themeSignal, AlarmAlertSettings().snoozeUntilSignal, UISettings().orientationSignal],
     );
   }
 
   Widget getSettingsButton(BuildContext context) {
+    if (UISettings().orientation == Orientation.portrait) {
+      return const SizedBox.shrink();
+    }
     return IconButton(
       color: Colors.white,
       highlightColor: Colors.white,

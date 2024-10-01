@@ -54,7 +54,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
         });
       },
       debugLabel: "SnoozeButton",
-      dependencies: [AlarmAlertSettings().snoozeUntilSignal],
+      dependencies: [AlarmAlertSettings().snoozeUntilSignal, AlarmsService().triggeredAlarms],
     );
   }
 

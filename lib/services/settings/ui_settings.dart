@@ -1,12 +1,16 @@
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:flutter/material.dart';
 
 enum _UINames {
   unit,
   screenActive,
 
   enableDim,
+
+  // Ephemeril
+  orientation,
 }
 
 class UISettings {
@@ -17,6 +21,7 @@ class UISettings {
     _UINames.screenActive: ASignal<bool>(false, debugLabel: 'screenActive'),
     _UINames.unit: ASignal<Unit>(Unit.mg, debugLabel: 'unit'),
     _UINames.enableDim: ASignal<bool>(true, debugLabel: 'enableDim'),
+    _UINames.orientation: ASignal<Orientation>(Orientation.portrait, debugLabel: 'orientation'),
   };
 
   UISettings._();
@@ -31,6 +36,11 @@ class UISettings {
 
   bool get enableDim => _signals[_UINames.enableDim]!.value as bool;
   set enableDim(bool value) => _signals[_UINames.enableDim]!.value = value;
+
+  // Ephemeril
+  ASignal get orientationSignal => _signals[_UINames.orientation]!;
+  Orientation get orientation => _signals[_UINames.orientation]!.value as Orientation;
+  set orientation(Orientation value) => _signals[_UINames.orientation]!.value = value;
 
   setupDBPropagation(KeyValueStore prefs) {
     // Assign the values from the DB

@@ -1,4 +1,5 @@
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snoozebutton.dart';
@@ -16,13 +17,9 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
     // This needs hardcoding because the scrollable outer widget
     return AWatch(
       (context) {
-        return OrientationBuilder(
-          builder: (context, orientation) {
-            return getLayout(context, orientation);
-          },
-        );
+        return getLayout(context, UISettings().orientation);
       },
-      dependencies: [AlarmSettings().disableAlarmsSignal],
+      dependencies: [AlarmSettings().disableAlarmsSignal, UISettings().orientationSignal],
       debugLabel: "HomeLayout",
     );
   }
