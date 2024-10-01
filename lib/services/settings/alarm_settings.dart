@@ -44,6 +44,7 @@ class AlarmSettings {
 
   AlarmSettings._();
 
+  ASignal get disableAlarmsSignal => _signals[_AlarmNames.disableAlarms]!;
   bool get disableAlarms => _signals[_AlarmNames.disableAlarms]!.value as bool;
   set disableAlarms(bool value) => _signals[_AlarmNames.disableAlarms]!.value = value;
 

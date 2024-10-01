@@ -23,11 +23,13 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
         return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
           var width = constraints.maxWidth;
           var height = constraints.maxHeight - 15;
-          double buttonRadias = min(height, min(75, width));
-          double betweenButtons = width - (2 * buttonRadias) - 10;
+          double buttonRadias = max(20, min(height, min(75, width)));
+          double betweenButtons = max(20, width - (2 * buttonRadias) - 10);
+
           return Window(
             child: Center(
               child: Container(
+                constraints: const BoxConstraints(minWidth: 200, minHeight: 50),
                 height: buttonRadias,
                 width: width,
                 decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),

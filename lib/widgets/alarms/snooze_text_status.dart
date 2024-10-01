@@ -27,20 +27,17 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
     var alarmText = alarmStringWidget(context);
     List<Widget> rows = [
       Expanded(
-        flex: 10,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-          child: Text(
-            "Snooze\n${snoozeString()}",
-            style: large,
-          ),
+        flex: 5,
+        child: Text(
+          "Snooze\n${snoozeString()}",
+          style: large,
         ),
       ),
     ];
 
     if (alarmText != null) {
       rows.add(const Spacer());
-      rows.add(alarmText);
+      rows.add(Expanded(flex: 5, child: alarmText));
     }
     return rows;
   }
@@ -93,6 +90,6 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
       alarmStrings.add(alarm.status());
     }
 
-    return Text(alarmStrings.join(","), style: small);
+    return Text(alarmStrings.join("\n"), style: small);
   }
 }
