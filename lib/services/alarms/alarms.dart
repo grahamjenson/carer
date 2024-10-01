@@ -70,8 +70,8 @@ enum Alarm {
     return methods.properties();
   }
 
-  String status() {
-    return methods.status();
+  String shortSummary() {
+    return methods.shortSummary();
   }
 
   IconData get icon {
@@ -101,7 +101,7 @@ abstract class AlarmMethods {
     return runtimeType.toString();
   }
 
-  String status();
+  String shortSummary();
   IconData icon();
 
   (bool, bool, bool) alarmStatus() {
@@ -157,7 +157,7 @@ class UrgentLowAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.temperature_minus;
 
   @override
-  String status() => "Urgent Low  ${lastSGVStr()} < ${unitStr(TargetSettings().lowUrgent)}";
+  String shortSummary() => "Urgent Low (<${unitStr(TargetSettings().lowUrgent)})";
 
   @override
   bool trigger() {
@@ -174,16 +174,16 @@ class LowAlarm extends AlarmMethods {
   const LowAlarm();
 
   @override
-  String status() {
+  String shortSummary() {
     if (_lowTrigger()) {
-      return "Low ${lastSGVStr()} < ${unitStr(TargetSettings().lowTarget)}";
+      return "Low (<${unitStr(TargetSettings().lowTarget)})";
     }
     if (_predictiveTrigger()) {
       var sgv = PredictionService().getReadingsAhead(numberOfReadings);
       if (sgv == null) {
         return "?";
       }
-      return "Predicted Low ${sgv.unitStr()} (in $numberOfReadings) < ${unitStr(TargetSettings().lowTarget)}";
+      return "Predicted Low (<${unitStr(TargetSettings().lowTarget)})";
     }
     return "?";
   }
@@ -240,11 +240,11 @@ class HighAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.temperature;
 
   @override
-  String status() {
+  String shortSummary() {
     if (smartSnooze()) {
-      return "High ${lastSGVStr()} > ${unitStr(TargetSettings().highTarget)} (Smart Snooze)";
+      return "High Smart Snooze (<${unitStr(TargetSettings().highTarget)})";
     }
-    return "High ${lastSGVStr()} > ${unitStr(TargetSettings().highTarget)}";
+    return "High (>${unitStr(TargetSettings().highTarget)})";
   }
 
   @override
@@ -295,7 +295,7 @@ class UrgentHighAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.temperature_plus;
 
   @override
-  String status() => "Urgent High ${lastSGVStr()} > ${unitStr(TargetSettings().highUrgent)}";
+  String shortSummary() => "Urgent High (>${unitStr(TargetSettings().highUrgent)})";
 
   @override
   bool trigger() {
@@ -315,7 +315,7 @@ class FastRiseAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.angle_double_up;
 
   @override
-  String status() => "Fast Rise < ${unitStr(TargetSettings().fastRiseDelta)}";
+  String shortSummary() => "Fast Rise (<${unitStr(TargetSettings().fastRiseDelta)})";
 
   @override
   List<String> properties() {
@@ -360,7 +360,7 @@ class FastDropAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.angle_double_down;
 
   @override
-  String status() => "Fast Drop > ${unitStr(TargetSettings().fastDropDelta)}";
+  String shortSummary() => "Fast Drop (<${unitStr(TargetSettings().fastDropDelta)})";
 
   @override
   List<String> properties() {
@@ -407,7 +407,7 @@ class NoDataAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.x;
 
   @override
-  String status() => "No Data ${age.inMinutes}m > ${alarmMinutes()}m";
+  String shortSummary() => "No Data for ${age.inMinutes}m";
 
   @override
   List<String> properties() {
@@ -457,15 +457,16 @@ class LowBatteryAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.battery_empty;
 
   @override
-  String status() {
-    var statusStr = "";
+  String shortSummary() {
+    var statusStr = [];
     if (_carerTrigger()) {
-      statusStr += "This Battery < 10%";
+      statusStr.add("This Battery");
     }
     if (_t1DTrigger()) {
-      statusStr += "T1D Battery(${PropertiesData().t1dPhonesBatteryLevel()}%) < 10%";
+      statusStr.add("T1D Battery(${PropertiesData().t1dPhonesBatteryLevel()}%)");
     }
-    return statusStr;
+
+    return "${statusStr.join(" and ")} < 10%";
   }
 
   @override

@@ -47,7 +47,7 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
 
   static Tooltip getAlarmToolTip(Alarm alarm, Color color) {
     return Tooltip(
-      message: alarm.status(),
+      message: alarm.shortSummary(),
       triggerMode: TooltipTriggerMode.tap,
       child: Icon(
         alarm.icon,

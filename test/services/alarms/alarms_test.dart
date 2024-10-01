@@ -55,7 +55,7 @@ void main() async {
       expect(active, true);
       expect(smartSnooze, true);
 
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("LowAlarm", () async {
@@ -77,7 +77,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, true);
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("UrgentHighAlarm", () async {
@@ -98,7 +98,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("UrgentLowAlarm", () async {
@@ -119,7 +119,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("FastRiseAlarm", () async {
@@ -140,7 +140,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("FastDropAlarm", () async {
@@ -161,7 +161,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("NoDataAlarm", () async {
@@ -181,7 +181,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
-      alarm.status();
+      alarm.shortSummary();
     });
 
     test("PredictiveLowAlarm", () async {
@@ -203,7 +203,7 @@ void main() async {
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
-      alarm.status();
+      alarm.shortSummary();
     });
   });
 }

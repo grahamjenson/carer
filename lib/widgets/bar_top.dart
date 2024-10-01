@@ -19,15 +19,14 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
     return AWatch(
       (context) {
         List<Widget> tiles = [
-          const CurrentTimeWidget(),
-          const Expanded(
-            child: SizedBox.shrink(),
-          ),
-          const StatusesBar(),
-          AlarmsBarIcons(),
-          const Spacer(),
-          getSettingsButton(context),
-        ];
+              const CurrentTimeWidget(),
+              const Expanded(
+                child: SizedBox.shrink(),
+              ),
+              const StatusesBar(),
+              AlarmsBarIcons(),
+            ] +
+            getSettingsButtonEnd(context);
 
         return BottomAppBar(
           color: const Color.fromRGBO(0, 0, 0, 0),
@@ -44,27 +43,30 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
     );
   }
 
-  Widget getSettingsButton(BuildContext context) {
+  List<Widget> getSettingsButtonEnd(BuildContext context) {
     if (UISettings().orientation == Orientation.portrait) {
-      return const SizedBox.shrink();
+      return [];
     }
-    return IconButton(
-      color: Colors.white,
-      highlightColor: Colors.white,
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(surfaceColorDim(context)),
-      ),
-      padding: EdgeInsets.zero,
-      icon: Icon(
-        Icons.settings,
-        color: tertiaryColor(context),
-      ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SettingsPage()),
-        );
-      },
-    );
+    return [
+      const Spacer(),
+      IconButton(
+        color: Colors.white,
+        highlightColor: Colors.white,
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(surfaceColorDim(context)),
+        ),
+        padding: EdgeInsets.zero,
+        icon: Icon(
+          Icons.settings,
+          color: tertiaryColor(context),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsPage()),
+          );
+        },
+      )
+    ];
   }
 }

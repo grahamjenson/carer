@@ -6,7 +6,6 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snooze_text_status.dart';
 import 'package:carer/widgets/alarms/snoozetime_page.dart';
-import 'package:carer/widgets/insights/window.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -23,31 +22,23 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
         return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
           var width = constraints.maxWidth;
-          var height = constraints.maxHeight - 15;
-          double buttonRadias = max(20, min(height, min(75, width)));
+          var height = constraints.maxHeight;
+          double buttonRadias = max(20, min(height, min(100, width)));
 
           // If there is one button
-          double betweenButtons = width - buttonRadias - 30;
-          if (AlarmAlertSettings().snoozeDuration != null) {
-            // If Cancel button is there
-            betweenButtons -= buttonRadias;
-          }
-          betweenButtons = max(20, betweenButtons);
 
-          return Window(
-            child: Center(
-              child: Container(
-                constraints: const BoxConstraints(minWidth: 200, minHeight: 50),
-                height: buttonRadias,
-                width: width,
-                decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
-                child: Stack(
-                  children: getTexts(context, betweenButtons, buttonRadias) +
-                      [
-                        getDismissable(context, buttonRadias, width, mainColor, buttonColor),
-                        getSnoozeCancel(context, buttonRadias, mainColor, buttonColor),
-                      ],
-                ),
+          return Center(
+            child: Container(
+              margin: const EdgeInsets.all(2),
+              height: buttonRadias,
+              width: width,
+              decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+              child: Stack(
+                children: getTexts(context, width, buttonRadias) +
+                    [
+                      getDismissable(context, buttonRadias, width, mainColor, buttonColor),
+                      getSnoozeCancel(context, buttonRadias, mainColor, buttonColor),
+                    ],
               ),
             ),
           );
@@ -58,7 +49,11 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
     );
   }
 
-  List<Widget> getTexts(BuildContext context, double betweenButtons, double buttonRadias) {
+  List<Widget> getTexts(BuildContext context, double width, double buttonRadias) {
+    double betweenButtons = width - buttonRadias * 2 - 20;
+
+    betweenButtons = max(20, betweenButtons);
+
     var alarmW = alarmStringWidget(context);
     if (alarmW != null) {
       return [
@@ -75,7 +70,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
     return [
       Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.center,
         child: SizedBox(width: betweenButtons, height: buttonRadias, child: const SnoozeTextStatus()),
       ),
     ];
@@ -94,7 +89,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
     var alarmStrings = [];
     for (var alarm in triggeredAlarms) {
-      alarmStrings.add(alarm.status());
+      alarmStrings.add(alarm.shortSummary());
     }
 
     return Center(
