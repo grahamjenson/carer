@@ -25,7 +25,14 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
           var width = constraints.maxWidth;
           var height = constraints.maxHeight - 15;
           double buttonRadias = max(20, min(height, min(75, width)));
-          double betweenButtons = max(20, width - (2 * buttonRadias) - 30);
+
+          // If there is one button
+          double betweenButtons = width - buttonRadias - 30;
+          if (AlarmAlertSettings().snoozeDuration != null) {
+            // If Cancel button is there
+            betweenButtons -= buttonRadias;
+          }
+          betweenButtons = max(20, betweenButtons);
 
           return Window(
             child: Center(
@@ -35,18 +42,11 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
                 width: width,
                 decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
                 child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(width: betweenButtons, height: buttonRadias * 2 / 3, child: const SnoozeTextStatus()),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: SizedBox(width: betweenButtons, height: buttonRadias * 1 / 3, child: alarmStringWidget(context)),
-                    ),
-                    getDismissable(context, buttonRadias, width, mainColor, buttonColor),
-                    getSnoozeCancel(context, buttonRadias, mainColor, buttonColor),
-                  ],
+                  children: getTexts(context, betweenButtons, buttonRadias) +
+                      [
+                        getDismissable(context, buttonRadias, width, mainColor, buttonColor),
+                        getSnoozeCancel(context, buttonRadias, mainColor, buttonColor),
+                      ],
                 ),
               ),
             ),
@@ -58,7 +58,30 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget alarmStringWidget(BuildContext context) {
+  List<Widget> getTexts(BuildContext context, double betweenButtons, double buttonRadias) {
+    var alarmW = alarmStringWidget(context);
+    if (alarmW != null) {
+      return [
+        Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(width: betweenButtons, height: buttonRadias * 2 / 3, child: const SnoozeTextStatus()),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(width: betweenButtons, height: buttonRadias * 1 / 3, child: alarmStringWidget(context)),
+        ),
+      ];
+    }
+
+    return [
+      Align(
+        alignment: Alignment.topCenter,
+        child: SizedBox(width: betweenButtons, height: buttonRadias, child: const SnoozeTextStatus()),
+      ),
+    ];
+  }
+
+  Widget? alarmStringWidget(BuildContext context) {
     var small = TextStyle(
       fontSize: 10,
       color: tertiaryColor(context),
@@ -66,7 +89,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;
     if (triggeredAlarms.isEmpty) {
-      return const SizedBox.shrink();
+      return null;
     }
 
     var alarmStrings = [];
