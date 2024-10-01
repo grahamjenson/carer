@@ -73,7 +73,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Expanded(flex: 6, child: SizedBox.expand(child: BGL())),
+          const Expanded(flex: 4, child: SizedBox.expand(child: BGL())),
           const Flexible(flex: 4, child: BGLChart()),
           Flexible(
             flex: 2,

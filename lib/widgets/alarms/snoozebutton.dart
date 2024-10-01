@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -24,7 +25,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
           var width = constraints.maxWidth;
           var height = constraints.maxHeight - 15;
           double buttonRadias = max(20, min(height, min(75, width)));
-          double betweenButtons = max(20, width - (2 * buttonRadias) - 10);
+          double betweenButtons = max(20, width - (2 * buttonRadias) - 30);
 
           return Window(
             child: Center(
@@ -35,7 +36,14 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
                 decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
                 child: Stack(
                   children: [
-                    Center(child: SizedBox(width: betweenButtons, child: const SnoozeTextStatus())),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(width: betweenButtons, height: buttonRadias * 2 / 3, child: const SnoozeTextStatus()),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(width: betweenButtons, height: buttonRadias * 1 / 3, child: alarmStringWidget(context)),
+                    ),
                     getDismissable(context, buttonRadias, width, mainColor, buttonColor),
                     getSnoozeCancel(context, buttonRadias, mainColor, buttonColor),
                   ],
@@ -47,6 +55,27 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
       },
       debugLabel: "SnoozeButton",
       dependencies: [AlarmAlertSettings().snoozeUntilSignal],
+    );
+  }
+
+  Widget alarmStringWidget(BuildContext context) {
+    var small = TextStyle(
+      fontSize: 10,
+      color: tertiaryColor(context),
+    );
+
+    var triggeredAlarms = AlarmsService().triggeredAlarms.value;
+    if (triggeredAlarms.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    var alarmStrings = [];
+    for (var alarm in triggeredAlarms) {
+      alarmStrings.add(alarm.status());
+    }
+
+    return Center(
+      child: SizedBox.expand(child: FittedBox(fit: BoxFit.contain, child: Text(alarmStrings.join("\n"), style: small))),
     );
   }
 

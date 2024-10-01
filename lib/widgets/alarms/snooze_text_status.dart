@@ -1,4 +1,3 @@
-import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
@@ -11,35 +10,18 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: getRows(context),
+      return Center(
+        child: SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Text(
+              "Snooze ${snoozeString()}",
+              style: labelLarge(context).copyWith(color: primaryColor(context).dim),
+            ),
+          ),
+        ),
       );
     }, dependencies: [TimerService().tenSecondSignal, AlarmAlertSettings().snoozeUntilSignal], debugLabel: "SnoozeTextStatus");
-  }
-
-  List<Widget> getRows(BuildContext context) {
-    var large = labelLarge(context).copyWith(
-      height: 1,
-      fontSize: 30,
-    );
-
-    var alarmText = alarmStringWidget(context);
-    List<Widget> rows = [
-      Expanded(
-        flex: 5,
-        child: Text(
-          "Snooze\n${snoozeString()}",
-          style: large,
-        ),
-      ),
-    ];
-
-    if (alarmText != null) {
-      rows.add(const Spacer());
-      rows.add(Expanded(flex: 5, child: alarmText));
-    }
-    return rows;
   }
 
   bool isSnoozing() {
@@ -71,25 +53,5 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
     }
 
     return "<1m";
-  }
-
-  Widget? alarmStringWidget(BuildContext context) {
-    var small = TextStyle(
-      fontSize: 10,
-      height: 1,
-      color: tertiaryColor(context),
-    );
-
-    var triggeredAlarms = AlarmsService().triggeredAlarms.value;
-    if (triggeredAlarms.isEmpty) {
-      return null;
-    }
-
-    var alarmStrings = [];
-    for (var alarm in triggeredAlarms) {
-      alarmStrings.add(alarm.status());
-    }
-
-    return Text(alarmStrings.join("\n"), style: small);
   }
 }
