@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carer/utils/logs.dart';
+import 'package:carer/utils/math.dart';
 
 JsonDecoder decoder = const JsonDecoder();
 JsonEncoder encoder = const JsonEncoder.withIndent('  ');
@@ -36,4 +37,12 @@ String truncateString(String str, int maxLength) {
   } else {
     return '${str.substring(0, maxLength)}...';
   }
+}
+
+String toMax2dpStr(num value) {
+  var x = toMax2dp(value);
+  if (x == x.toInt()) {
+    return x.toInt().toString();
+  }
+  return x.toString();
 }

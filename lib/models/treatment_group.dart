@@ -5,7 +5,7 @@ import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/sql/carbs.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/math.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
 
 class TreatmentList {
@@ -183,9 +183,23 @@ class TreatmentGroup with DateMixin {
   double get carbs => carbsModels.fold(0, (prev, element) => prev + element.value);
   bool get isConcated => count > 1;
 
+  String get treatmentStr {
+    if (count == 0) {
+      return "";
+    }
+    if (count == 1) {
+      if (bolusModels.isNotEmpty) {
+        return insulinStr;
+      } else {
+        return carbStr;
+      }
+    }
+    return '$insulinStr $carbStr';
+  }
+
   String get insulinStr {
     if (insulin != 0) {
-      return '${toMax2dp(insulin)}u';
+      return '${toMax2dpStr(insulin)}u';
     } else {
       return "";
     }
@@ -193,7 +207,7 @@ class TreatmentGroup with DateMixin {
 
   String get carbStr {
     if (carbs != 0) {
-      return '${toMax2dp(carbs)}g';
+      return '${toMax2dpStr(carbs)}g';
     } else {
       return "";
     }

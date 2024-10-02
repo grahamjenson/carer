@@ -295,6 +295,17 @@ class BGLChart extends StatelessWidget with ThemeMixin {
               );
             }
 
+            if (spot is TreatmentSpot) {
+              var line = const FlLine(
+                color: Colors.transparent,
+                strokeWidth: 0,
+              );
+              return TouchedSpotIndicatorData(
+                line,
+                FlDotData(show: true, getDotPainter: bglHighlightPainter(unit, color)),
+              );
+            }
+
             return null;
           },
         ).toList();
@@ -500,6 +511,14 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         );
       }
 
+      if (spot is TreatmentSpot) {
+        return treatmentsDotPainter(color, size: 2)(
+          spot,
+          xPercentage,
+          bar,
+          index,
+        );
+      }
       return FlDotCirclePainter(
         radius: 0,
         color: color,
@@ -515,37 +534,31 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return Alignment.bottomCenter;
   }
 
-  GetDotPainterCallback treatmentsDotPainter(Color color) {
+  GetDotPainterCallback treatmentsDotPainter(
+    Color color, {
+    double size = 1,
+  }) {
     return (
       FlSpot spot,
       double xPercentage,
       LineChartBarData bar,
-      int index, {
-      double? size,
-    }) {
+      int index,
+    ) {
       if (spot is TreatmentSpot) {
-        if (spot.treatment.insulin != 0 && spot.treatment.carbs != 0) {
+        if (spot.treatment.isSMBsOnly) {
           return FlTextPainterPainter(
-            "${spot.treatment.insulinStr} ${spot.treatment.carbStr}",
+            spot.treatment.treatmentStr,
             align: flipAlignment(index),
             strokeColor: Colors.black,
-            size: 8,
-            color: color,
+            size: 8 * size,
+            color: Colors.blue,
           );
-        } else if (spot.treatment.insulin != 0) {
+        } else {
           return FlTextPainterPainter(
-            spot.treatment.insulinStr,
+            spot.treatment.treatmentStr,
             align: flipAlignment(index),
             strokeColor: Colors.black,
-            size: 8,
-            color: color,
-          );
-        } else if (spot.treatment.carbs != 0) {
-          return FlTextPainterPainter(
-            spot.treatment.carbStr,
-            align: flipAlignment(index),
-            strokeColor: Colors.black,
-            size: 8,
+            size: 8 * size,
             color: color,
           );
         }

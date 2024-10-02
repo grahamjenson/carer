@@ -3,6 +3,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
@@ -134,13 +135,13 @@ class Treatments extends StatelessWidget with ThemeMixin {
         ],
       );
     }
-    return SmartText(texts: ["${toMax2dp(treatment.insulin)}", "u"], styles: [row, small]);
+    return SmartText(texts: [(toMax2dpStr(treatment.insulin)), "u"], styles: [row, small]);
   }
 
   Widget carbsSmartText(TreatmentGroup treatment, TextStyle row, TextStyle small) {
     if (treatment.carbs == 0) {
       return const SizedBox.shrink();
     }
-    return SmartText(texts: ["${treatment.carbs.round()}", "g"], styles: [row, small]);
+    return SmartText(texts: [toMax2dpStr(treatment.carbs), "g"], styles: [row, small]);
   }
 }
