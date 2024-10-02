@@ -22,13 +22,13 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
           padding: const EdgeInsets.all(4), // Add padding inside the border
           decoration: BoxDecoration(
             border: Border.all(
-              color: secondaryColor(context), // Color of the border
+              color: badColor(context), // Color of the border
               width: 1, // Width of the border
             ),
             borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
           ),
           child: Row(
-            children: getAlarmWidgets(triggeredAlarms, secondaryColor(context)),
+            children: getAlarmWidgets(triggeredAlarms, badColor(context)),
           ),
         );
       },

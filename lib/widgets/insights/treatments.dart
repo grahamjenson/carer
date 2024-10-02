@@ -34,8 +34,8 @@ class Treatments extends StatelessWidget with ThemeMixin {
                 alignment: Alignment.center,
                 child: DataTable(
                     border: TableBorder(
-                      verticalInside: BorderSide(color: outlineColor(context).dim, width: 0.5),
-                      horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.2),
+                      verticalInside: BorderSide(color: outlineColor(context), width: 0.5),
+                      horizontalInside: BorderSide(color: outlineColor(context), width: 0.2),
                     ),
                     columnSpacing: columnSpacing,
                     dividerThickness: dividerThickness,
@@ -57,14 +57,14 @@ class Treatments extends StatelessWidget with ThemeMixin {
     TextStyle heading = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.normal,
-      color: primaryColor(context),
+      color: accentColor(context),
       height: 1,
     );
 
     TextStyle headingSmall = TextStyle(
       fontSize: 15,
       fontWeight: FontWeight.normal,
-      color: primaryColor(context),
+      color: accentColor(context),
       height: 1,
     );
 

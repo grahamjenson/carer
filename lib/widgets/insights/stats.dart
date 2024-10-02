@@ -21,7 +21,7 @@ class Stats extends StatelessWidget with ThemeMixin {
     TextStyle heading = TextStyle(
       fontWeight: FontWeight.normal,
       fontSize: 15,
-      color: primaryColor(context),
+      color: accentColor(context),
       height: 1,
     );
     TextStyle row = TextStyle(

@@ -27,9 +27,11 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   Widget getLayout(BuildContext context, Orientation orientation) {
     final isSnoozeHidden = AlarmSettings().disableAlarms;
 
+    Widget snzbtn = const SnoozeButton();
     var snoozeFlex = 1;
     if (isSnoozeHidden) {
       snoozeFlex = 0;
+      snzbtn = const SizedBox.shrink();
     }
 
     if (orientation == Orientation.landscape) {
@@ -43,7 +45,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
                   flex: 6,
                   child: BGL(),
                 ),
-                Flexible(flex: 2 * snoozeFlex, child: const SnoozeButton()),
+                Flexible(flex: 2 * snoozeFlex, child: snzbtn),
               ],
             ),
           ),
@@ -81,7 +83,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
               ],
             ),
           ),
-          Flexible(flex: 2 * snoozeFlex, child: const SnoozeButton()),
+          Flexible(flex: 2 * snoozeFlex, child: snzbtn),
         ],
       );
     }

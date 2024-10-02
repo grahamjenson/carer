@@ -7,7 +7,7 @@ class Window extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var color = outlineColor(context);
+    var color = backgroundColorShade(context);
     return SizedBox.expand(
         child: Container(
       margin: const EdgeInsets.all(2),

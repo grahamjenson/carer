@@ -37,19 +37,12 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       var (lowTargets, highTargets) = targetSpots(targets);
       var treatments = treatmentsSpots(lastTreatments);
 
-      var bglLineData = LineChartBarData(
-        color: accentColor(context),
-        spots: bglSpotData,
-        barWidth: 1,
-        dotData: FlDotData(show: true, getDotPainter: PainterFunctions().bglDotPainter(context)),
-      );
-
       return Window(
         child: Column(children: [
           Flexible(
               flex: 15,
               child: ToggleButtons(
-                  selectedColor: primaryColor(context),
+                  selectedColor: accentColor(context),
                   constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
                   isSelected: [
                     chartHoursAgo == 2,
@@ -81,17 +74,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           Flexible(
             flex: 90,
             child: LineChart(
-              buildlineChartData(
-                context,
-                minsAgo,
-                maxBasal,
-                bglSpotData,
-                basalSpotData,
-                lowTargets,
-                highTargets,
-                treatments,
-                bglLineData,
-              ),
+              buildlineChartData(context, minsAgo, maxBasal, bglSpotData, basalSpotData, lowTargets, highTargets, treatments),
               duration: Duration.zero,
             ),
           ),
@@ -109,16 +92,22 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     List<FlSpot> lowTargets,
     List<FlSpot> highTargets,
     List<FlSpot> treatments,
-    LineChartBarData bglLineData,
   ) {
     double maxY = 306;
     double minY = 0;
     double minX = -1 * minsAgo.toDouble(); // mins ago
     double maxX = 0; // now
 
-    Color pColor = primaryColor(context);
-    Color opColor = onPrimaryColor(context);
-    Color tColor = accentColor(context);
+    Color pColor = accentColor(context);
+    Color opColor = backgroundColorShade(context);
+    Color tColor = primaryColor(context);
+
+    var bglLineData = LineChartBarData(
+      color: primaryColor(context),
+      spots: bglSpotData,
+      barWidth: 1,
+      dotData: FlDotData(show: true, getDotPainter: PainterFunctions().bglDotPainter(context)),
+    );
 
     return LineChartData(
       rangeAnnotations: rangeAnnotations(pColor.withAlpha(45)),

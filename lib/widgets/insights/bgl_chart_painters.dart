@@ -29,7 +29,7 @@ class PainterFunctions with ThemeMixin {
 
   // Painter used when spots on a veritcal line is slected
   GetDotPainterCallback highlightPainer(BuildContext context) {
-    var color = accentColor(context);
+    var color = primaryColor(context);
     return (
       FlSpot spot,
       double xPercentage,
@@ -98,7 +98,7 @@ class PainterFunctions with ThemeMixin {
       String text = spot.treatment.treatmentStr;
       bool isSMB = false;
       if (spot.treatment.bolus != null) {
-        pcolor = Colors.blue;
+        pcolor = accentColor(context);
         if (spot.treatment.bolus!.type == BolusType.smb) {
           text = "${spot.treatment.treatmentStr}*";
           isSMB = true;
@@ -139,7 +139,7 @@ class PainterFunctions with ThemeMixin {
 
   GetDotPainterCallback bglDotPainter(BuildContext context) {
     var color = primaryColor(context);
-    var outOfRangeColor = Colors.red;
+    var outOfRangeColor = badColor(context);
     return (
       FlSpot spot,
       double xPercentage,

@@ -15,7 +15,7 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
             fit: BoxFit.contain,
             child: Text(
               "Snooze ${snoozeString()}",
-              style: labelLarge(context).copyWith(color: primaryColor(context).dim),
+              style: labelLarge(context).copyWith(color: accentColor(context).dim),
             ),
           ),
         ),

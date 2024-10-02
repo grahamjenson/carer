@@ -33,11 +33,11 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
           padding: const EdgeInsets.all(4), // Add padding inside the border
           decoration: BoxDecoration(
             border: Border.all(
-              color: accentColor(context), // Color of the border
+              color: primaryColor(context), // Color of the border
               width: 1, // Width of the border
             ),
             borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
-            color: outlineColor(context),
+            color: backgroundColorShade(context),
           ),
           child: Row(
             children: rows,
@@ -63,7 +63,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bell_slash,
-          color: accentColor(context),
+          color: primaryColor(context),
         ),
       );
     }
@@ -86,7 +86,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.processor,
-          color: accentColor(context),
+          color: primaryColor(context),
         ),
       );
     }
@@ -109,7 +109,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.mobile_android,
-          color: accentColor(context),
+          color: primaryColor(context),
         ),
       );
     }
@@ -135,7 +135,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bolt_slash,
-          color: accentColor(context),
+          color: primaryColor(context),
         ),
       );
     }
@@ -164,7 +164,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.battery_empty,
-          color: accentColor(context),
+          color: primaryColor(context),
         ),
       );
     }

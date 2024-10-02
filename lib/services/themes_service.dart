@@ -13,7 +13,7 @@ class ColorSchemes {
   // Created and exported from https://www.realtimecolors.com/?colors=efeeec-080705-FFCD36-ffb600-3accf8&fonts=Inter-Inter
   // Trying to use the themes from Diabetes awareness month nz logo
   static const textColor = Color(0xFFefeeec);
-  static const backgroundColor = Color(0xFF080705);
+  static const backgroundColor = Color(0xFF323231);
   static const primaryColor = Color(0xFFFFCD36);
   static const primaryFgColor = Color(0xFF080705);
   static const secondaryColor = Color(0xFFffb600);
@@ -152,16 +152,31 @@ mixin ThemeMixin {
     return Theme.of(context).colorScheme.onSurface;
   }
 
+  Color textColor(BuildContext context) {
+    return onBackgroundColor(context);
+  }
+
+  Color outlineColor(BuildContext context) {
+    return backgroundColor(context).bright;
+  }
+
+  ////
+  // Semantic Colors
+  ////
+  Color badColor(BuildContext context) {
+    var cs = Theme.of(context).colorScheme;
+    if (cs == ColorSchemes.colorScheme) {
+      return Colors.red;
+    }
+    return Colors.grey[600]!;
+  }
+
   Color errorColor(BuildContext context) {
     return Theme.of(context).colorScheme.error;
   }
 
   Color onErrorColor(BuildContext context) {
     return Theme.of(context).colorScheme.onError;
-  }
-
-  Color outlineColor(BuildContext context) {
-    return backgroundColor(context).dim;
   }
 
   ///
@@ -259,9 +274,9 @@ mixin ThemeMixin {
       return null;
     }
     if (sgv.isLow || sgv.isHigh) {
-      return accentColor(context);
+      return primaryColor(context);
     }
-    return secondaryColor(context);
+    return badColor(context);
   }
 
   Color? diffColor(BuildContext context) {
@@ -276,9 +291,9 @@ mixin ThemeMixin {
       return null;
     }
     if (diffRange == Range7.low || diffRange == Range7.high) {
-      return accentColor(context);
+      return primaryColor(context);
     }
-    return secondaryColor(context);
+    return badColor(context);
   }
 
   Color? ageColor(BuildContext context) {
@@ -293,7 +308,7 @@ mixin ThemeMixin {
     if (seconds < 300) {
       return null;
     }
-    return accentColor(context);
+    return primaryColor(context);
   }
 }
 
@@ -308,6 +323,16 @@ ThemeData dimTheme = normalTheme.copyWith(colorScheme: ColorSchemes.darkcolorSch
 extension ColorExtension on Color {
   Color get dim {
     var amount = 0.7;
+    return Color.fromARGB(
+      alpha,
+      (red * amount).round(),
+      (green * amount).round(),
+      (blue * amount).round(),
+    );
+  }
+
+  Color get bright {
+    var amount = 1.3;
     return Color.fromARGB(
       alpha,
       (red * amount).round(),

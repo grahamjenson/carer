@@ -16,7 +16,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var mainColor = primaryColor(context);
+        var mainColor = accentColor(context);
         var backgroundColor = mainColor.dim.dim.dim;
         var buttonColor = mainColor.dim.dim;
 
