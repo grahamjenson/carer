@@ -9,6 +9,7 @@ class NSRawTreatment {
   int? carbs;
   DateTime date; // Now, date is a DateTime object
   String eventType;
+  String? type;
   bool? isReadOnly;
   bool? isValid;
   int utcOffset;
@@ -42,6 +43,7 @@ class NSRawTreatment {
     required this.app,
     required this.carbs,
     required this.date,
+    required this.type,
     required this.eventType,
     required this.isReadOnly,
     required this.isValid,
@@ -88,6 +90,7 @@ class NSRawTreatment {
       app: json['app'],
       carbs: json['carbs'],
       date: DateTime.fromMillisecondsSinceEpoch(json['date']),
+      type: json['type'],
       eventType: json['eventType'],
       utcOffset: json['utcOffset'],
       isReadOnly: json['isReadOnly'],
@@ -143,7 +146,11 @@ class NSRawTreatment {
           treatments.add(NSTreatmentCarbs(id: id, carbs: carbs!, date: date));
         }
         if (insulin != null) {
-          treatments.add(NSTreatmentInsulin(id: id, insulin: insulin!, date: date));
+          var ttype = eventType == "Meal Bolus" ? NSTreatmentInsulinType.meal : NSTreatmentInsulinType.correction;
+          if (type == "SMB") {
+            ttype = NSTreatmentInsulinType.smb;
+          }
+          treatments.add(NSTreatmentInsulin(id: id, insulin: insulin!, date: date, type: ttype));
         }
         break;
       case "Carb Correction":
@@ -202,15 +209,19 @@ class NSTreatmentCarbs extends NSTreatment {
   }
 }
 
+enum NSTreatmentInsulinType { meal, correction, smb }
+
 class NSTreatmentInsulin extends NSTreatment {
   String id;
   double insulin;
   DateTime date;
-  NSTreatmentInsulin({required this.id, required this.insulin, required this.date});
+  NSTreatmentInsulinType type;
+
+  NSTreatmentInsulin({required this.id, required this.insulin, required this.date, required this.type});
 
   @override
   String toString() {
-    return "Insulin: $insulin at $date";
+    return "Insulin(${type.name}): $insulin at $date";
   }
 }
 

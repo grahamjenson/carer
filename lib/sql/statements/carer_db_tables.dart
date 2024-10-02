@@ -39,6 +39,7 @@ const bolusTable = DBTable(bolusTableName, '''
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
       value REAL,
+      type TEXT,
       timestamp INTEGER,
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
       UNIQUE(eid)

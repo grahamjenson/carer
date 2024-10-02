@@ -24,21 +24,23 @@ class SQLToBolus extends SQLMapper<Bolus> {
   Bolus aToB(SQLRow row) {
     List<String> errors = [];
 
-    errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid"]));
+    errors.addAll(row.validateRequiredAttributes(["value", "timestamp", "eid", "type"]));
     errors.addAll(row.validateTypes([
       ("value", double),
       ("timestamp", int),
       ("eid", String),
+      ("type", String),
     ]));
 
     if (errors.isNotEmpty) {
       throw ArgumentError("Invalid Bolus Row: $row, Errors: $errors");
     }
-
+    var type = BolusType.values.firstWhere((element) => element.name == row["type"] as String);
     return Bolus(
       id: row["id"] as int?,
       eid: row["eid"] as String,
       value: row["value"] as double,
+      type: type,
       date: DateTime.fromMillisecondsSinceEpoch(row["timestamp"] as int),
     );
   }
@@ -49,6 +51,7 @@ class SQLToBolus extends SQLMapper<Bolus> {
       "value": model.value,
       "timestamp": model.date.millisecondsSinceEpoch,
       "eid": model.eid!,
+      "type": model.type.name.toString(),
     });
   }
 }

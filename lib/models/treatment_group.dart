@@ -31,6 +31,7 @@ class TreatmentList {
     if (model.value == 0) {
       return;
     }
+    print(model);
     bolusModels.add(model);
     _updateDate(model.date);
   }
@@ -62,13 +63,22 @@ class TreatmentList {
     List<TreatmentGroup> treatments = [];
     while (endTime.isBefore(now)) {
       var tg = TreatmentGroup(startTime, endTime);
+      var smbTG = TreatmentGroup(startTime, endTime);
+
+      treatments.insert(0, smbTG);
       treatments.insert(0, tg);
+
       for (var c in carbsModels) {
         tg.addCarbModel(c);
       }
       for (var b in bolusModels) {
-        tg.addBolusModel(b);
+        if (b.type == BolusType.smb) {
+          smbTG.addBolusModel(b);
+        } else {
+          tg.addBolusModel(b);
+        }
       }
+
       startTime = startTime.add(windowDuration);
       endTime = endTime.add(windowDuration);
     }
