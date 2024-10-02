@@ -8,7 +8,8 @@ class Window extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     var color = surfaceColorDim(context);
-    return Container(
+    return SizedBox.expand(
+        child: Container(
       margin: const EdgeInsets.all(2),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -21,6 +22,6 @@ class Window extends StatelessWidget with ThemeMixin {
       ),
       padding: const EdgeInsets.all(5),
       child: child,
-    );
+    ));
   }
 }

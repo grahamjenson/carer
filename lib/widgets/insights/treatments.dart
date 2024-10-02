@@ -1,3 +1,4 @@
+import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
@@ -23,7 +24,7 @@ class Treatments extends StatelessWidget with ThemeMixin {
 
     return AWatch((context) {
       var _ = TimerService().minuteSignal.value; // Refresh every minute
-      var treatments = TreatmentList.lastSixHours.value.getWindows(5);
+      var treatments = Treatment.lastSixHours.value;
       treatments = treatments.where((e) => e.age < timescale).toList();
       var history = [for (var t in treatments) historyRow(context, t)].where((row) => row != null).map((row) => row as DataRow).toList();
 
@@ -52,7 +53,7 @@ class Treatments extends StatelessWidget with ThemeMixin {
     }, debugLabel: "History");
   }
 
-  DataRow? historyRow(BuildContext context, TreatmentGroup treatment) {
+  DataRow? historyRow(BuildContext context, Treatment treatment) {
     TextStyle heading = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.normal,
@@ -87,7 +88,7 @@ class Treatments extends StatelessWidget with ThemeMixin {
     ]);
   }
 
-  SmartText dateAgoShort(TreatmentGroup treatment, TextStyle row, TextStyle small) {
+  SmartText dateAgoShort(Treatment treatment, TextStyle row, TextStyle small) {
     var diff = treatment.age;
 
     if (diff.inMinutes == 0) {
@@ -116,16 +117,16 @@ class Treatments extends StatelessWidget with ThemeMixin {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Widget insulinSmartText(TreatmentGroup treatment, TextStyle row, TextStyle small) {
-    if (treatment.insulin == 0) {
+  Widget insulinSmartText(Treatment treatment, TextStyle row, TextStyle small) {
+    if (treatment.bolus == null) {
       return const SizedBox.shrink();
     }
 
-    if (treatment.isSMBsOnly) {
+    if (treatment.bolus!.type == BolusType.smb) {
       return SmartText(
         texts: [
           "*",
-          "${toMax2dp(treatment.insulin)}",
+          "${toMax2dp(treatment.bolus!.value)}",
           "u",
         ],
         styles: [
@@ -135,13 +136,13 @@ class Treatments extends StatelessWidget with ThemeMixin {
         ],
       );
     }
-    return SmartText(texts: [(toMax2dpStr(treatment.insulin)), "u"], styles: [row, small]);
+    return SmartText(texts: [(toMax2dpStr(treatment.bolus!.value)), "u"], styles: [row, small]);
   }
 
-  Widget carbsSmartText(TreatmentGroup treatment, TextStyle row, TextStyle small) {
-    if (treatment.carbs == 0) {
+  Widget carbsSmartText(Treatment treatment, TextStyle row, TextStyle small) {
+    if (treatment.carbs == null) {
       return const SizedBox.shrink();
     }
-    return SmartText(texts: [toMax2dpStr(treatment.carbs), "g"], styles: [row, small]);
+    return SmartText(texts: [toMax2dpStr(treatment.carbs!.value), "g"], styles: [row, small]);
   }
 }

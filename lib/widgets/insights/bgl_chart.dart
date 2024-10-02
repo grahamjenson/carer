@@ -1,3 +1,4 @@
+import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
@@ -14,7 +15,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class TreatmentSpot extends FlSpot {
-  final TreatmentGroup treatment;
+  final Treatment treatment;
   TreatmentSpot(super.x, super.y, this.treatment);
 }
 
@@ -54,7 +55,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
 
       List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
       List<ASGV> sgvs = SGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<TreatmentGroup> lastTreatments = TreatmentList.last2days.value.getWindows(windowSize).where((e) => e.minsAgo < minsAgo).toList();
+      List<Treatment> lastTreatments = Treatment.last2days.value.where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);
@@ -182,6 +183,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
               show: true,
               getDotPainter: treatmentsDotPainter(
                 tColor,
+                justShape: true,
               )),
         ),
       ],
@@ -192,11 +194,11 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  List<FlSpot> treatmentsSpots(List<TreatmentGroup> lastTreatments) {
+  List<FlSpot> treatmentsSpots(List<Treatment> lastTreatments) {
     List<FlSpot> spots = [];
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
-    TreatmentGroup? lastTreatment;
+    Treatment? lastTreatment;
     var diff = 0.0;
     const double change = 20;
     for (var treatment in lastTreatments) {
@@ -206,7 +208,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         diff = 0;
       }
 
-      spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 270, treatment));
+      if (treatment.bolus != null && treatment.bolus!.type == BolusType.smb) {
+        spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 255, treatment));
+      } else if (treatment.bolus != null) {
+        spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 265, treatment));
+      } else {
+        spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 280, treatment));
+      }
 
       lastTreatment = treatment;
     }
@@ -537,6 +545,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   GetDotPainterCallback treatmentsDotPainter(
     Color color, {
     double size = 1,
+    bool justShape = false,
   }) {
     return (
       FlSpot spot,
@@ -544,29 +553,53 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       LineChartBarData bar,
       int index,
     ) {
-      if (spot is TreatmentSpot) {
-        if (spot.treatment.isSMBsOnly) {
-          return FlTextPainterPainter(
-            spot.treatment.treatmentStr,
-            align: flipAlignment(index),
-            strokeColor: Colors.black,
-            size: 8 * size,
-            color: Colors.blue,
-          );
-        } else {
-          return FlTextPainterPainter(
-            spot.treatment.treatmentStr,
-            align: flipAlignment(index),
-            strokeColor: Colors.black,
-            size: 8 * size,
-            color: color,
-          );
+      if (spot is! TreatmentSpot) {
+        return FlDotCirclePainter(
+          radius: 2,
+          color: color,
+          strokeColor: color,
+        );
+      }
+
+      var pcolor = color;
+      String text = spot.treatment.treatmentStr;
+      bool isSMB = false;
+      if (spot.treatment.bolus != null) {
+        pcolor = Colors.blue;
+        if (spot.treatment.bolus!.type == BolusType.smb) {
+          text = "${spot.treatment.treatmentStr}*";
+          isSMB = true;
         }
       }
-      return FlDotCirclePainter(
-        radius: 0,
-        color: color,
-        strokeColor: color,
+
+      if (justShape) {
+        if (isSMB) {
+          return FlDotCrossPainter(
+            size: 5,
+            color: pcolor,
+          );
+        }
+        if (spot.treatment.bolus != null) {
+          return FlDotSquarePainter(
+            size: 5,
+            color: pcolor,
+            strokeColor: Colors.black,
+          );
+        }
+        return FlDotCirclePainter(
+          radius: 2,
+          color: pcolor,
+          strokeColor: Colors.black,
+        );
+      }
+
+      return FlTextPainterPainter(
+        text,
+        align: Alignment.topCenter,
+        strokeColor: Colors.black,
+        size: 8 * size,
+        strokeWidth: size,
+        color: pcolor,
       );
     };
   }
@@ -574,8 +607,6 @@ class BGLChart extends StatelessWidget with ThemeMixin {
 
 /// This class is an implementation of a [FlDotPainter] that draws Text on a canvas
 class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
-  late FlDotCirclePainter circle;
-
   /// The color of the square is determined determined by [color],
   /// [size] determines the size of the square.
   /// You can have a stroke line around the square,
@@ -588,15 +619,7 @@ class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
     this.strokeColor = const Color.fromRGBO(76, 175, 80, 1),
     this.strokeWidth = 1.0,
     this.align = Alignment.bottomCenter,
-  }) {
-    circle = FlDotCirclePainter(
-      radius: 2,
-      color: color,
-      strokeColor: strokeColor,
-      strokeWidth: strokeWidth,
-    );
-  }
-
+  });
   final Alignment align;
 
   /// The fill color to use for the square
@@ -627,6 +650,12 @@ class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
   /// Implementation of the parent class to draw the square
   @override
   void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
+    var circle = FlDotCirclePainter(
+      radius: 3,
+      color: color,
+      strokeColor: strokeColor,
+      strokeWidth: strokeWidth,
+    );
     circle.draw(canvas, spot, offsetInCanvas);
 
     // Create a TextSpan

@@ -77,7 +77,7 @@ void runCarer() async {
 
   CleanSGV.setupSQLSignals();
   Profile.setupSQLSignals();
-  TreatmentList.setupSQLSignals();
+  Treatment.setupSQLSignals();
   ValueAtTime.setupSQLSignals();
   SGV.setupSQLSignals();
 
