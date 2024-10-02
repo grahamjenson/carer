@@ -31,7 +31,6 @@ class TreatmentList {
     if (model.value == 0) {
       return;
     }
-    print(model);
     bolusModels.add(model);
     _updateDate(model.date);
   }
@@ -63,7 +62,7 @@ class TreatmentList {
     List<TreatmentGroup> treatments = [];
     while (endTime.isBefore(now)) {
       var tg = TreatmentGroup(startTime, endTime);
-      var smbTG = TreatmentGroup(startTime, endTime);
+      var smbTG = TreatmentGroup(startTime, endTime, isSMBsOnly: true);
 
       treatments.insert(0, smbTG);
       treatments.insert(0, tg);
@@ -127,7 +126,8 @@ class TreatmentGroup with DateMixin {
   List<Bolus> bolusModels = [];
   List<Carbs> carbsModels = [];
 
-  TreatmentGroup(this.startDate, this.endDate) {
+  bool isSMBsOnly = false;
+  TreatmentGroup(this.startDate, this.endDate, {isSMBsOnly}) {
     date = startDate;
   }
 
@@ -141,6 +141,9 @@ class TreatmentGroup with DateMixin {
       return;
     }
 
+    if (isSMBsOnly) {
+      return;
+    }
     // Only add if carb model is between start and end date OR equal to endDate
     if ((model.date.isAfter(startDate) && (model.date.isBefore(endDate))) || model.date.isAtSameMomentAs(endDate)) {
       carbsModels.add(model);
@@ -163,6 +166,9 @@ class TreatmentGroup with DateMixin {
       return;
     }
 
+    if (isSMBsOnly && model.type != BolusType.smb) {
+      return;
+    }
     // Only add if insulin model is between start and end date OR equal to endDate
     if (((model.date.isAfter(startDate) && model.date.isBefore(endDate))) || model.date.isAtSameMomentAs(endDate)) {
       bolusModels.add(model);

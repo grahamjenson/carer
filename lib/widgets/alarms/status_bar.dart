@@ -123,15 +123,15 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
     List<String> tooltip = [];
 
     if (!thisPhonesCharging) {
-      tooltip.add("This Phone Not Charging");
+      tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%) Not Charging");
     }
     if (!t1dPhonesCharging) {
-      tooltip.add("T1D Phone Not Charging");
+      tooltip.add("T1D Phone Battery(${PropertiesData().battery.toInt()}%) Not Charging");
     }
 
     if (tooltip.isNotEmpty) {
       return Tooltip(
-        message: tooltip.join(", "),
+        message: tooltip.join("\n"),
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bolt_slash,
