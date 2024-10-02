@@ -60,7 +60,7 @@ class TreatmentList {
     // This is pretty inefficient, but I dont think it is that bad
     // plus it works
     List<TreatmentGroup> treatments = [];
-    while (endTime.isBefore(now)) {
+    while (startTime.isBefore(now)) {
       var tg = TreatmentGroup(startTime, endTime);
       var smbTG = TreatmentGroup(startTime, endTime, isSMBsOnly: true);
 
@@ -126,8 +126,8 @@ class TreatmentGroup with DateMixin {
   List<Bolus> bolusModels = [];
   List<Carbs> carbsModels = [];
 
-  bool isSMBsOnly = false;
-  TreatmentGroup(this.startDate, this.endDate, {isSMBsOnly}) {
+  bool isSMBsOnly;
+  TreatmentGroup(this.startDate, this.endDate, {this.isSMBsOnly = false}) {
     date = startDate;
   }
 

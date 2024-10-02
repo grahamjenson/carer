@@ -119,17 +119,20 @@ class Treatments extends StatelessWidget with ThemeMixin {
     if (treatment.insulin == 0) {
       return const SizedBox.shrink();
     }
+
     if (treatment.isSMBsOnly) {
-      print("afsjoiasjfoijsaf");
-      return SmartText(texts: [
-        "${toMax2dp(treatment.insulin)}",
-        "u",
-        "*"
-      ], styles: [
-        row,
-        small,
-        small.copyWith(fontFeatures: [const FontFeature.superscripts()])
-      ]);
+      return SmartText(
+        texts: [
+          "*",
+          "${toMax2dp(treatment.insulin)}",
+          "u",
+        ],
+        styles: [
+          row.copyWith(fontFeatures: [const FontFeature.superscripts()]),
+          row,
+          small,
+        ],
+      );
     }
     return SmartText(texts: ["${toMax2dp(treatment.insulin)}", "u"], styles: [row, small]);
   }
