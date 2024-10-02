@@ -1,6 +1,6 @@
 import 'package:carer/mappers/sql_mappers.dart';
-import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 
@@ -16,7 +16,7 @@ abstract class ASGV {
 
   int get minsAgo;
   Duration get age;
-  String sgvStr(Unit unit);
+  String sgvStr();
 }
 
 class SGV extends DBModel implements ASGV {
@@ -49,13 +49,8 @@ class SGV extends DBModel implements ASGV {
   bool get isUrgentHigh => range == Range5.veryHigh;
 
   @override
-  String sgvStr(Unit unit) {
-    switch (unit) {
-      case Unit.mg:
-        return value.toString();
-      case Unit.mmol:
-        return (value / MGtoMMOL).toStringAsFixed(1);
-    }
+  String sgvStr() {
+    return UISettings().unit.str(value);
   }
 
   @override

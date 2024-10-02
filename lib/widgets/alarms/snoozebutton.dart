@@ -79,7 +79,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
   Widget? alarmStringWidget(BuildContext context) {
     var small = TextStyle(
       fontSize: 10,
-      color: tertiaryColor(context),
+      color: accentColor(context),
     );
 
     var triggeredAlarms = AlarmsService().triggeredAlarms.value;

@@ -53,12 +53,12 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
         color: Colors.white,
         highlightColor: Colors.white,
         style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(surfaceColorDim(context)),
+          backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context)),
         ),
         padding: EdgeInsets.zero,
         icon: Icon(
           Icons.settings,
-          color: tertiaryColor(context),
+          color: accentColor(context),
         ),
         onPressed: () {
           Navigator.push(

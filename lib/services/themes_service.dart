@@ -8,25 +8,62 @@ import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
-class ColorPair {
-  final Color day;
-  final Color night;
+class ColorSchemes {
+  // Basing the working on https://www.youtube.com/watch?v=wIuVvCuiJhU&ab_channel=Juxtopposed video
+  // Created and exported from https://www.realtimecolors.com/?colors=ededed-303030-3accf8-7ddf79-f7ef59
+  // Trying to use the themes from Diabetes awareness month nz logo
+  static const textColor = Color(0xFFededed);
+  static const backgroundColor = Color(0xFF303030);
+  static const primaryColor = Color(0xFF3accf8);
+  static const primaryFgColor = Color(0xFF303030);
+  static const secondaryColor = Color(0xFF7ddf79);
+  static const secondaryFgColor = Color(0xFF303030);
+  static const accentColor = Color(0xFFf7ef59);
+  static const accentFgColor = Color(0xFF303030);
 
-  ColorPair(
-    this.day,
-    this.night,
+  static const colorScheme = ColorScheme(
+    brightness: Brightness.dark,
+    primary: primaryColor,
+    onPrimary: primaryFgColor,
+    secondary: secondaryColor,
+    onSecondary: secondaryFgColor,
+    tertiary: accentColor,
+    onTertiary: accentFgColor,
+    surface: backgroundColor,
+    onSurface: textColor,
+    error: Brightness.dark == Brightness.light ? Color(0xffB3261E) : Color(0xffF2B8B5),
+    onError: Brightness.dark == Brightness.light ? Color(0xffFFFFFF) : Color(0xff601410),
+  );
+
+  // exported from https://www.realtimecolors.com/?colors=848484-000000-777676-8d8d8d-b1b1b1&fonts=Inter-Inter
+  static const darktextColor = Color(0xFF848484);
+  static const darkbackgroundColor = Color(0xFF000000);
+  static const darkprimaryColor = Color(0xFF777676);
+  static const darkprimaryFgColor = Color(0xFF000000);
+  static const darksecondaryColor = Color(0xFF8d8d8d);
+  static const darksecondaryFgColor = Color(0xFF000000);
+  static const darkaccentColor = Color(0xFFb1b1b1);
+  static const darkaccentFgColor = Color(0xFF000000);
+
+  static const darkcolorScheme = ColorScheme(
+    brightness: Brightness.dark,
+    primary: darkprimaryColor,
+    onPrimary: darkprimaryFgColor,
+    secondary: darksecondaryColor,
+    onSecondary: darksecondaryFgColor,
+    tertiary: darkaccentColor,
+    onTertiary: darkaccentFgColor,
+    surface: darkbackgroundColor,
+    onSurface: darktextColor,
+    error: Brightness.dark == Brightness.light ? Color(0xffB3261E) : Color(0xffF2B8B5),
+    onError: Brightness.dark == Brightness.light ? Color(0xffFFFFFF) : Color(0xff601410),
   );
 }
 
-// Try and define all colors at this point, as a means of centralizing the color scheme
-ColorPair backgroundColorConst = ColorPair(Colors.grey[850]!, Colors.black);
-ColorPair textColorConst = ColorPair(const Color(0xFFEEEEEE), const Color(0xFF555555));
-ColorPair widgetBackgroundColorConst = ColorPair(const Color(0xFF555555), const Color(0xFFEEEEEE));
-
-Color blueColorConst = const Color(0xFF00BAEF);
-Color redColorConst = const Color.fromARGB(255, 227, 63, 63);
-Color yellowColorConst = const Color(0xFFFFCD36);
-
+////
+// Service
+////
+///
 class ThemeService {
   static final ThemeService _themeService = ThemeService._internal();
   factory ThemeService() {
@@ -71,6 +108,10 @@ mixin ThemeMixin {
     return Theme.of(context).colorScheme.primary;
   }
 
+  Color primaryColorShade(BuildContext context) {
+    return Theme.of(context).colorScheme.primary.dim;
+  }
+
   Color onPrimaryColor(BuildContext context) {
     return Theme.of(context).colorScheme.onPrimary;
   }
@@ -79,27 +120,35 @@ mixin ThemeMixin {
     return Theme.of(context).colorScheme.secondary;
   }
 
+  Color secondaryColorShade(BuildContext context) {
+    return Theme.of(context).colorScheme.secondary.dim;
+  }
+
   Color onSecondaryColor(BuildContext context) {
     return Theme.of(context).colorScheme.onSecondary;
   }
 
-  Color tertiaryColor(BuildContext context) {
+  Color accentColor(BuildContext context) {
     return Theme.of(context).colorScheme.tertiary;
   }
 
-  Color onTertiaryColor(BuildContext context) {
+  Color accentColorShade(BuildContext context) {
+    return Theme.of(context).colorScheme.tertiary.dim;
+  }
+
+  Color onAccentColor(BuildContext context) {
     return Theme.of(context).colorScheme.onTertiary;
   }
 
-  Color surfaceColor(BuildContext context) {
+  Color backgroundColor(BuildContext context) {
     return Theme.of(context).colorScheme.surface;
   }
 
-  Color surfaceColorDim(BuildContext context) {
-    return Theme.of(context).colorScheme.surface.dim;
+  Color backgroundColorShade(BuildContext context) {
+    return backgroundColor(context).dim;
   }
 
-  Color onSurfaceColor(BuildContext context) {
+  Color onBackgroundColor(BuildContext context) {
     return Theme.of(context).colorScheme.onSurface;
   }
 
@@ -112,7 +161,7 @@ mixin ThemeMixin {
   }
 
   Color outlineColor(BuildContext context) {
-    return Theme.of(context).colorScheme.outline;
+    return backgroundColor(context).dim;
   }
 
   ///
@@ -210,7 +259,7 @@ mixin ThemeMixin {
       return null;
     }
     if (sgv.isLow || sgv.isHigh) {
-      return tertiaryColor(context);
+      return accentColor(context);
     }
     return secondaryColor(context);
   }
@@ -227,7 +276,7 @@ mixin ThemeMixin {
       return null;
     }
     if (diffRange == Range7.low || diffRange == Range7.high) {
-      return tertiaryColor(context);
+      return accentColor(context);
     }
     return secondaryColor(context);
   }
@@ -244,157 +293,17 @@ mixin ThemeMixin {
     if (seconds < 300) {
       return null;
     }
-    return tertiaryColor(context);
+    return accentColor(context);
   }
 }
 
 var defaultTextTheme = Typography.material2018().white;
 ThemeData normalTheme = ThemeData(
   useMaterial3: true,
-  textTheme: defaultTextTheme.merge(TextTheme(
-    displayLarge: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    displayMedium: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    displaySmall: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    headlineLarge: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    headlineMedium: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    headlineSmall: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    titleLarge: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    titleMedium: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    titleSmall: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: textColorConst.day,
-    ),
-    bodyLarge: TextStyle(
-      color: textColorConst.day,
-    ),
-    bodyMedium: TextStyle(
-      color: textColorConst.day,
-    ),
-    bodySmall: TextStyle(
-      color: textColorConst.day,
-    ),
-    labelLarge: TextStyle(
-      color: textColorConst.day,
-    ),
-    labelMedium: TextStyle(
-      color: textColorConst.day,
-    ),
-    labelSmall: TextStyle(
-      color: textColorConst.day,
-    ),
-  )),
-  colorScheme: ColorScheme(
-    brightness: Brightness.dark,
-    primary: blueColorConst,
-    onPrimary: Colors.white,
-    secondary: redColorConst,
-    onSecondary: Colors.white,
-    tertiary: yellowColorConst,
-    onTertiary: Colors.white,
-    error: Colors.red,
-    onError: Colors.white,
-    surface: backgroundColorConst.day,
-    onSurface: textColorConst.day,
-    outline: blueColorConst.dim,
-  ),
+  colorScheme: ColorSchemes.colorScheme,
 );
 
-ThemeData dimTheme = normalTheme.copyWith(
-  textTheme: normalTheme.textTheme.merge(TextTheme(
-    displayLarge: TextStyle(
-      fontWeight: FontWeight.w600,
-      color: textColorConst.night,
-    ),
-    displayMedium: TextStyle(
-      fontWeight: FontWeight.w600,
-      color: textColorConst.night,
-    ),
-    displaySmall: TextStyle(
-      fontWeight: FontWeight.w600,
-      color: textColorConst.night,
-    ),
-    headlineLarge: TextStyle(
-      fontWeight: FontWeight.w500,
-      color: textColorConst.night,
-    ),
-    headlineMedium: TextStyle(
-      fontWeight: FontWeight.w500,
-      color: textColorConst.night,
-    ),
-    headlineSmall: TextStyle(
-      fontWeight: FontWeight.w500,
-      color: textColorConst.night,
-    ),
-    titleLarge: TextStyle(
-      fontWeight: FontWeight.w400,
-      color: textColorConst.night,
-    ),
-    titleMedium: TextStyle(
-      fontWeight: FontWeight.w400,
-      color: textColorConst.night,
-    ),
-    titleSmall: TextStyle(
-      fontWeight: FontWeight.w400,
-      color: textColorConst.night,
-    ),
-    bodyLarge: TextStyle(
-      color: textColorConst.night,
-    ),
-    bodyMedium: TextStyle(
-      color: textColorConst.night,
-    ),
-    bodySmall: TextStyle(
-      color: textColorConst.night,
-    ),
-    labelLarge: TextStyle(
-      color: textColorConst.night,
-    ),
-    labelMedium: TextStyle(
-      color: textColorConst.night,
-    ),
-    labelSmall: TextStyle(
-      color: textColorConst.night,
-    ),
-  )),
-  colorScheme: ColorScheme(
-    brightness: Brightness.dark,
-    primary: textColorConst.night,
-    onPrimary: Colors.black,
-    secondary: textColorConst.night,
-    onSecondary: Colors.black,
-    tertiary: textColorConst.night,
-    onTertiary: Colors.black,
-    error: Colors.red,
-    onError: Colors.white,
-    surface: backgroundColorConst.night,
-    onSurface: Colors.white,
-    outline: Colors.black,
-  ),
-);
+ThemeData dimTheme = normalTheme.copyWith(colorScheme: ColorSchemes.darkcolorScheme);
 
 extension ColorExtension on Color {
   Color get dim {

@@ -33,11 +33,11 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
           padding: const EdgeInsets.all(4), // Add padding inside the border
           decoration: BoxDecoration(
             border: Border.all(
-              color: tertiaryColor(context), // Color of the border
+              color: accentColor(context), // Color of the border
               width: 1, // Width of the border
             ),
             borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
-            color: surfaceColorDim(context),
+            color: outlineColor(context),
           ),
           child: Row(
             children: rows,
@@ -63,7 +63,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bell_slash,
-          color: tertiaryColor(context),
+          color: accentColor(context),
         ),
       );
     }
@@ -86,7 +86,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.processor,
-          color: tertiaryColor(context),
+          color: accentColor(context),
         ),
       );
     }
@@ -109,7 +109,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.mobile_android,
-          color: tertiaryColor(context),
+          color: accentColor(context),
         ),
       );
     }
@@ -135,7 +135,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.bolt_slash,
-          color: tertiaryColor(context),
+          color: accentColor(context),
         ),
       );
     }
@@ -164,7 +164,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           UniconsLine.battery_empty,
-          color: tertiaryColor(context),
+          color: accentColor(context),
         ),
       );
     }

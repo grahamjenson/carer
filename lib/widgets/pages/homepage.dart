@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget with ThemeMixin {
         }
 
         return Scaffold(
-          backgroundColor: surfaceColor(context),
+          backgroundColor: backgroundColor(context),
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {

@@ -2,7 +2,6 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/notification_service.dart';
-import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
 
@@ -49,10 +48,10 @@ class BackgroundService {
       var (newTriggeredAlarms, _) = AlarmsService().calculateAlarms();
       if (newTriggeredAlarms.isNotEmpty) {
         CleanSGV? sgv = CleanSGV.lastSGV.value;
-        var unit = UISettings().unit;
+
         var svgstr = "unknwon sgv";
         if (sgv != null) {
-          svgstr = "${sgv.sgvStr(unit)}${sgv.rate5mWithSign(unit)}, ${sgv.age.inMinutes}m ago";
+          svgstr = "${sgv.sgvStr()}${sgv.rate5mWithSign()}, ${sgv.age.inMinutes}m ago";
         }
 
         String alarms = "";

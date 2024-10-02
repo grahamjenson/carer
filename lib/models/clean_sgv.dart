@@ -1,6 +1,5 @@
 import 'package:carer/mappers/sql_mappers.dart';
 import 'package:carer/models/model.dart';
-import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -54,21 +53,13 @@ class CleanSGV with DateMixin implements ASGV {
     return value - before!.value;
   }
 
-  double sgvU(Unit unit) {
-    return unit.val(value);
-  }
-
   @override
-  String sgvStr(Unit unit) {
-    switch (unit) {
-      case Unit.mg:
-        return value.toString();
-      case Unit.mmol:
-        return (value / MGtoMMOL).toStringAsFixed(1);
-    }
+  String sgvStr() {
+    return UISettings().unit.str(value);
   }
 
-  String rate5mWithSign(Unit unit) {
+  String rate5mWithSign() {
+    var unit = UISettings().unit;
     var diffPer5Mins = rate5m ?? 0;
     var sgv = unit.val(diffPer5Mins);
     var sgvStr = sgv.toStringAsFixed(1);

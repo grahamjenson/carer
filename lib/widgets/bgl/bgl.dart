@@ -1,5 +1,4 @@
 import 'package:carer/models/clean_sgv.dart';
-import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bgl/time_ago_reading.dart';
@@ -20,7 +19,6 @@ class BGL extends StatelessWidget with ThemeMixin {
         if (sgv == null) {
           return loader;
         }
-        var unit = UISettings().unit;
 
         var rColor = rangeColor(context);
         var dColor = diffColor(context);
@@ -48,7 +46,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                       heightFactor: 0.85,
                       child: FittedBox(
                         child: Text(
-                          sgv.sgvStr(unit),
+                          sgv.sgvStr(),
                           style: displayLarge(context).merge(shadows()).copyWith(color: rColor),
                         ),
                       ),
@@ -60,7 +58,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                       heightFactor: 0.2,
                       child: Center(
                         child: Text(
-                          sgv.rate5mWithSign(unit),
+                          sgv.rate5mWithSign(),
                           style: displayMedium(context).merge(shadows()).copyWith(fontSize: 35, color: dColor),
                         ),
                       )),
