@@ -47,7 +47,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                       child: FittedBox(
                         child: Text(
                           sgv.sgvStr(),
-                          style: displayLarge(context).merge(shadows()).copyWith(color: rColor),
+                          style: displayLarge(context).merge(shadows()).copyWith(color: rColor, fontWeight: FontWeight.bold),
                         ),
                       ),
                     )),

@@ -10,16 +10,16 @@ import 'package:signals/signals_flutter.dart';
 
 class ColorSchemes {
   // Basing the working on https://www.youtube.com/watch?v=wIuVvCuiJhU&ab_channel=Juxtopposed video
-  // Created and exported from https://www.realtimecolors.com/?colors=ededed-303030-3accf8-7ddf79-f7ef59
+  // Created and exported from https://www.realtimecolors.com/?colors=efeeec-080705-FFCD36-ffb600-3accf8&fonts=Inter-Inter
   // Trying to use the themes from Diabetes awareness month nz logo
-  static const textColor = Color(0xFFededed);
-  static const backgroundColor = Color(0xFF303030);
-  static const primaryColor = Color(0xFF3accf8);
-  static const primaryFgColor = Color(0xFF303030);
-  static const secondaryColor = Color(0xFF7ddf79);
-  static const secondaryFgColor = Color(0xFF303030);
-  static const accentColor = Color(0xFFf7ef59);
-  static const accentFgColor = Color(0xFF303030);
+  static const textColor = Color(0xFFefeeec);
+  static const backgroundColor = Color(0xFF080705);
+  static const primaryColor = Color(0xFFFFCD36);
+  static const primaryFgColor = Color(0xFF080705);
+  static const secondaryColor = Color(0xFFffb600);
+  static const secondaryFgColor = Color(0xFF080705);
+  static const accentColor = Color(0xFF3accf8);
+  static const accentFgColor = Color(0xFF080705);
 
   static const colorScheme = ColorScheme(
     brightness: Brightness.dark,
