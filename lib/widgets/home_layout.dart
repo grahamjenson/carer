@@ -5,8 +5,8 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snoozebutton.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
-import 'package:carer/widgets/insights/history.dart';
 import 'package:carer/widgets/insights/stats.dart';
+import 'package:carer/widgets/insights/treatments.dart';
 import 'package:flutter/material.dart';
 
 class HomeLayout extends StatelessWidget with ThemeMixin {
@@ -56,7 +56,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
                   flex: 2,
                   child: Row(
                     children: [
-                      Flexible(child: History()),
+                      Flexible(child: Treatments()),
                       Flexible(child: Stats()),
                     ],
                   ),
@@ -76,7 +76,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
             flex: 2,
             child: Row(
               children: [
-                Flexible(child: History()),
+                Flexible(child: Treatments()),
                 Flexible(child: Stats()),
               ],
             ),

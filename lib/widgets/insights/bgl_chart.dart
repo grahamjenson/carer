@@ -1,6 +1,6 @@
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/sgv.dart';
-import 'package:carer/models/treatments.dart';
+import 'package:carer/models/treatment_group.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -14,7 +14,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class TreatmentSpot extends FlSpot {
-  final Treatment treatment;
+  final TreatmentGroup treatment;
   TreatmentSpot(super.x, super.y, this.treatment);
 }
 
@@ -29,6 +29,8 @@ class BasalSpot extends FlSpot {
 }
 
 ASignal<int> _chartMinsAgo = ASignal<int>(120, debugLabel: "BGLChartminsAgo");
+int get chartHoursAgo => _chartMinsAgo.value ~/ 60;
+set chartHoursAgo(int value) => _chartMinsAgo.value = value * 60;
 
 class BGLChart extends StatelessWidget with ThemeMixin {
   final basalMultiplier = 18 * 3;
@@ -40,19 +42,19 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return AWatch((context) {
       int minsAgo = _chartMinsAgo.value;
       var windowSize = 5;
-      if (minsAgo > 300) {
+      if (chartHoursAgo > 6) {
         windowSize = 30;
       }
-      if (minsAgo > 600) {
+      if (chartHoursAgo > 12) {
         windowSize = 120;
       }
-      if (minsAgo > 1000) {
+      if (chartHoursAgo > 15) {
         windowSize = 240;
       }
 
       List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
       List<ASGV> sgvs = SGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<Treatment> lastTreatments = TreatmentList.last2days.value.getWindows(windowSize).where((e) => e.minsAgo < minsAgo).toList();
+      List<TreatmentGroup> lastTreatments = TreatmentList.last2days.value.getWindows(windowSize).where((e) => e.minsAgo < minsAgo).toList();
 
       // convert the last hours of summary sgvs into flspots
       var bglSpotData = bglSpots(sgvs);
@@ -75,23 +77,23 @@ class BGLChart extends StatelessWidget with ThemeMixin {
                   selectedColor: primaryColor(context),
                   constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
                   isSelected: [
-                    _chartMinsAgo.value == 120,
-                    _chartMinsAgo.value == 240,
-                    _chartMinsAgo.value == 360,
-                    _chartMinsAgo.value == 720,
-                    _chartMinsAgo.value == 1440,
+                    chartHoursAgo == 2,
+                    chartHoursAgo == 4,
+                    chartHoursAgo == 6,
+                    chartHoursAgo == 12,
+                    chartHoursAgo == 24,
                   ],
                   onPressed: (int index) {
                     if (index == 0) {
-                      _chartMinsAgo.value = 120;
+                      chartHoursAgo = 2;
                     } else if (index == 1) {
-                      _chartMinsAgo.value = 240;
+                      chartHoursAgo = 4;
                     } else if (index == 2) {
-                      _chartMinsAgo.value = 360;
+                      chartHoursAgo = 6;
                     } else if (index == 3) {
-                      _chartMinsAgo.value = 720;
+                      chartHoursAgo = 12;
                     } else if (index == 4) {
-                      _chartMinsAgo.value = 1440;
+                      chartHoursAgo = 24;
                     }
                   },
                   children: [
@@ -190,11 +192,11 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  List<FlSpot> treatmentsSpots(List<Treatment> lastTreatments) {
+  List<FlSpot> treatmentsSpots(List<TreatmentGroup> lastTreatments) {
     List<FlSpot> spots = [];
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
-    Treatment? lastTreatment;
+    TreatmentGroup? lastTreatment;
     var diff = 0.0;
     const double change = 20;
     for (var treatment in lastTreatments) {
@@ -360,19 +362,19 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   }
 
   SideTitles bottomTitleWidgets() {
-    double interval = 30;
     bool showTime = false;
-    if (_chartMinsAgo.value > 300) {
-      interval = 60;
-    }
-    if (_chartMinsAgo.value > 600) {
-      interval = 1;
+    int showTimeHours = 1;
+    if (chartHoursAgo >= 6) {
       showTime = true;
+
+      if (_chartMinsAgo.value > 1000) {
+        showTimeHours = 2;
+      }
     }
     return SideTitles(
         showTitles: true,
         reservedSize: 17,
-        interval: interval,
+        interval: 1,
         getTitlesWidget: (double value, TitleMeta meta) {
           var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 7, height: 0.5);
 
@@ -380,7 +382,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           var date = clock.now().subtract(duration);
 
           //return Spacer if value is not mod 30 or on the hour if time
-          if (showTime && (date.minute != 0 || date.hour % 2 != 0)) {
+          if (showTime && (date.minute != 0 || date.hour % showTimeHours != 0)) {
             return const SizedBox.shrink();
           } else if (!showTime && (value.toInt() % 30 != 0)) {
             return const SizedBox.shrink();

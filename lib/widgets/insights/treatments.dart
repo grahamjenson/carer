@@ -1,4 +1,4 @@
-import 'package:carer/models/treatments.dart';
+import 'package:carer/models/treatment_group.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -7,8 +7,8 @@ import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
-class History extends StatelessWidget with ThemeMixin {
-  History({super.key});
+class Treatments extends StatelessWidget with ThemeMixin {
+  Treatments({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class History extends StatelessWidget with ThemeMixin {
     }, debugLabel: "History");
   }
 
-  DataRow? historyRow(BuildContext context, Treatment treatment) {
+  DataRow? historyRow(BuildContext context, TreatmentGroup treatment) {
     TextStyle heading = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.normal,
@@ -86,7 +86,7 @@ class History extends StatelessWidget with ThemeMixin {
     ]);
   }
 
-  SmartText dateAgoShort(Treatment treatment, TextStyle row, TextStyle small) {
+  SmartText dateAgoShort(TreatmentGroup treatment, TextStyle row, TextStyle small) {
     var diff = treatment.age;
 
     if (diff.inMinutes == 0) {
@@ -115,14 +115,14 @@ class History extends StatelessWidget with ThemeMixin {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Widget insulinSmartText(Treatment treatment, TextStyle row, TextStyle small) {
+  Widget insulinSmartText(TreatmentGroup treatment, TextStyle row, TextStyle small) {
     if (treatment.insulin == 0) {
       return const SizedBox.shrink();
     }
     return SmartText(texts: ["${toMax2dp(treatment.insulin)}", "u"], styles: [row, small]);
   }
 
-  Widget carbsSmartText(Treatment treatment, TextStyle row, TextStyle small) {
+  Widget carbsSmartText(TreatmentGroup treatment, TextStyle row, TextStyle small) {
     if (treatment.carbs == 0) {
       return const SizedBox.shrink();
     }

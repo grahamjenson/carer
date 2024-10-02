@@ -44,34 +44,36 @@ class TreatmentList {
     }
   }
 
-  List<Treatment> getWindows(int windowMins) {
-    Map<int, Treatment> timeBuckets = {};
+  List<TreatmentGroup> getWindows(int windowMins) {
+    if (windowMins < 1) {
+      return [];
+    }
+
     DateTime now = clock.now();
 
     Duration windowDuration = Duration(minutes: windowMins);
-    DateTime startTime = now.subtract(Duration(minutes: now.minute % windowMins, seconds: now.second, milliseconds: now.millisecond));
+    // This is the first Start time forthe groups
+    DateTime startTime =
+        startDate.subtract(Duration(minutes: startDate.minute % windowMins, seconds: startDate.second, milliseconds: startDate.millisecond));
     DateTime endTime = startTime.add(windowDuration);
 
-    var numberOfBuckets = clock.now().difference(startDate).inMinutes / windowMins;
-
-    var treatment = Treatment(startTime, endTime);
-    timeBuckets[treatment.bucketFor(windowMins)] = treatment;
-
-    for (var i = 0; i < numberOfBuckets + 2; i++) {
-      startTime = startTime.subtract(windowDuration);
-      endTime = endTime.subtract(windowDuration);
-      treatment = Treatment(startTime, endTime);
-      timeBuckets[treatment.bucketFor(windowMins)] = treatment;
+    // This is pretty inefficient, but I dont think it is that bad
+    // plus it works
+    List<TreatmentGroup> treatments = [];
+    while (endTime.isBefore(now)) {
+      var tg = TreatmentGroup(startTime, endTime);
+      treatments.insert(0, tg);
+      for (var c in carbsModels) {
+        tg.addCarbModel(c);
+      }
+      for (var b in bolusModels) {
+        tg.addBolusModel(b);
+      }
+      startTime = startTime.add(windowDuration);
+      endTime = endTime.add(windowDuration);
     }
 
-    for (var c in carbsModels) {
-      timeBuckets[c.bucketFor(windowMins)]!.addCarbModel(c);
-    }
-
-    for (var b in bolusModels) {
-      timeBuckets[b.bucketFor(windowMins)]!.addBolusModel(b);
-    }
-    var treatments = timeBuckets.values.where((t) => t.count > 0).toList();
+    treatments = treatments.where((t) => t.count > 0).toList();
 
     return treatments;
   }
@@ -105,7 +107,7 @@ class TreatmentList {
   }
 }
 
-class Treatment with DateMixin {
+class TreatmentGroup with DateMixin {
   DateTime startDate;
   late DateTime endDate;
 
@@ -115,7 +117,7 @@ class Treatment with DateMixin {
   List<Bolus> bolusModels = [];
   List<Carbs> carbsModels = [];
 
-  Treatment(this.startDate, this.endDate) {
+  TreatmentGroup(this.startDate, this.endDate) {
     date = startDate;
   }
 
@@ -132,10 +134,9 @@ class Treatment with DateMixin {
     // Only add if carb model is between start and end date OR equal to endDate
     if ((model.date.isAfter(startDate) && (model.date.isBefore(endDate))) || model.date.isAtSameMomentAs(endDate)) {
       carbsModels.add(model);
-    }
-
-    if (model.date.isAfter(date)) {
-      date = model.date;
+      if (model.date.isAfter(date)) {
+        date = model.date;
+      }
     }
   }
 
@@ -155,9 +156,9 @@ class Treatment with DateMixin {
     // Only add if insulin model is between start and end date OR equal to endDate
     if (((model.date.isAfter(startDate) && model.date.isBefore(endDate))) || model.date.isAtSameMomentAs(endDate)) {
       bolusModels.add(model);
-    }
-    if (model.date.isAfter(date)) {
-      date = model.date;
+      if (model.date.isAfter(date)) {
+        date = model.date;
+      }
     }
   }
 
