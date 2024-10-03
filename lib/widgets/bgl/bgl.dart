@@ -31,7 +31,7 @@ class BGL extends StatelessWidget with ThemeMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Flexible(
+                  const Expanded(
                     flex: 1,
                     child: FittedBox(
                       alignment: Alignment.bottomCenter,
@@ -47,13 +47,13 @@ class BGL extends StatelessWidget with ThemeMixin {
                       ),
                     ),
                   ),
-                  Flexible(
+                  Expanded(
                     flex: 1,
                     child: FittedBox(
                       alignment: Alignment.topCenter,
                       child: Text(
                         sgv.rate5mWithSign(),
-                        style: displayLarge(context).merge(shadows()).copyWith(color: dColor, height: 0.8),
+                        style: displayLarge(context).merge(shadows()).copyWith(color: dColor, height: 1),
                       ),
                     ),
                   ),
