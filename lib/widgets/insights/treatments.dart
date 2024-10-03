@@ -54,45 +54,28 @@ class Treatments extends StatelessWidget with ThemeMixin {
   }
 
   DataRow? historyRow(BuildContext context, Treatment treatment) {
-    TextStyle heading = TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.normal,
-      color: accentColor(context),
-      height: 1,
-    );
-
-    TextStyle headingSmall = TextStyle(
-      fontSize: 15,
-      fontWeight: FontWeight.normal,
-      color: accentColor(context),
-      height: 1,
-    );
-
-    TextStyle row = const TextStyle(
-      fontSize: 25,
-      fontWeight: FontWeight.w500,
-      fontFeatures: [FontFeature.tabularFigures()],
-      height: 1,
-    );
-
-    TextStyle small = const TextStyle(
-      fontSize: 15,
-      height: 1,
-      fontFeatures: [FontFeature.tabularFigures()],
-    );
-
     return DataRow(cells: [
-      DataCell(dateAgoShort(treatment, heading, headingSmall)),
-      DataCell(insulinSmartText(treatment, row, small)),
-      DataCell(carbsSmartText(treatment, row, small)),
+      DataCell(dateAgoShort(context, treatment)),
+      DataCell(insulinSmartText(context, treatment)),
+      DataCell(carbsSmartText(context, treatment)),
     ]);
   }
 
-  SmartText dateAgoShort(Treatment treatment, TextStyle row, TextStyle small) {
+  SmartText dateAgoShort(BuildContext context, Treatment treatment) {
+    TextStyle row = bodyLarge(context).copyWith(
+      fontFeatures: [const FontFeature.tabularFigures()],
+      color: accentColor(context),
+      height: 1,
+    );
+
+    TextStyle small = row.copyWith(
+      fontSize: row.fontSize! / 2,
+    );
+
     var diff = treatment.age;
 
     if (diff.inMinutes == 0) {
-      return SmartText(texts: const ["now"], styles: [row]);
+      return SmartText(texts: const ["now"], styles: [small]);
     }
 
     List<String> texts = [];
@@ -117,7 +100,14 @@ class Treatments extends StatelessWidget with ThemeMixin {
     return SmartText(texts: texts, styles: styles);
   }
 
-  Widget insulinSmartText(Treatment treatment, TextStyle row, TextStyle small) {
+  Widget insulinSmartText(BuildContext context, Treatment treatment) {
+    TextStyle row = headlineSmall(context).copyWith(
+      fontFeatures: [const FontFeature.tabularFigures()],
+      height: 1,
+    );
+
+    TextStyle smallSub = row.copyWith(fontFeatures: [const FontFeature.subscripts()]);
+
     if (treatment.bolus == null) {
       return const SizedBox.shrink();
     }
@@ -125,21 +115,26 @@ class Treatments extends StatelessWidget with ThemeMixin {
     if (treatment.bolus!.type == BolusType.smb) {
       return SmartText(
         texts: [
-          "*",
-          "${toMax2dp(treatment.bolus!.value)}",
+          "⁺${toMax2dp(treatment.bolus!.value)}",
           "u",
         ],
         styles: [
-          row.copyWith(fontFeatures: [const FontFeature.superscripts()]),
-          row,
-          small,
+          row.copyWith(color: primaryColor(context)),
+          smallSub.copyWith(color: primaryColor(context)),
         ],
       );
     }
-    return SmartText(texts: [(toMax2dpStr(treatment.bolus!.value)), "u"], styles: [row, small]);
+    return SmartText(texts: [(toMax2dpStr(treatment.bolus!.value)), "u"], styles: [row, smallSub]);
   }
 
-  Widget carbsSmartText(Treatment treatment, TextStyle row, TextStyle small) {
+  Widget carbsSmartText(BuildContext context, Treatment treatment) {
+    TextStyle row = headlineSmall(context).copyWith(
+      fontFeatures: [const FontFeature.tabularFigures()],
+      height: 1,
+    );
+
+    TextStyle small = row.copyWith(fontFeatures: [const FontFeature.subscripts()]);
+
     if (treatment.carbs == null) {
       return const SizedBox.shrink();
     }
