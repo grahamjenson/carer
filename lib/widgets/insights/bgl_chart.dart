@@ -146,7 +146,6 @@ class BGLChart extends StatelessWidget with ThemeMixin {
               show: true,
               getDotPainter: PainterFunctions().treatmentsDotPainter(
                 context,
-                justShape: true,
               )),
         ),
       ],

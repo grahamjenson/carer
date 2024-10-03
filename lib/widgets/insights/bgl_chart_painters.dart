@@ -1,4 +1,3 @@
-import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/services/themes_service.dart';
@@ -58,11 +57,23 @@ class PainterFunctions with ThemeMixin {
       }
 
       if (spot is TreatmentSpot) {
-        return treatmentsDotPainter(context, size: 2)(
-          spot,
-          xPercentage,
-          bar,
-          index,
+        String text = spot.treatment.treatmentStr;
+        if (spot.treatment.isSmb) {
+          text = "${spot.treatment.treatmentStr}*";
+        }
+        var pcolor = color;
+
+        if (spot.treatment.bolus != null) {
+          pcolor = accentColor(context);
+        }
+
+        return FlTextPainterPainter(
+          text,
+          align: Alignment.topCenter,
+          strokeColor: Colors.black,
+          size: 16,
+          strokeWidth: 2,
+          color: pcolor,
         );
       }
       return FlDotCirclePainter(
@@ -76,7 +87,6 @@ class PainterFunctions with ThemeMixin {
   GetDotPainterCallback treatmentsDotPainter(
     BuildContext context, {
     double size = 1,
-    bool justShape = false,
   }) {
     var color = primaryColor(context);
 
@@ -95,43 +105,28 @@ class PainterFunctions with ThemeMixin {
       }
 
       var pcolor = color;
-      String text = spot.treatment.treatmentStr;
-      bool isSMB = false;
+
       if (spot.treatment.bolus != null) {
         pcolor = accentColor(context);
-        if (spot.treatment.bolus!.type == BolusType.smb) {
-          text = "${spot.treatment.treatmentStr}*";
-          isSMB = true;
-        }
       }
 
-      if (justShape) {
-        if (isSMB) {
-          return FlDotCrossPainter(
-            size: 5,
-            color: pcolor,
-          );
-        }
-        if (spot.treatment.bolus != null) {
-          return FlDotSquarePainter(
-            size: 5,
-            color: pcolor,
-            strokeColor: Colors.black,
-          );
-        }
-        return FlDotCirclePainter(
-          radius: 2,
+      if (spot.treatment.isSmb) {
+        return ChevronDotPainter(
+          isUp: false,
+          size: 5,
           color: pcolor,
-          strokeColor: Colors.black,
         );
       }
-
-      return FlTextPainterPainter(
-        text,
-        align: Alignment.topCenter,
-        strokeColor: Colors.black,
-        size: 8 * size,
-        strokeWidth: size,
+      if (spot.treatment.bolus != null) {
+        return ChevronDotPainter(
+          isUp: false,
+          size: 5,
+          color: pcolor,
+        );
+      }
+      return ChevronDotPainter(
+        isUp: true,
+        size: 5,
         color: pcolor,
       );
     };
