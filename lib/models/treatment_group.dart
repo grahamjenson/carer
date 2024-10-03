@@ -85,6 +85,7 @@ class Treatment with DateMixin {
       tl.add(Treatment(b, null));
     }
 
+    tl.sort((a, b) => b.date.compareTo(a.date));
     return tl;
   }
 }
