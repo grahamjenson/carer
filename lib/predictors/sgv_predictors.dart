@@ -71,7 +71,19 @@ abstract class RegressionPredictor extends Predictor {
 
   @override
   init() {
-    List<CleanSGV> sgvs = CleanSGV.last3Hours.value;
+    CleanSGV? lastsgv = CleanSGV.lastSGV.value;
+    if (lastsgv == null) {
+      regression = NoopRegression();
+    }
+    List<CleanSGV?> maybeSGVs = lastsgv!.before5;
+
+    List<CleanSGV> sgvs = [];
+    for (var s in maybeSGVs) {
+      if (s == null) {
+        return NoopRegression();
+      }
+      sgvs.add(s);
+    }
 
     if (sgvs.length < pastReadings) {
       regression = NoopRegression();

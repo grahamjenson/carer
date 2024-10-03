@@ -15,13 +15,12 @@ class CleanSGV with DateMixin implements ASGV {
   final DateTime date;
 
   CleanSGV? before; // previous SVGs ID
-
+  List<CleanSGV?> get before5 => [this, before, before?.before, before?.before?.before, before?.before?.before?.before];
   CleanSGV(
     this.value,
     this.date, {
     this.before,
   });
-
   int? get rate5m {
     if (before == null) {
       return null;
@@ -85,18 +84,27 @@ class CleanSGV with DateMixin implements ASGV {
   bool get withinRange => value > TargetSettings().lowTarget && value < TargetSettings().highTarget;
 
   // Hardcoded cached prediction list
-  List<CleanSGV?> predictions = [];
+  List<CleanSGV?>? predictions;
   void setPredictions(List<CleanSGV?> predictions) {
+    if (this.predictions != null) {
+      // Do not update predictions,
+      // TODO, this is a hack to stop weird issues around the time of a new reading causing issues
+      return;
+    }
     this.predictions = predictions;
   }
 
   CleanSGV? getPredictedValue(int numberReadinggsAhead) {
-    // 0 is 1 reading ahead
-    var index = numberReadinggsAhead - 1;
-    if (index < 0 || index >= predictions.length) {
+    if (predictions == null) {
       return null;
     }
-    var pred = predictions[index];
+
+    // 0 is 1 reading ahead
+    var index = numberReadinggsAhead - 1;
+    if (index < 0 || index >= predictions!.length) {
+      return null;
+    }
+    var pred = predictions![index];
     if (pred == null) {
       return null;
     }
