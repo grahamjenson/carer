@@ -18,8 +18,8 @@ class TimeAgoReading extends StatelessWidget with ThemeMixin {
         }
 
         var aColor = ageColor(context);
-        var baseFont = labelLarge(context).copyWith(height: 1).merge(shadows());
-        var countdownFont = baseFont.copyWith(fontFeatures: [const FontFeature.superscripts()]);
+        var baseFont = displayLarge(context).copyWith(height: 1, color: aColor).merge(shadows());
+
         var seconds = sgv.age.inSeconds % 300;
 
         var additionalTX = "";
@@ -27,8 +27,9 @@ class TimeAgoReading extends StatelessWidget with ThemeMixin {
           additionalTX = " (+${seconds}s)";
         }
 
-        var mediumTS = baseFont.copyWith(fontSize: 30, color: aColor);
-        var smallTS = baseFont.copyWith(color: aColor, fontSize: 10);
+        var mediumTS = baseFont;
+        var smallTS = baseFont.copyWith(color: aColor, fontSize: mediumTS.fontSize! / 2);
+        var countdownFont = smallTS.copyWith(fontFeatures: [const FontFeature.superscripts()]);
 
         Widget text;
         if (sgv.age.inMinutes == 0) {

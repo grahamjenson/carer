@@ -23,47 +23,42 @@ class BGL extends StatelessWidget with ThemeMixin {
         var rColor = rangeColor(context);
         var dColor = diffColor(context);
         return Window(
-          child: AspectRatio(
-            aspectRatio: 2,
-            child: Stack(
-              children: [
-                const Align(
-                  alignment: Alignment(0, -1.1),
-                  heightFactor: 0.1,
-                  child: FractionallySizedBox(
-                    widthFactor: 1,
-                    heightFactor: 0.2,
+          child: FittedBox(
+            child: SizedBox(
+              width: 15,
+              height: 10,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Flexible(
+                    flex: 1,
                     child: FittedBox(
-                      alignment: Alignment(0, 0),
+                      alignment: Alignment.bottomCenter,
                       child: TimeAgoReading(),
                     ),
                   ),
-                ),
-                Align(
-                    alignment: const Alignment(0, 0),
-                    child: FractionallySizedBox(
-                      widthFactor: 1,
-                      heightFactor: 0.85,
-                      child: FittedBox(
-                        child: Text(
-                          sgv.sgvStr(),
-                          style: displayLarge(context).merge(shadows()).copyWith(color: rColor, fontWeight: FontWeight.bold),
-                        ),
+                  Flexible(
+                    flex: 4,
+                    child: FittedBox(
+                      child: Text(
+                        sgv.sgvStr(),
+                        style: displayLarge(context).merge(shadows()).copyWith(height: 0.8, color: rColor, fontWeight: FontWeight.bold),
                       ),
-                    )),
-                Align(
-                  alignment: const Alignment(0, 0.9),
-                  child: FractionallySizedBox(
-                      widthFactor: 0.4,
-                      heightFactor: 0.2,
-                      child: Center(
-                        child: Text(
-                          sgv.rate5mWithSign(),
-                          style: displayMedium(context).merge(shadows()).copyWith(fontSize: 35, color: dColor),
-                        ),
-                      )),
-                ),
-              ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: FittedBox(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        sgv.rate5mWithSign(),
+                        style: displayLarge(context).merge(shadows()).copyWith(color: dColor, height: 0.8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
