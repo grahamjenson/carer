@@ -3,7 +3,6 @@ import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/valueAtTime.dart';
-import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -57,7 +56,7 @@ class Stats extends StatelessWidget with ThemeMixin {
       var sageNow = PropertiesData().sage;
 
       var sgvs = CleanSGV.last3Hours.value;
-      var exp2preds = PredictionService().predictionsForReadings;
+      var exp2preds = CleanSGV.lastSGV.value?.predictions ?? [];
 
       return Window(
         child: SingleChildScrollView(
@@ -194,14 +193,19 @@ class Stats extends StatelessWidget with ThemeMixin {
     );
   }
 
-  DataRow predictions(String name, List<CleanSGV> preds, Unit unit, TextStyle heading, TextStyle row, TextStyle small) {
+  DataRow predictions(String name, List<CleanSGV?> preds, Unit unit, TextStyle heading, TextStyle row, TextStyle small) {
     return DataRow(
       cells: [
         DataCell(Text(name, style: heading)),
         DataCell(
           SmartText(texts: [
             "${preds.map(
-              (e) => unit.str(e.value),
+              (e) {
+                if (e == null) {
+                  return "?";
+                }
+                return e.unitStr();
+              },
             )}"
           ], styles: [
             small,

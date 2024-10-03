@@ -16,7 +16,6 @@ class PredictionService {
   factory PredictionService() => _singleton;
 
   late ASignal<List<CleanSGV>> predictionsSignal = ASignal<List<CleanSGV>>([], debugLabel: "Predictions");
-  late ASignal<List<CleanSGV>> predictionsForReadingsSignal = ASignal<List<CleanSGV>>([], debugLabel: "predictionsForReadings");
 
   PredictionService._() {
     signalAssign(predictionsSignal, () {
@@ -28,9 +27,10 @@ class PredictionService {
         return em;
       }
       return exp2predictor.predictNextHour();
-    }, debugLabel: "Predictions", dependencies: [TimerService().minuteSignal, CleanSGV.lastSGV]);
+    }, debugLabel: "Predictions", dependencies: [CleanSGV.lastSGV]);
 
-    signalAssign(predictionsForReadingsSignal, () {
+    // Attach the predictions to the lastest SGV
+    aeffect(() {
       var lastSGV = CleanSGV.lastSGV.value;
       if (lastSGV == null) {
         final List<CleanSGV> em = [];
@@ -43,12 +43,11 @@ class PredictionService {
         prs.add(_getPredictionAt(predictions, futureDate));
       }
 
-      return prs.whereType<CleanSGV>().toList();
-    }, debugLabel: "PredictionService", dependencies: [predictionsSignal]);
+      lastSGV.setPredictions(prs);
+    }, debugLabel: "PredictionService", dependencies: [predictionsSignal, CleanSGV.lastSGV]);
   }
 
   List<CleanSGV> get predictions => predictionsSignal.value;
-  List<CleanSGV> get predictionsForReadings => predictionsForReadingsSignal.value;
 
   // Get Values at specific time
   CleanSGV? getPredictionAt(DateTime time) {
@@ -65,28 +64,6 @@ class PredictionService {
 
   Range5? getPredictionAtRange(DateTime time) {
     CleanSGV? sgv = predictions.firstWhereOrNull((e) => e.date.isAfter(time));
-    if (sgv == null) {
-      return null;
-    }
-
-    return sgv.range;
-  }
-
-  // Get values ahead of the current reading
-  CleanSGV? getReadingsAhead(int readingsAhead) {
-    return predictionsForReadings.elementAtOrNull(readingsAhead - 1);
-  }
-
-  int getReadingsAheadValue(int readingsAhead) {
-    var sgv = getReadingsAhead(readingsAhead);
-    if (sgv == null) {
-      return 0;
-    }
-    return sgv.value;
-  }
-
-  Range5? getReadingsAheadRange(int readingsAhead) {
-    var sgv = getReadingsAhead(readingsAhead);
     if (sgv == null) {
       return null;
     }

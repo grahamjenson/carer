@@ -84,6 +84,26 @@ class CleanSGV with DateMixin implements ASGV {
 
   bool get withinRange => value > TargetSettings().lowTarget && value < TargetSettings().highTarget;
 
+  // Hardcoded cached prediction list
+  List<CleanSGV?> predictions = [];
+  void setPredictions(List<CleanSGV?> predictions) {
+    this.predictions = predictions;
+  }
+
+  CleanSGV? getPredictedValue(int numberReadinggsAhead) {
+    // 0 is 1 reading ahead
+    var index = numberReadinggsAhead - 1;
+    if (index < 0 || index >= predictions.length) {
+      return null;
+    }
+    var pred = predictions[index];
+    if (pred == null) {
+      return null;
+    }
+    // caching is to stop changes in prediction list.
+    return pred;
+  }
+
   static List<CleanSGV> _makeChained(List<CleanSGV> sgvs) {
     if (sgvs.isEmpty || sgvs.length == 1) {
       return sgvs;

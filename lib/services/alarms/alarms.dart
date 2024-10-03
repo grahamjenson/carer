@@ -1,7 +1,6 @@
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
-import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -148,6 +147,15 @@ abstract class AlarmMethods {
   String unitStr(int value) {
     return UISettings().unit.str(value);
   }
+
+  CleanSGV? getPredictedValue(int numberOfReadings) {
+    var lastSGV = CleanSGV.lastSGV.value;
+    if (lastSGV == null) {
+      return null;
+    }
+
+    return lastSGV.getPredictedValue(numberOfReadings);
+  }
 }
 
 class UrgentLowAlarm extends AlarmMethods {
@@ -179,7 +187,7 @@ class LowAlarm extends AlarmMethods {
       return "Low (<${unitStr(TargetSettings().lowTarget)})";
     }
     if (_predictiveTrigger()) {
-      var sgv = PredictionService().getReadingsAhead(numberOfReadings);
+      var sgv = getPredictedValue(numberOfReadings);
       if (sgv == null) {
         return "?";
       }
@@ -196,7 +204,7 @@ class LowAlarm extends AlarmMethods {
     return [
       "sgv(${lastSGVStr()})",
       "number($numberOfReadings)",
-      "prediction(${PredictionService().getReadingsAhead(numberOfReadings)})",
+      "prediction(${getPredictedValue(numberOfReadings)})",
     ];
   }
 
@@ -219,7 +227,8 @@ class LowAlarm extends AlarmMethods {
     if (!AlarmSettings().lowPredictionAlarm) {
       return false;
     }
-    CleanSGV? sgv = PredictionService().getReadingsAhead(numberOfReadings);
+    var sgv = getPredictedValue(numberOfReadings);
+
     if (sgv == null) {
       return false;
     }
@@ -279,7 +288,7 @@ class HighAlarm extends AlarmMethods {
   @override
   bool smartSnooze() {
     // TODO: make readings ahead adjustable
-    CleanSGV? sgv = PredictionService().getReadingsAhead(3);
+    CleanSGV? sgv = getPredictedValue(3);
     if (sgv == null) {
       return false;
     }

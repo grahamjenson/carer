@@ -10,6 +10,7 @@ import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/background_service.dart';
 import 'package:carer/services/notification_service.dart';
+import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -70,6 +71,7 @@ void runCarer() async {
   UpdateService().start();
   AlarmsService();
   ThemeService();
+  PredictionService();
 
   ////
   // SQL Signals
