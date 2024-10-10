@@ -1,4 +1,3 @@
-import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
@@ -46,7 +45,6 @@ class Treatments extends StatelessWidget with ThemeMixin {
                     columns: [
                       DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
                       DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
-                      DataColumn(numeric: true, label: Container(alignment: Alignment.center, child: const Text('      '))),
                     ],
                     rows: history))),
       );
@@ -54,11 +52,19 @@ class Treatments extends StatelessWidget with ThemeMixin {
   }
 
   DataRow? historyRow(BuildContext context, Treatment treatment) {
-    return DataRow(cells: [
-      DataCell(dateAgoShort(context, treatment)),
-      DataCell(insulinSmartText(context, treatment)),
-      DataCell(carbsSmartText(context, treatment)),
-    ]);
+    if (treatment.isBolus) {
+      return DataRow(cells: [
+        DataCell(dateAgoShort(context, treatment)),
+        DataCell(insulinSmartText(context, treatment)),
+      ]);
+    }
+    if (treatment.isCarb) {
+      return DataRow(cells: [
+        DataCell(dateAgoShort(context, treatment)),
+        DataCell(carbsSmartText(context, treatment)),
+      ]);
+    }
+    return null;
   }
 
   SmartText dateAgoShort(BuildContext context, Treatment treatment) {
@@ -70,6 +76,7 @@ class Treatments extends StatelessWidget with ThemeMixin {
 
     TextStyle small = row.copyWith(
       fontSize: row.fontSize! / 2,
+      color: onBackgroundColor(context).dim,
     );
 
     var diff = treatment.age;
@@ -101,22 +108,21 @@ class Treatments extends StatelessWidget with ThemeMixin {
   }
 
   Widget insulinSmartText(BuildContext context, Treatment treatment) {
+    if (!treatment.isBolus) {
+      return const SizedBox.shrink();
+    }
     TextStyle row = headlineSmall(context).copyWith(
       fontFeatures: [const FontFeature.tabularFigures()],
       height: 1,
-      color: onBackgroundColor(context),
+      color: accentColor(context),
     );
 
     TextStyle smallSub = row.copyWith(
       fontFeatures: [const FontFeature.subscripts()],
-      color: onBackgroundColor(context).dim,
+      color: accentColor(context).dim,
     );
 
-    if (treatment.bolus == null) {
-      return const SizedBox.shrink();
-    }
-
-    if (treatment.bolus!.type == BolusType.smb) {
+    if (treatment.isSmb) {
       return SmartText(
         texts: [
           "⁺${toMax2dp(treatment.bolus!.value)}",
@@ -132,20 +138,21 @@ class Treatments extends StatelessWidget with ThemeMixin {
   }
 
   Widget carbsSmartText(BuildContext context, Treatment treatment) {
+    if (!treatment.isCarb) {
+      return const SizedBox.shrink();
+    }
+
     TextStyle row = headlineSmall(context).copyWith(
       fontFeatures: [const FontFeature.tabularFigures()],
       height: 1,
-      color: onBackgroundColor(context),
+      color: primaryColor(context),
     );
 
     TextStyle small = row.copyWith(
       fontFeatures: [const FontFeature.subscripts()],
-      color: onBackgroundColor(context).dim,
+      color: primaryColor(context).dim,
     );
 
-    if (treatment.carbs == null) {
-      return const SizedBox.shrink();
-    }
     return SmartText(texts: [toMax2dpStr(treatment.carbs!.value), "g"], styles: [row, small]);
   }
 }

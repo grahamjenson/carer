@@ -1,4 +1,3 @@
-import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/models/valueAtTime.dart';
@@ -35,7 +34,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       var bglSpotData = bglSpots(sgvs);
       var (basalSpotData, maxBasal) = basalSpots(targets);
       var (lowTargets, highTargets) = targetSpots(targets);
-      var treatments = treatmentsSpots(lastTreatments);
+      var (carbSpots, bolusSpots) = treatmentsSpots(lastTreatments);
 
       var buttonTextStyle = labelLarge(context).copyWith(color: onBackgroundColor(context));
       return Window(
@@ -75,7 +74,17 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           Flexible(
             flex: 90,
             child: LineChart(
-              buildlineChartData(context, minsAgo, maxBasal, bglSpotData, basalSpotData, lowTargets, highTargets, treatments),
+              buildlineChartData(
+                context,
+                minsAgo,
+                maxBasal,
+                bglSpotData,
+                basalSpotData,
+                lowTargets,
+                highTargets,
+                carbSpots,
+                bolusSpots,
+              ),
               duration: Duration.zero,
             ),
           ),
@@ -92,7 +101,8 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     List<FlSpot> basalSpotData,
     List<FlSpot> lowTargets,
     List<FlSpot> highTargets,
-    List<FlSpot> treatments,
+    List<FlSpot> carbTreatmentSpots,
+    List<FlSpot> bolusTreatmentSpots,
   ) {
     double maxY = 306;
     double minY = 0;
@@ -141,7 +151,16 @@ class BGLChart extends StatelessWidget with ThemeMixin {
           dotData: const FlDotData(show: false),
         ),
         LineChartBarData(
-          spots: treatments,
+          spots: carbTreatmentSpots,
+          barWidth: 0,
+          dotData: FlDotData(
+              show: true,
+              getDotPainter: PainterFunctions().treatmentsDotPainter(
+                context,
+              )),
+        ),
+        LineChartBarData(
+          spots: bolusTreatmentSpots,
           barWidth: 0,
           dotData: FlDotData(
               show: true,
@@ -157,8 +176,9 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  List<FlSpot> treatmentsSpots(List<Treatment> lastTreatments) {
-    List<FlSpot> spots = [];
+  (List<FlSpot>, List<FlSpot>) treatmentsSpots(List<Treatment> lastTreatments) {
+    List<FlSpot> carbSpots = [];
+    List<FlSpot> bolusSpots = [];
 
     // we are going to pain these all at the same height and if they are too close to one another we will decrese height by 10
     Treatment? lastTreatment;
@@ -171,18 +191,16 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         diff = 0;
       }
 
-      if (treatment.bolus != null && treatment.bolus!.type == BolusType.smb) {
-        spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 255, treatment));
-      } else if (treatment.bolus != null) {
-        spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 265, treatment));
+      if (treatment.isBolus) {
+        bolusSpots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 268, treatment));
       } else {
-        spots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 280, treatment));
+        carbSpots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 280, treatment));
       }
 
       lastTreatment = treatment;
     }
 
-    return spots;
+    return (carbSpots, bolusSpots);
   }
 
   List<FlSpot> bglSpots(List<ASGV> sgvs) {

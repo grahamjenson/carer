@@ -37,12 +37,20 @@ class PainterFunctions with ThemeMixin {
       double? size,
     }) {
       if (spot is BGLSpot) {
+        var circle = FlDotCirclePainter(
+          radius: 3,
+          color: color,
+          strokeColor: Colors.black,
+          strokeWidth: 2,
+        );
+
         return FlTextPainterPainter(
           spot.sgv.sgvStr(),
           strokeColor: Colors.black,
           size: 12,
           color: color,
           align: Alignment.topCenter,
+          shapePainter: circle,
         );
       }
 
@@ -62,18 +70,21 @@ class PainterFunctions with ThemeMixin {
           text = "${spot.treatment.treatmentStr}*";
         }
         var pcolor = color;
-
-        if (spot.treatment.bolus != null) {
+        var align = Alignment.topCenter;
+        if (spot.treatment.isBolus) {
           pcolor = accentColor(context);
+          align = Alignment.bottomCenter;
         }
 
+        var painter = _getPainterForTreatmentSpot(spot.treatment, context, size: 1.3);
         return FlTextPainterPainter(
           text,
-          align: Alignment.topCenter,
+          align: align,
           strokeColor: Colors.black,
-          size: 16,
+          size: 12,
           strokeWidth: 2,
           color: pcolor,
+          shapePainter: painter,
         );
       }
       return FlDotCirclePainter(
@@ -88,8 +99,6 @@ class PainterFunctions with ThemeMixin {
     BuildContext context, {
     double size = 1,
   }) {
-    var color = primaryColor(context);
-
     return (
       FlSpot spot,
       double xPercentage,
@@ -98,38 +107,37 @@ class PainterFunctions with ThemeMixin {
     ) {
       if (spot is! TreatmentSpot) {
         return FlDotCirclePainter(
-          radius: 2,
-          color: color,
-          strokeColor: color,
+          radius: 0,
         );
       }
-
-      var pcolor = color;
-
-      if (spot.treatment.bolus != null) {
-        pcolor = accentColor(context);
-      }
-
-      if (spot.treatment.isSmb) {
-        return ChevronDotPainter(
-          isUp: false,
-          size: 5,
-          color: pcolor,
-        );
-      }
-      if (spot.treatment.bolus != null) {
-        return ChevronDotPainter(
-          isUp: false,
-          size: 5,
-          color: pcolor,
-        );
-      }
-      return ChevronDotPainter(
-        isUp: true,
-        size: 5,
-        color: pcolor,
-      );
+      return _getPainterForTreatmentSpot(spot.treatment, context);
     };
+  }
+
+  ChevronDotPainter _getPainterForTreatmentSpot(Treatment treatment, BuildContext context, {double size = 1}) {
+    if (treatment.isSmb) {
+      return ChevronDotPainter(
+        isUp: false,
+        size: 6 * size,
+        color: accentColor(context),
+        strokeColor: primaryColor(context),
+      );
+    }
+    if (treatment.isBolus) {
+      return ChevronDotPainter(
+        isUp: false,
+        size: 6 * size,
+        color: accentColor(context),
+        strokeColor: accentColor(context),
+      );
+    }
+    // Carbs
+    return ChevronDotPainter(
+      isUp: true,
+      size: 6 * size,
+      color: primaryColor(context),
+      strokeColor: primaryColor(context),
+    );
   }
 
   GetDotPainterCallback bglDotPainter(BuildContext context) {
@@ -177,8 +185,12 @@ class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
     this.strokeColor = const Color.fromRGBO(76, 175, 80, 1),
     this.strokeWidth = 1.0,
     this.align = Alignment.bottomCenter,
+    this.shapePainter,
   });
+
   final Alignment align;
+
+  final FlDotPainter? shapePainter;
 
   /// The fill color to use for the square
   final Color color;
@@ -208,13 +220,9 @@ class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
   /// Implementation of the parent class to draw the square
   @override
   void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
-    var circle = FlDotCirclePainter(
-      radius: 3,
-      color: color,
-      strokeColor: strokeColor,
-      strokeWidth: strokeWidth,
-    );
-    circle.draw(canvas, spot, offsetInCanvas);
+    if (shapePainter != null) {
+      shapePainter!.draw(canvas, spot, offsetInCanvas);
+    }
 
     // Create a TextSpan
     var span = TextSpan(
@@ -278,11 +286,13 @@ class FlTextPainterPainter extends FlDotPainter with ThemeMixin {
 class ChevronDotPainter extends FlDotPainter {
   final bool isUp;
   final Color color;
+  final Color strokeColor;
   final double size;
 
   ChevronDotPainter({
     required this.isUp,
     required this.color,
+    required this.strokeColor,
     this.size = 10.0,
   });
 
@@ -291,6 +301,11 @@ class ChevronDotPainter extends FlDotPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
+
+    final strokePaint = Paint()
+      ..color = strokeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
 
     final path = Path();
     if (isUp) {
@@ -304,6 +319,7 @@ class ChevronDotPainter extends FlDotPainter {
     }
     path.close();
 
+    canvas.drawPath(path, strokePaint);
     canvas.drawPath(path, paint);
   }
 

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 class SnoozeTimePage extends StatefulWidget {
   const SnoozeTimePage(this.popTime, {super.key});
-  static const TextStyle textStyle = TextStyle(fontSize: 50);
 
   final int popTime;
   static const List<int> minutesTimes = [5, 10, 20, 30, 45];
@@ -44,11 +43,13 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle textStyle = TextStyle(fontSize: 50, color: accentColor(context));
     var buttonStyle = ElevatedButton.styleFrom(
+      textStyle: textStyle,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8), // Square shape
         side: BorderSide(
-          color: primaryColor(context),
+          color: accentColor(context),
           width: 2,
         ), // Border color and width
       ),
@@ -74,7 +75,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             // Generate 100 widgets that display their index in the List.
-            children: getSnoozeButtonsLayout(context, buttonStyle) +
+            children: getSnoozeButtonsLayout(context, buttonStyle, textStyle) +
                 [
                   const Divider(),
                   SizedBox(
@@ -83,7 +84,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                       onPressed: () {
                         setSnooze(null);
                       },
-                      child: const Text("Cancel", style: SnoozeTimePage.textStyle),
+                      child: Text("Cancel", style: textStyle),
                     ),
                   ),
                   const Divider(),
@@ -94,9 +95,9 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     );
   }
 
-  List<Widget> getSnoozeButtonsLayout(BuildContext context, ButtonStyle buttonStyle) {
+  List<Widget> getSnoozeButtonsLayout(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
     final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
-    var mins = getMinuteButtons(context, buttonStyle);
+    var mins = getMinuteButtons(context, buttonStyle, textStyle);
 
     if (horizontal) {
       return [
@@ -110,7 +111,8 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
         Expanded(
           child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: getHourButtons(context, buttonStyle) + [const VerticalDivider()] + getTimeButtons(context, buttonStyle)),
+              children:
+                  getHourButtons(context, buttonStyle, textStyle) + [const VerticalDivider()] + getTimeButtons(context, buttonStyle, textStyle)),
         ),
       ];
     }
@@ -131,20 +133,20 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
       Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: getHourButtons(context, buttonStyle),
+          children: getHourButtons(context, buttonStyle, textStyle),
         ),
       ),
       const Divider(),
       Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: getTimeButtons(context, buttonStyle),
+          children: getTimeButtons(context, buttonStyle, textStyle),
         ),
       ),
     ];
   }
 
-  List<Widget> getMinuteButtons(BuildContext context, ButtonStyle buttonStyle) {
+  List<Widget> getMinuteButtons(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
     List<Widget> minuteButtons = [];
 
     for (var time in SnoozeTimePage.minutesTimes) {
@@ -158,7 +160,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
             },
             child: Text(
               "${time}m",
-              style: SnoozeTimePage.textStyle,
+              style: textStyle,
             ),
           ),
         ),
@@ -168,7 +170,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     return minuteButtons;
   }
 
-  List<Widget> getHourButtons(BuildContext context, ButtonStyle buttonStyle) {
+  List<Widget> getHourButtons(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
     List<Widget> hourButtons = [];
 
     for (var time in SnoozeTimePage.hoursTimes) {
@@ -182,7 +184,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
             },
             child: Text(
               "${time}h",
-              style: SnoozeTimePage.textStyle,
+              style: textStyle,
             ),
           ),
         ),
@@ -192,7 +194,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     return hourButtons;
   }
 
-  List<Widget> getTimeButtons(BuildContext context, ButtonStyle buttonStyle) {
+  List<Widget> getTimeButtons(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
     List<Widget> timeButtons = [];
 
     for (var time in SnoozeTimePage.timeTimes) {
@@ -205,7 +207,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
           },
           child: Text(
             Dates.stringOf24HourTime(time),
-            style: SnoozeTimePage.textStyle,
+            style: textStyle,
           ),
         ),
       ));

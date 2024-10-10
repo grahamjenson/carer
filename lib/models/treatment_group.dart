@@ -53,7 +53,11 @@ class Treatment with DateMixin {
     return '${toMax2dpStr(carbs!.value)}g';
   }
 
-  bool get isSmb => bolus != null && bolus!.type == BolusType.smb;
+  bool get isBolus => bolus != null;
+  bool get isCarb => carbs != null;
+
+  bool get isSmb => isBolus && bolus!.type == BolusType.smb;
+
   ////
   // Signals
   ////

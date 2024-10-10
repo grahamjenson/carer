@@ -16,7 +16,7 @@ class DeviceSettingsWidget extends AbstractSettingsSection {
       ];
 
       return SettingsSection(
-        title: const Text('Device Settings'),
+        title: const Text('Status Settings'),
         tiles: tiles,
       );
     }, debugLabel: "DeviceSettingsWidget");
