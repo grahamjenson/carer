@@ -62,9 +62,9 @@ class Treatments extends StatelessWidget with ThemeMixin {
   }
 
   SmartText dateAgoShort(BuildContext context, Treatment treatment) {
-    TextStyle row = bodyLarge(context).copyWith(
+    TextStyle row = headlineSmall(context).copyWith(
       fontFeatures: [const FontFeature.tabularFigures()],
-      color: accentColor(context),
+      color: onBackgroundColor(context),
       height: 1,
     );
 
@@ -123,8 +123,8 @@ class Treatments extends StatelessWidget with ThemeMixin {
           "u",
         ],
         styles: [
-          row.copyWith(color: primaryColor(context)),
-          smallSub.copyWith(color: primaryColor(context).dim),
+          row,
+          smallSub,
         ],
       );
     }

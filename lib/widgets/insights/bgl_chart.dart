@@ -37,6 +37,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       var (lowTargets, highTargets) = targetSpots(targets);
       var treatments = treatmentsSpots(lastTreatments);
 
+      var buttonTextStyle = labelLarge(context).copyWith(color: onBackgroundColor(context));
       return Window(
         child: Column(children: [
           Flexible(
@@ -65,11 +66,11 @@ class BGLChart extends StatelessWidget with ThemeMixin {
                     }
                   },
                   children: [
-                    Text("2h", style: labelLarge(context)),
-                    Text("4h", style: labelLarge(context)),
-                    Text("6h", style: labelLarge(context)),
-                    Text("12h", style: labelLarge(context)),
-                    Text("24h", style: labelLarge(context)),
+                    Text("2h", style: buttonTextStyle),
+                    Text("4h", style: buttonTextStyle),
+                    Text("6h", style: buttonTextStyle),
+                    Text("12h", style: buttonTextStyle),
+                    Text("24h", style: buttonTextStyle),
                   ])),
           Flexible(
             flex: 90,
@@ -112,7 +113,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     return LineChartData(
       rangeAnnotations: rangeAnnotations(pColor.withAlpha(45)),
       gridData: gridData(opColor.withAlpha(20)),
-      titlesData: titleData(maxBasal),
+      titlesData: titleData(context, maxBasal),
       borderData: borderData(opColor.withAlpha(20)),
       maxX: maxX,
       minX: minX,
@@ -291,17 +292,17 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  FlTitlesData titleData(double maxBasal) {
+  FlTitlesData titleData(BuildContext context, double maxBasal) {
     return FlTitlesData(
       show: true,
-      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(maxBasal)),
+      rightTitles: AxisTitles(sideTitles: rightTitleWidgets(context, maxBasal)),
       topTitles: const AxisTitles(
         sideTitles: SideTitles(showTitles: false),
       ),
       bottomTitles: AxisTitles(
-        sideTitles: bottomTitleWidgets(),
+        sideTitles: bottomTitleWidgets(context),
       ),
-      leftTitles: AxisTitles(sideTitles: leftTitleWidgets()),
+      leftTitles: AxisTitles(sideTitles: leftTitleWidgets(context)),
     );
   }
 
@@ -343,7 +344,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  SideTitles bottomTitleWidgets() {
+  SideTitles bottomTitleWidgets(BuildContext context) {
     bool showTime = false;
     int showTimeHours = 1;
     if (chartHoursAgo >= 6) {
@@ -358,7 +359,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         reservedSize: 17,
         interval: 1,
         getTitlesWidget: (double value, TitleMeta meta) {
-          var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 7, height: 0.5);
+          var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 7, height: 0.5, color: onBackgroundColor(context));
 
           var duration = Duration(minutes: value.toInt().abs());
           var date = clock.now().subtract(duration);
@@ -382,13 +383,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         });
   }
 
-  SideTitles rightTitleWidgets(double maxBasal) {
+  SideTitles rightTitleWidgets(BuildContext context, double maxBasal) {
     return SideTitles(
       showTitles: true,
       interval: 1,
       reservedSize: 19,
       getTitlesWidget: (double value, TitleMeta meta) {
-        var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 6, height: 0.5);
+        var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, height: 0.5, color: onBackgroundColor(context));
 
         bool drawTitle = (value == basalMultiplier.toDouble() || value == basalMultiplier.toDouble() / 2);
 
@@ -407,13 +408,13 @@ class BGLChart extends StatelessWidget with ThemeMixin {
     );
   }
 
-  SideTitles leftTitleWidgets() {
+  SideTitles leftTitleWidgets(BuildContext context) {
     return SideTitles(
       showTitles: true,
       interval: 1,
       reservedSize: 18,
       getTitlesWidget: (double value, TitleMeta meta) {
-        var style = const TextStyle(fontWeight: FontWeight.bold, fontSize: 6, height: 0.5);
+        var style = TextStyle(fontWeight: FontWeight.bold, fontSize: 6, height: 0.5, color: onBackgroundColor(context));
 
         if (value.toInt() == TargetSettings().highUrgent ||
             value.toInt() == TargetSettings().lowUrgent ||
