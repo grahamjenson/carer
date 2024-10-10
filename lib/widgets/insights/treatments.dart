@@ -104,9 +104,13 @@ class Treatments extends StatelessWidget with ThemeMixin {
     TextStyle row = headlineSmall(context).copyWith(
       fontFeatures: [const FontFeature.tabularFigures()],
       height: 1,
+      color: onBackgroundColor(context),
     );
 
-    TextStyle smallSub = row.copyWith(fontFeatures: [const FontFeature.subscripts()]);
+    TextStyle smallSub = row.copyWith(
+      fontFeatures: [const FontFeature.subscripts()],
+      color: onBackgroundColor(context).dim,
+    );
 
     if (treatment.bolus == null) {
       return const SizedBox.shrink();
@@ -120,7 +124,7 @@ class Treatments extends StatelessWidget with ThemeMixin {
         ],
         styles: [
           row.copyWith(color: primaryColor(context)),
-          smallSub.copyWith(color: primaryColor(context)),
+          smallSub.copyWith(color: primaryColor(context).dim),
         ],
       );
     }
@@ -131,9 +135,13 @@ class Treatments extends StatelessWidget with ThemeMixin {
     TextStyle row = headlineSmall(context).copyWith(
       fontFeatures: [const FontFeature.tabularFigures()],
       height: 1,
+      color: onBackgroundColor(context),
     );
 
-    TextStyle small = row.copyWith(fontFeatures: [const FontFeature.subscripts()]);
+    TextStyle small = row.copyWith(
+      fontFeatures: [const FontFeature.subscripts()],
+      color: onBackgroundColor(context).dim,
+    );
 
     if (treatment.carbs == null) {
       return const SizedBox.shrink();

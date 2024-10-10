@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +21,10 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
           ),
         ),
       );
-    }, dependencies: [AlarmAlertSettings().snoozeUntilSignal], debugLabel: "SnoozeTextStatus");
+    }, dependencies: [
+      AlarmAlertSettings().snoozeUntilSignal,
+      TimerService().tenSecondSignal, // Needed to update the time until snooze ends
+    ], debugLabel: "SnoozeTextStatus");
   }
 
   bool isSnoozing() {

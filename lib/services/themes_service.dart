@@ -20,6 +20,8 @@ class ColorSchemes {
   static const secondaryFgColor = Color(0xFF080705);
   static const accentColor = Color(0xFF3accf8);
   static const accentFgColor = Color(0xFF080705);
+  static const errorColor = Color(0xffB3261E);
+  static const onErrorColor = Color(0xffFFFFFF);
 
   static const colorScheme = ColorScheme(
     brightness: Brightness.dark,
@@ -31,32 +33,22 @@ class ColorSchemes {
     onTertiary: accentFgColor,
     surface: backgroundColor,
     onSurface: textColor,
-    error: Brightness.dark == Brightness.light ? Color(0xffB3261E) : Color(0xffF2B8B5),
-    onError: Brightness.dark == Brightness.light ? Color(0xffFFFFFF) : Color(0xff601410),
+    error: errorColor,
+    onError: onErrorColor,
   );
 
-  // exported from https://www.realtimecolors.com/?colors=848484-000000-777676-8d8d8d-b1b1b1&fonts=Inter-Inter
-  static const darktextColor = Color(0xFF848484);
-  static const darkbackgroundColor = Color(0xFF000000);
-  static const darkprimaryColor = Color(0xFF777676);
-  static const darkprimaryFgColor = Color(0xFF000000);
-  static const darksecondaryColor = Color(0xFF8d8d8d);
-  static const darksecondaryFgColor = Color(0xFF000000);
-  static const darkaccentColor = Color(0xFFb1b1b1);
-  static const darkaccentFgColor = Color(0xFF000000);
-
-  static const darkcolorScheme = ColorScheme(
+  static var darkcolorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: darkprimaryColor,
-    onPrimary: darkprimaryFgColor,
-    secondary: darksecondaryColor,
-    onSecondary: darksecondaryFgColor,
-    tertiary: darkaccentColor,
-    onTertiary: darkaccentFgColor,
-    surface: darkbackgroundColor,
-    onSurface: darktextColor,
-    error: Brightness.dark == Brightness.light ? Color(0xffB3261E) : Color(0xffF2B8B5),
-    onError: Brightness.dark == Brightness.light ? Color(0xffFFFFFF) : Color(0xff601410),
+    primary: colorScheme.primary.dim,
+    onPrimary: colorScheme.onPrimary.dim,
+    secondary: colorScheme.secondary.dim,
+    onSecondary: colorScheme.onSecondary.dim,
+    tertiary: colorScheme.tertiary.dim,
+    onTertiary: colorScheme.onTertiary.dim,
+    surface: colorScheme.surface.dim,
+    onSurface: colorScheme.onSurface.dim,
+    error: colorScheme.error.dim,
+    onError: colorScheme.onError.dim,
   );
 }
 
@@ -271,7 +263,7 @@ mixin ThemeMixin {
       return theme.error;
     }
     if (sgv.isNormal) {
-      return null;
+      return onBackgroundColor(context);
     }
     if (sgv.isLow || sgv.isHigh) {
       return primaryColor(context);
@@ -288,7 +280,7 @@ mixin ThemeMixin {
     }
     var diffRange = sgv.diffRange;
     if (diffRange == Range7.mid) {
-      return null;
+      return onBackgroundColor(context);
     }
     if (diffRange == Range7.low || diffRange == Range7.high) {
       return primaryColor(context);
@@ -306,7 +298,7 @@ mixin ThemeMixin {
 
     var seconds = sgv.age.inSeconds % 300;
     if (seconds < 300) {
-      return null;
+      return onBackgroundColor(context);
     }
     return primaryColor(context);
   }

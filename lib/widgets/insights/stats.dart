@@ -27,14 +27,15 @@ class Stats extends StatelessWidget with ThemeMixin {
       fontSize: 25,
       fontWeight: FontWeight.w500,
       fontFeatures: const [FontFeature.tabularFigures()],
-      color: labelSmall(context).color!,
+      color: onBackgroundColor(context),
       height: 1,
     );
 
-    TextStyle small = const TextStyle(
+    TextStyle small = TextStyle(
       fontSize: 10,
-      fontFeatures: [FontFeature.tabularFigures()],
+      fontFeatures: const [FontFeature.tabularFigures()],
       height: 1,
+      color: onBackgroundColor(context).dim,
     );
 
     return AWatch((context) {

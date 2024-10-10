@@ -227,6 +227,18 @@ class LowAlarm extends AlarmMethods {
     if (!AlarmSettings().lowPredictionAlarm) {
       return false;
     }
+
+    // Do not trigger predictive low if data is 15 mins out of date so like 3-4 readings
+    var lastSGV = CleanSGV.lastSGV.value;
+    if (lastSGV == null) {
+      return false;
+    }
+
+    if (lastSGV.age > const Duration(minutes: 15)) {
+      return false;
+    }
+
+    // Check prediction
     var sgv = getPredictedValue(numberOfReadings);
 
     if (sgv == null) {
