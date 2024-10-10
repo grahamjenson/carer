@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';

@@ -1,5 +1,13 @@
-import 'package:carer/mappers/ns_to_models.dart';
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/ns/bolus.dart';
+import 'package:carer/mappers/ns/carbs.dart';
+import 'package:carer/mappers/ns/profile.dart';
+import 'package:carer/mappers/ns/tempbasal.dart';
+import 'package:carer/mappers/ns/temptarget.dart';
+import 'package:carer/mappers/sql/bolus.dart';
+import 'package:carer/mappers/sql/carbs.dart';
+import 'package:carer/mappers/sql/profile.dart';
+import 'package:carer/mappers/sql/tempbasal.dart';
+import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/sql/carbs.dart';
 import 'package:carer/models/sql/profile.dart';

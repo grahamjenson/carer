@@ -1,5 +1,7 @@
 // Non persisted combined model of Bolus and Carbs
-import 'package:carer/mappers/sql_mappers.dart';
+
+import 'package:carer/mappers/sql/bolus.dart';
+import 'package:carer/mappers/sql/carbs.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/bolus.dart';
 import 'package:carer/models/sql/carbs.dart';

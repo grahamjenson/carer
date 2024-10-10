@@ -1,4 +1,6 @@
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/sql/profile.dart';
+import 'package:carer/mappers/sql/tempbasal.dart';
+import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/db_model.dart';
 import 'package:carer/models/sql/profile.dart';

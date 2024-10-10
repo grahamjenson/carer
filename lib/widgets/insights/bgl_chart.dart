@@ -192,7 +192,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       }
 
       if (treatment.isBolus) {
-        bolusSpots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 268, treatment));
+        bolusSpots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 265, treatment));
       } else {
         carbSpots.add(TreatmentSpot(-treatment.age.inMinutes.toDouble(), 280, treatment));
       }

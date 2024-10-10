@@ -1,4 +1,4 @@
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/sql/db_model.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';

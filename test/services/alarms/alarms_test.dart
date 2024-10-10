@@ -1,4 +1,9 @@
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/sql/bolus.dart';
+import 'package:carer/mappers/sql/carbs.dart';
+import 'package:carer/mappers/sql/profile.dart';
+import 'package:carer/mappers/sql/sgv.dart';
+import 'package:carer/mappers/sql/tempbasal.dart';
+import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/settings/alarm_settings.dart';

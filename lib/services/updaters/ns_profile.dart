@@ -1,5 +1,5 @@
-import 'package:carer/mappers/ns_to_models.dart';
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/ns/profile.dart';
+import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';

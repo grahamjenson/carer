@@ -1,4 +1,4 @@
-import 'package:carer/mappers/sql_mappers.dart';
+import 'package:carer/mappers/sql/tempbasal.dart';
 import 'package:carer/models/sql/db_model.dart';
 
 class TempBasal extends DateRangeDBModel {
