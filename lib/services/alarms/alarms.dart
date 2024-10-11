@@ -110,7 +110,7 @@ abstract class AlarmMethods {
   Map<String, dynamic> conditions() {
     CleanSGV? lastSGV = CleanSGV.lastSGV.value;
     return {
-      "lastSGV": lastSGV?.value,
+      "lastSGV": lastSGV?.toString(),
       "LastSGVStr": lastSGVStr(),
       "lastSGVAgeInMinutes": lastSGV?.age.inMinutes,
       "targetRange5": targetRange5.name,
@@ -122,7 +122,7 @@ abstract class AlarmMethods {
       "targetRange5ForReadings": targetRange5ForReadings(numberOfReadingsToTrigger).map((e) => e.name).toList(),
       "diffs": diffPer5MinuteForReadings(numberOfReadingsToTrigger),
       "targets": [TargetSettings().lowUrgent, TargetSettings().lowTarget, TargetSettings().highTarget, TargetSettings().highUrgent],
-      "deltas": [TargetSettings().fastRiseDelta, TargetSettings().fastDropDelta],
+      "fastDropRise": [TargetSettings().fastDropDelta, TargetSettings().fastRiseDelta],
     };
   }
 
@@ -156,7 +156,7 @@ abstract class AlarmMethods {
     }
 
     var sgvs = lastSGV.lastNReadings(numberOfReadings);
-    if (sgvs.isEmpty || sgvs.length != numberOfReadings) {
+    if (sgvs.isEmpty || sgvs.length != numberOfReadings + 1) {
       return [];
     }
     return sgvs.map((e) {
@@ -173,7 +173,7 @@ abstract class AlarmMethods {
     }
 
     var sgvs = lastSGV.lastNReadings(numberOfReadings);
-    if (sgvs.isEmpty || sgvs.length != numberOfReadings) {
+    if (sgvs.isEmpty || sgvs.length != numberOfReadings + 1) {
       return [];
     }
 

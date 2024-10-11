@@ -58,44 +58,57 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
     bool isDayModeOverride = TimeSettings().isDayModeOverride();
 
     Widget overrideButton = const SizedBox.shrink();
+
+    var btnH = 50.0;
+    var btnW = 100.0;
+
     // Cancel The Override
     if (isNightModeOverride || isDayModeOverride) {
       overrideButton = SizedBox(
+        height: btnH,
+        width: btnW,
         child: ElevatedButton(
           style: buttonstyle,
           onPressed: () async {
             TimeSettings().removeNightOverride();
           },
           child: Text(
-            "Cancel Override",
-            style: labelSmall(context),
+            "Cancel\nOverride",
+            textAlign: TextAlign.center,
+            style: labelSmall(context).copyWith(color: primaryColor(context)),
           ),
         ),
       );
     } else if (TimeSettings().isDay()) {
       // Set Night Time until Sunrise
       overrideButton = SizedBox(
+        height: btnH,
+        width: btnW,
         child: ElevatedButton(
           style: buttonstyle,
           onPressed: () async {
             TimeSettings().nightModeOverride();
           },
           child: Text(
-            "Night Until Sunrise",
-            style: labelSmall(context),
+            "Set Night\nUntil Sunrise",
+            textAlign: TextAlign.center,
+            style: labelSmall(context).copyWith(color: primaryColor(context)),
           ),
         ),
       );
     } else if (TimeSettings().isNight()) {
       overrideButton = SizedBox(
+        height: btnH,
+        width: btnW,
         child: ElevatedButton(
           style: buttonstyle,
           onPressed: () async {
             TimeSettings().dayModeOverride();
           },
           child: Text(
-            "Day Until Sunset",
-            style: labelSmall(context),
+            "Set Day\nUntil Sunset",
+            textAlign: TextAlign.center,
+            style: labelSmall(context).copyWith(color: primaryColor(context)),
           ),
         ),
       );

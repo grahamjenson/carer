@@ -143,6 +143,9 @@ class AlarmSettings {
 
     noDataAlarmMinutes = prefs.getInt(_AlarmNames.noDataAlarmMinutes.name, defaultValue: 30)!;
 
+    carerBatteryAlarm = prefs.getBool(_AlarmNames.carerBatteryAlarm.name, defaultValue: false)!;
+    t1dBatteryAlarm = prefs.getBool(_AlarmNames.t1dBatteryAlarm.name, defaultValue: false)!;
+
     // Turn off alarms
     aeffect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms), debugLabel: 'disableAlarms');
 

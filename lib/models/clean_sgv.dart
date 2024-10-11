@@ -129,6 +129,7 @@ class CleanSGV with DateMixin implements ASGV {
     return pred;
   }
 
+  // TODO TEST THIS METHOD
   static List<CleanSGV> _makeChained(List<CleanSGV> sgvs) {
     if (sgvs.isEmpty || sgvs.length == 1) {
       return sgvs;
@@ -139,8 +140,9 @@ class CleanSGV with DateMixin implements ASGV {
     var dateBefore = sgvs.first.date;
     for (var i = 1; i < sgvs.length; i++) {
       var sgv = sgvs[i];
-
-      if (dateBefore.difference(sgv.date).inMinutes > 3) {
+      var dinm = dateBefore.difference(sgv.date).inMinutes;
+      // We dont want the chain to be too close together and we dont want to chain too far apart
+      if (dinm > 3 && dinm < 20) {
         chainedSGVs.last.before = sgv;
         dateBefore = sgv.date;
         chainedSGVs.add(sgv);
