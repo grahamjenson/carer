@@ -8,6 +8,7 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:carer/widgets/settings/debug_pages/alarm_log_page.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
@@ -99,8 +100,20 @@ class DebugSettingsWidget extends AbstractSettingsSection {
           },
         );
 
+        var alarms = SettingsTile.navigation(
+          title: const Text("Alarms"),
+          descriptionInlineIos: true,
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AlarmLogPage()),
+            );
+          },
+        );
         var tiles = [
           logError,
+          alarms,
           shareLogs,
         ];
         if (Platform.isIOS || Platform.isAndroid) {

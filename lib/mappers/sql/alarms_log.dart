@@ -5,13 +5,18 @@ import 'package:carer/models/sql/alarm_logs.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
   static final SQLToAlarmLogs _singleton = SQLToAlarmLogs._();
   factory SQLToAlarmLogs() => _singleton;
-  SQLToAlarmLogs._();
+  SQLToAlarmLogs._() {
+    signalAssign(lastCoupleDays, () async => await last2Days(), debugLabel: "AlarmLogslastCoupleDays", dependencies: [writeSignal]);
+  }
+
+  final ASignal<List<AlarmLog>> lastCoupleDays = ASignal<List<AlarmLog>>([], debugLabel: "AlarmLogslastCoupleDays");
 
   @override
   String get tableName => alarmLogsTableName;
@@ -89,8 +94,8 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
 
   Future<AlarmLog?> findUnfinishedAlarmOfTypeAndStage(AlarmType type, AlarmStage stage) async {
     var res = await query(conditions: {
-      "type": type.name,
-      "stage": stage.name,
+      "type = ?": type.name,
+      "stage = ?": stage.name,
       "end IS NULL": null,
     }, limit: 1);
     if (res.isEmpty) {
