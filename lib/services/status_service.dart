@@ -1,6 +1,6 @@
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
-import 'package:carer/services/settings/device_settings.dart';
+import 'package:carer/services/settings/status_settings.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
@@ -170,7 +170,12 @@ class _SilentOn extends _StatusMethods {
   IconData get icon => UniconsLine.bell_slash;
 
   @override
-  String get status => "Silent Mode On";
+  String get status {
+    if (triggered()) {
+      return "Silent Mode On";
+    }
+    return "Silent Mode Off";
+  }
 
   @override
   bool triggered() {
