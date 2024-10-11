@@ -54,35 +54,35 @@ enum AlarmType {
   noData(_NoDataAlarm()),
   lowBattery(_LowBatteryAlarm());
 
-  final AlarmMethods methods;
-  const AlarmType(this.methods);
+  final AlarmMethods _methods;
+  const AlarmType(this._methods);
 
   bool trigger() {
-    return methods.trigger();
+    return _methods.trigger();
   }
 
   bool active() {
-    return methods.active();
+    return _methods.active();
   }
 
   bool smartSnooze() {
-    return methods.smartSnooze();
+    return _methods.smartSnooze();
   }
 
   Map<String, dynamic> conditions() {
-    return methods.conditions();
+    return _methods.conditions();
   }
 
   String shortSummary() {
-    return methods.shortSummary();
+    return _methods.shortSummary();
   }
 
   IconData get icon {
-    return methods.icon();
+    return _methods.icon();
   }
 
   (bool, bool, bool) alarmStatus() {
-    return methods.alarmStatus();
+    return _methods.alarmStatus();
   }
 
   static AlarmType fromName(String name) {

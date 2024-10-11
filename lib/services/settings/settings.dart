@@ -16,7 +16,7 @@ class Settings {
   final alarmSettings = AlarmSettings();
   final alarmAlertSettings = AlarmAlertSettings();
   final secureSettings = SecureSettings();
-  final deviceSettings = DeviceSettings();
+  final statusSettings = StatusSettings();
   final timeSettings = TimeSettings();
   Settings._();
 
@@ -28,7 +28,7 @@ class Settings {
     targetSettings.setupDBPropagation(prefs);
     alarmSettings.setupDBPropagation(prefs);
     alarmAlertSettings.setupDBPropagation(prefs);
-    deviceSettings.setupDBPropagation(prefs);
+    statusSettings.setupDBPropagation(prefs);
     timeSettings.setupDBPropagation(prefs);
 
     return true;
