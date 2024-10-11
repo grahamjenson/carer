@@ -91,7 +91,7 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
     var res = await query(conditions: {
       "type": type.name,
       "stage": stage.name,
-      "end": null,
+      "end IS NULL": null,
     }, limit: 1);
     if (res.isEmpty) {
       return null;

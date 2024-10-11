@@ -44,6 +44,7 @@ abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
     var cdb = await CarerDB.instance;
     orderBy ??= "$timestampField DESC";
     var (where, whereArgs) = _buildWhereStatement(after: after, before: before, conditions: conditions);
+
     var (res, err) = await go(
       cdb.db.query(tableName, where: where, whereArgs: whereArgs, limit: limit, orderBy: orderBy),
       name: "$runtimeType ${name ?? "q"}",
@@ -86,10 +87,10 @@ abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
     if (conditions != null) {
       conditions.forEach((key, value) {
         if (value != null) {
-          where.add('$key = ?');
+          where.add('$key ');
           whereArgs.add(value);
         } else {
-          where.add('$key IS NULL');
+          where.add('$key ');
         }
       });
     }
