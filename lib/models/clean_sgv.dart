@@ -16,7 +16,23 @@ class CleanSGV with DateMixin implements ASGV {
   final DateTime date;
 
   CleanSGV? before; // previous SVGs ID
-  List<CleanSGV?> get before5 => [this, before, before?.before, before?.before?.before, before?.before?.before?.before];
+  List<CleanSGV> get before5 => _beforeN(5);
+  List<CleanSGV> get before12 => _beforeN(12);
+  List<CleanSGV> lastNReadings(int n) => _beforeN(n);
+
+  List<CleanSGV> _beforeN(int n) {
+    var list = [this];
+    var before = this.before;
+    for (var i = 0; i < n; i++) {
+      if (before == null) {
+        break;
+      }
+      list.add(before);
+      before = before.before;
+    }
+    return list;
+  }
+
   CleanSGV(
     this.value,
     this.date, {

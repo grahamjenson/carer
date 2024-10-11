@@ -119,7 +119,6 @@ const String alarmLogsTableName = 'alarm_logs';
 const alarmLogsTable = DBTable(alarmLogsTableName, '''
     CREATE TABLE alarm_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      eid TEXT,
       type TEXT,
       conditions TEXT,
       stage TEXT, -- Like pending, alerting
@@ -130,12 +129,11 @@ const alarmLogsTable = DBTable(alarmLogsTableName, '''
 
       timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
-      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
+      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL
       
       
 
       -- CONTRAINTS
-      UNIQUE(eid)
     )
   ''');
 

@@ -25,15 +25,14 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
       "stage",
       "conditions",
       "start",
-      "eid",
     ]));
+
     errors.addAll(row.validateTypes([
       ("type", String),
       ("stage", String),
       ("conditions", String),
       ("start", int),
       ("end", int),
-      ("eid", String),
     ]));
 
     if (errors.isNotEmpty) {
@@ -57,7 +56,6 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
 
     return AlarmLog(
       id: row["id"] as int?,
-      eid: row["eid"] as String,
       type: type,
       stage: stage,
       conditions: conditions,
@@ -69,7 +67,6 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
   @override
   SQLRow bToA(AlarmLog model) {
     var row = SQLRow({
-      "eid": model.eid!,
       "type": model.type.name,
       "stage": model.stage.name,
       "conditions": jsonEncode(model.conditions),
@@ -88,5 +85,17 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
     int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
 
     return query(after: startOfYesterdayEpoch);
+  }
+
+  Future<AlarmLog?> findUnfinishedAlarmOfTypeAndStage(AlarmType type, AlarmStage stage) async {
+    var res = await query(conditions: {
+      "type": type.name,
+      "stage": stage.name,
+      "end": null,
+    }, limit: 1);
+    if (res.isEmpty) {
+      return null;
+    }
+    return res.first;
   }
 }

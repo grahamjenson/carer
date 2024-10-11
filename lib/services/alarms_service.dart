@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:carer/mappers/sql/alarms_log.dart';
 import 'package:carer/mappers/sql/sgv.dart';
+import 'package:carer/models/sql/alarm_logs.dart';
 import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
@@ -13,6 +15,7 @@ import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -105,6 +108,22 @@ class AlarmsService {
         TimerService().tenSecondSignal,
       ],
     );
+
+    // Writing the logs of alarms to the database
+    AlarmSet pendingAlarmsCheck = AlarmSet({});
+    AlarmSet alertingAlarmsCheck = AlarmSet({});
+
+    aeffect(() async {
+      if (pendingAlarmsCheck != pendingAlarms.value) {
+        pendingAlarmsCheck = pendingAlarms.value;
+        updateAlarmLog(pendingAlarms.value, pendingAlarms.previousValue, AlarmStage.pending);
+      }
+
+      if (alertingAlarmsCheck != alertingAlarms.value) {
+        alertingAlarmsCheck = alertingAlarms.value;
+        updateAlarmLog(alertingAlarms.value, alertingAlarms.previousValue, AlarmStage.alerting);
+      }
+    }, debugLabel: "WriteAlarmLogs");
   }
 
   (Set<AlarmType>, Set<AlarmType>) calculateAlarms() {
@@ -212,5 +231,37 @@ class AlarmsService {
     }
     alog("Playing test alarm");
     testAlarmPlaying = true;
+  }
+
+  Future<void> updateAlarmLog(AlarmSet alarms, AlarmSet? previousAlarms, AlarmStage stage) async {
+    var newAlarms = alarms;
+    var removedAlarms = AlarmSet({});
+    if (previousAlarms != null) {
+      newAlarms = alarms.difference(previousAlarms);
+      removedAlarms = previousAlarms.difference(alarms);
+    }
+
+    // Write the alarms
+
+    // // if there is a new value then create a new alarm
+    for (var newAlarm in newAlarms) {
+      var log = AlarmLog(
+        type: newAlarm,
+        conditions: newAlarm.conditions(),
+        stage: stage,
+        startDate: clock.now(),
+      );
+      await SQLToAlarmLogs().save(log);
+    }
+
+    // If there is a removed Value then remove the alarm
+    for (var removedAlarm in removedAlarms) {
+      var log = await SQLToAlarmLogs().findUnfinishedAlarmOfTypeAndStage(removedAlarm, stage);
+      if (log == null) {
+        continue;
+      }
+      log.endDate = clock.now();
+      await SQLToAlarmLogs().save(log);
+    }
   }
 }

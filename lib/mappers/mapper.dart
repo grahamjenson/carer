@@ -36,7 +36,7 @@ abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
   Future<List<T>> query({
     int? after,
     int? before,
-    Map<String, Object>? conditions,
+    Map<String, Object?>? conditions,
     int? limit,
     String? name, // Optional for debugging
     String? orderBy,
@@ -72,7 +72,7 @@ abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
   }
 
   // utils
-  (String?, List<Object>?) _buildWhereStatement({int? after, int? before, Map<String, Object>? conditions}) {
+  (String?, List<Object>?) _buildWhereStatement({int? after, int? before, Map<String, Object?>? conditions}) {
     var where = <String>[];
     var whereArgs = <Object>[];
     if (after != null) {
@@ -85,8 +85,12 @@ abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
     }
     if (conditions != null) {
       conditions.forEach((key, value) {
-        where.add('$key ');
-        whereArgs.add(value);
+        if (value != null) {
+          where.add('$key = ?');
+          whereArgs.add(value);
+        } else {
+          where.add('$key IS NULL');
+        }
       });
     }
     if (where.isEmpty) {

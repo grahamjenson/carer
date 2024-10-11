@@ -37,6 +37,10 @@ class AlarmSet extends Iterable<AlarmType> {
   String toString() {
     return _alarms.toString();
   }
+
+  AlarmSet difference(AlarmSet other) {
+    return AlarmSet(_alarms.difference(other._alarms));
+  }
 }
 
 // TODO this is a step towards having all alarms as static
@@ -100,16 +104,25 @@ abstract class AlarmMethods {
     return false;
   }
 
+  get minutesToTrigger => -1;
+  get numberOfReadingsToTrigger => minutesToTrigger ~/ 5;
+
   Map<String, dynamic> conditions() {
     CleanSGV? lastSGV = CleanSGV.lastSGV.value;
     return {
       "lastSGV": lastSGV?.value,
       "LastSGVStr": lastSGVStr(),
       "lastSGVAgeInMinutes": lastSGV?.age.inMinutes,
-      "diffs": diffPer5Minute(30),
       "targetRange5": targetRange5.name,
-      "previousReadings": lastSGV?.before5,
-      "predictions": lastSGV?.predictions,
+      "previousReadings": lastSGV?.before12.map((e) => e.toString()).toList(),
+      "predictions": lastSGV?.predictions?.map((e) => e?.toString()).toList(),
+      "minutesToTrigger": minutesToTrigger,
+      "numberOfReadingsToTriggerPrediction": numberOfReadingsToTrigger,
+      "prediction": getPredictedValue(numberOfReadingsToTrigger)?.toString(),
+      "targetRange5ForReadings": targetRange5ForReadings(numberOfReadingsToTrigger).map((e) => e.name).toList(),
+      "diffs": diffPer5MinuteForReadings(numberOfReadingsToTrigger),
+      "targets": [TargetSettings().lowUrgent, TargetSettings().lowTarget, TargetSettings().highTarget, TargetSettings().highUrgent],
+      "deltas": [TargetSettings().fastRiseDelta, TargetSettings().fastDropDelta],
     };
   }
 
@@ -135,16 +148,34 @@ abstract class AlarmMethods {
     return lastSGV.range;
   }
 
-  List<Range5> targetRange5ForMins(int minsAgo) {
-    var sgvs = CleanSGV.last3Hours.value.where((e) => e.minsAgo < minsAgo);
+  List<Range5> targetRange5ForReadings(int numberOfReadings) {
+    var lastSGV = CleanSGV.lastSGV.value;
+
+    if (lastSGV == null) {
+      return [];
+    }
+
+    var sgvs = lastSGV.lastNReadings(numberOfReadings);
+    if (sgvs.isEmpty || sgvs.length != numberOfReadings) {
+      return [];
+    }
     return sgvs.map((e) {
       var (t, _) = targetRange(e.value);
       return t;
     }).toList();
   }
 
-  List<int> diffPer5Minute(int minsAgo) {
-    var sgvs = CleanSGV.last3Hours.value.where((e) => e.minsAgo < minsAgo);
+  List<int> diffPer5MinuteForReadings(int numberOfReadings) {
+    var lastSGV = CleanSGV.lastSGV.value;
+
+    if (lastSGV == null) {
+      return [];
+    }
+
+    var sgvs = lastSGV.lastNReadings(numberOfReadings);
+    if (sgvs.isEmpty || sgvs.length != numberOfReadings) {
+      return [];
+    }
 
     List<int> diffs = [];
     for (var sgv in sgvs) {
@@ -200,12 +231,15 @@ class _LowAlarm extends AlarmMethods {
   const _LowAlarm();
 
   @override
+  get minutesToTrigger => AlarmSettings().lowPredictionMinutes;
+
+  @override
   String shortSummary() {
     if (_lowTrigger()) {
       return "Low (<${unitStr(TargetSettings().lowTarget)})";
     }
     if (_predictiveTrigger()) {
-      var sgv = getPredictedValue(numberOfReadings);
+      var sgv = getPredictedValue(numberOfReadingsToTrigger);
       if (sgv == null) {
         return "?";
       }
@@ -216,15 +250,6 @@ class _LowAlarm extends AlarmMethods {
 
   @override
   IconData icon() => UniconsLine.temperature_empty;
-
-  @override
-  Map<String, dynamic> conditions() {
-    return super.conditions()
-      ..addAll({
-        "numberOfReadings": numberOfReadings,
-        "prediction": getPredictedValue(numberOfReadings),
-      });
-  }
 
   bool _lowTrigger() {
     return targetRange5 == Range5.low || targetRange5 == Range5.veryLow;
@@ -238,8 +263,6 @@ class _LowAlarm extends AlarmMethods {
   ///
   // Predictive Bit of the Alarm
   ///
-
-  int get numberOfReadings => AlarmSettings().lowPredictionMinutes ~/ 5;
 
   bool _predictiveTrigger() {
     if (!AlarmSettings().lowPredictionAlarm) {
@@ -257,7 +280,7 @@ class _LowAlarm extends AlarmMethods {
     }
 
     // Check prediction
-    var sgv = getPredictedValue(numberOfReadings);
+    var sgv = getPredictedValue(numberOfReadingsToTrigger);
 
     if (sgv == null) {
       return false;
@@ -287,14 +310,7 @@ class _HighAlarm extends AlarmMethods {
   }
 
   @override
-  Map<String, dynamic> conditions() {
-    return super.conditions()
-      ..addAll({
-        "mins": mins,
-      });
-  }
-
-  int get mins => AlarmSettings().highMinutes;
+  get minutesToTrigger => AlarmSettings().highMinutes;
 
   @override
   bool trigger() {
@@ -304,7 +320,7 @@ class _HighAlarm extends AlarmMethods {
     if (!latest) {
       return false;
     }
-    List<Range5> targets = targetRange5ForMins(AlarmSettings().highMinutes);
+    List<Range5> targets = targetRange5ForReadings(numberOfReadingsToTrigger);
     if (targets.isEmpty) {
       return true;
     }
@@ -358,16 +374,9 @@ class _FastRiseAlarm extends AlarmMethods {
   String shortSummary() => "Fast Rise (<${unitStr(TargetSettings().fastRiseDelta)})";
 
   @override
-  Map<String, dynamic> conditions() {
-    return super.conditions()
-      ..addAll({
-        "delta": TargetSettings().fastRiseDelta,
-        "mins": mins,
-      });
-  }
+  int get minutesToTrigger => AlarmSettings().fastRiseAlarmMinutes;
 
-  int get mins => AlarmSettings().fastRiseAlarmMinutes;
-  List<int> get diffs => diffPer5Minute(mins);
+  List<int> get diffs => diffPer5MinuteForReadings(numberOfReadingsToTrigger);
 
   @override
   bool trigger() {
@@ -403,16 +412,8 @@ class _FastDropAlarm extends AlarmMethods {
   String shortSummary() => "Fast Drop (<${unitStr(TargetSettings().fastDropDelta)})";
 
   @override
-  Map<String, dynamic> conditions() {
-    return super.conditions()
-      ..addAll({
-        "delta": TargetSettings().fastDropDelta,
-        "mins": mins,
-      });
-  }
-
-  int get mins => AlarmSettings().fastDropAlarmMinutes;
-  List<int> get diffs => diffPer5Minute(mins);
+  int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;
+  List<int> get diffs => diffPer5MinuteForReadings(numberOfReadingsToTrigger);
 
   @override
   bool trigger() {
@@ -450,17 +451,7 @@ class _NoDataAlarm extends AlarmMethods {
   String shortSummary() => "No Data for ${age.inMinutes}m";
 
   @override
-  Map<String, dynamic> conditions() {
-    return super.conditions()
-      ..addAll({
-        "mins": alarmMinutes(),
-      });
-  }
-
-  int get mins => AlarmSettings().fastDropAlarmMinutes;
-
-  // This allows the alarm to still trigger with "default" even when not active
-  int alarmMinutes() {
+  int get minutesToTrigger {
     var mins = AlarmSettings().noDataAlarmMinutes;
     if (mins == -1) {
       mins = 20;
@@ -474,7 +465,7 @@ class _NoDataAlarm extends AlarmMethods {
       return false;
     }
 
-    return age.inMinutes > alarmMinutes();
+    return age.inMinutes > minutesToTrigger;
   }
 
   Duration get age {

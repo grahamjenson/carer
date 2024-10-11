@@ -16,7 +16,6 @@ enum AlarmStage {
 }
 
 // This is a record of all triggered alarms.
-// Give a goal is to reduce the number of alarms, this is a good place to start.
 class AlarmLog extends DBModel {
   @override
   get date => startDate;
@@ -30,7 +29,6 @@ class AlarmLog extends DBModel {
 
   AlarmLog({
     super.id,
-    required super.eid,
     required this.startDate,
     this.endDate,
     required this.type,
