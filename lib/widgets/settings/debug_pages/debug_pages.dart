@@ -10,6 +10,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/settings/debug_pages/alarm_log_page.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
+import 'package:carer/widgets/settings/debug_pages/nightscout_debug.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -69,6 +70,7 @@ class DebugSettingsPage extends StatelessWidget {
       getErrorLog(),
       getAlarms(),
       getShareLogs(),
+      getServices(),
     ];
 
     if (Platform.isIOS || Platform.isAndroid) {
@@ -161,6 +163,24 @@ class DebugSettingsPage extends StatelessWidget {
             // await BackgroundService().run();
             // print("Done Background Do");
             BackgroundService().onFetch("com.transistorsoft.fetch");
+          },
+        )
+      ],
+    );
+  }
+
+  SettingsSection getServices() {
+    return SettingsSection(
+      title: const Text('Services'),
+      tiles: [
+        SettingsTile(
+          title: const Text("NightScout"),
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NightScoutServiceDebugPage()),
+            );
           },
         )
       ],

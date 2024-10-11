@@ -16,6 +16,9 @@ abstract class Updater {
   Future<bool> update();
   String raw = "";
 
+  Duration get updatedAge => clock.now().difference(lastUpdated);
+  Duration get successfulAge => clock.now().difference(lastSuccessfulUpdate);
+
   forceUpdate() {
     _forceUpdate = true;
   }

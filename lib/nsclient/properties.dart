@@ -43,6 +43,7 @@ class NSProperties {
   final double? cob;
   final int? cannulaChangeTime;
   final int? sensorChangeTime;
+  final String raw;
 
   NSProperties({
     required this.battery,
@@ -53,6 +54,7 @@ class NSProperties {
     required this.cob,
     required this.sensorChangeTime,
     required this.cannulaChangeTime,
+    required this.raw,
   });
 
   static NSProperties? fromJson(String jsonString) {
@@ -68,6 +70,7 @@ class NSProperties {
         cob: json["cob"]?["cob"]?.toDouble(),
         sensorChangeTime: json["sage"]?["Sensor Change"]?["treatmentDate"]?.toInt(),
         cannulaChangeTime: json["cage"]?["treatmentDate"]?.toInt(),
+        raw: jsonString,
       );
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);

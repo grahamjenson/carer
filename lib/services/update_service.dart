@@ -9,14 +9,23 @@ class UpdateService {
   static final UpdateService _instance = UpdateService._();
   factory UpdateService() => _instance;
 
-  List<Updater> updaters = [];
-  UpdateService._() {
-    var nsSummaryUpdater = NSPropertiesUpdater();
-    var nsEntriesUpdater = NSEntriesUpdater();
-    var nsTreatmentUpdater = NSTreatmentsUpdater();
-    var nsProfileUpdater = NSProfileUpdater();
+  late NSPropertiesUpdater nsSummaryUpdater;
+  late NSEntriesUpdater nsEntriesUpdater;
+  late NSTreatmentsUpdater nsTreatmentUpdater;
+  late NSProfileUpdater nsProfileUpdater;
 
-    updaters.addAll([nsSummaryUpdater, nsEntriesUpdater, nsTreatmentUpdater, nsProfileUpdater]);
+  List<Updater> get updaters => [
+        nsSummaryUpdater,
+        nsEntriesUpdater,
+        nsTreatmentUpdater,
+        nsProfileUpdater,
+      ];
+
+  UpdateService._() {
+    nsSummaryUpdater = NSPropertiesUpdater();
+    nsEntriesUpdater = NSEntriesUpdater();
+    nsTreatmentUpdater = NSTreatmentsUpdater();
+    nsProfileUpdater = NSProfileUpdater();
   }
 
   start() {

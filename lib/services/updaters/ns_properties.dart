@@ -29,6 +29,8 @@ class NSPropertiesUpdater extends Updater {
       return false;
     }
 
+    raw = properties.raw;
+
     if (properties.battery != null) {
       PropertiesData().setBattery(properties.battery!.toDouble());
     }
