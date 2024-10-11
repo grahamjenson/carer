@@ -14,6 +14,7 @@ class SQLRow {
   SQLRow(this._attributes);
 
   Object? operator [](String key) => _attributes[key];
+  operator []=(String key, Object? value) => _attributes[key] = value;
 
   List<String> validateRequiredAttributes(List<String> keys) {
     List<String> errors = [];

@@ -1,6 +1,7 @@
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/sgv.dart';
+import 'package:carer/services/prediction_service.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
@@ -156,7 +157,17 @@ class CleanSGV with DateMixin implements ASGV {
 
     signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours).toList(), debugLabel: 'last3HoursQuery');
 
-    signalAssign(lastSGV, () => last2Days.value.firstOrNull, debugLabel: 'lastSGVQuery');
+    signalAssign(lastSGV, () {
+      var lastSGV = last2Days.value.firstOrNull;
+      if (lastSGV == null) {
+        return null;
+      }
+
+      var predictions = PredictionService().getPredictedReadings(lastSGV);
+      lastSGV.setPredictions(predictions);
+
+      return lastSGV;
+    }, debugLabel: 'lastSGVQuery');
 
     signalAssign(todaysPercentage, () {
       var todaysSGVs = last2Days.value.where((e) => e.isDuringToday);

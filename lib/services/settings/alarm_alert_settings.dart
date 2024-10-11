@@ -110,7 +110,7 @@ class AlarmAlertSettings {
     volumeProgressionSeconds = prefs.getInt(_AANames.volumeProgressionSeconds.name, defaultValue: 10)!;
 
     var prefsAlarmAsset = prefs.getString(_AANames.alarmAsset.name, defaultValue: AlarmSounds.nightguard.name)!;
-    alarmAsset = AlarmSounds.values.firstWhere((e) => e.name == prefsAlarmAsset, orElse: () => AlarmSounds.nightguard);
+    alarmAsset = AlarmSounds.fromName(prefsAlarmAsset, AlarmSounds.nightguard);
 
     brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: false)!;
 
@@ -180,7 +180,15 @@ class AlarmAlertSettings {
   }
 }
 
-enum AlarmSounds { nightguard, letsgo, hybridas }
+enum AlarmSounds {
+  nightguard,
+  letsgo,
+  hybridas;
+
+  static AlarmSounds fromName(String name, AlarmSounds defaultValue) {
+    return AlarmSounds.values.firstWhere((e) => e.name == name, orElse: () => defaultValue);
+  }
+}
 
 extension AlarmSoundsExtension on AlarmSounds {
   String get name {

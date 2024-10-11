@@ -37,7 +37,7 @@ void main() async {
     });
 
     test("HighAlarm", () async {
-      AlarmMethods alarm = const HighAlarm();
+      AlarmType alarm = AlarmType.high;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -64,7 +64,7 @@ void main() async {
     });
 
     test("LowAlarm", () async {
-      AlarmMethods alarm = const LowAlarm();
+      AlarmType alarm = AlarmType.low;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -86,7 +86,7 @@ void main() async {
     });
 
     test("UrgentHighAlarm", () async {
-      AlarmMethods alarm = const UrgentHighAlarm();
+      AlarmType alarm = AlarmType.urgentHigh;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -107,7 +107,7 @@ void main() async {
     });
 
     test("UrgentLowAlarm", () async {
-      AlarmMethods alarm = const UrgentLowAlarm();
+      AlarmType alarm = AlarmType.urgentLow;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -128,7 +128,7 @@ void main() async {
     });
 
     test("FastRiseAlarm", () async {
-      AlarmMethods alarm = const FastRiseAlarm();
+      AlarmType alarm = AlarmType.fastRise;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -149,7 +149,7 @@ void main() async {
     });
 
     test("FastDropAlarm", () async {
-      AlarmMethods alarm = const FastDropAlarm();
+      AlarmType alarm = AlarmType.fastDrop;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -170,7 +170,7 @@ void main() async {
     });
 
     test("NoDataAlarm", () async {
-      AlarmMethods alarm = const NoDataAlarm();
+      AlarmType alarm = AlarmType.noData;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);
@@ -190,7 +190,7 @@ void main() async {
     });
 
     test("PredictiveLowAlarm", () async {
-      AlarmMethods alarm = const LowAlarm();
+      AlarmType alarm = AlarmType.low;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
       expect(active, false);

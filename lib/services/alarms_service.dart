@@ -27,8 +27,8 @@ class AlarmsService {
   bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
   set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
 
-  ASignal<AlarmSet> triggeredAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "TriggeredAlarms");
-  ASignal<AlarmSet> activeAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "ActiveAlarms");
+  ASignal<AlarmSet> pendingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "PendingAlarms");
+  ASignal<AlarmSet> alertingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "AlertingAlarms");
 
   AlarmsService._() {
     List<Signal> allSettingsSignals = [];
@@ -55,16 +55,16 @@ class AlarmsService {
 
     aeffect(() {
       try {
-        var (newTriggeredAlarms, newActiveAlarms) = calculateAlarms();
+        var (newPendingAlarms, newAlertingAlarms) = calculateAlarms();
 
         // If the app has only recently been resumed or a screen changed, we wipe all the active alarms
         // because we want to give the app some time ot "warm up" and if the user is doing something give them time to finish
         if (AppLifecycleService().wasRecentlyResumed || AppLifecycleService().wasRecentlyScreenChanged) {
-          newActiveAlarms = <Alarm>{};
+          newAlertingAlarms = <AlarmType>{};
         }
 
-        triggeredAlarms.value = AlarmSet(newTriggeredAlarms);
-        activeAlarms.value = AlarmSet(newActiveAlarms);
+        pendingAlarms.value = AlarmSet(newPendingAlarms);
+        alertingAlarms.value = AlarmSet(newAlertingAlarms);
       } catch (err) {
         alog("CheckAlarms: Error checking alarms: $err");
       }
@@ -79,8 +79,8 @@ class AlarmsService {
         isCheckingAlarms = true;
 
         try {
-          var audio = go(audioAlerts(activeAlarms.value));
-          var brightness = go(brightnessAlert(activeAlarms.value));
+          var audio = go(audioAlerts(alertingAlarms.value));
+          var brightness = go(brightnessAlert(alertingAlarms.value));
 
           var (_, err) = await audio;
 
@@ -101,25 +101,25 @@ class AlarmsService {
       },
       debugLabel: "AudioBrightnessAlarms",
       dependencies: [
-        activeAlarms,
+        alertingAlarms,
         TimerService().tenSecondSignal,
       ],
     );
   }
 
-  (Set<Alarm>, Set<Alarm>) calculateAlarms() {
+  (Set<AlarmType>, Set<AlarmType>) calculateAlarms() {
     var notSnoozing = AlarmAlertSettings().snoozeDuration == null;
-    Set<Alarm> newTriggeredAlarms = {};
-    Set<Alarm> newActiveAlarms = {};
+    Set<AlarmType> newPendingAlarms = {};
+    Set<AlarmType> newActiveAlarms = {};
 
     var disabledAllAlarms = AlarmSettings().disableAlarms;
 
-    for (var alarm in Alarm.values) {
+    for (var alarm in AlarmType.values) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
 
       // Build the lists
       if (triggered) {
-        newTriggeredAlarms.add(alarm);
+        newPendingAlarms.add(alarm);
       }
 
       var addToActive = !disabledAllAlarms && triggered && active && notSnoozing && !(smartSnooze);
@@ -129,22 +129,22 @@ class AlarmsService {
       }
     }
     // Filter out doubles of alarms
-    newTriggeredAlarms = filterAlarms(newTriggeredAlarms);
+    newPendingAlarms = filterAlarms(newPendingAlarms);
     newActiveAlarms = filterAlarms(newActiveAlarms);
 
     // Set alarms that have been triggered
-    return (newTriggeredAlarms, newActiveAlarms);
+    return (newPendingAlarms, newActiveAlarms);
   }
 
-  Set<Alarm> filterAlarms(Set<Alarm> alarms) {
+  Set<AlarmType> filterAlarms(Set<AlarmType> alarms) {
     // remove low if urgent low
-    if (alarms.contains(Alarm.low) && alarms.contains(Alarm.urgentLow)) {
-      alarms.remove(Alarm.low);
+    if (alarms.contains(AlarmType.low) && alarms.contains(AlarmType.urgentLow)) {
+      alarms.remove(AlarmType.low);
     }
 
     // remove high if urgent high
-    if (alarms.contains(Alarm.high) && alarms.contains(Alarm.urgentHigh)) {
-      alarms.remove(Alarm.high);
+    if (alarms.contains(AlarmType.high) && alarms.contains(AlarmType.urgentHigh)) {
+      alarms.remove(AlarmType.high);
     }
     return alarms;
   }

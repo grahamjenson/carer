@@ -12,9 +12,9 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var triggeredAlarms = AlarmsService().triggeredAlarms.value;
+        var pendingAlarms = AlarmsService().pendingAlarms.value;
 
-        if (triggeredAlarms.isEmpty) {
+        if (pendingAlarms.isEmpty) {
           return const SizedBox.shrink();
         }
 
@@ -28,7 +28,7 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
             borderRadius: BorderRadius.circular(5), // Optional: if you want rounded corners
           ),
           child: Row(
-            children: getAlarmWidgets(triggeredAlarms, badColor(context)),
+            children: getAlarmWidgets(pendingAlarms, badColor(context)),
           ),
         );
       },
@@ -45,7 +45,7 @@ class AlarmsBarIcons extends StatelessWidget with ThemeMixin {
     return alarmWidgets;
   }
 
-  static Tooltip getAlarmToolTip(Alarm alarm, Color color) {
+  static Tooltip getAlarmToolTip(AlarmType alarm, Color color) {
     return Tooltip(
       message: alarm.shortSummary(),
       triggerMode: TooltipTriggerMode.tap,

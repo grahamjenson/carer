@@ -1,6 +1,19 @@
 import 'package:carer/models/sql/db_model.dart';
 
-enum BolusType { correction, meal, smb }
+enum BolusType {
+  correction,
+  meal,
+  smb;
+
+  static BolusType fromName(String type) {
+    for (var t in BolusType.values) {
+      if (t.name == type) {
+        return t;
+      }
+    }
+    throw ArgumentError("Invalid Bolus Type: $type");
+  }
+}
 
 class Bolus extends DBModel {
   final double value;

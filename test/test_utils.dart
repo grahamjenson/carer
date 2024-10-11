@@ -8,6 +8,7 @@ Future<void> sqfliteTestInit() async {
   databaseFactory = databaseFactoryFfi;
   var db = await CarerDB.instance;
   print("VERSION ${await db.db.getVersion()}");
+  print(db.db.path);
 }
 
 double dp4(double x) {

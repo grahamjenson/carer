@@ -45,7 +45,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
         });
       },
       debugLabel: "SnoozeButton",
-      dependencies: [AlarmAlertSettings().snoozeUntilSignal, AlarmsService().triggeredAlarms],
+      dependencies: [AlarmAlertSettings().snoozeUntilSignal, AlarmsService().pendingAlarms],
     );
   }
 
@@ -82,13 +82,13 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
       color: accentColor(context),
     );
 
-    var triggeredAlarms = AlarmsService().triggeredAlarms.value;
-    if (triggeredAlarms.isEmpty) {
+    var pendingAlarms = AlarmsService().pendingAlarms.value;
+    if (pendingAlarms.isEmpty) {
       return null;
     }
 
     var alarmStrings = [];
-    for (var alarm in triggeredAlarms) {
+    for (var alarm in pendingAlarms) {
       alarmStrings.add(alarm.shortSummary());
     }
 

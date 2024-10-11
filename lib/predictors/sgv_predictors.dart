@@ -10,7 +10,7 @@ abstract class Predictor {
   final DateTime _lastReadingDate = clock.now();
 
   // Get all the expencive calls done here, and can be repedtly called when new data arrives
-  init();
+  init({required List<CleanSGV?> lastSGVs});
 
   // Returns the predicted value at mins
   CleanSGV? predictAt(double timestamp);
@@ -70,15 +70,15 @@ abstract class RegressionPredictor extends Predictor {
   int fnRX(double x) => (x * 60000.0).toInt() + mimnutesFromEpochToLastWeek.toInt();
 
   @override
-  init() {
-    CleanSGV? lastsgv = CleanSGV.lastSGV.value;
-    if (lastsgv == null) {
+  init({required List<CleanSGV?> lastSGVs}) {
+    if (lastSGVs.length < pastReadings) {
       regression = NoopRegression();
+      return;
     }
-    List<CleanSGV?> maybeSGVs = lastsgv!.before5;
+    lastSGVs = lastSGVs.sublist(0, pastReadings);
 
     List<CleanSGV> sgvs = [];
-    for (var s in maybeSGVs) {
+    for (var s in lastSGVs) {
       if (s == null) {
         return NoopRegression();
       }

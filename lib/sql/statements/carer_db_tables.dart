@@ -14,6 +14,7 @@ const dbTables = [
   tempbasalTable,
   temptargetsTable,
   profileTable,
+  alarmLogsTable,
 ];
 
 // Used for key values like iob...
@@ -27,8 +28,12 @@ const sgvTable = DBTable(sgvsTableName, '''
       eid TEXT,
       value INTEGER,
       timestamp INTEGER,
+      
+      -- VIRTUAL
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
       minute_timestamp INTEGER GENERATED ALWAYS AS (timestamp / 60000) VIRTUAL,
+
+      -- CONTRAINTS
       UNIQUE(eid)
     )
   ''');
@@ -41,7 +46,11 @@ const bolusTable = DBTable(bolusTableName, '''
       value REAL,
       type TEXT,
       timestamp INTEGER,
+
+      -- VIRTUAL
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+
+      -- CONTRAINTS
       UNIQUE(eid)
     )
   ''');
@@ -53,7 +62,12 @@ const carbsTable = DBTable(carbsTableName, '''
       eid TEXT,
       value INTEGER,
       timestamp INTEGER,
+
+      -- VIRTUAL
       datetime TEXT GENERATED ALWAYS AS (datetime(timestamp / 1000, 'unixepoch')) VIRTUAL,
+
+
+      -- CONTRAINTS
       UNIQUE(eid)
     )
   ''');
@@ -64,13 +78,17 @@ const tempbasalTable = DBTable(tempbasalTableName, '''
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
       start INTEGER,
-      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
-      
       duration INTEGER,
+      value REAL,
+
+      -- VIRTUAL
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
-      value REAL,
+      
+
+      -- CONTRAINTS
       UNIQUE(eid)
     )
   ''');
@@ -81,14 +99,42 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
       start INTEGER,
-      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       duration INTEGER,
+      highTarget INTEGER,
+      lowTarget INTEGER,
+
+      -- VIRTUAL
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       end INTEGER GENERATED ALWAYS AS (start + (duration * 1000)) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
 
-      highTarget INTEGER,
-      lowTarget INTEGER,
+
+      -- CONTRAINTS
+      UNIQUE(eid)
+    )
+  ''');
+
+const String alarmLogsTableName = 'alarm_logs';
+const alarmLogsTable = DBTable(alarmLogsTableName, '''
+    CREATE TABLE alarm_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      eid TEXT,
+      type TEXT,
+      conditions TEXT,
+      stage TEXT, -- Like pending, alerting
+      start INTEGER,
+      end INTEGER,
+
+      -- VIRTUAL
+
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
+      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL,
+      
+      
+
+      -- CONTRAINTS
       UNIQUE(eid)
     )
   ''');
@@ -133,6 +179,9 @@ const profileTable = DBTable(profileTableName, '''
       basal0 REAL, basal1 REAL, basal2 REAL, basal3 REAL, basal4 REAL, basal5 REAL, basal6 REAL, basal7 REAL, basal8 REAL, basal9 REAL, basal10 REAL, basal11 REAL, basal12 REAL, basal13 REAL, basal14 REAL, basal15 REAL, basal16 REAL, basal17 REAL, basal18 REAL, basal19 REAL, basal20 REAL, basal21 REAL, basal22 REAL, basal23 REAL,
       tlow0 INTEGER, tlow1 INTEGER, tlow2 INTEGER, tlow3 INTEGER, tlow4 INTEGER, tlow5 INTEGER, tlow6 INTEGER, tlow7 INTEGER, tlow8 INTEGER, tlow9 INTEGER, tlow10 INTEGER, tlow11 INTEGER, tlow12 INTEGER, tlow13 INTEGER, tlow14 INTEGER, tlow15 INTEGER, tlow16 INTEGER, tlow17 INTEGER, tlow18 INTEGER, tlow19 INTEGER, tlow20 INTEGER, tlow21 INTEGER, tlow22 INTEGER, tlow23 INTEGER,
       thigh0 INTEGER, thigh1 INTEGER, thigh2 INTEGER, thigh3 INTEGER, thigh4 INTEGER, thigh5 INTEGER, thigh6 INTEGER, thigh7 INTEGER, thigh8 INTEGER, thigh9 INTEGER, thigh10 INTEGER, thigh11 INTEGER, thigh12 INTEGER, thigh13 INTEGER, thigh14 INTEGER, thigh15 INTEGER, thigh16 INTEGER, thigh17 INTEGER, thigh18 INTEGER, thigh19 INTEGER, thigh20 INTEGER, thigh21 INTEGER, thigh22 INTEGER, thigh23 INTEGER,
+
+
+      -- CONTRAINTS
       UNIQUE(eid)
     )
   ''');

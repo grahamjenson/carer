@@ -59,7 +59,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("Urgent Low Alarm"),
-      leading: Icon(Alarm.urgentLow.icon),
+      leading: Icon(AlarmType.urgentLow.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const UrgentAlarmLowSettingsPage())),
@@ -78,7 +78,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("Low Alarm"),
-      leading: Icon(Alarm.low.icon),
+      leading: Icon(AlarmType.low.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const LowAlarmSettingsPage())),
@@ -100,7 +100,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("High Alarm"),
-      leading: Icon(Alarm.high.icon),
+      leading: Icon(AlarmType.high.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const HighAlarmSettingsPage())),
@@ -116,7 +116,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("Urgent High Alarm"),
-      leading: Icon(Alarm.urgentHigh.icon),
+      leading: Icon(AlarmType.urgentHigh.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const UrgentAlarmHighSettingsPage())),
@@ -131,7 +131,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("Fast Drop Alarm"),
-      leading: Icon(Alarm.fastDrop.icon),
+      leading: Icon(AlarmType.fastDrop.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const FastFallAlarmSettingsPage())),
@@ -146,7 +146,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("Fast Rise Alarm"),
-      leading: Icon(Alarm.fastRise.icon),
+      leading: Icon(AlarmType.fastRise.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const FastRiseAlarmSettingsPage())),
@@ -209,7 +209,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("No Data Alarm"),
-      leading: Icon(Alarm.noData.icon),
+      leading: Icon(AlarmType.noData.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const NoDataAlarmSettingsPage())),
@@ -233,7 +233,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection {
 
     return SettingsTile.navigation(
       title: const Text("Low Battery Alarm"),
-      leading: Icon(Alarm.lowBattery.icon),
+      leading: Icon(AlarmType.lowBattery.icon),
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => const BatteryAlarmSettingsPage())),

@@ -74,7 +74,7 @@ class ThemeService {
       debugLabel: "ThemeSignalAssign",
       dependencies: [
             TimerService().minuteSignal,
-            AlarmsService().activeAlarms,
+            AlarmsService().alertingAlarms,
           ] +
           UISettings().allSignals,
     );
@@ -83,7 +83,7 @@ class ThemeService {
   ThemeData get theme => themeSignal.value;
 
   static ThemeData selectTheme() {
-    if (AlarmsService().activeAlarms.value.isNotEmpty) {
+    if (AlarmsService().alertingAlarms.value.isNotEmpty) {
       return normalTheme;
     }
 

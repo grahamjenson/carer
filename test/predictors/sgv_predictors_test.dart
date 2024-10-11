@@ -37,7 +37,6 @@ void main() async {
     test("Linear2Predictor", () async {
       withClock(Clock.fixed(now), () async {
         Linear2Predictor pr = Linear2Predictor();
-        await pr.init();
 
         var sgvs = pr.predictNextHour();
 

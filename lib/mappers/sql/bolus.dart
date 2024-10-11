@@ -26,7 +26,7 @@ class SQLToBolus extends SQLMapper<Bolus> {
     if (errors.isNotEmpty) {
       throw ArgumentError("Invalid Bolus Row: $row, Errors: $errors");
     }
-    var type = BolusType.values.firstWhere((element) => element.name == row["type"] as String);
+    var type = BolusType.fromName(row["type"] as String);
     return Bolus(
       id: row["id"] as int?,
       eid: row["eid"] as String,

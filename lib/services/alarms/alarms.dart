@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
 
-class AlarmSet extends Iterable<Alarm> {
-  final Set<Alarm> _alarms;
+class AlarmSet extends Iterable<AlarmType> {
+  final Set<AlarmType> _alarms;
 
   AlarmSet(this._alarms);
 
@@ -31,7 +31,7 @@ class AlarmSet extends Iterable<Alarm> {
   bool get isEmpty => _alarms.isEmpty;
 
   @override
-  Iterator<Alarm> get iterator => _alarms.iterator;
+  Iterator<AlarmType> get iterator => _alarms.iterator;
 
   @override
   String toString() {
@@ -40,18 +40,18 @@ class AlarmSet extends Iterable<Alarm> {
 }
 
 // TODO this is a step towards having all alarms as static
-enum Alarm {
-  urgentLow(UrgentLowAlarm()),
-  low(LowAlarm()),
-  high(HighAlarm()),
-  urgentHigh(UrgentHighAlarm()),
-  fastRise(FastRiseAlarm()),
-  fastDrop(FastDropAlarm()),
-  noData(NoDataAlarm()),
-  lowBattery(LowBatteryAlarm());
+enum AlarmType {
+  urgentLow(_UrgentLowAlarm()),
+  low(_LowAlarm()),
+  high(_HighAlarm()),
+  urgentHigh(_UrgentHighAlarm()),
+  fastRise(_FastRiseAlarm()),
+  fastDrop(_FastDropAlarm()),
+  noData(_NoDataAlarm()),
+  lowBattery(_LowBatteryAlarm());
 
   final AlarmMethods methods;
-  const Alarm(this.methods);
+  const AlarmType(this.methods);
 
   bool trigger() {
     return methods.trigger();
@@ -65,8 +65,8 @@ enum Alarm {
     return methods.smartSnooze();
   }
 
-  List<String> properties() {
-    return methods.properties();
+  Map<String, dynamic> conditions() {
+    return methods.conditions();
   }
 
   String shortSummary() {
@@ -80,6 +80,15 @@ enum Alarm {
   (bool, bool, bool) alarmStatus() {
     return methods.alarmStatus();
   }
+
+  static AlarmType fromName(String name) {
+    for (var alarm in AlarmType.values) {
+      if (alarm.name == name) {
+        return alarm;
+      }
+    }
+    throw ArgumentError("Invalid Alarm Name: $name");
+  }
 }
 
 abstract class AlarmMethods {
@@ -91,8 +100,17 @@ abstract class AlarmMethods {
     return false;
   }
 
-  List<String> properties() {
-    return [];
+  Map<String, dynamic> conditions() {
+    CleanSGV? lastSGV = CleanSGV.lastSGV.value;
+    return {
+      "lastSGV": lastSGV?.value,
+      "LastSGVStr": lastSGVStr(),
+      "lastSGVAgeInMinutes": lastSGV?.age.inMinutes,
+      "diffs": diffPer5Minute(30),
+      "targetRange5": targetRange5.name,
+      "previousReadings": lastSGV?.before5,
+      "predictions": lastSGV?.predictions,
+    };
   }
 
   @override
@@ -158,8 +176,8 @@ abstract class AlarmMethods {
   }
 }
 
-class UrgentLowAlarm extends AlarmMethods {
-  const UrgentLowAlarm();
+class _UrgentLowAlarm extends AlarmMethods {
+  const _UrgentLowAlarm();
 
   @override
   IconData icon() => UniconsLine.temperature_minus;
@@ -178,8 +196,8 @@ class UrgentLowAlarm extends AlarmMethods {
   }
 }
 
-class LowAlarm extends AlarmMethods {
-  const LowAlarm();
+class _LowAlarm extends AlarmMethods {
+  const _LowAlarm();
 
   @override
   String shortSummary() {
@@ -200,12 +218,12 @@ class LowAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.temperature_empty;
 
   @override
-  List<String> properties() {
-    return [
-      "sgv(${lastSGVStr()})",
-      "number($numberOfReadings)",
-      "prediction(${getPredictedValue(numberOfReadings)})",
-    ];
+  Map<String, dynamic> conditions() {
+    return super.conditions()
+      ..addAll({
+        "numberOfReadings": numberOfReadings,
+        "prediction": getPredictedValue(numberOfReadings),
+      });
   }
 
   bool _lowTrigger() {
@@ -254,8 +272,8 @@ class LowAlarm extends AlarmMethods {
   }
 }
 
-class HighAlarm extends AlarmMethods {
-  const HighAlarm();
+class _HighAlarm extends AlarmMethods {
+  const _HighAlarm();
 
   @override
   IconData icon() => UniconsLine.temperature;
@@ -269,10 +287,11 @@ class HighAlarm extends AlarmMethods {
   }
 
   @override
-  List<String> properties() {
-    return [
-      "mins($mins)",
-    ];
+  Map<String, dynamic> conditions() {
+    return super.conditions()
+      ..addAll({
+        "mins": mins,
+      });
   }
 
   int get mins => AlarmSettings().highMinutes;
@@ -309,8 +328,8 @@ class HighAlarm extends AlarmMethods {
   }
 }
 
-class UrgentHighAlarm extends AlarmMethods {
-  const UrgentHighAlarm();
+class _UrgentHighAlarm extends AlarmMethods {
+  const _UrgentHighAlarm();
 
   @override
   IconData icon() => UniconsLine.temperature_plus;
@@ -329,8 +348,8 @@ class UrgentHighAlarm extends AlarmMethods {
   }
 }
 
-class FastRiseAlarm extends AlarmMethods {
-  const FastRiseAlarm();
+class _FastRiseAlarm extends AlarmMethods {
+  const _FastRiseAlarm();
 
   @override
   IconData icon() => UniconsLine.angle_double_up;
@@ -339,16 +358,16 @@ class FastRiseAlarm extends AlarmMethods {
   String shortSummary() => "Fast Rise (<${unitStr(TargetSettings().fastRiseDelta)})";
 
   @override
-  List<String> properties() {
-    return [
-      "delta(${TargetSettings().fastRiseDelta})"
-          "mins($mins)",
-      "diffs($diffs)",
-    ];
+  Map<String, dynamic> conditions() {
+    return super.conditions()
+      ..addAll({
+        "delta": TargetSettings().fastRiseDelta,
+        "mins": mins,
+      });
   }
 
   int get mins => AlarmSettings().fastRiseAlarmMinutes;
-  List<int> get diffs => diffPer5Minute(AlarmSettings().fastRiseAlarmMinutes);
+  List<int> get diffs => diffPer5Minute(mins);
 
   @override
   bool trigger() {
@@ -374,8 +393,8 @@ class FastRiseAlarm extends AlarmMethods {
   }
 }
 
-class FastDropAlarm extends AlarmMethods {
-  const FastDropAlarm();
+class _FastDropAlarm extends AlarmMethods {
+  const _FastDropAlarm();
 
   @override
   IconData icon() => UniconsLine.angle_double_down;
@@ -384,12 +403,12 @@ class FastDropAlarm extends AlarmMethods {
   String shortSummary() => "Fast Drop (<${unitStr(TargetSettings().fastDropDelta)})";
 
   @override
-  List<String> properties() {
-    return [
-      "delta(${TargetSettings().fastDropDelta})"
-          "mins($mins)",
-      "diffs($diffs)",
-    ];
+  Map<String, dynamic> conditions() {
+    return super.conditions()
+      ..addAll({
+        "delta": TargetSettings().fastDropDelta,
+        "mins": mins,
+      });
   }
 
   int get mins => AlarmSettings().fastDropAlarmMinutes;
@@ -421,8 +440,8 @@ class FastDropAlarm extends AlarmMethods {
   }
 }
 
-class NoDataAlarm extends AlarmMethods {
-  const NoDataAlarm();
+class _NoDataAlarm extends AlarmMethods {
+  const _NoDataAlarm();
 
   @override
   IconData icon() => UniconsLine.x;
@@ -431,10 +450,11 @@ class NoDataAlarm extends AlarmMethods {
   String shortSummary() => "No Data for ${age.inMinutes}m";
 
   @override
-  List<String> properties() {
-    return [
-      "mins(${alarmMinutes()})",
-    ];
+  Map<String, dynamic> conditions() {
+    return super.conditions()
+      ..addAll({
+        "mins": alarmMinutes(),
+      });
   }
 
   int get mins => AlarmSettings().fastDropAlarmMinutes;
@@ -471,11 +491,22 @@ class NoDataAlarm extends AlarmMethods {
   }
 }
 
-class LowBatteryAlarm extends AlarmMethods {
-  const LowBatteryAlarm();
+class _LowBatteryAlarm extends AlarmMethods {
+  const _LowBatteryAlarm();
 
   @override
   IconData icon() => UniconsLine.battery_empty;
+
+  @override
+  Map<String, dynamic> conditions() {
+    return super.conditions()
+      ..addAll({
+        "thisCharging": PlatformInfoService().thisPhoneIsCharging(),
+        "thisBattery": PlatformInfoService().thisPhonesBatteryLevel(),
+        "t1dCharging": PropertiesData().t1dPhoneIsCharging(),
+        "t1dBattery": PropertiesData().t1dPhonesBatteryLevel(),
+      });
+  }
 
   @override
   String shortSummary() {
