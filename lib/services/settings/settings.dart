@@ -1,7 +1,7 @@
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
-import 'package:carer/services/settings/device_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
+import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';

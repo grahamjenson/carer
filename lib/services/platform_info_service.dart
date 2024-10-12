@@ -50,8 +50,9 @@ class PlatformInfoService {
   ASignal<int> batteryLevel = ASignal(100, debugLabel: "BatteryLevel");
 
   bool thisPhoneIsCharging() {
-    // TODO sometimes this returns false, if battery is 100% and plugged in
-    return batteryMode.value == BatteryMode.charging || batteryMode.value == BatteryMode.connectedNotCharging;
+    return batteryMode.value == BatteryMode.charging ||
+        batteryMode.value == BatteryMode.connectedNotCharging ||
+        batteryMode.value == BatteryMode.full;
   }
 
   int thisPhonesBatteryLevel() {

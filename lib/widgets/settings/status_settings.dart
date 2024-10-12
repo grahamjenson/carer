@@ -1,4 +1,4 @@
-import 'package:carer/services/settings/device_settings.dart';
+import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/status_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';

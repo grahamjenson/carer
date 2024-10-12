@@ -17,7 +17,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
     return AWatch(
       (context) {
         var mainColor = accentColor(context);
-        var backgroundColor = mainColor.dim.dim.dim;
+        var bColor = backgroundColorShade(context);
         var buttonColor = mainColor.dim.dim;
 
         return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
@@ -32,7 +32,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
               margin: const EdgeInsets.all(2),
               height: buttonRadias,
               width: width,
-              decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: bColor, borderRadius: BorderRadius.circular(10)),
               child: Stack(
                 children: getTexts(context, width, buttonRadias) +
                     [
@@ -79,7 +79,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
   Widget? alarmStringWidget(BuildContext context) {
     var small = TextStyle(
       fontSize: 10,
-      color: accentColor(context),
+      color: primaryColor(context),
     );
 
     var pendingAlarms = AlarmsService().pendingAlarms.value;
@@ -97,7 +97,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget getSnoozeCancel(BuildContext context, double buttonRadias, Color mainColor, Color backgroundColor) {
+  Widget getSnoozeCancel(BuildContext context, double buttonRadias, Color mainColor, Color bColor) {
     if (AlarmAlertSettings().snoozeDuration == null) {
       return const SizedBox.shrink();
     }
@@ -112,7 +112,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
           width: buttonRadias,
           child: IconButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(backgroundColor),
+              backgroundColor: WidgetStateProperty.all<Color>(bColor),
               shape: WidgetStateProperty.all<OutlinedBorder>(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
