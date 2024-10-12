@@ -119,8 +119,8 @@ class PainterFunctions with ThemeMixin {
       return ChevronDotPainter(
         isUp: false,
         size: 6 * size,
-        color: accentColor(context),
-        strokeColor: primaryColor(context),
+        color: accentColor(context).dim.dim,
+        strokeColor: accentColor(context).dim,
       );
     }
     if (treatment.isBolus) {
