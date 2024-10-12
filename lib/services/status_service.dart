@@ -8,7 +8,10 @@ import 'package:unicons/unicons.dart';
 abstract class _StatusMethods {
   const _StatusMethods();
   IconData get icon;
-  String get status;
+  String get title;
+  String get description;
+  String get reason;
+  String get status => reason;
   bool triggered();
 }
 
@@ -24,7 +27,10 @@ enum Status {
   const Status(this._methods);
 
   IconData get icon => _methods.icon;
+  String get title => _methods.title;
+  String get reason => _methods.reason;
   String get status => _methods.status;
+  String get description => _methods.description;
   bool triggered() => _methods.triggered();
 }
 
@@ -32,11 +38,16 @@ class _CannulaChange extends _StatusMethods {
   const _CannulaChange();
 
   @override
+  String get title => "Cannula Change";
+
+  @override
+  String get description => "Shows 24 hours before change";
+
+  @override
   IconData get icon => UniconsLine.mobile_android;
 
   @override
-  @override
-  String get status {
+  String get reason {
     var hours = hoursLeft;
     var hoursStr = "in ${hours}h";
     if (hours < 1) {
@@ -62,10 +73,16 @@ class _SensorChange extends _StatusMethods {
   const _SensorChange();
 
   @override
+  String get title => "Sensor Change";
+
+  @override
+  String get description => "Shows 24 hours before change";
+
+  @override
   IconData get icon => UniconsLine.processor;
 
   @override
-  String get status {
+  String get reason {
     var hours = hoursLeft;
     var hoursStr = "in ${hours}h";
     if (hours < 1) {
@@ -91,10 +108,28 @@ class _NotCharging extends _StatusMethods {
   const _NotCharging();
 
   @override
+  String get title => "Not Charging";
+
+  @override
+  String get description => "Shows When Phone is not Charging";
+
+  @override
   IconData get icon => UniconsLine.bolt_slash;
 
   @override
   String get status {
+    List<String> tooltip = [];
+
+    var thisChargingStr = PlatformInfoService().thisPhoneIsCharging() ? "Charging" : "Not Charging";
+    var t1dPhoneChargingStr = PropertiesData().t1dPhoneIsCharging() ? "Charging" : "Not Charging";
+
+    tooltip.add("T1D Phone Battery(${PropertiesData().battery.toInt()}%) $t1dPhoneChargingStr");
+    tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%) $thisChargingStr");
+    return tooltip.join("\n");
+  }
+
+  @override
+  String get reason {
     var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
     var t1dPhonesCharging = PropertiesData().t1dPhoneIsCharging();
 
@@ -120,11 +155,27 @@ class _NotCharging extends _StatusMethods {
 
 class _PowerLow extends _StatusMethods {
   const _PowerLow();
+
+  @override
+  String get title => "Power Low";
+
+  @override
+  String get description => "Shows When Phone Battery is below 30%";
+
   @override
   IconData get icon => UniconsLine.battery_empty;
 
   @override
   String get status {
+    List<String> tooltip = [];
+
+    tooltip.add("T1D Phone Battery(${PropertiesData().battery.toInt()}%)");
+    tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%)");
+    return tooltip.join("\n");
+  }
+
+  @override
+  String get reason {
     List<String> tooltip = [];
 
     if (thisPhoneLowPower()) {
@@ -166,11 +217,18 @@ class _PowerLow extends _StatusMethods {
 
 class _SilentOn extends _StatusMethods {
   const _SilentOn();
+
+  @override
+  String get title => "Silent Mode";
+
+  @override
+  String get description => "Shows When Silent Mode is On";
+
   @override
   IconData get icon => UniconsLine.bell_slash;
 
   @override
-  String get status {
+  String get reason {
     if (triggered()) {
       return "Silent Mode On";
     }

@@ -57,33 +57,21 @@ enum AlarmType {
   final AlarmMethods _methods;
   const AlarmType(this._methods);
 
-  bool trigger() {
-    return _methods.trigger();
-  }
+  bool trigger() => _methods.trigger();
 
-  bool active() {
-    return _methods.active();
-  }
+  bool active() => _methods.active();
 
-  bool smartSnooze() {
-    return _methods.smartSnooze();
-  }
+  bool smartSnooze() => _methods.smartSnooze();
 
-  Map<String, dynamic> conditions() {
-    return _methods.conditions();
-  }
+  Map<String, dynamic> conditions() => _methods.conditions();
 
-  String shortSummary() {
-    return _methods.shortSummary();
-  }
+  String get description => _methods.description;
+  String get title => _methods.title;
+  String shortSummary() => _methods.shortSummary();
 
-  IconData get icon {
-    return _methods.icon();
-  }
+  IconData get icon => _methods.icon();
 
-  (bool, bool, bool) alarmStatus() {
-    return _methods.alarmStatus();
-  }
+  (bool, bool, bool) alarmStatus() => _methods.alarmStatus();
 
   static AlarmType fromName(String name) {
     for (var alarm in AlarmType.values) {
@@ -131,6 +119,8 @@ abstract class AlarmMethods {
     return runtimeType.toString();
   }
 
+  String get description;
+  String get title;
   String shortSummary();
   IconData icon();
 
@@ -214,6 +204,19 @@ class _UrgentLowAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.temperature_minus;
 
   @override
+  String get title => "Urgent Low Alarm";
+
+  @override
+  String get description {
+    var unit = UISettings().unit;
+    String description = "Alarm Below ${unit.str(TargetSettings().lowUrgent)}";
+    if (!AlarmSettings().urgentLowAlarm) {
+      description = "Off";
+    }
+    return description;
+  }
+
+  @override
   String shortSummary() => "Urgent Low (<${unitStr(TargetSettings().lowUrgent)})";
 
   @override
@@ -232,6 +235,22 @@ class _LowAlarm extends AlarmMethods {
 
   @override
   get minutesToTrigger => AlarmSettings().lowPredictionMinutes;
+
+  @override
+  String get title => "Low Alarm";
+
+  @override
+  String get description {
+    var unit = UISettings().unit;
+    String description = "Alarm Below ${unit.str(TargetSettings().lowTarget)}";
+    if (AlarmSettings().lowPredictionAlarm) {
+      description += " (w/ Predictive Low in ${AlarmSettings().lowPredictionMinutes}m)";
+    }
+    if (!AlarmSettings().lowAlarm) {
+      description = "Off";
+    }
+    return description;
+  }
 
   @override
   String shortSummary() {
@@ -302,6 +321,25 @@ class _HighAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.temperature;
 
   @override
+  String get title => "High Alarm";
+
+  @override
+  String get description {
+    var unit = UISettings().unit;
+    String description = "Alarm Above ${unit.str(TargetSettings().highTarget)}";
+    if (AlarmSettings().highMinutes > 0) {
+      description += " for ${AlarmSettings().highMinutes}m";
+    }
+    if (AlarmAlertSettings().smartSnoozeHigh) {
+      description += " (w/ Smart Snooze)";
+    }
+    if (!AlarmSettings().highAlarm) {
+      description = "Off";
+    }
+    return description;
+  }
+
+  @override
   String shortSummary() {
     if (smartSnooze()) {
       return "High Smart Snooze (<${unitStr(TargetSettings().highTarget)})";
@@ -348,7 +386,20 @@ class _UrgentHighAlarm extends AlarmMethods {
   const _UrgentHighAlarm();
 
   @override
+  String get title => "Urgent High Alarm";
+
+  @override
   IconData icon() => UniconsLine.temperature_plus;
+
+  @override
+  String get description {
+    var unit = UISettings().unit;
+    String description = "Alarm Above ${unit.str(TargetSettings().highUrgent)}";
+    if (!AlarmSettings().urgentHighAlarm) {
+      description = "Off";
+    }
+    return description;
+  }
 
   @override
   String shortSummary() => "Urgent High (>${unitStr(TargetSettings().highUrgent)})";
@@ -368,7 +419,19 @@ class _FastRiseAlarm extends AlarmMethods {
   const _FastRiseAlarm();
 
   @override
+  String get title => "Fast Rise Alarm";
+
+  @override
   IconData icon() => UniconsLine.angle_double_up;
+
+  @override
+  String get description {
+    var description = "Fast Rise Alarm after ${AlarmSettings().fastRiseAlarmMinutes}m";
+    if (AlarmSettings().fastRiseAlarmMinutes < 0) {
+      description = "Off";
+    }
+    return description;
+  }
 
   @override
   String shortSummary() => "Fast Rise (<${unitStr(TargetSettings().fastRiseDelta)})";
@@ -406,7 +469,19 @@ class _FastDropAlarm extends AlarmMethods {
   const _FastDropAlarm();
 
   @override
+  String get title => "Fast Drop Alarm";
+
+  @override
   IconData icon() => UniconsLine.angle_double_down;
+
+  @override
+  String get description {
+    var description = "Fast Drop Alarm after ${AlarmSettings().fastDropAlarmMinutes}m";
+    if (AlarmSettings().fastDropAlarmMinutes < 0) {
+      description = "Off";
+    }
+    return description;
+  }
 
   @override
   String shortSummary() => "Fast Drop (<${unitStr(TargetSettings().fastDropDelta)})";
@@ -445,7 +520,19 @@ class _NoDataAlarm extends AlarmMethods {
   const _NoDataAlarm();
 
   @override
+  String get title => "No Data Alarm";
+
+  @override
   IconData icon() => UniconsLine.x;
+
+  @override
+  String get description {
+    var description = "No Data Alarm after ${AlarmSettings().noDataAlarmMinutes}m";
+    if (AlarmSettings().noDataAlarmMinutes < 0) {
+      description = "Off";
+    }
+    return description;
+  }
 
   @override
   String shortSummary() => "No Data for ${age.inMinutes}m";
@@ -486,6 +573,9 @@ class _LowBatteryAlarm extends AlarmMethods {
   const _LowBatteryAlarm();
 
   @override
+  String get title => "Low Battery Alarm";
+
+  @override
   IconData icon() => UniconsLine.battery_empty;
 
   @override
@@ -497,6 +587,24 @@ class _LowBatteryAlarm extends AlarmMethods {
         "t1dCharging": PropertiesData().t1dPhoneIsCharging(),
         "t1dBattery": PropertiesData().t1dPhonesBatteryLevel(),
       });
+  }
+
+  @override
+  String get description {
+    String description = "Battery below 10%(";
+    List<String> phones = [];
+    if (AlarmSettings().t1dBatteryAlarm) {
+      phones.add("T1D Phone");
+    }
+    if (AlarmSettings().carerBatteryAlarm) {
+      phones.add("This Phone");
+    }
+    description += "${phones.join(", ")})";
+
+    if (!AlarmSettings().t1dBatteryAlarm && !AlarmSettings().carerBatteryAlarm) {
+      description = "Off";
+    }
+    return description;
   }
 
   @override

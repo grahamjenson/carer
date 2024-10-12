@@ -2,6 +2,7 @@ import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/status_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:unicons/unicons.dart';
@@ -30,13 +31,17 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   }
 
   SettingsTile inactiveStatus(BuildContext context, Status status) {
-    return SettingsTile.switchTile(
+    Color? iconColor;
+    if (status.triggered()) {
+      iconColor = primaryColor(context);
+    }
+    var descriptionStyle = labelMedium(context).copyWith(color: onBackgroundColor(context));
+    var statusStyle = labelSmall(context).copyWith(color: onBackgroundColor(context).dim);
+    return SettingsTile(
       descriptionInlineIos: true,
-      title: Text(status.name),
-      initialValue: true,
-      onToggle: (value) => null,
-      description: Text(status.status),
-      leading: Icon(status.icon),
+      title: Text(status.title),
+      description: SmartText(texts: ["${status.description}\n", status.status], styles: [descriptionStyle, statusStyle]),
+      leading: Icon(status.icon, color: iconColor),
     );
   }
 

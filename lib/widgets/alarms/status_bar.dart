@@ -55,7 +55,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
   Widget? getStatusIcon(BuildContext context, Status status) {
     if (status.triggered()) {
       return Tooltip(
-        message: status.status,
+        message: status.reason,
         triggerMode: TooltipTriggerMode.tap,
         child: Icon(
           status.icon,
