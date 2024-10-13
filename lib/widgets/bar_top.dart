@@ -4,8 +4,9 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/alarms_bar.dart';
 import 'package:carer/widgets/alarms/status_bar.dart';
+import 'package:carer/widgets/bar/care_btn.dart';
+import 'package:carer/widgets/bar/settings_btn.dart';
 import 'package:carer/widgets/current_time.dart';
-import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:flutter/material.dart';
 
 class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWidget {
@@ -49,24 +50,8 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
     }
     return [
       const Spacer(),
-      IconButton(
-        color: Colors.white,
-        highlightColor: Colors.white,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context)),
-        ),
-        padding: EdgeInsets.zero,
-        icon: Icon(
-          Icons.settings,
-          color: accentColor(context),
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
-          );
-        },
-      )
+      const CareBtn(),
+      const SettingsBtn(),
     ];
   }
 }
