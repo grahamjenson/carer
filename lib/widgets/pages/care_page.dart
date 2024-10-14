@@ -1,3 +1,5 @@
+import 'package:carer/nsclient/nsclient.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -16,10 +18,13 @@ class CarePage extends StatelessWidget {
             SettingsSection(
               title: const Text('Carbs'),
               tiles: [
-                SettingsTile.switchTile(
-                  initialValue: false,
-                  onToggle: (aha) => null,
-                  title: const Text('Carbs'),
+                SettingsTile.navigation(
+                  title: const Text('Add 1 Carb'),
+                  onPressed: (context) {
+                    var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
+                    NSClient().addCarbs(nsURL, nsToken, 1);
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
             ),

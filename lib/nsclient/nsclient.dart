@@ -35,6 +35,9 @@ Uri currentProfile(nsURL, token) => Uri.parse('$nsURL/api/v1/profile/current.jso
 
 Uri propertiesEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties.json?token=$token');
 
+// Add Carbs endpoint
+Uri addCarbsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
+
 // Singleton
 class NSClient {
   static final NSClient _singleton = NSClient._internal();
@@ -43,6 +46,30 @@ class NSClient {
 
   ASignal<DateTime?> lastError = ASignal<DateTime?>(null, debugLabel: "NSClientLastError");
   ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
+
+  Future<bool> addCarbs(String nsURL, String token, int carbs) async {
+    if (nsURL == "" || token == "") {
+      alog("No NS URL or token");
+      return false;
+    }
+    var ep = addCarbsEndpoint(nsURL, token);
+
+    var body = '''{
+            "eventType": "Carb Correction",
+            "carbs": $carbs
+      }''';
+    final (response, err) = await go(http.post(ep,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: body));
+
+    if (_handleResponseError(ep, response, err)) {
+      return false;
+    }
+
+    return true;
+  }
 
   Future<NSEntries> getEntries(String nsURL, String token, DateTime gteCreateAt) async {
     if (nsURL == "" || token == "") {

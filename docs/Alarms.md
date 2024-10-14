@@ -55,3 +55,4 @@ Smart Snooze
 Notifications
 Alert volume override
 Continuouse alarm (not just a few beeps)
+
