@@ -38,7 +38,7 @@ Uri currentProfile(nsURL, token) => Uri.parse('$nsURL/api/v1/profile/current.jso
 Uri propertiesEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties.json?token=$token');
 
 // Add Carbs endpoint
-Uri addCarbsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
+Uri v3TreatmentsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v3/treatments');
 
 // JWT endpoint
 Uri jwtEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/authorization/request/token=$token');
@@ -100,7 +100,7 @@ class NSClient {
       return false;
     }
 
-    var ep = addCarbsEndpoint(nsURL, token);
+    var ep = v3TreatmentsEndpoint(nsURL, token);
 
     var date = clock.now();
     var dateInMilliseconds = date.millisecondsSinceEpoch;
@@ -117,6 +117,53 @@ class NSClient {
     final (response, err) = await go(http.post(ep,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          "Accept": " application/json",
+          "Authorization": "bearer $jwt",
+        },
+        body: jsonEncode(bodyMap)));
+
+    if (_handleResponseError(ep, response, err)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<bool> addTempTarget(String nsURL, String token, int low, int high, int duration, String reason) async {
+    if (nsURL == "" || token == "") {
+      alog("No NS URL or token");
+      return false;
+    }
+
+    var jwtSuccess = await refreshJWT(nsURL, token);
+    if (!jwtSuccess) {
+      return false;
+    }
+
+    var ep = v3TreatmentsEndpoint(nsURL, token);
+
+    var date = clock.now();
+    var dateInMilliseconds = date.millisecondsSinceEpoch;
+
+    Map<String, dynamic> bodyMap = {
+      "eventType": "Temporary Target",
+      "reason": reason,
+      "targetBottom": low,
+      "targetTop": high,
+      "units": "mg/dl",
+      "duration": duration, // In minutes
+      "durationInMilliseconds": duration * 60 * 1000, // ms
+      "date": dateInMilliseconds,
+      "mills": dateInMilliseconds, // NightGuard requires this ¯\_(ツ)_/¯
+      "isValid": true,
+      "app": "carer",
+    };
+
+    final (response, err) = await go(http.post(ep,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Accept": " application/json",
+          "Authorization": "bearer $jwt",
         },
         body: jsonEncode(bodyMap)));
 
@@ -204,10 +251,10 @@ class NSClient {
       lastError.value = clock.now();
       return true;
     }
-    alog("FETCHED ${uri.toString()}");
-    if (response.statusCode != 200) {
+    alog("NSCLIENT: FETCHED ${uri.toString()}");
+    if (response.statusCode != 200 && response.statusCode != 201) {
       lastError.value = clock.now();
-      alog("NON 200 responce code ${response.statusCode}");
+      alog("NSCLIENT: NON 200 responce code ${response.statusCode}");
       return true;
     }
     lastFetched.value = clock.now();
