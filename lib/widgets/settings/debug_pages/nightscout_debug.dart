@@ -49,7 +49,7 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('$name: ${updater.successfulAge.inMinutes}'),
-        Text(prettyPrintJson(updater.raw)),
+        Text(prettyPrintJson(updater.raw) ?? ''),
       ],
     );
   }

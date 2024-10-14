@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
@@ -8,6 +10,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:uuid/uuid.dart';
 
 String toNSDateString(DateTime dt) {
   dt = dt.toUtc();
@@ -54,15 +57,28 @@ class NSClient {
     }
     var ep = addCarbsEndpoint(nsURL, token);
 
-    var body = '''{
-            "eventType": "Carb Correction",
-            "carbs": $carbs
-      }''';
+    //
+    var date = clock.now();
+    var dateInMilliseconds = date.millisecondsSinceEpoch;
+    var dateIsoString = date.toIso8601String();
+    Map<String, dynamic> bodyMap = {
+      "eventType": "Carb Correction",
+      "carbs": carbs,
+      "notes": " ",
+      "date": dateInMilliseconds,
+      "created_at": dateIsoString,
+      "isReadOnly": false,
+      "isValid": true,
+      "app": "AAPS",
+      "subject": "display",
+      "identifier": const Uuid().v4(),
+    };
+
     final (response, err) = await go(http.post(ep,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: body));
+        body: jsonEncode(bodyMap)));
 
     if (_handleResponseError(ep, response, err)) {
       return false;
