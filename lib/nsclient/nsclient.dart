@@ -10,7 +10,6 @@ import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:uuid/uuid.dart';
 
 String toNSDateString(DateTime dt) {
   dt = dt.toUtc();
@@ -41,6 +40,9 @@ Uri propertiesEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties.json
 // Add Carbs endpoint
 Uri addCarbsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token');
 
+// JWT endpoint
+Uri jwtEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/authorization/request/token=$token');
+
 // Singleton
 class NSClient {
   static final NSClient _singleton = NSClient._internal();
@@ -50,28 +52,66 @@ class NSClient {
   ASignal<DateTime?> lastError = ASignal<DateTime?>(null, debugLabel: "NSClientLastError");
   ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
 
+  String? jwt;
+  DateTime? jwtExpire;
+
+  ///
+  // API V3 Calls
+  ////
+
+  Future<bool> refreshJWT(String nsURL, String token) async {
+    // check to see if we need a new JWT
+    if (jwt != null && jwtExpire != null && jwtExpire!.isAfter(clock.now().add(const Duration(minutes: 5)))) {
+      return true;
+    }
+
+    if (nsURL == "" || token == "") {
+      alog("No NS URL or token");
+      return false;
+    }
+    alog("NSCLIENT: REFRESHING JWT");
+    var ep = jwtEndpoint(nsURL, token);
+    final (response, err) = await go(http.get(ep));
+    if (_handleResponseError(ep, response, err)) {
+      return false;
+    }
+
+    // expample
+    // {"token":"<t>>",
+    // "sub":"display",
+    // "permissionGroups":[["api:treatments:create"],["*:*:read"],[]],
+    // "iat":1728938573,
+    // "exp":1728967373}
+    var body = jsonDecode(response!.body);
+    jwt = body["token"] as String;
+    var expts = body["exp"] as int;
+    jwtExpire = DateTime.fromMillisecondsSinceEpoch(expts * 1000);
+    return true;
+  }
+
   Future<bool> addCarbs(String nsURL, String token, int carbs) async {
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
       return false;
     }
+
+    var jwtSuccess = await refreshJWT(nsURL, token);
+    if (!jwtSuccess) {
+      return false;
+    }
+
     var ep = addCarbsEndpoint(nsURL, token);
 
-    //
     var date = clock.now();
     var dateInMilliseconds = date.millisecondsSinceEpoch;
-    var dateIsoString = date.toIso8601String();
+
     Map<String, dynamic> bodyMap = {
       "eventType": "Carb Correction",
       "carbs": carbs,
-      "notes": " ",
       "date": dateInMilliseconds,
-      "created_at": dateIsoString,
-      "isReadOnly": false,
+      "mills": dateInMilliseconds, // NightGuard requires this ¯\_(ツ)_/¯
       "isValid": true,
-      "app": "AAPS",
-      "subject": "display",
-      "identifier": const Uuid().v4(),
+      "app": "carer",
     };
 
     final (response, err) = await go(http.post(ep,
@@ -87,6 +127,9 @@ class NSClient {
     return true;
   }
 
+  ///
+  // API  V1 CALLS
+  ///
   Future<NSEntries> getEntries(String nsURL, String token, DateTime gteCreateAt) async {
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
