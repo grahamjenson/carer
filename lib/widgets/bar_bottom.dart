@@ -13,10 +13,10 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     return AWatch(
       (context) {
         List<Widget> tiles = [
+          const CareBtn(),
           const Expanded(
             child: SizedBox.shrink(),
           ),
-          const CareBtn(),
           const SettingsBtn(),
         ];
 

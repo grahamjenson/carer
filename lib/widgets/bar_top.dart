@@ -51,6 +51,13 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
     return [
       const Spacer(),
       const CareBtn(),
+      VerticalDivider(
+        color: outlineColor(context),
+        thickness: 5,
+        width: 20,
+        indent: 5,
+        endIndent: 5,
+      ),
       const SettingsBtn(),
     ];
   }
