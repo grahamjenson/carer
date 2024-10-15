@@ -48,3 +48,4 @@ data.json
 data.csv
 macosData
 coverage/
+.vscode/
