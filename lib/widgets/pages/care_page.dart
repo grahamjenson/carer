@@ -31,6 +31,7 @@ class CarePage extends StatelessWidget {
               tiles: [
                 ttTile("Hypo", 145, 145, 30),
                 ttTile("Activity", 126, 145, 30),
+                ttTile("Eating Soon", 90, 90, 30),
               ],
             ),
           ],
