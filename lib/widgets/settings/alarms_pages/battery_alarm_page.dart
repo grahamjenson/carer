@@ -34,7 +34,7 @@ class BatteryAlarmSettingsPage extends StatelessWidget {
                     title: const Text("Carer Battery Alarm"),
                     descriptionInlineIos: true,
                     description: const Text(
-                      "Alarms when THIS phones Battery < 10%",
+                      "Alarms when THIS devices Battery < 10%",
                     ),
                     initialValue: AlarmSettings().carerBatteryAlarm,
                     onToggle: (value) {

@@ -597,7 +597,7 @@ class _LowBatteryAlarm extends AlarmMethods {
       phones.add("T1D Phone");
     }
     if (AlarmSettings().carerBatteryAlarm) {
-      phones.add("This Phone");
+      phones.add("This Device");
     }
     description += "${phones.join(", ")})";
 

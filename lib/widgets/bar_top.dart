@@ -30,7 +30,7 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
             getSettingsButtonEnd(context);
 
         return BottomAppBar(
-          color: const Color.fromRGBO(0, 0, 0, 0),
+          color: backgroundColorShade(context),
           padding: const EdgeInsets.only(left: 8, right: 8),
           height: 40,
           child: Row(

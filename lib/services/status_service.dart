@@ -47,6 +47,16 @@ class _CannulaChange extends _StatusMethods {
   IconData get icon => UniconsLine.mobile_android;
 
   @override
+  String get status {
+    var hours = hoursLeft;
+    var hoursStr = "in ${hours}h";
+    if (hours < 1) {
+      hoursStr = "NOW";
+    }
+    return "Cannula ($daysOld days old) change $hoursStr";
+  }
+
+  @override
   String get reason {
     var hours = hoursLeft;
     var hoursStr = "in ${hours}h";
@@ -61,6 +71,11 @@ class _CannulaChange extends _StatusMethods {
     var cageExpiry = cage.add(StatusSettings().cannulaDuration);
     var hours = cageExpiry.difference(clock.now()).inHours;
     return hours;
+  }
+
+  int get daysOld {
+    var cage = PropertiesData().cage;
+    return clock.now().difference(cage).inDays;
   }
 
   @override
@@ -82,6 +97,16 @@ class _SensorChange extends _StatusMethods {
   IconData get icon => UniconsLine.processor;
 
   @override
+  String get status {
+    var hours = hoursLeft;
+    var hoursStr = "in ${hours}h";
+    if (hours < 1) {
+      hoursStr = "NOW";
+    }
+    return "Sensor ($daysOld days old) Change $hoursStr";
+  }
+
+  @override
   String get reason {
     var hours = hoursLeft;
     var hoursStr = "in ${hours}h";
@@ -96,6 +121,11 @@ class _SensorChange extends _StatusMethods {
     var sageExpiry = sage.add(StatusSettings().sensorDuration);
     var hours = sageExpiry.difference(clock.now()).inHours;
     return hours;
+  }
+
+  int get daysOld {
+    var sage = PropertiesData().sage;
+    return clock.now().difference(sage).inDays;
   }
 
   @override
@@ -180,7 +210,7 @@ class _PowerLow extends _StatusMethods {
 
     if (thisPhoneLowPower()) {
       var thisPhonesBattery = PlatformInfoService().thisPhonesBatteryLevel();
-      tooltip.add("This Phones Battery < 30%($thisPhonesBattery%)");
+      tooltip.add("Battery < 30%($thisPhonesBattery%)");
     }
 
     if (t1dPhoneLowPower()) {

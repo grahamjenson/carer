@@ -10,7 +10,6 @@ import 'package:carer/utils/math.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
 class Stats extends StatelessWidget with ThemeMixin {
   Stats({super.key});
@@ -51,13 +50,6 @@ class Stats extends StatelessWidget with ThemeMixin {
 
       var iobNow = PropertiesData().iob;
       var cobNow = PropertiesData().cob;
-      var cageNow = PropertiesData().cage;
-      var powerNow = PropertiesData().battery;
-      var charging = PropertiesData().t1dPhoneIsCharging();
-      var sageNow = PropertiesData().sage;
-
-      var sgvs = CleanSGV.last3Hours.value;
-      var exp2preds = CleanSGV.lastSGV.value?.predictions ?? [];
 
       return Window(
         child: SingleChildScrollView(
@@ -90,16 +82,9 @@ class Stats extends StatelessWidget with ThemeMixin {
                 basal(currentBasal, heading, row, small),
                 target(UISettings().unit, profileLowTarget, profileHighTarget, heading, row, small),
                 currentProfile(heading, row, small),
-                fifteenMinDiff(UISettings().unit, sgvs, heading, row, small),
-                profileValues(heading, row, small),
                 divider(),
                 todaysInRange(heading, row, small),
                 yesterdayInRange(heading, row, small),
-                cage(cageNow, heading, row, small),
-                sage(sageNow, heading, row, small),
-                power(powerNow.toInt(), charging, heading, row, small),
-                divider(),
-                predictions("Forecast", exp2preds, UISettings().unit, heading, row, small),
               ],
             ),
           ),
@@ -114,43 +99,6 @@ class Stats extends StatelessWidget with ThemeMixin {
       cells: [
         DataCell(Text(" ", style: style)),
         DataCell(Text(" ", style: style)),
-      ],
-    );
-  }
-
-  DataRow profileValues(TextStyle heading, TextStyle row, TextStyle small) {
-    ValueAtTime? valueAtTime = ValueAtTime.lastSixHours.value.firstOrNull;
-    if (valueAtTime == null) {
-      return DataRow(
-        cells: [
-          DataCell(Text("CR/ISF", style: heading)),
-          DataCell(
-            Text("none", style: row),
-          ),
-        ],
-      );
-    }
-    var cr = valueAtTime.cr;
-    var isf = valueAtTime.isf;
-
-    return DataRow(
-      cells: [
-        DataCell(Text("CR/ISF", style: heading)),
-        DataCell(
-          SmartText(textAlign: TextAlign.center, texts: [
-            "$cr",
-            "g",
-            " | ",
-            "$isf",
-            "u",
-          ], styles: [
-            row,
-            small,
-            row,
-            row,
-            small,
-          ]),
-        ),
       ],
     );
   }
@@ -194,28 +142,6 @@ class Stats extends StatelessWidget with ThemeMixin {
     );
   }
 
-  DataRow predictions(String name, List<CleanSGV?> preds, Unit unit, TextStyle heading, TextStyle row, TextStyle small) {
-    return DataRow(
-      cells: [
-        DataCell(Text(name, style: heading)),
-        DataCell(
-          SmartText(texts: [
-            "${preds.map(
-              (e) {
-                if (e == null) {
-                  return "?";
-                }
-                return e.unitStr();
-              },
-            )}"
-          ], styles: [
-            small,
-          ]),
-        ),
-      ],
-    );
-  }
-
   DataRow iob(double iob, TextStyle heading, TextStyle row, TextStyle small) {
     iob = toMax2dp(iob);
     return DataRow(
@@ -239,49 +165,6 @@ class Stats extends StatelessWidget with ThemeMixin {
         ),
         DataCell(
           SmartText(texts: ["$cob", "g"], styles: [row, small]),
-        ),
-      ],
-    );
-  }
-
-  DataRow power(int battery, bool charging, TextStyle heading, TextStyle row, TextStyle small) {
-    Widget chargingW = const SizedBox.shrink();
-
-    if (charging) {
-      chargingW = Icon(UniconsLine.bolt, color: row.color!, size: row.fontSize);
-    }
-    return DataRow(
-      cells: [
-        DataCell(Text("Power", style: heading)),
-        DataCell(
-          Row(children: [
-            SmartText(texts: ["$battery", "%"], styles: [row, small]),
-            chargingW,
-          ]),
-        ),
-      ],
-    );
-  }
-
-  DataRow cage(DateTime cage, TextStyle heading, TextStyle row, TextStyle small) {
-    Duration d = DateTime.now().difference(cage);
-    return DataRow(
-      cells: [
-        DataCell(Text("cage", style: heading)),
-        DataCell(
-          SmartText(texts: ["${d.inDays}", "d"], styles: [row, small]),
-        ),
-      ],
-    );
-  }
-
-  DataRow sage(DateTime sage, TextStyle heading, TextStyle row, TextStyle small) {
-    Duration d = DateTime.now().difference(sage);
-    return DataRow(
-      cells: [
-        DataCell(Text("sage", style: heading)),
-        DataCell(
-          SmartText(texts: ["${d.inDays}", "d"], styles: [row, small]),
         ),
       ],
     );
@@ -363,29 +246,6 @@ class Stats extends StatelessWidget with ThemeMixin {
     }
 
     return SmartText(texts: texts, styles: styles);
-  }
-
-  DataRow fifteenMinDiff(Unit unit, List<CleanSGV> bigsgvs, TextStyle heading, TextStyle row, TextStyle small) {
-    if (bigsgvs.length < 3) {
-      return DataRow(
-        cells: [
-          DataCell(Text("15m Δ", style: heading)),
-          DataCell(
-            Text("none", style: row),
-          ),
-        ],
-      );
-    }
-    var sgvs = bigsgvs.sublist(0, 3);
-    var diff = sgvs.first.value - sgvs.last.value;
-    return DataRow(
-      cells: [
-        DataCell(Text("15m Δ", style: heading)),
-        DataCell(
-          SmartText(texts: [(unit.str(diff)), (unit.name)], styles: [row, small]),
-        ),
-      ],
-    );
   }
 
   DataRow todaysInRange(TextStyle heading, TextStyle row, TextStyle small) {

@@ -21,7 +21,7 @@ class BarBottom extends StatelessWidget with ThemeMixin {
         ];
 
         return BottomAppBar(
-          color: Colors.transparent,
+          color: backgroundColorShade(context),
           padding: const EdgeInsets.only(left: 8, right: 8),
           height: 40,
           child: Row(

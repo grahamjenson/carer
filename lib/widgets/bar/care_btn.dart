@@ -11,7 +11,7 @@ class CareBtn extends StatelessWidget with ThemeMixin {
       color: Colors.white,
       highlightColor: Colors.white,
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context)),
+        backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context).bright),
       ),
       padding: EdgeInsets.zero,
       icon: Icon(
