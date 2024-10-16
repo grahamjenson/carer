@@ -92,6 +92,14 @@ class ValueAtTime with DateMixin {
   static ASignal<List<ValueAtTime>> last2Days = ASignal([], debugLabel: 'valueAtTimeLast2Days');
   static ASignal<List<ValueAtTime>> lastSixHours = ASignal([], debugLabel: 'valueAtTimeLastSixHours');
 
+  static ValueAtTime? last() {
+    var values = lastSixHours.value;
+    if (values.isEmpty) {
+      return null;
+    }
+    return values.first;
+  }
+
   static Future<List<ValueAtTime>> updateValues(int hoursAgo) async {
     alog('ValueAtTime.updateValues');
     var now = clock.now();
