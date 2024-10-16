@@ -1,30 +1,43 @@
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url "${project(':background_fetch').projectDir}/libs" }
+    }
+
+    subprojects {
+        afterEvaluate { project ->
+            if (project.hasProperty('android')) {
+                project.android {
+                    if (namespace == null) {
+                        namespace project.group
+                    }
+               }
+           }
+      }
+   }
+
+    ext {
+        compileSdkVersion   = 34                
+        targetSdkVersion    = 34
+        ndkVersion = "27.0.12077973" 
+        minSdkVersion = 34               
     }
 }
 
-rootProject.buildDir = '../build'
+
+
+rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
-    project.evaluationDependsOn(':app')
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+
+
