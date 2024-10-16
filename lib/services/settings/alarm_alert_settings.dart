@@ -29,12 +29,12 @@ class AlarmAlertSettings {
   factory AlarmAlertSettings() => _singleton;
 
   final Map<_AANames, ASignal> _signals = {
-    _AANames.smartSnoozeHigh: ASignal<bool>(false, debugLabel: 'smartSnoozeHigh'),
-    _AANames.brightnessAdjustAtNight: ASignal<bool>(false, debugLabel: 'brightnessAdjustAtNight'),
-    _AANames.enableFlashOnAlarm: ASignal<bool>(false, debugLabel: 'enableFlashOnAlarm'),
+    _AANames.smartSnoozeHigh: ASignal<bool>(true, debugLabel: 'smartSnoozeHigh'),
+    _AANames.brightnessAdjustAtNight: ASignal<bool>(true, debugLabel: 'brightnessAdjustAtNight'),
+    _AANames.enableFlashOnAlarm: ASignal<bool>(true, debugLabel: 'enableFlashOnAlarm'),
     _AANames.enableAudioAlarm: ASignal<bool>(true, debugLabel: 'enableAudioAlarm'),
-    _AANames.volumeOveride: ASignal<bool>(false, debugLabel: 'volumeOveride'),
-    _AANames.volumeOverrideValue: ASignal<int>(10, debugLabel: 'volumeOverrideValue'),
+    _AANames.volumeOveride: ASignal<bool>(true, debugLabel: 'volumeOveride'),
+    _AANames.volumeOverrideValue: ASignal<int>(50, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
     _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
     _AANames.snoozeUntil: ASignal<DateTime?>(null, debugLabel: "snoozeUntil"),
@@ -114,18 +114,18 @@ class AlarmAlertSettings {
   }
 
   setupDBPropagation(KeyValueStore prefs) {
-    smartSnoozeHigh = prefs.getBool(_AANames.smartSnoozeHigh.name, defaultValue: false)!;
+    smartSnoozeHigh = prefs.getBool(_AANames.smartSnoozeHigh.name, defaultValue: true)!;
 
     enableAudioAlarm = prefs.getBool(_AANames.enableAudioAlarm.name, defaultValue: true)!;
-    volumeOveride = prefs.getBool(_AANames.volumeOveride.name, defaultValue: false)!;
+    volumeOveride = prefs.getBool(_AANames.volumeOveride.name, defaultValue: true)!;
     volumeOverrideValue = prefs.getInt(_AANames.volumeOverrideValue.name, defaultValue: 50)!;
     volumeProgressionSeconds = prefs.getInt(_AANames.volumeProgressionSeconds.name, defaultValue: 10)!;
 
     var prefsAlarmAsset = prefs.getString(_AANames.alarmAsset.name, defaultValue: AlarmSounds.nightguard.name)!;
     alarmAsset = AlarmSounds.fromName(prefsAlarmAsset, AlarmSounds.nightguard);
 
-    brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: false)!;
-    enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: false)!;
+    brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: true)!;
+    enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: true)!;
 
     aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'smartSnoozeHigh');
 

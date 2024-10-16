@@ -28,18 +28,18 @@ class AlarmSettings {
 
   final Map<_AlarmNames, ASignal> _signals = {
     _AlarmNames.disableAlarms: ASignal<bool>(true, debugLabel: 'disableAlarms'),
-    _AlarmNames.urgentLowAlarm: ASignal<bool>(false, debugLabel: 'urgentLowAlarm'),
-    _AlarmNames.lowAlarm: ASignal<bool>(false, debugLabel: 'lowAlarm'),
-    _AlarmNames.highAlarm: ASignal<bool>(false, debugLabel: 'highAlarm'),
+    _AlarmNames.urgentLowAlarm: ASignal<bool>(true, debugLabel: 'urgentLowAlarm'),
+    _AlarmNames.lowAlarm: ASignal<bool>(true, debugLabel: 'lowAlarm'),
+    _AlarmNames.highAlarm: ASignal<bool>(true, debugLabel: 'highAlarm'),
     _AlarmNames.highMinutes: ASignal<int>(5, debugLabel: 'highMinutes'),
-    _AlarmNames.urgentHighAlarm: ASignal<bool>(false, debugLabel: 'urgentHighAlarm'),
+    _AlarmNames.urgentHighAlarm: ASignal<bool>(true, debugLabel: 'urgentHighAlarm'),
     _AlarmNames.fastDropAlarmMinutes: ASignal<int>(-1, debugLabel: 'fastDropAlarmMinutes'),
     _AlarmNames.fastRiseAlarmMinutes: ASignal<int>(-1, debugLabel: 'fastRiseAlarmMinutes'),
     _AlarmNames.noDataAlarmMinutes: ASignal<int>(-1, debugLabel: 'noDataAlarmMinutes'),
-    _AlarmNames.lowPredictionAlarm: ASignal<bool>(false, debugLabel: 'lowPredictionAlarm'),
+    _AlarmNames.lowPredictionAlarm: ASignal<bool>(true, debugLabel: 'lowPredictionAlarm'),
     _AlarmNames.lowPredictionMinutes: ASignal<int>(5, debugLabel: 'lowPredictionMinutes'),
-    _AlarmNames.carerBatteryAlarm: ASignal<bool>(false, debugLabel: 'carerBatteryAlarm'),
-    _AlarmNames.t1dBatteryAlarm: ASignal<bool>(false, debugLabel: 't1dBatteryAlarm'),
+    _AlarmNames.carerBatteryAlarm: ASignal<bool>(true, debugLabel: 'carerBatteryAlarm'),
+    _AlarmNames.t1dBatteryAlarm: ASignal<bool>(true, debugLabel: 't1dBatteryAlarm'),
   };
 
   AlarmSettings._();
@@ -129,22 +129,22 @@ class AlarmSettings {
 
   setupDBPropagation(KeyValueStore prefs) {
     disableAlarms = prefs.getBool(_AlarmNames.disableAlarms.name, defaultValue: false)!;
-    urgentLowAlarm = prefs.getBool(_AlarmNames.urgentLowAlarm.name, defaultValue: false)!;
-    lowAlarm = prefs.getBool(_AlarmNames.lowAlarm.name, defaultValue: false)!;
-    highAlarm = prefs.getBool(_AlarmNames.highAlarm.name, defaultValue: false)!;
+    urgentLowAlarm = prefs.getBool(_AlarmNames.urgentLowAlarm.name, defaultValue: true)!;
+    lowAlarm = prefs.getBool(_AlarmNames.lowAlarm.name, defaultValue: true)!;
+    highAlarm = prefs.getBool(_AlarmNames.highAlarm.name, defaultValue: true)!;
+    urgentHighAlarm = prefs.getBool(_AlarmNames.urgentHighAlarm.name, defaultValue: true)!;
 
-    highMinutes = prefs.getInt(_AlarmNames.highMinutes.name, defaultValue: 30)!;
-    urgentHighAlarm = prefs.getBool(_AlarmNames.urgentHighAlarm.name, defaultValue: false)!;
-    lowPredictionAlarm = prefs.getBool(_AlarmNames.lowPredictionAlarm.name, defaultValue: false)!;
-    lowPredictionMinutes = prefs.getInt(_AlarmNames.lowPredictionMinutes.name, defaultValue: 30)!;
+    highMinutes = prefs.getInt(_AlarmNames.highMinutes.name, defaultValue: 5)!;
+    lowPredictionAlarm = prefs.getBool(_AlarmNames.lowPredictionAlarm.name, defaultValue: true)!;
+    lowPredictionMinutes = prefs.getInt(_AlarmNames.lowPredictionMinutes.name, defaultValue: 10)!;
 
-    fastDropAlarmMinutes = prefs.getInt(_AlarmNames.fastDropAlarmMinutes.name, defaultValue: 30)!;
-    fastRiseAlarmMinutes = prefs.getInt(_AlarmNames.fastRiseAlarmMinutes.name, defaultValue: 30)!;
+    fastDropAlarmMinutes = prefs.getInt(_AlarmNames.fastDropAlarmMinutes.name, defaultValue: 20)!;
+    fastRiseAlarmMinutes = prefs.getInt(_AlarmNames.fastRiseAlarmMinutes.name, defaultValue: 20)!;
 
     noDataAlarmMinutes = prefs.getInt(_AlarmNames.noDataAlarmMinutes.name, defaultValue: 30)!;
 
-    carerBatteryAlarm = prefs.getBool(_AlarmNames.carerBatteryAlarm.name, defaultValue: false)!;
-    t1dBatteryAlarm = prefs.getBool(_AlarmNames.t1dBatteryAlarm.name, defaultValue: false)!;
+    carerBatteryAlarm = prefs.getBool(_AlarmNames.carerBatteryAlarm.name, defaultValue: true)!;
+    t1dBatteryAlarm = prefs.getBool(_AlarmNames.t1dBatteryAlarm.name, defaultValue: true)!;
 
     // Turn off alarms
     aeffect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms), debugLabel: 'disableAlarms');
