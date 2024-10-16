@@ -207,6 +207,6 @@ class _YesterdayInRange extends _StatMethods {
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return ([(value.toStringAsFixed(0)), "%"], [style, small]);
+    return ([value.toStringAsFixed(0), "%"], [style, small]);
   }
 }
