@@ -24,16 +24,26 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
           return const SizedBox.shrink();
         }
         List<SettingsTile> tiles = [
+          enableFlashOnAlarm(),
           brightnessAdjust(),
-          volumeOverride(context),
-          volumeSettings(context, width),
-          progressiveVolume(context),
-          alarmFileSelect(),
-          testAlert(context, width),
+          enableAudioAlarms(context),
         ].whereType<SettingsTile>().toList();
 
+        if (AlarmAlertSettings().enableAudioAlarm) {
+          tiles = [
+            enableFlashOnAlarm(),
+            brightnessAdjust(),
+            enableAudioAlarms(context),
+            volumeOverride(context),
+            volumeSettings(context, width),
+            progressiveVolume(context),
+            alarmFileSelect(),
+            testAlert(context, width),
+          ].whereType<SettingsTile>().toList();
+        }
+
         return SettingsSection(
-          title: const Text('Alarm Alert'),
+          title: const Text('Alarm Alerts'),
           tiles: tiles,
         );
       },
@@ -54,6 +64,68 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       initialValue: AlarmAlertSettings().brightnessAdjustAtNight,
       onToggle: (bool value) {
         AlarmAlertSettings().brightnessAdjustAtNight = value;
+      },
+    );
+  }
+
+  SettingsTile enableFlashOnAlarm() {
+    return SettingsTile.switchTile(
+      title: const Text("Enable Flash on Alarm"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Flashs the screen white when an alarm is triggered",
+      ),
+      initialValue: AlarmAlertSettings().enableFlashOnAlarm,
+      onToggle: (bool value) {
+        AlarmAlertSettings().enableFlashOnAlarm = value;
+      },
+    );
+  }
+
+  SettingsTile enableAudioAlarms(BuildContext context) {
+    return SettingsTile.switchTile(
+      title: const Text("Enable Audio Alarms"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Play audio alert when an alarm is triggered",
+      ),
+      initialValue: AlarmAlertSettings().enableAudioAlarm,
+      onToggle: (bool enable) async {
+        if (enable) {
+          AlarmAlertSettings().enableAudioAlarm = enable;
+          return;
+        }
+        // show the dialog
+        bool? areYouSure = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            Widget cancelButton = TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            );
+            Widget disableButton = TextButton(
+              child: const Text("Disable Audio Alerts"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            );
+
+            // set up the AlertDialog
+            return AlertDialog(
+              title: const Text("Disable Audio Alarms"),
+              content: const Text("Disable Audio Alerts from Alarms (not recommended)?"),
+              actions: [
+                cancelButton,
+                disableButton,
+              ],
+            );
+          },
+        );
+        if (areYouSure == true) {
+          AlarmAlertSettings().enableAudioAlarm = false;
+        }
       },
     );
   }

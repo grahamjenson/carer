@@ -82,6 +82,7 @@ class AlarmsService {
         isCheckingAlarms = true;
 
         try {
+          // Do async so that one failure doesn't stop any other
           var audio = go(audioAlerts(alertingAlarms.value));
           var brightness = go(brightnessAlert(alertingAlarms.value));
 
@@ -169,7 +170,8 @@ class AlarmsService {
   }
 
   Future<bool> audioAlerts(AlarmSet alarms) async {
-    if (alarms.isEmpty) {
+    if (alarms.isEmpty || !AlarmAlertSettings().enableAudioAlarm) {
+      alog("Stopping Audio Alarm: Setting is ${AlarmAlertSettings().enableAudioAlarm} Alarms are $alarms");
       var (playing, err) = await go(player.stopAlarm());
       if (playing == null || err != null) {
         alog("Error stopping alarm: $err");
@@ -190,14 +192,9 @@ class AlarmsService {
       return false;
     }
 
-    if (!TimeSettings().isNight()) {
+    if (!TimeSettings().isNight() || !AlarmAlertSettings().brightnessAdjustAtNight) {
       // Brightness only works at night
-      BrightnessAlert().stop();
-      return false;
-    }
-
-    if (!AlarmAlertSettings().brightnessAdjustAtNight) {
-      alog("Stopping Brightness Alarms Turned off");
+      alog("Stopping Brightness: Setting is ${AlarmAlertSettings().brightnessAdjustAtNight} Night is ${TimeSettings().isNight()}");
       BrightnessAlert().stop();
       return false;
     }

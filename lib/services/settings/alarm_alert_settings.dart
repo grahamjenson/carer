@@ -10,12 +10,14 @@ enum _AANames {
   smartSnoozeHigh,
 
   // AUDIO SETTINGS
+  enableAudioAlarm,
   volumeOveride,
   volumeOverrideValue,
   volumeProgressionSeconds,
   alarmAsset,
 
   // Other ALARM
+  enableFlashOnAlarm,
   brightnessAdjustAtNight,
 
   // ephemeral
@@ -29,6 +31,8 @@ class AlarmAlertSettings {
   final Map<_AANames, ASignal> _signals = {
     _AANames.smartSnoozeHigh: ASignal<bool>(false, debugLabel: 'smartSnoozeHigh'),
     _AANames.brightnessAdjustAtNight: ASignal<bool>(false, debugLabel: 'brightnessAdjustAtNight'),
+    _AANames.enableFlashOnAlarm: ASignal<bool>(false, debugLabel: 'enableFlashOnAlarm'),
+    _AANames.enableAudioAlarm: ASignal<bool>(true, debugLabel: 'enableAudioAlarm'),
     _AANames.volumeOveride: ASignal<bool>(false, debugLabel: 'volumeOveride'),
     _AANames.volumeOverrideValue: ASignal<int>(10, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
@@ -40,6 +44,9 @@ class AlarmAlertSettings {
 
   bool get smartSnoozeHigh => _signals[_AANames.smartSnoozeHigh]!.value as bool;
   set smartSnoozeHigh(bool value) => _signals[_AANames.smartSnoozeHigh]!.value = value;
+
+  bool get enableAudioAlarm => _signals[_AANames.enableAudioAlarm]!.value as bool;
+  set enableAudioAlarm(bool value) => _signals[_AANames.enableAudioAlarm]!.value = value;
 
   bool get volumeOveride => _signals[_AANames.volumeOveride]!.value as bool;
   set volumeOveride(bool value) => _signals[_AANames.volumeOveride]!.value = value;
@@ -57,6 +64,9 @@ class AlarmAlertSettings {
 
   bool get brightnessAdjustAtNight => _signals[_AANames.brightnessAdjustAtNight]!.value as bool;
   set brightnessAdjustAtNight(bool value) => _signals[_AANames.brightnessAdjustAtNight]!.value = value;
+
+  bool get enableFlashOnAlarm => _signals[_AANames.enableFlashOnAlarm]!.value as bool;
+  set enableFlashOnAlarm(bool value) => _signals[_AANames.enableFlashOnAlarm]!.value = value;
 
   ASignal<DateTime?> get snoozeUntilSignal => _signals[_AANames.snoozeUntil]! as ASignal<DateTime?>;
 
@@ -105,6 +115,8 @@ class AlarmAlertSettings {
 
   setupDBPropagation(KeyValueStore prefs) {
     smartSnoozeHigh = prefs.getBool(_AANames.smartSnoozeHigh.name, defaultValue: false)!;
+
+    enableAudioAlarm = prefs.getBool(_AANames.enableAudioAlarm.name, defaultValue: true)!;
     volumeOveride = prefs.getBool(_AANames.volumeOveride.name, defaultValue: false)!;
     volumeOverrideValue = prefs.getInt(_AANames.volumeOverrideValue.name, defaultValue: 50)!;
     volumeProgressionSeconds = prefs.getInt(_AANames.volumeProgressionSeconds.name, defaultValue: 10)!;
@@ -113,8 +125,11 @@ class AlarmAlertSettings {
     alarmAsset = AlarmSounds.fromName(prefsAlarmAsset, AlarmSounds.nightguard);
 
     brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: false)!;
+    enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: false)!;
 
     aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'smartSnoozeHigh');
+
+    aeffect(() => prefs.setBool(_AANames.enableAudioAlarm.name, enableAudioAlarm), debugLabel: 'enableAudioAlarm');
 
     aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride), debugLabel: 'volumeOveride');
 
@@ -130,6 +145,10 @@ class AlarmAlertSettings {
     aeffect(() {
       prefs.setBool(_AANames.brightnessAdjustAtNight.name, brightnessAdjustAtNight);
     }, debugLabel: 'brightnessAdjustAtNight');
+
+    aeffect(() {
+      prefs.setBool(_AANames.enableFlashOnAlarm.name, enableFlashOnAlarm);
+    }, debugLabel: 'enableFlashOnAlarm');
   }
 
   Timer? snoozeTimer;

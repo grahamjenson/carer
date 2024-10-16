@@ -52,6 +52,13 @@ class ColorSchemes {
   );
 }
 
+ThemeData normalTheme = ThemeData(
+  useMaterial3: true,
+  colorScheme: ColorSchemes.colorScheme,
+);
+
+ThemeData dimTheme = normalTheme.copyWith(colorScheme: ColorSchemes.darkcolorScheme);
+
 ////
 // Service
 ////
@@ -73,7 +80,7 @@ class ThemeService {
       selectTheme,
       debugLabel: "ThemeSignalAssign",
       dependencies: [
-            TimerService().minuteSignal,
+            TimerService().secondSignal,
             AlarmsService().alertingAlarms,
           ] +
           UISettings().allSignals,
@@ -81,7 +88,6 @@ class ThemeService {
   }
 
   ThemeData get theme => themeSignal.value;
-
   static ThemeData selectTheme() {
     if (AlarmsService().alertingAlarms.value.isNotEmpty) {
       return normalTheme;
@@ -303,14 +309,6 @@ mixin ThemeMixin {
     return primaryColor(context);
   }
 }
-
-var defaultTextTheme = Typography.material2018().white;
-ThemeData normalTheme = ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorSchemes.colorScheme,
-);
-
-ThemeData dimTheme = normalTheme.copyWith(colorScheme: ColorSchemes.darkcolorScheme);
 
 extension ColorExtension on Color {
   Color get dim {
