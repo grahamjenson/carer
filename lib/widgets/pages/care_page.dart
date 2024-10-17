@@ -2,6 +2,7 @@ import 'package:carer/models/sql/constants.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/widgets/common/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -51,9 +52,9 @@ class CarePage extends StatelessWidget {
       description: Text(description),
       descriptionInlineIos: true,
       onPressed: (context) async {
-        bool? areYouSure = await areYouSureDialog(context, 'Are you sure you want to $description?');
+        bool? areYouSure = await Dialogs.areYouSureDialog(context, "Confirm TempTarget", 'Are you sure you want to $description?', "Set Temp Target");
 
-        if (areYouSure != null && areYouSure) {
+        if (areYouSure == true) {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
           NSClient().addTempTarget(nsURL, nsToken, bottom, top, duration, name);
           if (context.mounted) {
@@ -68,9 +69,10 @@ class CarePage extends StatelessWidget {
     return SettingsTile.navigation(
       title: Text('Add $carbs Carb'),
       onPressed: (context) async {
-        bool? areYouSure = await areYouSureDialog(context, 'Are you sure you want to add $carbs carbs?');
+        bool? areYouSure =
+            await Dialogs.areYouSureDialog(context, "Confirm Add Carbs", 'Are you sure you want to add $carbs carbs?', "Add ${carbs}g Carbs");
 
-        if (areYouSure != null && areYouSure) {
+        if (areYouSure == true) {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
           NSClient().addCarbs(nsURL, nsToken, carbs);
           if (context.mounted) {
@@ -79,30 +81,5 @@ class CarePage extends StatelessWidget {
         }
       },
     );
-  }
-
-  Future<bool?> areYouSureDialog(BuildContext context, String message) {
-    return showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Confirm'),
-            content: Text(message),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              TextButton(
-                child: const Text('Confirm'),
-                onPressed: () {
-                  Navigator.of(context).pop(true); // Close the dialog
-                },
-              ),
-            ],
-          );
-        });
   }
 }

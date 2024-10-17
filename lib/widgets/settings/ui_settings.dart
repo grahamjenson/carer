@@ -3,6 +3,7 @@ import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -16,14 +17,32 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
+        var keepScreenActiveDescript = const Text('Keep the awake.\nWhen screen is asleep alarms wont work!');
+        if (!UISettings().screenActive) {
+          keepScreenActiveDescript = Text(
+            'Alarms wont work when screen is asleep!',
+            style: TextStyle(color: primaryColor(context)),
+          );
+        }
         return SettingsSection(
           title: const Text('UI'),
           tiles: [
             SettingsTile.switchTile(
               title: const Text('Keep Screen Active'),
+              descriptionInlineIos: true,
+              description: keepScreenActiveDescript,
               initialValue: UISettings().screenActive,
               onToggle: (value) async {
-                UISettings().screenActive = value;
+                if (value) {
+                  UISettings().screenActive = value;
+                  return;
+                }
+                bool? areYouSure = await Dialogs.areYouSureDialog(
+                    context, "Confirm Disable Screen Active", 'If Screen Falls Asleep Alarms will not work', "Disable");
+
+                if (areYouSure == true) {
+                  UISettings().screenActive = value;
+                }
               },
             ),
             SettingsTile.switchTile(

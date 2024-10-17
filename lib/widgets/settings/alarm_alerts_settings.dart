@@ -6,6 +6,7 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -96,33 +97,8 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
           return;
         }
         // show the dialog
-        bool? areYouSure = await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            Widget cancelButton = TextButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            );
-            Widget disableButton = TextButton(
-              child: const Text("Disable Audio Alerts"),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            );
+        bool? areYouSure = await Dialogs.areYouSureDialog(context, "Disable Audio Alerts", "Disable Audio Alerts (not recommended)?", "Disable");
 
-            // set up the AlertDialog
-            return AlertDialog(
-              title: const Text("Disable Audio Alarms"),
-              content: const Text("Disable Audio Alerts from Alarms (not recommended)?"),
-              actions: [
-                cancelButton,
-                disableButton,
-              ],
-            );
-          },
-        );
         if (areYouSure == true) {
           AlarmAlertSettings().enableAudioAlarm = false;
         }

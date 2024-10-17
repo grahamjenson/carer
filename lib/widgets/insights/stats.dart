@@ -90,7 +90,7 @@ class Stats extends StatelessWidget with ThemeMixin {
     var (texts, styles) = stat.status(context, row, small);
     return DataRow(
       cells: [
-        DataCell(Text(stat.title, style: heading)),
+        DataCell(Icon(stat.icon, size: 20, color: stat.highlight ? primaryColor(context) : accentColor(context))),
         DataCell(
           SmartText(textAlign: TextAlign.center, texts: texts, styles: styles),
         ),

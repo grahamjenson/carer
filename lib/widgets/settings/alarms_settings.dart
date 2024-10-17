@@ -4,6 +4,7 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/alarms_pages/battery_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/fast_fall_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/fast_rise_alarm_page.dart';
@@ -64,33 +65,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           return;
         }
         // show the dialog
-        bool? areYouSure = await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            Widget cancelButton = TextButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            );
-            Widget disableButton = TextButton(
-              child: const Text("Disable"),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            );
-
-            // set up the AlertDialog
-            return AlertDialog(
-              title: const Text("Disable Alarms"),
-              content: const Text("Disable all alarms (not recommended)?"),
-              actions: [
-                cancelButton,
-                disableButton,
-              ],
-            );
-          },
-        );
+        bool? areYouSure = await Dialogs.areYouSureDialog(context, "Disable Alarms", "Disable all alarms (not recommended)?", "Disable");
         if (areYouSure == true) {
           AlarmSettings().disableAlarms = true;
         }

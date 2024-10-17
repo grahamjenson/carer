@@ -14,6 +14,7 @@ abstract class _StatMethods with ThemeMixin {
   IconData get icon;
   String get title;
   String get description;
+  bool get highlight => false;
   Unit get unit => UISettings().unit;
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small);
 }
@@ -34,6 +35,8 @@ enum Stat {
   IconData get icon => _methods.icon;
   String get title => _methods.title;
   String get description => _methods.description;
+  bool get highlight => _methods.highlight;
+
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) =>
       _methods.status(context, style, small);
 }
@@ -91,6 +94,15 @@ class _Basal extends _StatMethods {
   IconData get icon => UniconsLine.tear;
 
   @override
+  bool get highlight {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return false;
+    }
+    return valueAtTime.isTempBasal;
+  }
+
+  @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
     var valueAtTime = ValueAtTime.last();
     if (valueAtTime == null) {
@@ -119,6 +131,15 @@ class _Target extends _StatMethods {
 
   @override
   IconData get icon => UniconsLine.focus_target;
+
+  @override
+  bool get highlight {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return false;
+    }
+    return valueAtTime.isTempTarget;
+  }
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
@@ -150,6 +171,15 @@ class _CurrentProfile extends _StatMethods {
 
   @override
   IconData get icon => UniconsLine.user;
+
+  @override
+  bool get highlight {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return false;
+    }
+    return valueAtTime.isTempProfile;
+  }
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
