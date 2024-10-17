@@ -34,7 +34,7 @@ class Stats extends StatelessWidget with ThemeMixin {
               dataRowMaxHeight: 23,
               horizontalMargin: 0,
               columns: const [
-                DataColumn(numeric: true, label: SizedBox(width: 50)),
+                DataColumn(numeric: true, label: SizedBox(width: 25)),
                 DataColumn(label: SizedBox(width: 50)),
               ],
               rows: [
@@ -88,9 +88,13 @@ class Stats extends StatelessWidget with ThemeMixin {
     );
 
     var (texts, styles) = stat.status(context, row, small);
+    Widget statIcon = Tooltip(
+      message: stat.title,
+      child: Icon(stat.icon, size: 20, color: stat.highlight ? primaryColor(context) : accentColor(context)),
+    );
     return DataRow(
       cells: [
-        DataCell(Icon(stat.icon, size: 20, color: stat.highlight ? primaryColor(context) : accentColor(context))),
+        DataCell(statIcon),
         DataCell(
           SmartText(textAlign: TextAlign.center, texts: texts, styles: styles),
         ),
