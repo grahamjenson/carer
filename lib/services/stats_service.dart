@@ -1,14 +1,15 @@
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/constants.dart';
-import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
 
-abstract class _StatMethods {
+abstract class _StatMethods with ThemeMixin {
   const _StatMethods();
   IconData get icon;
   String get title;
@@ -80,15 +81,6 @@ class _COB extends _StatMethods {
 class _Basal extends _StatMethods {
   const _Basal();
 
-  double get value {
-    var valueAtTime = ValueAtTime.last();
-
-    if (valueAtTime != null) {
-      return valueAtTime.basal;
-    }
-    return 0;
-  }
-
   @override
   String get title => "Basal";
 
@@ -100,21 +92,24 @@ class _Basal extends _StatMethods {
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return (["${toMax2dp(value)}", "u/h"], [style, small]);
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return (["?"], [style]);
+    }
+
+    List<String> texts = ["${toMax2dp(valueAtTime.basal)}", "u/h"];
+    List<TextStyle> styles = [style, small];
+    if (valueAtTime.isTempBasal) {
+      texts.add(" ${Dates.dateAgoShort(valueAtTime.tempBasalRemaining)}");
+      styles.add(small.copyWith(color: primaryColor(context)));
+    }
+
+    return (texts, styles);
   }
 }
 
 class _Target extends _StatMethods {
   const _Target();
-
-  (int, int) get value {
-    var valueAtTime = ValueAtTime.last();
-
-    if (valueAtTime != null) {
-      return (valueAtTime.lowTarget, valueAtTime.highTarget);
-    }
-    return (0, 0);
-  }
 
   @override
   String get title => "Target";
@@ -127,34 +122,25 @@ class _Target extends _StatMethods {
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return (["${value.$1}", "-", "${value.$2}", unit.name], [style, small, style, small]);
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return (["?-?"], [style]);
+    }
+    String lowStr = unit.str(valueAtTime.lowTarget);
+    String highStr = unit.str(valueAtTime.highTarget);
+
+    List<String> texts = ["$lowStr-$highStr", unit.name];
+    List<TextStyle> styles = [style, small];
+    if (valueAtTime.isTempTarget) {
+      texts.add(" ${Dates.dateAgoShort(valueAtTime.tempTargetRemaining)}");
+      styles.add(small.copyWith(color: primaryColor(context)));
+    }
+    return (texts, styles);
   }
 }
 
 class _CurrentProfile extends _StatMethods {
   const _CurrentProfile();
-
-  int get value {
-    var profile = Profile.currentProfile.value;
-    if (profile == null) {
-      return -1;
-    }
-
-    return profile.percent;
-  }
-
-  Duration? get remaining {
-    var profile = Profile.currentProfile.value;
-    if (profile == null) {
-      return null;
-    }
-
-    if (profile.duration == 0) {
-      return null;
-    }
-
-    return profile.remaining;
-  }
 
   @override
   String get title => "Profile";
@@ -167,7 +153,19 @@ class _CurrentProfile extends _StatMethods {
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return (["$value"], [style]);
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return (["?"], [style]);
+    }
+
+    List<String> texts = ["${valueAtTime.profilePercent}", "%"];
+    List<TextStyle> styles = [style, small];
+
+    if (valueAtTime.isTempProfile) {
+      texts.add(" ${Dates.dateAgoShort(valueAtTime.tempProfileRemaining)}");
+      styles.add(small.copyWith(color: primaryColor(context)));
+    }
+    return (texts, styles);
   }
 }
 

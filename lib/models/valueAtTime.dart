@@ -27,21 +27,32 @@ class ValueAtTime with DateMixin {
   final int profilePercent;
 
   final bool isTempBasal;
+  final DateTime? tempBasalEndDate;
+  Duration get tempBasalRemaining => tempBasalEndDate?.difference(clock.now()) ?? Duration.zero;
+
   final bool isTempTarget;
+  final DateTime? tempTargetEndDate;
+  Duration get tempTargetRemaining => tempTargetEndDate?.difference(clock.now()) ?? Duration.zero;
+
   final bool isTempProfile;
+  final DateTime? tempProfileEndDate;
+  Duration get tempProfileRemaining => tempProfileEndDate?.difference(clock.now()) ?? Duration.zero;
 
   ValueAtTime({
     required this.date,
     required this.lowTarget,
     required this.highTarget,
-    required this.isTempTarget,
     required this.basal,
-    required this.isTempBasal,
     required this.isf,
     required this.cr,
     required this.profileName,
     required this.profilePercent,
+    required this.isTempBasal,
+    required this.tempBasalEndDate,
+    required this.isTempTarget,
+    required this.tempTargetEndDate,
     required this.isTempProfile,
+    required this.tempProfileEndDate,
   });
 
   @override
@@ -68,22 +79,43 @@ class ValueAtTime with DateMixin {
     String profileName = profile?.name ?? "";
     int profilePercent = profile?.percent ?? 100;
 
-    bool isTempProfile = profile?.isTempProfile ?? false;
-    bool isTempBasal = tempBasal != null;
-    bool isTempTarget = tempTarget != null;
+    bool isTempBasal = false;
+    DateTime? tempBasalEndDate;
+    bool isTempProfile = false;
+    DateTime? tempProfileEndDate;
+    bool isTempTarget = false;
+    DateTime? tempTargetEndDate;
+
+    if (tempBasal != null) {
+      isTempBasal = true;
+      tempBasalEndDate = tempBasal.endDate;
+    }
+
+    if (profile != null && profile.isTempProfile) {
+      isTempProfile = true;
+      tempProfileEndDate = profile.endDate;
+    }
+
+    if (tempTarget != null) {
+      isTempTarget = true;
+      tempTargetEndDate = tempTarget.endDate;
+    }
 
     ValueAtTime v = ValueAtTime(
       date: date,
       lowTarget: lowTarget,
       highTarget: highTarget,
-      isTempTarget: isTempTarget,
       basal: basal,
-      isTempBasal: isTempBasal,
       isf: isf,
       cr: cr,
       profileName: profileName,
       profilePercent: profilePercent,
+      isTempBasal: isTempBasal,
+      tempBasalEndDate: tempBasalEndDate,
+      isTempTarget: isTempTarget,
+      tempTargetEndDate: tempTargetEndDate,
       isTempProfile: isTempProfile,
+      tempProfileEndDate: tempProfileEndDate,
     );
 
     return v;

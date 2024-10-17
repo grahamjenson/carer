@@ -73,7 +73,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       title: const Text("Enable Flash on Alarm"),
       descriptionInlineIos: true,
       description: const Text(
-        "Flashs the screen white when an alarm is triggered",
+        "Flashs the screen white when an alarming",
       ),
       initialValue: AlarmAlertSettings().enableFlashOnAlarm,
       onToggle: (bool value) {
@@ -87,7 +87,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       title: const Text("Enable Audio Alarms"),
       descriptionInlineIos: true,
       description: const Text(
-        "Play audio alert when an alarm is triggered",
+        "Play audio alert when an alarming",
       ),
       initialValue: AlarmAlertSettings().enableAudioAlarm,
       onToggle: (bool enable) async {

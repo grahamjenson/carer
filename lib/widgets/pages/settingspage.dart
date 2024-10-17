@@ -4,6 +4,7 @@ import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/services_settings.dart';
+import 'package:carer/widgets/settings/stats_settings.dart';
 import 'package:carer/widgets/settings/status_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
@@ -34,6 +35,7 @@ class SettingsPage extends StatelessWidget {
             const AlarmsSettingsWidget(),
             const AlarmsAlertSettingsWidget(),
             const StatusSettingsWidget(),
+            const StatsSettingsWidget(),
             const DebugSettingsWidget(),
           ],
         ),

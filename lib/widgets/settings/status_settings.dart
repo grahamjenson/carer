@@ -1,6 +1,7 @@
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/status_service.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
@@ -12,22 +13,26 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      List<SettingsTile> tiles = [
-        inactiveStatus(context, Status.cannulaChange),
-        cannulaAge(context),
-        inactiveStatus(context, Status.sensorChange),
-        sensorAge(context),
-        inactiveStatus(context, Status.notCharging),
-        inactiveStatus(context, Status.powerLow),
-        inactiveStatus(context, Status.silentOn),
-      ];
+    return AWatch(
+      (context) {
+        List<SettingsTile> tiles = [
+          inactiveStatus(context, Status.cannulaChange),
+          cannulaAge(context),
+          inactiveStatus(context, Status.sensorChange),
+          sensorAge(context),
+          inactiveStatus(context, Status.notCharging),
+          inactiveStatus(context, Status.powerLow),
+          inactiveStatus(context, Status.silentOn),
+        ];
 
-      return SettingsSection(
-        title: const Text('Status Settings'),
-        tiles: tiles,
-      );
-    }, debugLabel: "StatusSettingsWidget");
+        return SettingsSection(
+          title: const Text('Status Settings'),
+          tiles: tiles,
+        );
+      },
+      debugLabel: "StatusSettingsWidget",
+      dependencies: [TimerService().fifteenSecondSignal],
+    );
   }
 
   SettingsTile inactiveStatus(BuildContext context, Status status) {
