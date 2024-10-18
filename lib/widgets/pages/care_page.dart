@@ -2,6 +2,7 @@ import 'package:carer/models/sql/constants.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/toast_service.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -56,7 +57,14 @@ class CarePage extends StatelessWidget {
 
         if (areYouSure == true) {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
-          NSClient().addTempTarget(nsURL, nsToken, bottom, top, duration, name);
+          NSClient().addTempTarget(nsURL, nsToken, bottom, top, duration, name).then((value) {
+            if (value) {
+              ToastService().showSuccess("TempTarget $description");
+            } else {
+              ToastService().showError("Failed to set TempTarget");
+            }
+          });
+
           if (context.mounted) {
             Navigator.of(context).pop();
           }
@@ -67,14 +75,20 @@ class CarePage extends StatelessWidget {
 
   SettingsTile carbsTile(int carbs) {
     return SettingsTile.navigation(
-      title: Text('Add $carbs Carb'),
+      title: Text('Add ${carbs}g Carb'),
       onPressed: (context) async {
         bool? areYouSure =
-            await Dialogs.areYouSureDialog(context, "Confirm Add Carbs", 'Are you sure you want to add $carbs carbs?', "Add ${carbs}g Carbs");
+            await Dialogs.areYouSureDialog(context, "Confirm Add Carbs", 'Are you sure you want to add ${carbs}g carbs?', "Add ${carbs}g Carbs");
 
         if (areYouSure == true) {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
-          NSClient().addCarbs(nsURL, nsToken, carbs);
+          NSClient().addCarbs(nsURL, nsToken, carbs).then((value) {
+            if (value) {
+              ToastService().showSuccess("${carbs}g carbs added");
+            } else {
+              ToastService().showError("Failed to add ${carbs}g carbs");
+            }
+          });
           if (context.mounted) {
             Navigator.of(context).pop();
           }

@@ -10,13 +10,6 @@ class Stats extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle heading = TextStyle(
-      fontWeight: FontWeight.normal,
-      fontSize: 15,
-      color: accentColor(context),
-      height: 1,
-    );
-
     return AWatch((context) {
       return Window(
         child: SingleChildScrollView(

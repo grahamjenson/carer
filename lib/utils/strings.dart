@@ -6,6 +6,15 @@ import 'package:carer/utils/math.dart';
 JsonDecoder decoder = const JsonDecoder();
 JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
+Map<String, dynamic>? decodeJson(String input) {
+  try {
+    return decoder.convert(input);
+  } catch (e, stackTrace) {
+    Errors.captureError(e, stackTrace, name: "decodeJson");
+    return null;
+  }
+}
+
 String prettyPrintDecodedJson(Map<String, dynamic> input) {
   try {
     var prettyString = encoder.convert(input);

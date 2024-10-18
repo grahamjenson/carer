@@ -5,8 +5,10 @@ import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
+import 'package:carer/services/toast_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -249,12 +251,25 @@ class NSClient {
   bool _handleResponseError(Uri uri, Response? response, Object? err) {
     if (err != null || response == null) {
       lastError.value = clock.now();
+      ToastService().showError("Nightscout Error", description: err.toString());
       return true;
     }
     alog("NSCLIENT: FETCHED ${uri.toString()}");
     if (response.statusCode != 200 && response.statusCode != 201) {
       lastError.value = clock.now();
       alog("NSCLIENT: NON 200 responce code ${response.statusCode}");
+
+      String body = response.body;
+      var json = decodeJson(response.body);
+      if (json != null) {
+        if (json.containsKey("message") && json.containsKey("description")) {
+          body = "${json["message"]} - ${json["description"]}";
+        } else if (json.containsKey("message")) {
+          body = json["message"];
+        }
+      }
+
+      ToastService().showError("Nightscout Error: Bad Response Code", description: "${response.statusCode}: $body");
       return true;
     }
     lastFetched.value = clock.now();

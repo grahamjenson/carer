@@ -22,6 +22,7 @@ import 'package:carer/widgets/pages/homepage.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:toastification/toastification.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
@@ -103,13 +104,15 @@ class _MyAppState extends State<MyApp> {
     return ValueListenableBuilder<ThemeData>(
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
-          return MaterialApp(
-            navigatorObservers: [NavigationChangeObserver(), SentryNavigatorObserver()],
-            title: 'Carer',
-            debugShowCheckedModeBanner: false,
-            theme: theme,
-            home: const HomePage(),
-            initialRoute: '/',
+          return ToastificationWrapper(
+            child: MaterialApp(
+              navigatorObservers: [NavigationChangeObserver(), SentryNavigatorObserver()],
+              title: 'Carer',
+              debugShowCheckedModeBanner: false,
+              theme: theme,
+              home: const HomePage(),
+              initialRoute: '/',
+            ),
           );
         });
   }

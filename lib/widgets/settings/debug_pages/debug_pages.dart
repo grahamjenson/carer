@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 import 'package:carer/services/background_service.dart';
+import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
@@ -71,6 +72,7 @@ class DebugSettingsPage extends StatelessWidget {
       getAlarms(),
       getShareLogs(),
       getServices(),
+      getTestButtons(),
     ];
 
     if (Platform.isIOS || Platform.isAndroid) {
@@ -78,6 +80,28 @@ class DebugSettingsPage extends StatelessWidget {
     }
 
     return sections;
+  }
+
+  SettingsSection getTestButtons() {
+    return SettingsSection(
+      title: const Text('Test Buttons'),
+      tiles: [
+        SettingsTile(
+          title: const Text("Test Error Toast"),
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            ToastService().showError("Test Error", description: "this is a test error");
+          },
+        ),
+        SettingsTile(
+          title: const Text("Test Success Toast"),
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            ToastService().showSuccess("Test Success", description: "this is a test success");
+          },
+        ),
+      ],
+    );
   }
 
   SettingsSection getErrorLog() {

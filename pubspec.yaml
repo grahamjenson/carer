@@ -69,6 +69,7 @@ dependencies:
   battery_plus: ^6.0.2
   sqflite_common: ^2.5.4
   desktop_window: ^0.4.0
+  toastification: ^2.3.0
 
   
 
