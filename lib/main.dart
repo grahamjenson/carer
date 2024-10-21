@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:carer/models/clean_sgv.dart';
+import 'package:carer/models/flow_data.dart';
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/sql/sgv.dart';
@@ -59,6 +60,7 @@ void runCarer() async {
   // Setup the StateData DB stuff
   await executeWithRetry(PropertiesData().setupDBPropagation);
 
+  await executeWithRetry(FlowData().setupDBPropagation);
   // For some reason screens forget to stay awake
   aeffect(() {
     var _ = TimerService().fifteenSecondSignal.value;
@@ -105,7 +107,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    var doIntro = true;
+    var doIntro = FlowData().needsOnboarding;
     Widget startingPage = const HomePage();
     if (doIntro) {
       startingPage = const IntroductionPage();

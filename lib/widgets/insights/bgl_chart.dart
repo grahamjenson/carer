@@ -43,7 +43,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
               flex: 15,
               child: ToggleButtons(
                   selectedColor: accentColor(context),
-                  constraints: const BoxConstraints(maxHeight: 20, maxWidth: 60, minWidth: 40, minHeight: 20),
+                  constraints: const BoxConstraints(maxHeight: 20, minWidth: 40, minHeight: 20),
                   isSelected: [
                     chartHoursAgo == 2,
                     chartHoursAgo == 4,

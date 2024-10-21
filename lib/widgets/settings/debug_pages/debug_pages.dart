@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
+import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/background_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/update_service.dart';
@@ -73,6 +74,7 @@ class DebugSettingsPage extends StatelessWidget {
       getShareLogs(),
       getServices(),
       getTestButtons(),
+      getResetButtons(),
     ];
 
     if (Platform.isIOS || Platform.isAndroid) {
@@ -80,6 +82,22 @@ class DebugSettingsPage extends StatelessWidget {
     }
 
     return sections;
+  }
+
+  SettingsSection getResetButtons() {
+    return SettingsSection(
+      title: const Text('Reset Buttons'),
+      tiles: [
+        SettingsTile(
+          title: const Text("Reset Onboarding Data"),
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            FlowData().agreedPrivacyPolicy = null;
+            FlowData().agreedTermsAndConditions = null;
+          },
+        ),
+      ],
+    );
   }
 
   SettingsSection getTestButtons() {
