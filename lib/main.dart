@@ -20,6 +20,7 @@ import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/pages/homepage.dart';
+import 'package:carer/widgets/pages/introduction_page.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -104,6 +105,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    var doIntro = true;
+    Widget startingPage = const HomePage();
+    if (doIntro) {
+      startingPage = const IntroductionPage();
+    }
     return ValueListenableBuilder<ThemeData>(
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
@@ -113,7 +119,7 @@ class _MyAppState extends State<MyApp> {
               title: 'Carer',
               debugShowCheckedModeBanner: false,
               theme: theme,
-              home: const HomePage(),
+              home: startingPage,
               initialRoute: '/',
             ),
           );

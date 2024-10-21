@@ -166,7 +166,7 @@ mixin ThemeMixin {
     if (cs == ColorSchemes.colorScheme) {
       return Colors.red;
     }
-    return Colors.grey[600]!;
+    return Colors.red.dim;
   }
 
   Color errorColor(BuildContext context) {

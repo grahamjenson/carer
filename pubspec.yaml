@@ -71,6 +71,7 @@ dependencies:
   desktop_window: ^0.4.0
   toastification: ^2.3.0
   flutter_markdown: ^0.7.4
+  introduction_screen: ^3.1.14
 
   
 
@@ -102,6 +103,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/carer_logo.png
     - assets/alarm.mp3
     - assets/letsgo.mp3
     - assets/hybridas.mp3
