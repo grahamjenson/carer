@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/math.dart';
+import 'package:flutter/services.dart';
 
 JsonDecoder decoder = const JsonDecoder();
 JsonEncoder encoder = const JsonEncoder.withIndent('  ');
@@ -54,4 +55,21 @@ String toMax2dpStr(num value) {
     return x.toInt().toString();
   }
   return x.toString();
+}
+
+class StringAssets {
+  static final StringAssets _singleton = StringAssets._();
+  factory StringAssets() => _singleton;
+  StringAssets._();
+
+  void loadStrings() async {
+    termsAndConditions = await rootBundle.loadString(termsAndConditionsFile);
+    privacyPolicy = await rootBundle.loadString(privacyPolicyFile);
+  }
+
+  static const String termsAndConditionsFile = "assets/TERMS_AND_CONDITIONS.md";
+  static const String privacyPolicyFile = "assets/PRIVACY_POLICY.md";
+
+  String termsAndConditions = "";
+  String privacyPolicy = "";
 }

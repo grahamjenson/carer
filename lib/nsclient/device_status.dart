@@ -16,8 +16,6 @@ class NSDeviceStatus {
     bool? isCharging;
     double? battery;
 
-    print(jsonEncode(json));
-
     if (json["pump"] != null && json["pump"] is Map<String, dynamic> && json["pump"]["reservoir"] != null && json["pump"]["reservoir"] is num) {
       reservoir = json["pump"]["reservoir"].toDouble();
     }

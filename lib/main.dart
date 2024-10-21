@@ -18,6 +18,7 @@ import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,8 @@ void runCarer() async {
   if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
     await DesktopWindow.setMinWindowSize(const Size(450, 450));
   }
+
+  StringAssets().loadStrings();
 
   // Signals logging
   setupSignalsLogging();

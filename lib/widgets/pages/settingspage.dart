@@ -7,6 +7,7 @@ import 'package:carer/widgets/settings/services_settings.dart';
 import 'package:carer/widgets/settings/stats_settings.dart';
 import 'package:carer/widgets/settings/status_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
+import 'package:carer/widgets/settings/tandcandpp_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -36,6 +37,7 @@ class SettingsPage extends StatelessWidget {
             const AlarmsAlertSettingsWidget(),
             const StatusSettingsWidget(),
             const StatsSettingsWidget(),
+            const TermsAndConditionsPrivacyPolicyWidget(),
             const DebugSettingsWidget(),
           ],
         ),

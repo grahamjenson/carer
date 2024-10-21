@@ -70,6 +70,7 @@ dependencies:
   sqflite_common: ^2.5.4
   desktop_window: ^0.4.0
   toastification: ^2.3.0
+  flutter_markdown: ^0.7.4
 
   
 
@@ -104,6 +105,8 @@ flutter:
     - assets/alarm.mp3
     - assets/letsgo.mp3
     - assets/hybridas.mp3
+    - assets/TERMS_AND_CONDITIONS.md
+    - assets/PRIVACY_POLICY.md
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
