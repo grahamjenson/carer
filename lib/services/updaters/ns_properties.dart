@@ -31,12 +31,6 @@ class NSPropertiesUpdater extends Updater {
 
     raw = properties.raw;
 
-    if (properties.battery != null) {
-      PropertiesData().setBattery(properties.battery!.toDouble());
-    }
-    if (properties.batteryDisplay != null) {
-      PropertiesData().setBatteryDisplay(properties.batteryDisplay!);
-    }
     if (properties.iob != null) {
       PropertiesData().setIOB(properties.iob!.toDouble());
     }

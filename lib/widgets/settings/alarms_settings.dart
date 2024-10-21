@@ -1,4 +1,4 @@
-import 'package:carer/services/alarms/alarms.dart';
+import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';

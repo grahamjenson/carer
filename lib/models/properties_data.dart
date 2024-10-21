@@ -4,13 +4,14 @@ import 'package:carer/utils/futures.dart';
 
 enum PropertiesDataName {
   battery,
-  batteryDisplay,
+  isCharging,
   iob,
   basaliob,
   treatmentIob,
   cob,
   cage,
   sage,
+  reservoir,
 }
 
 class PropertiesData {
@@ -20,13 +21,14 @@ class PropertiesData {
 
   final Map<PropertiesDataName, ASignal> _signals = {
     PropertiesDataName.battery: ASignal(100.0, debugLabel: "Battery"),
-    PropertiesDataName.batteryDisplay: ASignal("", debugLabel: "BatteryDisplay"),
+    PropertiesDataName.isCharging: ASignal(false, debugLabel: "isCharging"),
     PropertiesDataName.iob: ASignal(0.0, debugLabel: "IOB"),
     PropertiesDataName.basaliob: ASignal(0.0, debugLabel: "BasalIOB"),
     PropertiesDataName.treatmentIob: ASignal(0.0, debugLabel: "TreatmentIOB"),
     PropertiesDataName.cob: ASignal(0.0, debugLabel: "COB"),
     PropertiesDataName.cage: ASignal(0.0, debugLabel: "CannulaAge"),
     PropertiesDataName.sage: ASignal(0.0, debugLabel: "SensorAge"),
+    PropertiesDataName.reservoir: ASignal(0.0, debugLabel: "Reservoir"),
   };
 
   // Constructor
@@ -44,9 +46,9 @@ class PropertiesData {
 
     aeffect(
       () {
-        kvdb.setString(PropertiesDataName.batteryDisplay.name, _signals[PropertiesDataName.batteryDisplay]!.value);
+        kvdb.setBool(PropertiesDataName.isCharging.name, _signals[PropertiesDataName.isCharging]!.value);
       },
-      debugLabel: "BatteryDisplay",
+      debugLabel: "isCharging",
     );
 
     aeffect(
@@ -91,13 +93,20 @@ class PropertiesData {
       debugLabel: "SAGE",
     );
 
+    aeffect(
+      () {
+        kvdb.setDouble(PropertiesDataName.reservoir.name, _signals[PropertiesDataName.reservoir]!.value);
+      },
+      debugLabel: "Reservoir",
+    );
+
     return true;
   }
 
   // Getters
   double get battery => _signals[PropertiesDataName.battery]!.value;
-  String get batteryDisplay => _signals[PropertiesDataName.batteryDisplay]!.value;
-  bool t1dPhoneIsCharging() => batteryDisplay.contains("⚡");
+
+  bool t1dPhoneIsCharging() => _signals[PropertiesDataName.isCharging]!.value;
   int t1dPhonesBatteryLevel() => battery.toInt();
 
   double get iob => _signals[PropertiesDataName.iob]!.value;
@@ -106,13 +115,14 @@ class PropertiesData {
   double get cob => _signals[PropertiesDataName.cob]!.value;
   DateTime get cage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.cage]!.value.toInt());
   DateTime get sage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.sage]!.value.toInt());
+  double get reservoir => _signals[PropertiesDataName.reservoir]!.value;
 
   setBattery(double value) {
     _signals[PropertiesDataName.battery]!.value = value;
   }
 
-  setBatteryDisplay(String value) {
-    _signals[PropertiesDataName.batteryDisplay]!.value = value;
+  setIsCharging(bool value) {
+    _signals[PropertiesDataName.isCharging]!.value = value;
   }
 
   setIOB(double value) {
@@ -137,5 +147,9 @@ class PropertiesData {
 
   setSAge(double value) {
     _signals[PropertiesDataName.sage]!.value = value;
+  }
+
+  setReservoir(double value) {
+    _signals[PropertiesDataName.reservoir]!.value = value;
   }
 }

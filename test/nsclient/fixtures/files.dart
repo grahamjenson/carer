@@ -16,4 +16,5 @@ var files = {
 
   "current_profile": 'test/nsclient/fixtures/current_profile.json',
   "properties": 'test/nsclient/fixtures/properties.json',
+  "devicestatus": 'test/nsclient/fixtures/devicestatus.json',
 };

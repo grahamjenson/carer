@@ -1,5 +1,5 @@
+import 'package:carer/models/details/status/status_service.dart';
 import 'package:carer/services/settings/status_settings.dart';
-import 'package:carer/services/status_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -23,6 +23,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           inactiveStatus(context, Status.notCharging),
           inactiveStatus(context, Status.powerLow),
           inactiveStatus(context, Status.silentOn),
+          inactiveStatus(context, Status.lowReservoir),
         ];
 
         return SettingsSection(

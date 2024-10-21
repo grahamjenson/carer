@@ -20,7 +20,8 @@ enum Status {
   sensorChange(_SensorChange()),
   notCharging(_NotCharging()),
   powerLow(_PowerLow()),
-  silentOn(_SilentOn());
+  silentOn(_SilentOn()),
+  lowReservoir(_LowReservoir());
 
   final _StatusMethods _methods;
 
@@ -272,12 +273,27 @@ class _SilentOn extends _StatusMethods {
   }
 }
 
-///
-// SERVICE
-////
-class StatusService {
-  static final StatusService _singleton = StatusService._();
-  factory StatusService() => _singleton;
+class _LowReservoir extends _StatusMethods {
+  const _LowReservoir();
 
-  StatusService._();
+  @override
+  String get title => "Low Reservoir";
+
+  @override
+  String get description => "Shows When Reservoir below 20u";
+
+  @override
+  IconData get icon => UniconsLine.water_drop_slash;
+
+  @override
+  String get reason {
+    var reservoir = PropertiesData().reservoir;
+    return "Reservoir has ${reservoir.toInt()}u remaining";
+  }
+
+  @override
+  bool triggered() {
+    var reservoir = PropertiesData().reservoir;
+    return reservoir < 20;
+  }
 }

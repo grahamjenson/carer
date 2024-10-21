@@ -1,6 +1,6 @@
 import 'package:carer/mappers/sql/alarms_log.dart';
+import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/models/sql/alarm_logs.dart';
-import 'package:carer/services/alarms/alarms.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';

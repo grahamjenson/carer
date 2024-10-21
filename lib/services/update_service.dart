@@ -1,3 +1,4 @@
+import 'package:carer/services/updaters/ns_device_status.dart';
 import 'package:carer/services/updaters/ns_entries.dart';
 import 'package:carer/services/updaters/ns_profile.dart';
 import 'package:carer/services/updaters/ns_properties.dart';
@@ -13,12 +14,14 @@ class UpdateService {
   late NSEntriesUpdater nsEntriesUpdater;
   late NSTreatmentsUpdater nsTreatmentUpdater;
   late NSProfileUpdater nsProfileUpdater;
+  late NSDeviceStatusUpdater nsDeviceStatusUpdater;
 
   List<Updater> get updaters => [
         nsSummaryUpdater,
         nsEntriesUpdater,
         nsTreatmentUpdater,
         nsProfileUpdater,
+        nsDeviceStatusUpdater,
       ];
 
   UpdateService._() {
@@ -26,6 +29,7 @@ class UpdateService {
     nsEntriesUpdater = NSEntriesUpdater();
     nsTreatmentUpdater = NSTreatmentsUpdater();
     nsProfileUpdater = NSProfileUpdater();
+    nsDeviceStatusUpdater = NSDeviceStatusUpdater();
   }
 
   start() {

@@ -231,7 +231,7 @@ class _YesterdayInRange extends _StatMethods {
   String get description => "Yesterday's Time in Range";
 
   @override
-  IconData get icon => UniconsLine.chart_pie;
+  IconData get icon => UniconsLine.chart_pie_alt;
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {

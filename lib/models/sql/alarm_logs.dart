@@ -1,5 +1,5 @@
+import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/models/sql/db_model.dart';
-import 'package:carer/services/alarms/alarms.dart';
 
 enum AlarmStage {
   pending,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
@@ -38,6 +39,8 @@ Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token
 Uri currentProfile(nsURL, token) => Uri.parse('$nsURL/api/v1/profile/current.json?token=$token');
 
 Uri propertiesEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/properties.json?token=$token');
+
+Uri deviceStatusEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v1/devicestatus.json?token=$token&count=1');
 
 // Add Carbs endpoint
 Uri v3TreatmentsEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v3/treatments');
@@ -246,6 +249,27 @@ class NSClient {
     }
 
     return NSProperties.fromJson(response!.body);
+  }
+
+  Future<NSDeviceStatus?> getDeviceStatus(String nsURL, String token) async {
+    if (nsURL == "" || token == "") {
+      alog("getDeviceStatus No NS URL");
+      return null;
+    }
+    var ep = deviceStatusEndpoint(nsURL, token);
+    final (response, err) = await go(http.get(ep));
+    if (_handleResponseError(ep, response, err)) {
+      return null;
+    }
+    List<dynamic> jsonList = json.decode(response!.body);
+    if (jsonList.isEmpty) {
+      return null;
+    }
+    var firstElem = jsonList.first;
+    if (firstElem is Map<String, dynamic>) {
+      return NSDeviceStatus.fromJson(firstElem);
+    }
+    return null;
   }
 
   bool _handleResponseError(Uri uri, Response? response, Object? err) {

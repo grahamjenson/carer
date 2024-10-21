@@ -1,6 +1,6 @@
+import 'package:carer/models/details/status/status_service.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
-import 'package:carer/services/status_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -19,6 +19,7 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
           getStatusIcon(context, Status.notCharging),
           getStatusIcon(context, Status.powerLow),
           getStatusIcon(context, Status.silentOn),
+          getStatusIcon(context, Status.lowReservoir),
         ];
         List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
 

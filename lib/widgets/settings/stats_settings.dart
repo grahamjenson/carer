@@ -1,4 +1,4 @@
-import 'package:carer/services/stats_service.dart';
+import 'package:carer/models/details/stats/stats_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
