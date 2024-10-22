@@ -49,6 +49,7 @@ class SnoozeFloatingButton extends StatelessWidget with ThemeMixin {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          extendedPadding: const EdgeInsets.all(5),
           onPressed: () {
             Navigator.push(
               context,

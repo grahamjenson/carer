@@ -46,7 +46,7 @@ void main() async {
 void runCarer() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
-    await DesktopWindow.setMinWindowSize(const Size(450, 450));
+    await DesktopWindow.setMinWindowSize(const Size(300, 450));
   }
 
   StringAssets().loadStrings();

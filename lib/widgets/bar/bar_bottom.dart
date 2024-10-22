@@ -17,15 +17,15 @@ class BarBottom extends StatelessWidget with ThemeMixin {
       (context) {
         var children = [
           createButton(context, "Care", Icons.back_hand_outlined, const CarePage()),
-          createButton(context, "Alarms", UniconsLine.bell, const SettingsPage()),
           createButton(context, "Stats", UniconsLine.abacus, const SettingsPage()),
+          createButton(context, "Alarms", UniconsLine.bell, const SettingsPage()),
           createButton(context, "Settings", Icons.settings_outlined, const SettingsPage()),
         ];
 
         NotchedShape? notchShape;
         if (!AlarmSettings().disableAlarms) {
           // Add gap for floating button
-          children.insert(2, const Spacer());
+          children.insert(2, const Spacer(flex: 5));
 
           notchShape = const AutomaticNotchedShape(
             RoundedRectangleBorder(
@@ -42,7 +42,7 @@ class BarBottom extends StatelessWidget with ThemeMixin {
             color: backgroundColorShade(context),
             shape: notchShape,
             height: 60,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children));
       },
       debugLabel: "BarBottom",
@@ -81,8 +81,17 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context)),
+        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(0)),
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+      ),
+      onPressed: onPressed,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
