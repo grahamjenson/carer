@@ -42,6 +42,7 @@ class BarBottom extends StatelessWidget with ThemeMixin {
             color: backgroundColorShade(context),
             shape: notchShape,
             height: 60,
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 0),
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children));
       },
       debugLabel: "BarBottom",
@@ -52,17 +53,48 @@ class BarBottom extends StatelessWidget with ThemeMixin {
   Widget createButton(BuildContext context, String name, IconData id, Widget navigateTo) {
     return Flexible(
       flex: 2,
-      child: ElevatedButton(
-        child: Column(children: [
-          Icon(id, size: 16),
-          Text(name, style: labelSmall(context)),
-        ]),
+      child: IconButtonWithText(
+        icon: id,
+        label: name,
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => navigateTo),
           );
         },
+      ),
+    );
+  }
+}
+
+class IconButtonWithText extends StatelessWidget with ThemeMixin {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  const IconButtonWithText({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 24.0,
+            color: primaryColor(context),
+          ),
+          const SizedBox(height: 4.0),
+          Text(label, style: TextStyle(fontSize: 12.0, color: primaryColor(context))),
+        ],
       ),
     );
   }

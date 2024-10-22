@@ -19,7 +19,7 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
           child: FittedBox(
             fit: BoxFit.contain,
             child: SmartText(
-              texts: ["Snooze", snoozeString()],
+              texts: ["Snooze", AlarmAlertSettings().snoozeString()],
               styles: [inatctiveSnoozeStyle, activeSnoozeStyle],
             ),
           ),
@@ -29,36 +29,5 @@ class SnoozeTextStatus extends StatelessWidget with ThemeMixin {
       AlarmAlertSettings().snoozeUntilSignal,
       TimerService().tenSecondSignal, // Needed to update the time until snooze ends
     ], debugLabel: "SnoozeTextStatus");
-  }
-
-  bool isSnoozing() {
-    var duration = AlarmAlertSettings().snoozeDuration;
-    if (duration == null) {
-      return false;
-    }
-    var totalSeconds = duration.inSeconds;
-    if (totalSeconds <= 0) {
-      return false;
-    }
-    return true;
-  }
-
-  String snoozeString() {
-    if (!isSnoozing()) {
-      return "";
-    }
-    var duration = AlarmAlertSettings().snoozeDuration!;
-    var minutes = duration.inMinutes;
-    var hours = duration.inHours;
-
-    if (hours > 0) {
-      return "${hours}h";
-    }
-
-    if (minutes > 0) {
-      return "${minutes}m";
-    }
-
-    return "<1m";
   }
 }

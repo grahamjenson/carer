@@ -197,6 +197,37 @@ class AlarmAlertSettings {
     alog("Alarm: Snooze: Snooze Duration Seconds set to $time from ${snoozeUntilSignal.peek}");
     snoozeUntilSignal.value = time;
   }
+
+  bool isSnoozing() {
+    var duration = AlarmAlertSettings().snoozeDuration;
+    if (duration == null) {
+      return false;
+    }
+    var totalSeconds = duration.inSeconds;
+    if (totalSeconds <= 0) {
+      return false;
+    }
+    return true;
+  }
+
+  String snoozeString() {
+    if (!isSnoozing()) {
+      return "";
+    }
+    var duration = AlarmAlertSettings().snoozeDuration!;
+    var minutes = duration.inMinutes;
+    var hours = duration.inHours;
+
+    if (hours > 0) {
+      return "${hours}h";
+    }
+
+    if (minutes > 0) {
+      return "${minutes}m";
+    }
+
+    return "<1m";
+  }
 }
 
 enum AlarmSounds {
