@@ -24,6 +24,7 @@ class BGL extends StatelessWidget with ThemeMixin {
         var dColor = diffColor(context);
         return Window(
           child: FittedBox(
+            alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
             child: SizedBox(
               width: 15,
               height: 10,
