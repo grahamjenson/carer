@@ -5,6 +5,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/alarms/flashing_widget.dart';
 import 'package:carer/widgets/bar/bar_bottom.dart';
 import 'package:carer/widgets/bar/bar_top.dart';
+import 'package:carer/widgets/bar/snooze_floating_button.dart';
 import 'package:carer/widgets/home_layout.dart';
 import 'package:flutter/material.dart';
 
@@ -51,15 +52,7 @@ class HomePage extends StatelessWidget with ThemeMixin {
           ),
           appBar: const BarTop(),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: FloatingActionButton.extended(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            onPressed: () {},
-            isExtended: true,
-            icon: const Icon(Icons.bedtime_outlined),
-            label: const Text("Add"),
-          ),
+          floatingActionButton: const SnoozeFloatingButton(),
           bottomNavigationBar: const BarBottom(),
         );
       },

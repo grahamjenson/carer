@@ -2,7 +2,6 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/alarms/snoozebutton.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
 import 'package:carer/widgets/insights/stats.dart';
@@ -25,27 +24,17 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
   }
 
   Widget getLayout(BuildContext context, Orientation orientation) {
-    final isSnoozeHidden = AlarmSettings().disableAlarms;
-
-    Widget snzbtn = const SnoozeButton();
-    var snoozeFlex = 1;
-    if (isSnoozeHidden) {
-      snoozeFlex = 0;
-      snzbtn = const SizedBox.shrink();
-    }
-
     if (orientation == Orientation.landscape) {
       return Row(
         children: [
-          Flexible(
+          const Flexible(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   flex: 6,
                   child: BGL(),
                 ),
-                Flexible(flex: 2 * snoozeFlex, child: snzbtn),
               ],
             ),
           ),
@@ -83,7 +72,6 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
               ],
             ),
           ),
-          Flexible(flex: 2 * snoozeFlex, child: snzbtn),
         ],
       );
     }
