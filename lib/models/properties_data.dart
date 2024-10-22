@@ -7,7 +7,7 @@ enum PropertiesDataName {
   isCharging,
   iob,
   basaliob,
-  treatmentIob,
+  treatmentiob,
   cob,
   cage,
   sage,
@@ -24,7 +24,7 @@ class PropertiesData {
     PropertiesDataName.isCharging: ASignal(false, debugLabel: "isCharging"),
     PropertiesDataName.iob: ASignal(0.0, debugLabel: "IOB"),
     PropertiesDataName.basaliob: ASignal(0.0, debugLabel: "BasalIOB"),
-    PropertiesDataName.treatmentIob: ASignal(0.0, debugLabel: "TreatmentIOB"),
+    PropertiesDataName.treatmentiob: ASignal(0.0, debugLabel: "TreatmentiOB"),
     PropertiesDataName.cob: ASignal(0.0, debugLabel: "COB"),
     PropertiesDataName.cage: ASignal(0.0, debugLabel: "CannulaAge"),
     PropertiesDataName.sage: ASignal(0.0, debugLabel: "SensorAge"),
@@ -36,6 +36,16 @@ class PropertiesData {
     final db = (await CarerDB.instance).db;
     var kvdb = KeyValueStore(db);
     await kvdb.internalPopulate();
+
+    battery = kvdb.getDouble(PropertiesDataName.battery.name, defaultValue: 100.0)!;
+    isCharging = kvdb.getBool(PropertiesDataName.isCharging.name, defaultValue: false)!;
+    iob = kvdb.getDouble(PropertiesDataName.iob.name, defaultValue: 0.0)!;
+    basaliob = kvdb.getDouble(PropertiesDataName.basaliob.name, defaultValue: 0.0)!;
+    treatmentiob = kvdb.getDouble(PropertiesDataName.treatmentiob.name, defaultValue: 0.0)!;
+    cob = kvdb.getDouble(PropertiesDataName.cob.name, defaultValue: 0.0)!;
+    cage = DateTime.fromMillisecondsSinceEpoch(kvdb.getDouble(PropertiesDataName.cage.name, defaultValue: 0.0)!.toInt());
+    sage = DateTime.fromMillisecondsSinceEpoch(kvdb.getDouble(PropertiesDataName.sage.name, defaultValue: 0.0)!.toInt());
+    reservoir = kvdb.getDouble(PropertiesDataName.reservoir.name, defaultValue: 0.0)!;
 
     aeffect(
       () {
@@ -67,9 +77,9 @@ class PropertiesData {
 
     aeffect(
       () {
-        kvdb.setDouble(PropertiesDataName.treatmentIob.name, _signals[PropertiesDataName.treatmentIob]!.value);
+        kvdb.setDouble(PropertiesDataName.treatmentiob.name, _signals[PropertiesDataName.treatmentiob]!.value);
       },
-      debugLabel: "TreatmentIOB",
+      debugLabel: "TreatmentiOB",
     );
 
     aeffect(
@@ -104,52 +114,52 @@ class PropertiesData {
   }
 
   // Getters
-  double get battery => _signals[PropertiesDataName.battery]!.value;
 
   bool t1dPhoneIsCharging() => _signals[PropertiesDataName.isCharging]!.value;
   int t1dPhonesBatteryLevel() => battery.toInt();
 
+  double get battery => _signals[PropertiesDataName.battery]!.value;
   double get iob => _signals[PropertiesDataName.iob]!.value;
   double get basaliob => _signals[PropertiesDataName.basaliob]!.value;
-  double get treatmentIob => _signals[PropertiesDataName.treatmentIob]!.value;
+  double get treatmentiob => _signals[PropertiesDataName.treatmentiob]!.value;
   double get cob => _signals[PropertiesDataName.cob]!.value;
   DateTime get cage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.cage]!.value.toInt());
   DateTime get sage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.sage]!.value.toInt());
   double get reservoir => _signals[PropertiesDataName.reservoir]!.value;
 
-  setBattery(double value) {
+  set battery(double value) {
     _signals[PropertiesDataName.battery]!.value = value;
   }
 
-  setIsCharging(bool value) {
+  set isCharging(bool value) {
     _signals[PropertiesDataName.isCharging]!.value = value;
   }
 
-  setIOB(double value) {
+  set iob(double value) {
     _signals[PropertiesDataName.iob]!.value = value;
   }
 
-  setIOBBasal(double value) {
+  set basaliob(double value) {
     _signals[PropertiesDataName.basaliob]!.value = value;
   }
 
-  setIOBTreatment(double value) {
-    _signals[PropertiesDataName.treatmentIob]!.value = value;
+  set treatmentiob(double value) {
+    _signals[PropertiesDataName.treatmentiob]!.value = value;
   }
 
-  setCOB(double value) {
+  set cob(double value) {
     _signals[PropertiesDataName.cob]!.value = value;
   }
 
-  setCAge(double value) {
-    _signals[PropertiesDataName.cage]!.value = value;
+  set cage(DateTime value) {
+    _signals[PropertiesDataName.cage]!.value = value.millisecondsSinceEpoch.toDouble();
   }
 
-  setSAge(double value) {
-    _signals[PropertiesDataName.sage]!.value = value;
+  set sage(DateTime value) {
+    _signals[PropertiesDataName.sage]!.value = value.millisecondsSinceEpoch.toDouble();
   }
 
-  setReservoir(double value) {
+  set reservoir(double value) {
     _signals[PropertiesDataName.reservoir]!.value = value;
   }
 }

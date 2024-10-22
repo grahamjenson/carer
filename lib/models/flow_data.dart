@@ -23,6 +23,14 @@ class FlowData {
     var kvdb = KeyValueStore(db);
     await kvdb.internalPopulate();
 
+    agreedPrivacyPolicy = DateTime.fromMillisecondsSinceEpoch(
+      kvdb.getInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, defaultValue: 0)!,
+    );
+
+    agreedTermsAndConditions = DateTime.fromMillisecondsSinceEpoch(
+      kvdb.getInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, defaultValue: 0)!,
+    );
+
     aeffect(
       () {
         kvdb.setInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, _signals[FlowDataNames.agreedPrivacyPolicyTimeStamp]!.value);
@@ -32,7 +40,7 @@ class FlowData {
 
     aeffect(
       () {
-        kvdb.setBool(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value);
+        kvdb.setInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value);
       },
       debugLabel: "agreedTermsAndConditionsTimeStamp",
     );
@@ -45,6 +53,7 @@ class FlowData {
 
   DateTime? get agreedPrivacyPolicy {
     var timeStamp = _signals[FlowDataNames.agreedPrivacyPolicyTimeStamp]!.value;
+
     if (timeStamp == 0) {
       return null;
     }

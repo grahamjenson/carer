@@ -1,20 +1,36 @@
+import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/pages/homepage.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:introduction_screen/introduction_screen.dart';
 
-class IntroductionPage extends StatelessWidget with ThemeMixin {
+class IntroductionPage extends StatefulWidget {
   const IntroductionPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final introKey = GlobalKey<IntroductionScreenState>();
-    bool acceptedTermsAndConditions = false;
-    bool acceptedPrivacyPolicy = false;
+  State<IntroductionPage> createState() => _IntroductionPageState();
+}
 
-    ButtonStyle acceptButtonStyl = ButtonStyle(
+class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = IntroPageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ButtonStyle btnStyle = ButtonStyle(
       backgroundColor: WidgetStateProperty.all<Color>(accentColor(context).dim.dim.dim),
       padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(20)),
       textStyle: WidgetStateProperty.all<TextStyle>(
@@ -34,93 +50,144 @@ class IntroductionPage extends StatelessWidget with ThemeMixin {
     return Scaffold(
       backgroundColor: backgroundColor(context),
       body: SafeArea(
-        child: IntroductionScreen(
-          key: introKey,
-          isProgressTap: false,
-          pages: [
-            PageViewModel(
-              title: "Welcome to Carer",
-              image: Image.asset("assets/carer_logo.png"),
-              bodyWidget: const MarkdownBody(data: "Carer is a diabetes management app that helps you monitor Type 1 Diabetes"),
-              footer: ElevatedButton(
-                style: acceptButtonStyl,
-                onPressed: () {
-                  introKey.currentState?.next();
-                },
-                child: const Text("Next"),
-              ),
-              decoration: const PageDecoration(
-                imageFlex: 5,
-                bodyFlex: 5,
-                footerFlex: 2,
-                safeArea: 0,
-              ),
-            ),
-            PageViewModel(
-              title: "Terms And Conditions",
-              bodyWidget: Column(children: [
-                SingleChildScrollView(child: MarkdownBody(data: StringAssets().termsAndConditions)),
-                ElevatedButton(
-                  style: acceptButtonStyl,
-                  child: const Text("Accept"),
-                  onPressed: () {
-                    acceptedTermsAndConditions = true;
-                    introKey.currentState?.next();
-                  },
-                ),
-              ]),
-              decoration: const PageDecoration(
-                imageFlex: 1,
-                bodyFlex: 5,
-                footerFlex: 2,
-                safeArea: 0,
-              ),
-            ),
-            PageViewModel(
-              title: "Privacy Policy",
-              bodyWidget: Column(
-                children: [
-                  MarkdownBody(data: StringAssets().privacyPolicy),
-                  ElevatedButton(
-                    style: acceptButtonStyl,
-                    onPressed: () {
-                      acceptedPrivacyPolicy = true;
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomePage()),
-                      );
-                    },
-                    child: const Text("Accept"),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          canProgress: (page) {
-            bool ret = false;
-            if (page == 0) {
-              // Can always progress from the first page
-              ret = true;
-            } else if (page == 1) {
-              // must accept T&C to progress
-              ret = acceptedTermsAndConditions;
-            } else if (page == 2) {
-              // must accept PP to progress to main app
-              ret = acceptedPrivacyPolicy && acceptedTermsAndConditions;
-            }
-
-            return ret;
-          },
-          showNextButton: false,
-          showDoneButton: false,
-          showBackButton: true,
-          back: const Text("Back"),
-          dotsDecorator: DotsDecorator(
-            color: primaryColor(context),
-            activeColor: accentColor(context),
+        child: GestureDetector(
+          onHorizontalDragUpdate: _onHorizontalDragUpdate,
+          child: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _getWelcomePage(btnStyle),
+              _getTermsAndConditionsPage(btnStyle),
+              _getPrivacyPolicyPage(btnStyle),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _getWelcomePage(ButtonStyle btnStyle) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          Expanded(flex: 10, child: Image.asset("assets/carer_logo.png")),
+          const Flexible(flex: 4, child: MarkdownBody(data: "Carer is a diabetes management app that helps you monitor Type 1 Diabetes")),
+          Flexible(
+            flex: 4,
+            child: ElevatedButton(
+              style: btnStyle,
+              onPressed: () {
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
+                    1,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              child: const Text("Next"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getTermsAndConditionsPage(ButtonStyle btnStyle) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            MarkdownBody(data: StringAssets().termsAndConditions),
+            ElevatedButton(
+              style: btnStyle,
+              onPressed: () {
+                FlowData().agreedTermsAndConditions = clock.now();
+
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
+                    2,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              child: const Text("Accept"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getPrivacyPolicyPage(ButtonStyle btnStyle) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          SingleChildScrollView(child: MarkdownBody(data: StringAssets().privacyPolicy)),
+          ElevatedButton(
+            style: btnStyle,
+            onPressed: () {
+              FlowData().agreedPrivacyPolicy = clock.now();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+            child: const Text("Accept"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onHorizontalDragUpdate(DragUpdateDetails details) {
+    if (details.primaryDelta! < 0) {
+      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    } else if (details.primaryDelta! > 0) {
+      _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    }
+  }
+}
+
+allowPageChange(int currentPage, int nextPage) {
+  if (currentPage == 0) {
+    return true;
+  }
+
+  if (currentPage == 1 && nextPage == 2) {
+    return FlowData().agreedTermsAndConditions != null;
+  }
+
+  if (currentPage == 2 && nextPage == 3) {
+    return FlowData().agreedPrivacyPolicy != null;
+  }
+  return true;
+}
+
+class IntroPageController extends PageController {
+  IntroPageController() : super();
+
+  @override
+  Future<void> animateToPage(
+    int page, {
+    required Duration duration,
+    required Curve curve,
+  }) {
+    if (!allowPageChange(this.page!.round(), page)) {
+      return Future.value();
+    }
+    return super.animateToPage(page, duration: duration, curve: curve);
+  }
+
+  @override
+  void jumpToPage(int page) {
+    if (!allowPageChange(this.page!.round(), page)) {
+      return;
+    }
+    super.jumpToPage(page);
   }
 }

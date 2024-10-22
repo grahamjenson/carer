@@ -1,3 +1,4 @@
+import 'package:carer/models/flow_data.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -10,18 +11,22 @@ class TermsAndConditionsPrivacyPolicyWidget extends AbstractSettingsSection {
   @override
   Widget build(BuildContext context) {
     return SettingsSection(
-      title: const Text('Debug'),
+      title: const Text('Documents'),
       tiles: [
         SettingsTile.navigation(
           title: const Text("Terms and Conditions"),
-          leading: const Icon(UniconsLine.bug),
+          descriptionInlineIos: true,
+          description: Text("Agreed on ${_formatDate(FlowData().agreedTermsAndConditions)}"),
+          leading: const Icon(UniconsLine.document_info),
           onPressed: (BuildContext context) async {
             await showDocument(context, "Terms and Conditions", StringAssets().termsAndConditions);
           },
         ),
         SettingsTile.navigation(
             title: const Text("Privacy Policy"),
-            leading: const Icon(UniconsLine.bug),
+            leading: const Icon(UniconsLine.document_info),
+            descriptionInlineIos: true,
+            description: Text("Agreed on ${_formatDate(FlowData().agreedPrivacyPolicy)}"),
             onPressed: (context) async {
               await showDocument(context, "Privacy Policy", StringAssets().privacyPolicy);
             }),
@@ -51,5 +56,12 @@ class TermsAndConditionsPrivacyPolicyWidget extends AbstractSettingsSection {
             ],
           );
         });
+  }
+
+  String _formatDate(DateTime? dt) {
+    if (dt == null) {
+      return "Unknown";
+    }
+    return "${dt.year}-${dt.month}-${dt.day}";
   }
 }

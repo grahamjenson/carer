@@ -32,22 +32,22 @@ class NSPropertiesUpdater extends Updater {
     raw = properties.raw;
 
     if (properties.iob != null) {
-      PropertiesData().setIOB(properties.iob!.toDouble());
+      PropertiesData().iob = properties.iob!.toDouble();
     }
     if (properties.basaliob != null) {
-      PropertiesData().setIOBBasal(properties.basaliob!.toDouble());
+      PropertiesData().basaliob = (properties.basaliob!.toDouble());
     }
     if (properties.treatmentIob != null) {
-      PropertiesData().setIOBTreatment(properties.treatmentIob!.toDouble());
+      PropertiesData().treatmentiob = (properties.treatmentIob!.toDouble());
     }
     if (properties.cob != null) {
-      PropertiesData().setCOB(properties.cob!.toDouble());
+      PropertiesData().cob = (properties.cob!.toDouble());
     }
     if (properties.cannulaChangeTime != null) {
-      PropertiesData().setCAge(properties.cannulaChangeTime!.toDouble());
+      PropertiesData().cage = DateTime.fromMillisecondsSinceEpoch(properties.cannulaChangeTime!);
     }
     if (properties.sensorChangeTime != null) {
-      PropertiesData().setSAge(properties.sensorChangeTime!.toDouble());
+      PropertiesData().sage = DateTime.fromMillisecondsSinceEpoch(properties.sensorChangeTime!);
     }
 
     alog('''update properties:

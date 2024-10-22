@@ -200,10 +200,6 @@ class DebugSettingsPage extends StatelessWidget {
           descriptionInlineIos: true,
           leading: const Icon(UniconsLine.bug),
           onPressed: (context) async {
-            // manually schedule the background task to be run
-            // print("Stargin Background Do");
-            // await BackgroundService().run();
-            // print("Done Background Do");
             BackgroundService().onFetch("com.transistorsoft.fetch");
           },
         )

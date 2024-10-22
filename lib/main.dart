@@ -112,6 +112,7 @@ class _MyAppState extends State<MyApp> {
     if (doIntro) {
       startingPage = const IntroductionPage();
     }
+
     return ValueListenableBuilder<ThemeData>(
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
