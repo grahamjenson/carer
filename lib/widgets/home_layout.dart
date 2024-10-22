@@ -65,7 +65,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
                 )
               ],
             ),
-          )
+          ),
         ],
       );
     } else {

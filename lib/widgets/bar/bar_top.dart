@@ -4,8 +4,6 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/alarms_bar.dart';
 import 'package:carer/widgets/alarms/status_bar.dart';
-import 'package:carer/widgets/bar/care_btn.dart';
-import 'package:carer/widgets/bar/settings_btn.dart';
 import 'package:carer/widgets/current_time.dart';
 import 'package:flutter/material.dart';
 
@@ -20,14 +18,12 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
     return AWatch(
       (context) {
         List<Widget> tiles = [
-              const CurrentTimeWidget(),
-              const Expanded(
-                child: SizedBox.shrink(),
-              ),
-              const StatusesBar(),
-              AlarmsBarIcons(),
-            ] +
-            getSettingsButtonEnd(context);
+          const CurrentTimeWidget(),
+          const Spacer(),
+          const StatusesBar(),
+          const Spacer(),
+          AlarmsBarIcons(),
+        ];
 
         return BottomAppBar(
           color: backgroundColorShade(context),
@@ -42,23 +38,5 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
       debugLabel: "BarTop",
       dependencies: [ThemeService().themeSignal, AlarmAlertSettings().snoozeUntilSignal, UISettings().orientationSignal],
     );
-  }
-
-  List<Widget> getSettingsButtonEnd(BuildContext context) {
-    if (UISettings().orientation == Orientation.portrait) {
-      return [];
-    }
-    return [
-      const Spacer(),
-      const CareBtn(),
-      VerticalDivider(
-        color: outlineColor(context),
-        thickness: 5,
-        width: 20,
-        indent: 5,
-        endIndent: 5,
-      ),
-      const SettingsBtn(),
-    ];
   }
 }
