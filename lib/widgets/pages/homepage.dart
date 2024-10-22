@@ -26,6 +26,10 @@ class HomePage extends StatelessWidget with ThemeMixin {
         return Scaffold(
           backgroundColor: backgroundColor(context),
           body: SafeArea(
+            left: false,
+            right: false,
+            bottom: false,
+            minimum: const EdgeInsets.all(0),
             child: Stack(children: [
               LayoutBuilder(
                 builder: (context, constraints) {

@@ -15,7 +15,8 @@ class CareBtn extends StatelessWidget with ThemeMixin {
       ),
       padding: EdgeInsets.zero,
       icon: Icon(
-        Icons.back_hand,
+        Icons.back_hand_outlined,
+        size: 40,
         color: accentColor(context),
       ),
       onPressed: () {

@@ -8,6 +8,7 @@ class SettingsBtn extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      iconSize: 40,
       color: Colors.white,
       highlightColor: Colors.white,
       style: ButtonStyle(
@@ -15,7 +16,7 @@ class SettingsBtn extends StatelessWidget with ThemeMixin {
       ),
       padding: EdgeInsets.zero,
       icon: Icon(
-        Icons.settings,
+        Icons.settings_outlined,
         color: accentColor(context),
       ),
       onPressed: () {

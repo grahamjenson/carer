@@ -10,14 +10,14 @@ class Window extends StatelessWidget with ThemeMixin {
     var color = backgroundColorShade(context);
     return SizedBox.expand(
         child: Container(
-      margin: const EdgeInsets.all(2),
+      margin: const EdgeInsets.only(left: 1, right: 1, top: 1, bottom: 1),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         border: Border.all(
           width: 0,
           color: color,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(0),
         color: color,
       ),
       padding: const EdgeInsets.all(5),

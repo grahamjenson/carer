@@ -27,12 +27,15 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
 
           // If there is one button
 
-          return Center(
+          return Container(
+            decoration: BoxDecoration(color: bColor, borderRadius: BorderRadius.circular(0)),
+            alignment: const Alignment(0.0, 0.5),
+            margin: const EdgeInsets.only(top: 1, bottom: 1),
             child: Container(
-              margin: const EdgeInsets.all(2),
+              margin: const EdgeInsets.all(1),
               height: buttonRadias,
               width: width,
-              decoration: BoxDecoration(color: bColor, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: bColor.dim.dim, borderRadius: BorderRadius.circular(0)),
               child: Stack(
                 children: getTexts(context, width, buttonRadias) +
                     [
@@ -115,7 +118,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
               backgroundColor: WidgetStateProperty.all<Color>(bColor),
               shape: WidgetStateProperty.all<OutlinedBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(0),
                 ),
               ),
             ),
@@ -161,7 +164,7 @@ class SnoozeButton extends StatelessWidget with ThemeMixin {
           alignment: Alignment.center,
           height: buttonRadias,
           width: buttonRadias,
-          decoration: BoxDecoration(color: buttonColor, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: buttonColor),
           child: Center(child: dismissibleIcon),
         ),
       ),

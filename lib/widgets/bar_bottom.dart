@@ -4,6 +4,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bar/care_btn.dart';
 import 'package:carer/widgets/bar/settings_btn.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class BarBottom extends StatelessWidget with ThemeMixin {
   const BarBottom({super.key});
@@ -14,18 +15,26 @@ class BarBottom extends StatelessWidget with ThemeMixin {
       (context) {
         List<Widget> tiles = [
           const CareBtn(),
-          const Expanded(
-            child: SizedBox.shrink(),
+          IconButton(
+            icon: const Icon(UniconsLine.list_ul),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(UniconsLine.bell),
+            onPressed: () {},
           ),
           const SettingsBtn(),
         ];
 
         return BottomAppBar(
           color: backgroundColorShade(context),
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          height: 40,
+          notchMargin: 5.0,
+          clipBehavior: Clip.antiAlias,
+          height: kBottomNavigationBarHeight,
+          shape: const CircularNotchedRectangle(),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: tiles,
           ),
         );
