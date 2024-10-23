@@ -40,6 +40,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
         );
 
         return ElevatedButton(
+          clipBehavior: Clip.antiAlias,
           style: buttonStyle,
           onPressed: () {
             Navigator.push(
@@ -90,6 +91,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
     var alarmStrings = [];
     for (var alarm in pendingAlarms) {
       alarmStrings.add(alarm.shortSummary());
+      break;
     }
 
     return [
