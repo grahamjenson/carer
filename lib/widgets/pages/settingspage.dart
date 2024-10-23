@@ -1,11 +1,5 @@
-import 'package:carer/services/alarms_service.dart';
-import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
-import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/services_settings.dart';
-import 'package:carer/widgets/settings/stats_settings.dart';
-import 'package:carer/widgets/settings/status_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/tandcandpp_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
@@ -18,12 +12,6 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (bool didPop) {
-        if (didPop) {
-          alog("Stop Test Alarm because POP");
-          AlarmsService().stopTestAlarm();
-        }
-      },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Settings'),
@@ -33,10 +21,6 @@ class SettingsPage extends StatelessWidget {
             ServicesSettingsWidget(),
             const T1DSettingsWidget(),
             const UISettingsWidget(),
-            const AlarmsSettingsWidget(),
-            const AlarmsAlertSettingsWidget(),
-            const StatusSettingsWidget(),
-            const StatsSettingsWidget(),
             const TermsAndConditionsPrivacyPolicyWidget(),
             const DebugSettingsWidget(),
           ],

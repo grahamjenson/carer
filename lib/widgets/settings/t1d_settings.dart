@@ -41,15 +41,6 @@ class T1DSettingsWidget extends AbstractSettingsSection with ThemeMixin {
 
         return SettingsSection(
           tiles: [
-            SettingsTile.switchTile(
-              title: const Text('Units'),
-              trailing: Text(unit.name),
-              initialValue: unit.toBool(),
-              onToggle: (value) async {
-                var unitP = Unit.fromBool(value);
-                UISettings().unit = unitP;
-              },
-            ),
             SettingsTile(
               title: Row(children: [
                 const Expanded(flex: 2, child: Text("Target")),

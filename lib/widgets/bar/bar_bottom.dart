@@ -2,7 +2,10 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/alarms/snooze_bar_button.dart';
+import 'package:carer/widgets/pages/alarm_settings_page.dart';
 import 'package:carer/widgets/pages/care_page.dart';
+import 'package:carer/widgets/pages/info_settings_page.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -17,15 +20,15 @@ class BarBottom extends StatelessWidget with ThemeMixin {
       (context) {
         var children = [
           createButton(context, "Care", Icons.back_hand_outlined, const CarePage()),
-          createButton(context, "Stats", UniconsLine.abacus, const SettingsPage()),
-          createButton(context, "Alarms", UniconsLine.bell, const SettingsPage()),
+          createButton(context, "Info", UniconsLine.info_circle, const InfoSettingsPage()),
+          createButton(context, "Alarms", UniconsLine.bell, const AlarmsSettingsPage()),
           createButton(context, "Settings", Icons.settings_outlined, const SettingsPage()),
         ];
 
         NotchedShape? notchShape;
         if (!AlarmSettings().disableAlarms) {
           // Add gap for floating button
-          children.insert(2, const Spacer(flex: 5));
+          children.insert(2, const Flexible(flex: 4, child: SnoozeBarButton()));
 
           notchShape = const AutomaticNotchedShape(
             RoundedRectangleBorder(

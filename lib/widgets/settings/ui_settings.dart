@@ -1,3 +1,4 @@
+import 'package:carer/models/sql/constants.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -17,6 +18,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
+        var unit = UISettings().unit;
         var keepScreenActiveDescript = const Text('Keep the awake.\nWhen screen is asleep alarms wont work!');
         if (!UISettings().screenActive) {
           keepScreenActiveDescript = Text(
@@ -27,6 +29,15 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
         return SettingsSection(
           title: const Text('UI'),
           tiles: [
+            SettingsTile.switchTile(
+              title: const Text('Units'),
+              trailing: Text(unit.name),
+              initialValue: unit.toBool(),
+              onToggle: (value) async {
+                var unitP = Unit.fromBool(value);
+                UISettings().unit = unitP;
+              },
+            ),
             SettingsTile.switchTile(
               title: const Text('Keep Screen Active'),
               descriptionInlineIos: true,

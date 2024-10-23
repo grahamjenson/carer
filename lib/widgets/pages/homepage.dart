@@ -3,7 +3,6 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/alarms/flashing_widget.dart';
-import 'package:carer/widgets/alarms/snooze_floating_button.dart';
 import 'package:carer/widgets/bar/bar_bottom.dart';
 import 'package:carer/widgets/bar/bar_top.dart';
 import 'package:carer/widgets/home_layout.dart';
@@ -51,8 +50,6 @@ class HomePage extends StatelessWidget with ThemeMixin {
             ]),
           ),
           appBar: const BarTop(),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: const SnoozeFloatingButton(),
           bottomNavigationBar: const BarBottom(),
         );
       },

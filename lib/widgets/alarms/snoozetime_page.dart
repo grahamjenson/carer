@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
-import 'package:carer/utils/dates.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeTimePage extends StatefulWidget {
@@ -10,8 +9,7 @@ class SnoozeTimePage extends StatefulWidget {
 
   final int popTime;
   static const List<int> minutesTimes = [5, 10, 20, 30, 45];
-  static const List<int> hoursTimes = [1, 2, 3];
-  static const List<int> timeTimes = [6, 22];
+  static const List<int> hoursTimes = [1, 2, 3, 6, 12];
 
   @override
   State<SnoozeTimePage> createState() => _SnoozeTimePageState();
@@ -80,6 +78,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                   const Divider(),
                   SizedBox(
                     width: double.infinity,
+                    height: 200,
                     child: ElevatedButton(
                       onPressed: () {
                         setSnooze(null);
@@ -87,7 +86,6 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                       child: Text("Cancel", style: textStyle),
                     ),
                   ),
-                  const Divider(),
                 ],
           ),
         ],
@@ -98,7 +96,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
   List<Widget> getSnoozeButtonsLayout(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
     final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
     var mins = getMinuteButtons(context, buttonStyle, textStyle);
-
+    var hours = getHourButtons(context, buttonStyle, textStyle);
     if (horizontal) {
       return [
         Expanded(
@@ -109,10 +107,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
         ),
         const Divider(),
         Expanded(
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children:
-                  getHourButtons(context, buttonStyle, textStyle) + [const VerticalDivider()] + getTimeButtons(context, buttonStyle, textStyle)),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: hours),
         ),
       ];
     }
@@ -133,14 +128,13 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
       Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: getHourButtons(context, buttonStyle, textStyle),
+          children: [hours[0], hours[1], hours[2]],
         ),
       ),
-      const Divider(),
       Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: getTimeButtons(context, buttonStyle, textStyle),
+          children: [hours[3], hours[4], const SizedBox.shrink()],
         ),
       ),
     ];
@@ -192,27 +186,5 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     }
 
     return hourButtons;
-  }
-
-  List<Widget> getTimeButtons(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
-    List<Widget> timeButtons = [];
-
-    for (var time in SnoozeTimePage.timeTimes) {
-      timeButtons.add(Container(
-        padding: const EdgeInsets.all(5),
-        child: ElevatedButton(
-          style: buttonStyle,
-          onPressed: () {
-            setSnooze(Dates.secondsTillNext24HourTime(time));
-          },
-          child: Text(
-            Dates.stringOf24HourTime(time),
-            style: textStyle,
-          ),
-        ),
-      ));
-    }
-
-    return timeButtons;
   }
 }
