@@ -76,14 +76,17 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
             children: getSnoozeButtonsLayout(context, buttonStyle, textStyle) +
                 [
                   const Divider(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 200,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setSnooze(null);
-                      },
-                      child: Text("Cancel", style: textStyle),
+                  Flexible(
+                    flex: 3,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setSnooze(null);
+                        },
+                        child: Text("Cancel", style: textStyle),
+                      ),
                     ),
                   ),
                 ],
@@ -100,6 +103,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     if (horizontal) {
       return [
         Expanded(
+          flex: 2,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: mins,
@@ -107,18 +111,21 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
         ),
         const Divider(),
         Expanded(
+          flex: 2,
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: hours),
         ),
       ];
     }
     return [
       Expanded(
+        flex: 2,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [mins[0], mins[1], mins[2]],
         ),
       ),
       Expanded(
+        flex: 2,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [mins[3], mins[4], const SizedBox.shrink()],
@@ -126,12 +133,14 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
       ),
       const Divider(),
       Expanded(
+        flex: 2,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [hours[0], hours[1], hours[2]],
         ),
       ),
       Expanded(
+        flex: 2,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [hours[3], hours[4], const SizedBox.shrink()],
