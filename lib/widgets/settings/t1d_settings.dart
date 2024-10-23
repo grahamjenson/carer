@@ -8,8 +8,8 @@ import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class T1DSettingsWidget extends AbstractSettingsSection with ThemeMixin {
-  const T1DSettingsWidget({super.key});
+class TargetSettingsWidget extends AbstractSettingsSection with ThemeMixin {
+  const TargetSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +40,7 @@ class T1DSettingsWidget extends AbstractSettingsSection with ThemeMixin {
         }
 
         return SettingsSection(
+          title: const Text('Targets'),
           tiles: [
             SettingsTile(
               title: Row(children: [

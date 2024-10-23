@@ -8,7 +8,6 @@ import 'package:carer/widgets/pages/care_page.dart';
 import 'package:carer/widgets/pages/info_settings_page.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
 class BarBottom extends StatelessWidget with ThemeMixin {
   final bool vertical;
@@ -19,16 +18,16 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     return AWatch(
       (context) {
         var children = [
-          createButton(context, "Care", Icons.back_hand_outlined, const CarePage()),
-          createButton(context, "Info", UniconsLine.info_circle, const InfoSettingsPage()),
-          createButton(context, "Alarms", UniconsLine.bell, const AlarmsSettingsPage()),
-          createButton(context, "Settings", Icons.settings_outlined, const SettingsPage()),
+          createButton(context, "Care", Icons.back_hand, const CarePage()),
+          createButton(context, "Info", Icons.info, const InfoSettingsPage()),
+          createButton(context, "Alarms", Icons.alarm, const AlarmsSettingsPage()),
+          createButton(context, "Settings", Icons.settings, const SettingsPage()),
         ];
 
         NotchedShape? notchShape;
         if (!AlarmSettings().disableAlarms) {
           // Add gap for floating button
-          children.insert(2, const Flexible(flex: 4, child: SnoozeBarButton()));
+          children.insert(2, const Flexible(flex: 5, child: SnoozeBarButton()));
 
           notchShape = const AutomaticNotchedShape(
             RoundedRectangleBorder(
@@ -55,7 +54,7 @@ class BarBottom extends StatelessWidget with ThemeMixin {
 
   Widget createButton(BuildContext context, String name, IconData id, Widget navigateTo) {
     return Flexible(
-      flex: 2,
+      flex: 1,
       child: IconButtonWithText(
         icon: id,
         label: name,
@@ -84,17 +83,6 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var iconText = Text(
-      String.fromCharCode(icon.codePoint),
-      style: TextStyle(
-        inherit: false,
-        fontSize: 32.0,
-        fontWeight: FontWeight.w100,
-        fontFamily: icon.fontFamily,
-        package: icon.fontPackage,
-      ),
-    );
-
     return ElevatedButton(
       style: ButtonStyle(
         foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
@@ -111,7 +99,10 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          iconText,
+          Icon(
+            icon,
+            size: 32.0,
+          ),
           const SizedBox(height: 4.0),
           Text(label,
               style: const TextStyle(

@@ -217,7 +217,7 @@ class _UrgentLowAlarm extends AlarmMethods {
   }
 
   @override
-  String shortSummary() => "Urgent Low (<${unitStr(TargetSettings().lowUrgent)})";
+  String shortSummary() => "Urgent Low <${unitStr(TargetSettings().lowUrgent)}";
 
   @override
   bool trigger() {
@@ -255,14 +255,14 @@ class _LowAlarm extends AlarmMethods {
   @override
   String shortSummary() {
     if (_lowTrigger()) {
-      return "Low (<${unitStr(TargetSettings().lowTarget)})";
+      return "Low <${unitStr(TargetSettings().lowTarget)}";
     }
     if (_predictiveTrigger()) {
       var sgv = getPredictedValue(numberOfReadingsToTrigger);
       if (sgv == null) {
         return "?";
       }
-      return "Predicted Low (<${unitStr(TargetSettings().lowTarget)})";
+      return "Predicted Low <${unitStr(TargetSettings().lowTarget)}";
     }
     return "?";
   }
@@ -342,9 +342,9 @@ class _HighAlarm extends AlarmMethods {
   @override
   String shortSummary() {
     if (smartSnooze()) {
-      return "High Smart Snooze (<${unitStr(TargetSettings().highTarget)})";
+      return "High <${unitStr(TargetSettings().highTarget)} Smart Snooze";
     }
-    return "High (>${unitStr(TargetSettings().highTarget)})";
+    return "High >${unitStr(TargetSettings().highTarget)}";
   }
 
   @override
@@ -402,7 +402,7 @@ class _UrgentHighAlarm extends AlarmMethods {
   }
 
   @override
-  String shortSummary() => "Urgent High (>${unitStr(TargetSettings().highUrgent)})";
+  String shortSummary() => "Urgent High >${unitStr(TargetSettings().highUrgent)}";
 
   @override
   bool trigger() {
@@ -434,7 +434,7 @@ class _FastRiseAlarm extends AlarmMethods {
   }
 
   @override
-  String shortSummary() => "Fast Rise (<${unitStr(TargetSettings().fastRiseDelta)})";
+  String shortSummary() => "Fast Rise <${unitStr(TargetSettings().fastRiseDelta)}";
 
   @override
   int get minutesToTrigger => AlarmSettings().fastRiseAlarmMinutes;
@@ -484,7 +484,7 @@ class _FastDropAlarm extends AlarmMethods {
   }
 
   @override
-  String shortSummary() => "Fast Drop (<${unitStr(TargetSettings().fastDropDelta)})";
+  String shortSummary() => "Fast Drop <${unitStr(TargetSettings().fastDropDelta)}";
 
   @override
   int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;

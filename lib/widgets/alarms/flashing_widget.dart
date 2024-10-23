@@ -1,5 +1,6 @@
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +11,7 @@ class FlasthingWidget extends StatefulWidget {
   State<FlasthingWidget> createState() => _FlasthingWidgetState();
 }
 
-class _FlasthingWidgetState extends State<FlasthingWidget> with SingleTickerProviderStateMixin {
+class _FlasthingWidgetState extends State<FlasthingWidget> with SingleTickerProviderStateMixin, ThemeMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -18,11 +19,12 @@ class _FlasthingWidgetState extends State<FlasthingWidget> with SingleTickerProv
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1000),
       vsync: this,
+      lowerBound: 0,
+      duration: const Duration(seconds: 1),
     )..repeat();
 
-    _animation = Tween<double>(begin: .8, end: 0).animate(_controller);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);
   }
 
   @override
@@ -43,12 +45,18 @@ class _FlasthingWidgetState extends State<FlasthingWidget> with SingleTickerProv
           child: AnimatedBuilder(
             animation: _animation,
             builder: (context, child) {
-              return Opacity(
-                opacity: _animation.value,
-                child: Container(
-                  color: Colors.white,
-                  width: double.infinity,
-                  height: double.infinity,
+              return OverflowBox(
+                maxWidth: double.infinity,
+                maxHeight: double.infinity,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    _buildContainer(context, 400 * _controller.value),
+                    _buildContainer(context, 600 * _controller.value),
+                    _buildContainer(context, 800 * _controller.value),
+                    _buildContainer(context, 1000 * _controller.value),
+                    _buildContainer(context, 1500 * _controller.value),
+                  ],
                 ),
               );
             },
@@ -57,6 +65,17 @@ class _FlasthingWidgetState extends State<FlasthingWidget> with SingleTickerProv
       },
       debugLabel: "FlasthingWidget",
       dependencies: [AlarmsService().alertingAlarms],
+    );
+  }
+
+  Widget _buildContainer(BuildContext context, double radius) {
+    return Container(
+      width: radius,
+      height: radius,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: primaryColor(context).withOpacity(0.6 * (1 - _controller.value)),
+      ),
     );
   }
 }

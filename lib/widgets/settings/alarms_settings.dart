@@ -4,7 +4,6 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/alarms_pages/battery_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/fast_fall_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/fast_rise_alarm_page.dart';
@@ -24,23 +23,20 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var tiles = [
-          disableAlarms(context),
+        if (AlarmSettings().disableAlarms) {
+          return const SizedBox.shrink();
+        }
+        List<SettingsTile> tiles = [
+          alarmNavigationTile(context, AlarmType.urgentLow, const UrgentAlarmLowSettingsPage()),
+          alarmNavigationTile(context, AlarmType.low, const LowAlarmSettingsPage()),
+          alarmNavigationTile(context, AlarmType.high, const HighAlarmSettingsPage()),
+          alarmNavigationTile(context, AlarmType.urgentHigh, const UrgentAlarmHighSettingsPage()),
+          alarmNavigationTile(context, AlarmType.fastRise, const FastRiseAlarmSettingsPage()),
+          alarmNavigationTile(context, AlarmType.fastDrop, const FastFallAlarmSettingsPage()),
+          alarmNavigationTile(context, AlarmType.noData, const NoDataAlarmSettingsPage()),
+          alarmNavigationTile(context, AlarmType.lowBattery, const BatteryAlarmSettingsPage()),
         ];
 
-        if (!AlarmSettings().disableAlarms) {
-          tiles = [
-            disableAlarms(context),
-            alarmNavigationTile(context, AlarmType.urgentLow, const UrgentAlarmLowSettingsPage()),
-            alarmNavigationTile(context, AlarmType.low, const LowAlarmSettingsPage()),
-            alarmNavigationTile(context, AlarmType.high, const HighAlarmSettingsPage()),
-            alarmNavigationTile(context, AlarmType.urgentHigh, const UrgentAlarmHighSettingsPage()),
-            alarmNavigationTile(context, AlarmType.fastRise, const FastRiseAlarmSettingsPage()),
-            alarmNavigationTile(context, AlarmType.fastDrop, const FastFallAlarmSettingsPage()),
-            alarmNavigationTile(context, AlarmType.noData, const NoDataAlarmSettingsPage()),
-            alarmNavigationTile(context, AlarmType.lowBattery, const BatteryAlarmSettingsPage()),
-          ];
-        }
         return SettingsSection(
           title: const Text('Alarms'),
           tiles: tiles,
@@ -48,28 +44,6 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
       },
       debugLabel: "AlarmsSettingsWidget",
       dependencies: AlarmSettings().allSignals() + TargetSettings().allSignals() + AlarmAlertSettings().allSignals(),
-    );
-  }
-
-  SettingsTile disableAlarms(BuildContext context) {
-    return SettingsTile.switchTile(
-      title: const Text("Disable Alarms"),
-      descriptionInlineIos: true,
-      description: const Text(
-        "Turn off all alarms",
-      ),
-      initialValue: AlarmSettings().disableAlarms,
-      onToggle: (bool disable) async {
-        if (!disable) {
-          AlarmSettings().disableAlarms = false;
-          return;
-        }
-        // show the dialog
-        bool? areYouSure = await Dialogs.areYouSureDialog(context, "Disable Alarms", "Disable all alarms (not recommended)?", "Disable");
-        if (areYouSure == true) {
-          AlarmSettings().disableAlarms = true;
-        }
-      },
     );
   }
 

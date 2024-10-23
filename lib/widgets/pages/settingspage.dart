@@ -19,7 +19,7 @@ class SettingsPage extends StatelessWidget {
         body: SettingsList(
           sections: [
             ServicesSettingsWidget(),
-            const T1DSettingsWidget(),
+            const TargetSettingsWidget(),
             const UISettingsWidget(),
             const TermsAndConditionsPrivacyPolicyWidget(),
             const DebugSettingsWidget(),

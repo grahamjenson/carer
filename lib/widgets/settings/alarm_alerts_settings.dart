@@ -71,7 +71,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
 
   SettingsTile enableFlashOnAlarm() {
     return SettingsTile.switchTile(
-      title: const Text("Enable Flash on Alarm"),
+      title: const Text("Flash on Alarm"),
       descriptionInlineIos: true,
       description: const Text(
         "Flashs the screen white when an alarming",
@@ -85,7 +85,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
 
   SettingsTile enableAudioAlarms(BuildContext context) {
     return SettingsTile.switchTile(
-      title: const Text("Enable Audio Alarms"),
+      title: const Text("Audio Alarms"),
       descriptionInlineIos: true,
       description: const Text(
         "Play audio alert when an alarming",

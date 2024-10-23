@@ -21,6 +21,8 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
         ButtonStyle buttonStyle = ElevatedButton.styleFrom(
           foregroundColor: Colors.black,
           backgroundColor: primaryColor(context),
+          padding: const EdgeInsets.all(5),
+          minimumSize: const Size(100, 50),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
