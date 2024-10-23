@@ -84,8 +84,20 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
+    var iconText = Text(
+      String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        inherit: false,
+        fontSize: 32.0,
+        fontWeight: FontWeight.w100,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+      ),
+    );
+
     return ElevatedButton(
       style: ButtonStyle(
+        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
         backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context)),
         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(0)),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
@@ -99,13 +111,12 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 24.0,
-            color: primaryColor(context),
-          ),
+          iconText,
           const SizedBox(height: 4.0),
-          Text(label, style: TextStyle(fontSize: 12.0, color: primaryColor(context))),
+          Text(label,
+              style: const TextStyle(
+                fontSize: 10.0,
+              )),
         ],
       ),
     );
