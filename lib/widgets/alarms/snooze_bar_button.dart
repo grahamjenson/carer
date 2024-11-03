@@ -33,11 +33,10 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
           children: [Icon(Icons.bedtime_outlined), Text("Snooze")],
         );
 
-        Widget snoozeText = Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: alarmStrings() + snoozeStrings(context),
-        );
+        List<Widget> children = [snoozeIcon];
+        if (AlarmAlertSettings().snoozeDuration != null) {
+          children.add(snoozeStrings(context));
+        }
 
         return ElevatedButton(
           clipBehavior: Clip.antiAlias,
@@ -54,7 +53,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [snoozeIcon, snoozeText]),
+              children: children),
         );
       },
       debugLabel: "SnoozeFloatingButton",
@@ -67,37 +66,19 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
     );
   }
 
-  List<Widget> snoozeStrings(BuildContext context) {
-    if (AlarmAlertSettings().snoozeDuration == null) {
-      return [];
-    }
-    return [
-      Text(
+  Widget snoozeStrings(BuildContext context) {
+    return Container(
+      width: 100,
+      height: 40,
+      alignment: Alignment.center,
+      child: Text(
         AlarmAlertSettings().snoozeString(),
         style: labelLarge(context).copyWith(
-          fontSize: 20,
+          height: 0.6,
+          fontSize: 40,
           color: Colors.black,
         ),
       ),
-    ];
-  }
-
-  List<Widget> alarmStrings() {
-    var pendingAlarms = AlarmsService().pendingAlarms.value;
-    if (pendingAlarms.isEmpty) {
-      return [];
-    }
-
-    var alarmStrings = [];
-    for (var alarm in pendingAlarms) {
-      alarmStrings.add(alarm.shortSummary());
-      break;
-    }
-
-    return [
-      Text(
-        alarmStrings.join("\n"),
-      )
-    ];
+    );
   }
 }

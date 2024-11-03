@@ -60,7 +60,7 @@ class CleanSGV with DateMixin implements ASGV {
   @override
   bool get isUrgentHigh => range == Range5.veryHigh;
 
-  Range7 get diffRange => diffRange7(rate5m ?? 0);
+  Range5 get diffRange => diffRange5(rate5m ?? 0);
 
   int? get diff {
     if (before == null) {

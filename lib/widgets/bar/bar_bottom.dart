@@ -85,7 +85,7 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(
-        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+        foregroundColor: WidgetStateProperty.all<Color>(onBackgroundColor(context)),
         backgroundColor: WidgetStateProperty.all<Color>(backgroundColorShade(context)),
         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(0)),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(

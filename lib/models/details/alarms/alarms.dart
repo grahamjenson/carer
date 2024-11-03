@@ -443,7 +443,7 @@ class _FastRiseAlarm extends AlarmMethods {
 
   @override
   bool trigger() {
-    // Dont trigger if High or Very High, fast drop when high is what we want
+    // Dont trigger if low or Very Low, fast rise when low is what we want
     if (targetRange5 == Range5.low || targetRange5 == Range5.veryLow) {
       return false;
     }

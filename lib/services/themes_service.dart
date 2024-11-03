@@ -1,10 +1,8 @@
-import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/math.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -259,54 +257,6 @@ mixin ThemeMixin {
           offset: Offset(-width, width),
           color: color),
     ]);
-  }
-
-  Color? rangeColor(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-
-    CleanSGV? sgv = CleanSGV.lastSGV.value;
-    if (sgv == null) {
-      return theme.error;
-    }
-    if (sgv.isNormal) {
-      return onBackgroundColor(context);
-    }
-    if (sgv.isLow || sgv.isHigh) {
-      return primaryColor(context);
-    }
-    return badColor(context);
-  }
-
-  Color? diffColor(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-
-    CleanSGV? sgv = CleanSGV.lastSGV.value;
-    if (sgv == null) {
-      return theme.error;
-    }
-    var diffRange = sgv.diffRange;
-    if (diffRange == Range7.mid) {
-      return onBackgroundColor(context);
-    }
-    if (diffRange == Range7.low || diffRange == Range7.high) {
-      return primaryColor(context);
-    }
-    return badColor(context);
-  }
-
-  Color? ageColor(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-
-    var sgv = CleanSGV.lastSGV.value;
-    if (sgv == null) {
-      return theme.error;
-    }
-
-    var seconds = sgv.age.inSeconds % 300;
-    if (seconds < 300) {
-      return onBackgroundColor(context);
-    }
-    return primaryColor(context);
   }
 }
 
