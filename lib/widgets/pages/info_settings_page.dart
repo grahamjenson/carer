@@ -1,4 +1,4 @@
-import 'package:carer/widgets/settings/stats_settings.dart';
+import 'package:carer/widgets/settings/info_settings.dart';
 import 'package:carer/widgets/settings/status_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';

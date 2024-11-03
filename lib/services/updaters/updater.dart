@@ -1,6 +1,7 @@
 // An Updater Manages the time that the data is updated
 import 'dart:async';
 
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
@@ -25,10 +26,16 @@ abstract class Updater {
 
   void start() {
     Timer.periodic(intervalToCheck, (Timer t) async {
+      // If this tries to update too quickly after reopening it will cause an OS error
+      if (AppLifecycleService().wasResumed1SecondsAgo) {
+        return;
+      }
+
       var reasons = shouldUpdate();
 
       if (reasons.isNotEmpty) {
         alog("Updating $runtimeType because ${reasons.join(", ")}");
+
         // We always update
         lastUpdated = DateTime.now();
         var (ret, err) = await go(update());

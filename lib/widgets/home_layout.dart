@@ -4,7 +4,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
-import 'package:carer/widgets/insights/stats.dart';
+import 'package:carer/widgets/insights/info.dart';
 import 'package:carer/widgets/insights/treatments.dart';
 import 'package:flutter/material.dart';
 

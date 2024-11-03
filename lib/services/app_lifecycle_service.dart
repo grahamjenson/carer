@@ -20,7 +20,9 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  bool get wasRecentlyResumed => clock.now().difference(lastResumed.value).inSeconds < 9;
+  bool get wasResumed1SecondsAgo => clock.now().difference(lastResumed.value).inMilliseconds < 1000;
+
+  bool get wasResumed10SecondsAgo => clock.now().difference(lastResumed.value).inSeconds < 9;
 
   bool get wasRecentlyScreenChanged => clock.now().difference(lastChangeScreen.value).inSeconds < 9;
 
@@ -60,6 +62,7 @@ class NavigationChangeObserver extends NavigatorObserver {
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
+
     // If poping to the inital route, then remove the lastScreenChange
     if (previousRoute?.settings.name == "/") {
       // TODO: a bit hacky, needs a rename like LastNotOnMainScreen

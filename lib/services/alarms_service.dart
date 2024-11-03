@@ -62,7 +62,7 @@ class AlarmsService {
 
         // If the app has only recently been resumed or a screen changed, we wipe all the active alarms
         // because we want to give the app some time ot "warm up" and if the user is doing something give them time to finish
-        if (AppLifecycleService().wasRecentlyResumed || AppLifecycleService().wasRecentlyScreenChanged) {
+        if (AppLifecycleService().wasResumed10SecondsAgo || AppLifecycleService().wasRecentlyScreenChanged) {
           newAlertingAlarms = <AlarmType>{};
         }
 
