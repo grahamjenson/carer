@@ -1,4 +1,4 @@
-import 'package:carer/models/details/stats/stats_service.dart';
+import 'package:carer/models/details/info/info_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -6,34 +6,34 @@ import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class StatsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
-  const StatsSettingsWidget({super.key});
+class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
+  const InfoSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
         List<SettingsTile> tiles = [
-          inactiveStat(context, Stat.iob),
-          inactiveStat(context, Stat.cob),
-          inactiveStat(context, Stat.basal),
-          inactiveStat(context, Stat.target),
-          inactiveStat(context, Stat.currentProfile),
-          inactiveStat(context, Stat.todaysInRange),
-          inactiveStat(context, Stat.yesterdayInRange),
+          inactiveStat(context, Info.iob),
+          inactiveStat(context, Info.cob),
+          inactiveStat(context, Info.basal),
+          inactiveStat(context, Info.target),
+          inactiveStat(context, Info.currentProfile),
+          inactiveStat(context, Info.todaysInRange),
+          inactiveStat(context, Info.yesterdayInRange),
         ];
 
         return SettingsSection(
-          title: const Text('Stats Settings'),
+          title: const Text('Info Settings'),
           tiles: tiles,
         );
       },
-      debugLabel: "StatsSettingsWidget",
+      debugLabel: "InfoSettingsWidget",
       dependencies: [TimerService().fifteenSecondSignal],
     );
   }
 
-  SettingsTile inactiveStat(BuildContext context, Stat stat) {
+  SettingsTile inactiveStat(BuildContext context, Info stat) {
     Color? iconColor;
 
     var descriptionStyle = labelMedium(context).copyWith(color: onBackgroundColor(context));

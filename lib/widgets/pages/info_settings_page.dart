@@ -15,7 +15,7 @@ class InfoSettingsPage extends StatelessWidget {
         ),
         body: const SettingsList(
           sections: [
-            StatsSettingsWidget(),
+            InfoSettingsWidget(),
             StatusSettingsWidget(),
           ],
         ),

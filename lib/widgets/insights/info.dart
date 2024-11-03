@@ -1,12 +1,12 @@
-import 'package:carer/models/details/stats/stats_service.dart';
+import 'package:carer/models/details/info/info_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
-class Stats extends StatelessWidget with ThemeMixin {
-  Stats({super.key});
+class InfoWidget extends StatelessWidget with ThemeMixin {
+  InfoWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +31,14 @@ class Stats extends StatelessWidget with ThemeMixin {
                 DataColumn(label: SizedBox(width: 50)),
               ],
               rows: [
-                statsRow(context, Stat.iob),
-                statsRow(context, Stat.cob),
-                statsRow(context, Stat.basal),
-                statsRow(context, Stat.target),
-                statsRow(context, Stat.currentProfile),
+                infoRow(context, Info.iob),
+                infoRow(context, Info.cob),
+                infoRow(context, Info.basal),
+                infoRow(context, Info.target),
+                infoRow(context, Info.currentProfile),
                 divider(),
-                statsRow(context, Stat.todaysInRange),
-                statsRow(context, Stat.yesterdayInRange),
+                infoRow(context, Info.todaysInRange),
+                infoRow(context, Info.yesterdayInRange),
               ],
             ),
           ),
@@ -57,14 +57,7 @@ class Stats extends StatelessWidget with ThemeMixin {
     );
   }
 
-  DataRow statsRow(BuildContext context, Stat stat) {
-    TextStyle heading = TextStyle(
-      fontWeight: FontWeight.normal,
-      fontSize: 15,
-      color: accentColor(context),
-      height: 1,
-    );
-
+  DataRow infoRow(BuildContext context, Info stat) {
     TextStyle row = TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w500,

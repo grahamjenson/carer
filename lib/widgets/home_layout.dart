@@ -48,7 +48,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
                   child: Row(
                     children: [
                       Flexible(child: Treatments()),
-                      Flexible(child: Stats()),
+                      Flexible(child: InfoWidget()),
                     ],
                   ),
                 )
@@ -68,7 +68,7 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
             child: Row(
               children: [
                 Flexible(child: Treatments()),
-                Flexible(child: Stats()),
+                Flexible(child: InfoWidget()),
               ],
             ),
           ),

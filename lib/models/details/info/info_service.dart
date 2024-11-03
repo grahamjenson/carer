@@ -9,8 +9,8 @@ import 'package:carer/utils/math.dart';
 import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
 
-abstract class _StatMethods with ThemeMixin {
-  const _StatMethods();
+abstract class _InfoMethods with ThemeMixin {
+  const _InfoMethods();
   IconData get icon;
   String get title;
   String get description;
@@ -19,7 +19,7 @@ abstract class _StatMethods with ThemeMixin {
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small);
 }
 
-enum Stat {
+enum Info {
   iob(_IOB()),
   cob(_COB()),
   basal(_Basal()),
@@ -28,9 +28,9 @@ enum Stat {
   todaysInRange(_TodayInRange()),
   yesterdayInRange(_YesterdayInRange());
 
-  final _StatMethods _methods;
+  final _InfoMethods _methods;
 
-  const Stat(this._methods);
+  const Info(this._methods);
 
   IconData get icon => _methods.icon;
   String get title => _methods.title;
@@ -41,7 +41,7 @@ enum Stat {
       _methods.status(context, style, small);
 }
 
-class _IOB extends _StatMethods {
+class _IOB extends _InfoMethods {
   const _IOB();
 
   double get value => PropertiesData().iob;
@@ -61,7 +61,7 @@ class _IOB extends _StatMethods {
   }
 }
 
-class _COB extends _StatMethods {
+class _COB extends _InfoMethods {
   const _COB();
 
   double get value => PropertiesData().cob;
@@ -81,7 +81,7 @@ class _COB extends _StatMethods {
   }
 }
 
-class _Basal extends _StatMethods {
+class _Basal extends _InfoMethods {
   const _Basal();
 
   @override
@@ -120,7 +120,7 @@ class _Basal extends _StatMethods {
   }
 }
 
-class _Target extends _StatMethods {
+class _Target extends _InfoMethods {
   const _Target();
 
   @override
@@ -160,7 +160,7 @@ class _Target extends _StatMethods {
   }
 }
 
-class _CurrentProfile extends _StatMethods {
+class _CurrentProfile extends _InfoMethods {
   const _CurrentProfile();
 
   @override
@@ -199,7 +199,7 @@ class _CurrentProfile extends _StatMethods {
   }
 }
 
-class _TodayInRange extends _StatMethods {
+class _TodayInRange extends _InfoMethods {
   const _TodayInRange();
 
   double get value => CleanSGV.todaysPercentage.value ?? 0.0;
@@ -219,7 +219,7 @@ class _TodayInRange extends _StatMethods {
   }
 }
 
-class _YesterdayInRange extends _StatMethods {
+class _YesterdayInRange extends _InfoMethods {
   const _YesterdayInRange();
 
   double get value => CleanSGV.yesterdaysPercentage.value ?? 0.0;
