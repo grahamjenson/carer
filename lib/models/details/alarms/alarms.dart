@@ -68,6 +68,7 @@ enum AlarmType {
   String get description => _methods.description;
   String get title => _methods.title;
   String shortSummary() => _methods.shortSummary();
+  String statment() => _methods.statment();
 
   IconData get icon => _methods.icon();
 
@@ -122,6 +123,7 @@ abstract class AlarmMethods {
   String get description;
   String get title;
   String shortSummary();
+  String statment();
   IconData icon();
 
   (bool, bool, bool) alarmStatus() {
@@ -220,6 +222,9 @@ class _UrgentLowAlarm extends AlarmMethods {
   String shortSummary() => "Urgent Low <${unitStr(TargetSettings().lowUrgent)}";
 
   @override
+  String statment() => "Urgent Low";
+
+  @override
   bool trigger() {
     return targetRange5 == Range5.veryLow;
   }
@@ -254,9 +259,6 @@ class _LowAlarm extends AlarmMethods {
 
   @override
   String shortSummary() {
-    if (_lowTrigger()) {
-      return "Low <${unitStr(TargetSettings().lowTarget)}";
-    }
     if (_predictiveTrigger()) {
       var sgv = getPredictedValue(numberOfReadingsToTrigger);
       if (sgv == null) {
@@ -264,7 +266,15 @@ class _LowAlarm extends AlarmMethods {
       }
       return "Predicted Low <${unitStr(TargetSettings().lowTarget)}";
     }
-    return "?";
+    return "Low <${unitStr(TargetSettings().lowTarget)}";
+  }
+
+  @override
+  String statment() {
+    if (_predictiveTrigger()) {
+      return "Predicted Low";
+    }
+    return "Low";
   }
 
   @override
@@ -348,6 +358,14 @@ class _HighAlarm extends AlarmMethods {
   }
 
   @override
+  String statment() {
+    if (smartSnooze()) {
+      return "High (Smart Snooze)";
+    }
+    return "High";
+  }
+
+  @override
   get minutesToTrigger => AlarmSettings().highMinutes;
 
   @override
@@ -405,6 +423,9 @@ class _UrgentHighAlarm extends AlarmMethods {
   String shortSummary() => "Urgent High >${unitStr(TargetSettings().highUrgent)}";
 
   @override
+  String statment() => "Urgent High";
+
+  @override
   bool trigger() {
     return targetRange5 == Range5.veryHigh;
   }
@@ -435,6 +456,9 @@ class _FastRiseAlarm extends AlarmMethods {
 
   @override
   String shortSummary() => "Fast Rise <${unitStr(TargetSettings().fastRiseDelta)}";
+
+  @override
+  String statment() => "Fast Rise";
 
   @override
   int get minutesToTrigger => AlarmSettings().fastRiseAlarmMinutes;
@@ -487,6 +511,9 @@ class _FastDropAlarm extends AlarmMethods {
   String shortSummary() => "Fast Drop <${unitStr(TargetSettings().fastDropDelta)}";
 
   @override
+  String statment() => "Fast Drop";
+
+  @override
   int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;
   List<int> get diffs => diffPer5MinuteForReadings(numberOfReadingsToTrigger);
 
@@ -536,6 +563,9 @@ class _NoDataAlarm extends AlarmMethods {
 
   @override
   String shortSummary() => "No Data for ${age.inMinutes}m";
+
+  @override
+  String statment() => "No Data";
 
   @override
   int get minutesToTrigger {
@@ -611,13 +641,25 @@ class _LowBatteryAlarm extends AlarmMethods {
   String shortSummary() {
     var statusStr = [];
     if (_carerTrigger()) {
-      statusStr.add("This Battery");
+      statusStr.add("Battery");
     }
     if (_t1DTrigger()) {
       statusStr.add("T1D Battery(${PropertiesData().t1dPhonesBatteryLevel()}%)");
     }
 
     return "${statusStr.join(" and ")} < 10%";
+  }
+
+  @override
+  String statment() {
+    var statusStr = [];
+    if (_carerTrigger()) {
+      statusStr.add("Battery");
+    }
+    if (_t1DTrigger()) {
+      statusStr.add("T1D Battery");
+    }
+    return "${statusStr.join(" and ")} Low";
   }
 
   @override

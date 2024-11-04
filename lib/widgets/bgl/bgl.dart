@@ -1,5 +1,4 @@
 import 'package:carer/models/clean_sgv.dart';
-import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -112,24 +111,6 @@ class BGL extends StatelessWidget with ThemeMixin {
           ),
         ];
 
-        var pendingAlarms = AlarmsService().pendingAlarms.value;
-        if (pendingAlarms.isNotEmpty) {
-          var alarmStrings = [];
-          for (var alarm in pendingAlarms) {
-            alarmStrings.add(alarm.shortSummary());
-          }
-
-          children.insert(
-            0,
-            Flexible(
-              flex: 2,
-              child: FittedBox(
-                child: Text(alarmStrings.join("\n"), style: badStyle(context)),
-              ),
-            ),
-          );
-        }
-
         return Window(
           child: FittedBox(
             alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
@@ -154,15 +135,14 @@ class BGL extends StatelessWidget with ThemeMixin {
       additionalTX = " (+${seconds}s)";
     }
 
-    var mediumTS = baseStyle;
-    var smallTS = baseStyle.copyWith(fontSize: mediumTS.fontSize! / 2);
+    var smallTS = baseStyle.copyWith(fontSize: baseStyle.fontSize! * 0.8);
     var countdownFont = smallTS.copyWith(fontFeatures: [const FontFeature.superscripts()]);
 
     Widget text;
     if (sgv.age.inMinutes == 0) {
-      text = Text("now", style: mediumTS);
+      text = Text("now", style: baseStyle);
     } else {
-      text = SmartText(texts: ["${sgv.age.inMinutes}", "min", additionalTX], styles: [mediumTS, smallTS, countdownFont]);
+      text = SmartText(texts: ["${sgv.age.inMinutes}", "min", additionalTX], styles: [baseStyle, smallTS, countdownFont]);
     }
 
     return text;
