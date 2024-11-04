@@ -1,4 +1,5 @@
 import 'package:carer/models/details/info/info_service.dart';
+import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -14,13 +15,13 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return AWatch(
       (context) {
         List<SettingsTile> tiles = [
-          inactiveStat(context, Info.iob),
-          inactiveStat(context, Info.cob),
-          inactiveStat(context, Info.basal),
-          inactiveStat(context, Info.target),
-          inactiveStat(context, Info.currentProfile),
-          inactiveStat(context, Info.todaysInRange),
-          inactiveStat(context, Info.yesterdayInRange),
+          infoTile(context, Info.iob),
+          infoTile(context, Info.cob),
+          infoTile(context, Info.basal),
+          infoTile(context, Info.target),
+          infoTile(context, Info.currentProfile),
+          infoTile(context, Info.todaysInRange),
+          infoTile(context, Info.yesterdayInRange),
         ];
 
         return SettingsSection(
@@ -33,14 +34,23 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     );
   }
 
-  SettingsTile inactiveStat(BuildContext context, Info stat) {
+  SettingsTile infoTile(BuildContext context, Info stat) {
+    StatusSettings statusSettings = StatusSettings();
     Color? iconColor;
 
     var descriptionStyle = labelMedium(context).copyWith(color: onBackgroundColor(context));
     var statusStyle = labelSmall(context).copyWith(color: onBackgroundColor(context).dim);
 
     var (texts, styles) = stat.status(context, statusStyle, statusStyle);
-    return SettingsTile(
+    return SettingsTile.switchTile(
+      initialValue: statusSettings.infoEnabledContains(stat.name),
+      onToggle: (bool value) {
+        if (value) {
+          statusSettings.infoEnabledAdd(stat.name);
+        } else {
+          statusSettings.infoEnabledRemove(stat.name);
+        }
+      },
       descriptionInlineIos: true,
       title: Text(stat.title),
       description: SmartText(texts: ["${stat.description}\n"] + texts, styles: [descriptionStyle] + styles),
