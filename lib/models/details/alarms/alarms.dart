@@ -259,6 +259,9 @@ class _LowAlarm extends AlarmMethods {
 
   @override
   String shortSummary() {
+    if (_lowTrigger()) {
+      return "Low <${unitStr(TargetSettings().lowTarget)}";
+    }
     if (_predictiveTrigger()) {
       var sgv = getPredictedValue(numberOfReadingsToTrigger);
       if (sgv == null) {
@@ -271,6 +274,9 @@ class _LowAlarm extends AlarmMethods {
 
   @override
   String statment() {
+    if (_lowTrigger()) {
+      return "Low";
+    }
     if (_predictiveTrigger()) {
       return "Predicted Low";
     }
