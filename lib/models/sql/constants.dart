@@ -38,7 +38,7 @@ enum Unit {
   String str(num value) {
     switch (this) {
       case Unit.mg:
-        return value.toString();
+        return value.toStringAsFixed(0);
       case Unit.mmol:
         return (value / MGtoMMOL).toStringAsFixed(1);
     }

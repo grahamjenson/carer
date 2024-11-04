@@ -127,7 +127,13 @@ class KeyValueStore {
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// double.
-  double? getDouble(String key, {double? defaultValue}) => _cache[key] ?? defaultValue;
+  double? getDouble(String key, {double? defaultValue}) {
+    var val = _cache[key] ?? defaultValue;
+    if (val is int) {
+      return val.toDouble();
+    }
+    return val;
+  }
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// String.

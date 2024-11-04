@@ -185,7 +185,7 @@ abstract class AlarmMethods {
     return lastSGV.unitStr();
   }
 
-  String unitStr(int value) {
+  String unitStr(num value) {
     return UISettings().unit.str(value);
   }
 
@@ -453,7 +453,7 @@ class _FastRiseAlarm extends AlarmMethods {
 
   @override
   String get description {
-    var description = "Fast Rise Alarm after ${AlarmSettings().fastRiseAlarmMinutes}m";
+    var description = "Fast Rise Alarm ${unitStr(TargetSettings().fastRiseDelta)} for ${AlarmSettings().fastRiseAlarmMinutes}m";
     if (AlarmSettings().fastRiseAlarmMinutes < 0) {
       description = "Off";
     }
@@ -506,7 +506,7 @@ class _FastDropAlarm extends AlarmMethods {
 
   @override
   String get description {
-    var description = "Fast Drop Alarm after ${AlarmSettings().fastDropAlarmMinutes}m";
+    var description = "Fast Drop Alarm ${unitStr(TargetSettings().fastDropDelta)} for ${AlarmSettings().fastDropAlarmMinutes}m";
     if (AlarmSettings().fastDropAlarmMinutes < 0) {
       description = "Off";
     }

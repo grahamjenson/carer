@@ -13,17 +13,22 @@ enum _TNames {
   fastRiseDelta,
 }
 
+const MIN_TARGET = 40.0;
+const MAX_TARGET = 280.0;
+const MAX_DELTA = 36.0;
+
 class TargetSettings {
   static final TargetSettings _singleton = TargetSettings._();
   factory TargetSettings() => _singleton;
 
-  final Map<_TNames, ASignal<int>> _signals = {
-    _TNames.highTarget: ASignal<int>(180, debugLabel: 'highTarget'),
-    _TNames.lowTarget: ASignal<int>(72, debugLabel: 'lowTarget'),
-    _TNames.highUrgent: ASignal<int>(270, debugLabel: 'highUrgent'),
-    _TNames.lowUrgent: ASignal<int>(55, debugLabel: 'lowUrgent'),
-    _TNames.fastDropDelta: ASignal<int>(9, debugLabel: 'fastDropDelta'),
-    _TNames.fastRiseDelta: ASignal<int>(-9, debugLabel: 'fastRiseDelta'),
+  final Map<_TNames, ASignal<double>> _signals = {
+    // These are doubles because mmol/mg doesnt easily divide
+    _TNames.highTarget: ASignal<double>(180, debugLabel: 'highTarget'),
+    _TNames.lowTarget: ASignal<double>(72, debugLabel: 'lowTarget'),
+    _TNames.highUrgent: ASignal<double>(270, debugLabel: 'highUrgent'),
+    _TNames.lowUrgent: ASignal<double>(55, debugLabel: 'lowUrgent'),
+    _TNames.fastDropDelta: ASignal<double>(9, debugLabel: 'fastDropDelta'),
+    _TNames.fastRiseDelta: ASignal<double>(-9, debugLabel: 'fastRiseDelta'),
   };
 
   TargetSettings._();
@@ -38,89 +43,95 @@ class TargetSettings {
     return _signals.values.toList();
   }
 
-  int get highTarget => _signals[_TNames.highTarget]!.value;
-  int get highTargetPeek => _signals[_TNames.highTarget]!.peek();
-  set highTarget(int value) {
+  double get highTarget => _signals[_TNames.highTarget]!.value;
+  double get highTargetPeek => _signals[_TNames.highTarget]!.peek();
+  set highTarget(double value) {
     if (!validTargets(lowUrgent, lowTarget, value, highUrgent)) {
       return;
     }
     _signals[_TNames.highTarget]!.value = value;
   }
 
-  int get lowTarget => _signals[_TNames.lowTarget]!.value;
-  int get lowTargetPeek => _signals[_TNames.lowTarget]!.peek();
+  double get lowTarget => _signals[_TNames.lowTarget]!.value;
+  double get lowTargetPeek => _signals[_TNames.lowTarget]!.peek();
 
-  set lowTarget(int value) {
+  set lowTarget(double value) {
     if (!validTargets(lowUrgent, value, highTarget, highUrgent)) {
       return;
     }
     _signals[_TNames.lowTarget]!.value = value;
   }
 
-  int get highUrgent => _signals[_TNames.highUrgent]!.value;
-  int get highUrgentPeek => _signals[_TNames.highUrgent]!.peek();
-  set highUrgent(int value) {
+  double get highUrgent => _signals[_TNames.highUrgent]!.value;
+  double get highUrgentPeek => _signals[_TNames.highUrgent]!.peek();
+  set highUrgent(double value) {
     if (!validTargets(lowUrgent, lowTarget, highTarget, value)) {
       return;
     }
     _signals[_TNames.highUrgent]!.value = value;
   }
 
-  int get lowUrgent => _signals[_TNames.lowUrgent]!.value;
-  int get lowUrgentPeek => _signals[_TNames.lowUrgent]!.peek();
-  set lowUrgent(int value) {
+  double get lowUrgent => _signals[_TNames.lowUrgent]!.value;
+  double get lowUrgentPeek => _signals[_TNames.lowUrgent]!.peek();
+  set lowUrgent(double value) {
     if (!validTargets(value, lowTarget, highTarget, highUrgent)) {
       return;
     }
     _signals[_TNames.lowUrgent]!.value = value;
   }
 
-  int get fastDropDelta => _signals[_TNames.fastDropDelta]!.value;
-  int get fastDropDeltaPeek => _signals[_TNames.fastDropDelta]!.peek();
+  double get fastDropDelta => _signals[_TNames.fastDropDelta]!.value.toDouble();
+  double get fastDropDeltaPeek => _signals[_TNames.fastDropDelta]!.peek().toDouble();
 
-  set fastDropDelta(int value) => fastDropDeltaSet(_signals[_TNames.fastDropDelta]!, value);
+  set fastDropDelta(double value) => fastDropDeltaSet(_signals[_TNames.fastDropDelta]!, value);
 
-  int get fastRiseDelta => _signals[_TNames.fastRiseDelta]!.value;
-  int get fastRiseDeltaPeek => _signals[_TNames.fastRiseDelta]!.peek();
+  double get fastRiseDelta => _signals[_TNames.fastRiseDelta]!.value.toDouble();
+  double get fastRiseDeltaPeek => _signals[_TNames.fastRiseDelta]!.peek().toDouble();
 
-  set fastRiseDelta(int value) => fastRiseDeltaSet(_signals[_TNames.fastRiseDelta]!, value);
+  set fastRiseDelta(double value) => fastRiseDeltaSet(_signals[_TNames.fastRiseDelta]!, value);
 
-  bool validTargets(int lowUrgent, int lowTarget, int highTarget, int highUrgent) {
-    return 9 <= lowUrgent && lowUrgent <= lowTarget && lowTarget <= highTarget && highTarget <= highUrgent && highUrgent <= 360;
+  bool validTargets(num lowUrgent, num lowTarget, num highTarget, num highUrgent) {
+    return MIN_TARGET <= lowUrgent && lowUrgent <= lowTarget && lowTarget <= highTarget && highTarget <= highUrgent && highUrgent <= MAX_TARGET;
   }
 
-  fastDropDeltaSet(ASignal<int> signal, value) {
+  fastDropDeltaSet(ASignal<double> signal, double value) {
     if (value > -8) {
       value = -8;
+    }
+    if (value < -MAX_DELTA) {
+      value = -MAX_DELTA;
     }
     signal.value = value;
   }
 
-  fastRiseDeltaSet(ASignal<int> signal, value) {
+  fastRiseDeltaSet(ASignal<double> signal, double value) {
     if (value < 8) {
       value = 8;
+    }
+    if (value > MAX_DELTA) {
+      value = MAX_DELTA;
     }
     signal.value = value;
   }
 
   setupDBPropagation(KeyValueStore prefs) {
-    highTarget = prefs.getInt(_TNames.highTarget.name) ?? 180;
-    lowTarget = prefs.getInt(_TNames.lowTarget.name) ?? 72;
-    highUrgent = prefs.getInt(_TNames.highUrgent.name) ?? 270;
-    lowUrgent = prefs.getInt(_TNames.lowUrgent.name) ?? 55;
-    fastDropDelta = prefs.getInt(_TNames.fastDropDelta.name, defaultValue: -20)!;
-    fastRiseDelta = prefs.getInt(_TNames.fastRiseDelta.name, defaultValue: 20)!;
+    highTarget = prefs.getDouble(_TNames.highTarget.name) ?? 180.0;
+    lowTarget = prefs.getDouble(_TNames.lowTarget.name) ?? 72.0;
+    highUrgent = prefs.getDouble(_TNames.highUrgent.name) ?? 270.0;
+    lowUrgent = prefs.getDouble(_TNames.lowUrgent.name) ?? 55.0;
+    fastDropDelta = prefs.getDouble(_TNames.fastDropDelta.name, defaultValue: -20)!;
+    fastRiseDelta = prefs.getDouble(_TNames.fastRiseDelta.name, defaultValue: 20)!;
 
-    aeffect(() => prefs.setInt(_TNames.fastDropDelta.name, fastDropDelta), debugLabel: 'fastDropDelta');
+    aeffect(() => prefs.setDouble(_TNames.fastDropDelta.name, fastDropDelta), debugLabel: 'fastDropDelta');
 
-    aeffect(() => prefs.setInt(_TNames.fastRiseDelta.name, fastRiseDelta), debugLabel: 'fastRiseDelta');
+    aeffect(() => prefs.setDouble(_TNames.fastRiseDelta.name, fastRiseDelta), debugLabel: 'fastRiseDelta');
 
-    aeffect(() => prefs.setInt(_TNames.highTarget.name, highTarget), debugLabel: 'highTarget');
+    aeffect(() => prefs.setDouble(_TNames.highTarget.name, highTarget), debugLabel: 'highTarget');
 
-    aeffect(() => prefs.setInt(_TNames.lowTarget.name, lowTarget), debugLabel: 'lowTarget');
+    aeffect(() => prefs.setDouble(_TNames.lowTarget.name, lowTarget), debugLabel: 'lowTarget');
 
-    aeffect(() => prefs.setInt(_TNames.highUrgent.name, highUrgent), debugLabel: 'highUrgent');
+    aeffect(() => prefs.setDouble(_TNames.highUrgent.name, highUrgent), debugLabel: 'highUrgent');
 
-    aeffect(() => prefs.setInt(_TNames.lowUrgent.name, lowUrgent), debugLabel: 'lowUrgent');
+    aeffect(() => prefs.setDouble(_TNames.lowUrgent.name, lowUrgent), debugLabel: 'lowUrgent');
   }
 }
