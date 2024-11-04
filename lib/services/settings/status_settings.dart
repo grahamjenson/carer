@@ -1,3 +1,5 @@
+import 'package:carer/models/details/info/info_service.dart';
+import 'package:carer/models/details/status/status_service.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 
@@ -8,6 +10,12 @@ enum _StatusNames {
   statusEnabledSet,
 }
 
+final Set<String> defaultInfoSet = Info.values.map((e) => e.name).toSet();
+final Set<String> defaultStatusSet = Status.values.map((e) => e.name).toSet();
+
+final String defaultStatusString = Status.values.map((e) => e.name).join(',');
+final String defaultInfoString = Info.values.map((e) => e.name).join(',');
+
 class StatusSettings {
   static final StatusSettings _singleton = StatusSettings._();
   factory StatusSettings() => _singleton;
@@ -15,11 +23,17 @@ class StatusSettings {
   final Map<_StatusNames, ASignal> _signals = {
     _StatusNames.cannulaDays: ASignal<int>(3, debugLabel: 'cannulaDays'),
     _StatusNames.sensorDays: ASignal<int>(10, debugLabel: 'sensorDays'),
-    _StatusNames.infoEnabledSet: ASignal<Set<String>>({}, debugLabel: 'infoEnabled'), // Comma Seperated List of INFO types that are enabled
-    _StatusNames.statusEnabledSet: ASignal<Set<String>>({}, debugLabel: 'statusEnabled'), // Comma Seperated List of INFO types that are enabled
+    _StatusNames.infoEnabledSet:
+        ASignal<Set<String>>(defaultInfoSet, debugLabel: 'infoEnabled'), // Comma Seperated List of INFO types that are enabled
+    _StatusNames.statusEnabledSet:
+        ASignal<Set<String>>(defaultStatusSet, debugLabel: 'statusEnabled'), // Comma Seperated List of INFO types that are enabled
   };
 
   StatusSettings._();
+
+  List<ASignal> allSignals() {
+    return _signals.values.toList();
+  }
 
   int get cannulaDays => _signals[_StatusNames.cannulaDays]!.value;
   set cannulaDays(int value) {
@@ -74,10 +88,10 @@ class StatusSettings {
     sensorDays = prefs.getInt(_StatusNames.sensorDays.name, defaultValue: 10)!;
 
     _signals[_StatusNames.infoEnabledSet]!.value =
-        prefs.getString(_StatusNames.infoEnabledSet.name, defaultValue: '')?.split(',').toSet() ?? <String>{};
+        prefs.getString(_StatusNames.infoEnabledSet.name, defaultValue: defaultInfoString)!.split(',').toSet();
 
     _signals[_StatusNames.statusEnabledSet]!.value =
-        prefs.getString(_StatusNames.statusEnabledSet.name, defaultValue: '')?.split(',').toSet() ?? <String>{};
+        prefs.getString(_StatusNames.statusEnabledSet.name, defaultValue: defaultStatusString)!.split(',').toSet();
 
     aeffect(() => prefs.setInt(_StatusNames.cannulaDays.name, cannulaDays), debugLabel: 'cannulaDays');
 

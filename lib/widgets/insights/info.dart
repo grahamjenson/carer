@@ -1,4 +1,5 @@
 import 'package:carer/models/details/info/info_service.dart';
+import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/insights/window.dart';
@@ -10,41 +11,47 @@ class InfoWidget extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      return Window(
-        child: SingleChildScrollView(
-          child: Container(
-            alignment: Alignment.center,
-            child: DataTable(
-              border: TableBorder(
-                verticalInside: BorderSide(color: outlineColor(context)),
-                horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
-              ),
-              columnSpacing: 10,
-              dividerThickness: 0.01,
-              headingRowHeight: 0,
-              dataRowMinHeight: 14,
-              dataRowMaxHeight: 23,
-              horizontalMargin: 0,
-              columns: const [
-                DataColumn(numeric: true, label: SizedBox(width: 25)),
-                DataColumn(label: SizedBox(width: 50)),
-              ],
-              rows: [
-                infoRow(context, Info.iob),
-                infoRow(context, Info.cob),
-                infoRow(context, Info.basal),
-                infoRow(context, Info.target),
-                infoRow(context, Info.currentProfile),
-                divider(),
-                infoRow(context, Info.todaysInRange),
-                infoRow(context, Info.yesterdayInRange),
-              ],
+    return AWatch(
+      (context) {
+        List<DataRow?> rows = [
+          infoRow(context, Info.iob),
+          infoRow(context, Info.cob),
+          infoRow(context, Info.basal),
+          infoRow(context, Info.target),
+          infoRow(context, Info.currentProfile),
+          infoRow(context, Info.todaysInRange),
+          infoRow(context, Info.yesterdayInRange),
+        ];
+
+        List<DataRow> filteredRows = rows.whereType<DataRow>().toList();
+
+        return Window(
+          child: SingleChildScrollView(
+            child: Container(
+              alignment: Alignment.center,
+              child: DataTable(
+                  border: TableBorder(
+                    verticalInside: BorderSide(color: outlineColor(context)),
+                    horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
+                  ),
+                  columnSpacing: 10,
+                  dividerThickness: 0.01,
+                  headingRowHeight: 0,
+                  dataRowMinHeight: 14,
+                  dataRowMaxHeight: 23,
+                  horizontalMargin: 0,
+                  columns: const [
+                    DataColumn(numeric: true, label: SizedBox(width: 25)),
+                    DataColumn(label: SizedBox(width: 50)),
+                  ],
+                  rows: filteredRows),
             ),
           ),
-        ),
-      );
-    }, debugLabel: "Stats");
+        );
+      },
+      debugLabel: "Stats",
+      dependencies: StatusSettings().allSignals() + [],
+    );
   }
 
   DataRow divider() {
@@ -57,7 +64,11 @@ class InfoWidget extends StatelessWidget with ThemeMixin {
     );
   }
 
-  DataRow infoRow(BuildContext context, Info stat) {
+  DataRow? infoRow(BuildContext context, Info stat) {
+    if (!stat.enabled) {
+      return null;
+    }
+
     TextStyle row = TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w500,

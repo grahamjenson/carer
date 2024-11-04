@@ -32,7 +32,12 @@ enum Status {
   String get reason => _methods.reason;
   String get status => _methods.status;
   String get description => _methods.description;
-  bool triggered() => _methods.triggered();
+  bool triggered() {
+    if (StatusSettings().statusEnabledContains(name)) {
+      return _methods.triggered();
+    }
+    return false;
+  }
 }
 
 class _CannulaChange extends _StatusMethods {

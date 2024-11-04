@@ -2,6 +2,7 @@ import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/models/valueAtTime.dart';
+import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
@@ -36,6 +37,7 @@ enum Info {
   String get title => _methods.title;
   String get description => _methods.description;
   bool get highlight => _methods.highlight;
+  bool get enabled => StatusSettings().infoEnabledContains(name);
 
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) =>
       _methods.status(context, style, small);

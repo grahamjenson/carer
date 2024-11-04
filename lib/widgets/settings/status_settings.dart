@@ -15,20 +15,21 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        List<SettingsTile> tiles = [
-          inactiveStatus(context, Status.cannulaChange),
+        List<SettingsTile?> tiles = [
+          statusTile(context, Status.cannulaChange),
           cannulaAge(context),
-          inactiveStatus(context, Status.sensorChange),
+          statusTile(context, Status.sensorChange),
           sensorAge(context),
-          inactiveStatus(context, Status.notCharging),
-          inactiveStatus(context, Status.powerLow),
-          inactiveStatus(context, Status.silentOn),
-          inactiveStatus(context, Status.lowReservoir),
+          statusTile(context, Status.notCharging),
+          statusTile(context, Status.powerLow),
+          statusTile(context, Status.silentOn),
+          statusTile(context, Status.lowReservoir),
         ];
 
+        List<SettingsTile> filteredTiles = tiles.whereType<SettingsTile>().toList();
         return SettingsSection(
           title: const Text('Status Settings'),
-          tiles: tiles,
+          tiles: filteredTiles,
         );
       },
       debugLabel: "StatusSettingsWidget",
@@ -36,14 +37,22 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     );
   }
 
-  SettingsTile inactiveStatus(BuildContext context, Status status) {
+  SettingsTile statusTile(BuildContext context, Status status) {
     Color? iconColor;
     if (status.triggered()) {
       iconColor = primaryColor(context);
     }
     var descriptionStyle = labelMedium(context).copyWith(color: onBackgroundColor(context));
     var statusStyle = labelSmall(context).copyWith(color: onBackgroundColor(context).dim);
-    return SettingsTile(
+    return SettingsTile.switchTile(
+      initialValue: StatusSettings().statusEnabledContains(status.name),
+      onToggle: (bool value) {
+        if (value) {
+          StatusSettings().statusEnabledAdd(status.name);
+        } else {
+          StatusSettings().statusEnabledRemove(status.name);
+        }
+      },
       descriptionInlineIos: true,
       title: Text(status.title),
       description: SmartText(texts: ["${status.description}\n", status.status], styles: [descriptionStyle, statusStyle]),
@@ -51,7 +60,11 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     );
   }
 
-  SettingsTile cannulaAge(BuildContext context) {
+  SettingsTile? cannulaAge(BuildContext context) {
+    if (!StatusSettings().statusEnabledContains(Status.cannulaChange.name)) {
+      return null;
+    }
+
     return intSelector(
       context,
       "Cannula Max Age (Days)",
@@ -61,7 +74,11 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     );
   }
 
-  SettingsTile sensorAge(BuildContext context) {
+  SettingsTile? sensorAge(BuildContext context) {
+    if (!StatusSettings().statusEnabledContains(Status.sensorChange.name)) {
+      return null;
+    }
+
     return intSelector(
       context,
       "Sensor Max Age (Days)",
