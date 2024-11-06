@@ -25,9 +25,22 @@ abstract class Updater {
   }
 
   void start() {
+    aeffect(() {
+      // If the app has been closed for 5 seconds force an update so that we get new information
+      DateTime paused = AppLifecycleService().lastPaused.peek();
+      DateTime reload = AppLifecycleService().lastResumed.value;
+      var diff = reload.difference(paused);
+
+      if (diff.inSeconds > 5) {
+        // If the app has been closed a while force an update;
+
+        _forceUpdate = true;
+      }
+    }, debugLabel: "LastResumedUpdaterEffect");
+
     Timer.periodic(intervalToCheck, (Timer t) async {
       // If this tries to update too quickly after reopening it will cause an OS error
-      if (AppLifecycleService().wasResumed1SecondsAgo) {
+      if (AppLifecycleService().wasResumed2SecondsAgo) {
         return;
       }
 

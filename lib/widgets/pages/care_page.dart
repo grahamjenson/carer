@@ -59,7 +59,7 @@ class CarePage extends StatelessWidget {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
           NSClient().addTempTarget(nsURL, nsToken, bottom, top, duration, name).then((value) {
             if (value) {
-              ToastService().showSuccess("TempTarget $description");
+              ToastService().showSuccess("Temp Target $description");
             } else {
               ToastService().showError("Failed to set TempTarget");
             }

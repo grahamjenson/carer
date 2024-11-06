@@ -44,6 +44,7 @@ class ToastService {
     }
     toastification.show(
       title: Text(msg),
+      showProgressBar: false,
       description: descriptionWidget,
       type: ToastificationType.success,
       autoCloseDuration: const Duration(seconds: 5),

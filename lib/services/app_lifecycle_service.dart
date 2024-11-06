@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 
 class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
   ASignal<DateTime> lastResumed = ASignal(clock.now(), debugLabel: "LastResumed");
+  ASignal<DateTime> lastPaused = ASignal(clock.now(), debugLabel: "LastPaused");
   ASignal<DateTime> lastChangeScreen = ASignal(clock.now(), debugLabel: "changeScreen");
 
   //singleton
@@ -21,6 +22,7 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
   }
 
   bool get wasResumed1SecondsAgo => clock.now().difference(lastResumed.value).inMilliseconds < 1000;
+  bool get wasResumed2SecondsAgo => clock.now().difference(lastResumed.value).inMilliseconds < 2000;
 
   bool get wasResumed10SecondsAgo => clock.now().difference(lastResumed.value).inSeconds < 9;
 
@@ -31,16 +33,22 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
     // WARNING: this works differently on all platforms, so anything complicated should be platform specific
     switch (state) {
       case AppLifecycleState.inactive:
+        alog("AppLifecycleService: Inactive");
         break;
       case AppLifecycleState.paused:
+        alog("AppLifecycleService: paused");
+        lastPaused.value = clock.now();
         break;
       case AppLifecycleState.resumed:
         alog("AppLifecycleService: Resumed");
         lastResumed.value = clock.now();
         break;
       case AppLifecycleState.hidden:
+        alog("AppLifecycleService: hidden");
+
         break;
       case AppLifecycleState.detached:
+        alog("AppLifecycleService: detached");
         break;
     }
   }
