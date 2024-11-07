@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -18,6 +19,8 @@ class Settings {
   final secureSettings = SecureSettings();
   final statusSettings = StatusSettings();
   final timeSettings = TimeSettings();
+  final careSettings = CareSettings();
+
   Settings._();
 
   Future<bool> setupDBPropagation() async {
@@ -30,7 +33,7 @@ class Settings {
     alarmAlertSettings.setupDBPropagation(prefs);
     statusSettings.setupDBPropagation(prefs);
     timeSettings.setupDBPropagation(prefs);
-
+    careSettings.setupDBPropagation(prefs);
     return true;
   }
 }
