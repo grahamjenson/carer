@@ -26,6 +26,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         }
         List<SettingsTile> tiles = [
           enableFlashOnAlarm(),
+          enableAutoSnoozeOff(),
           brightnessAdjust(),
           enableAudioAlarms(context),
         ].whereType<SettingsTile>().toList();
@@ -33,6 +34,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         if (AlarmAlertSettings().enableAudioAlarm) {
           tiles = [
             enableFlashOnAlarm(),
+            enableAutoSnoozeOff(),
             brightnessAdjust(),
             enableAudioAlarms(context),
             volumeOverride(context),
@@ -79,6 +81,20 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       initialValue: AlarmAlertSettings().enableFlashOnAlarm,
       onToggle: (bool value) {
         AlarmAlertSettings().enableFlashOnAlarm = value;
+      },
+    );
+  }
+
+  SettingsTile enableAutoSnoozeOff() {
+    return SettingsTile.switchTile(
+      title: const Text("Auto Snooze Off"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Stop Snoozing after 30 minutes if Not Alarming",
+      ),
+      initialValue: AlarmAlertSettings().enableAutoSnoozeOff,
+      onToggle: (bool value) {
+        AlarmAlertSettings().enableAutoSnoozeOff = value;
       },
     );
   }

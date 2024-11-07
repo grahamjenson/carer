@@ -116,6 +116,13 @@ class _MyAppState extends State<MyApp> {
     return ValueListenableBuilder<ThemeData>(
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
+          final landscape = MediaQuery.of(context).size.aspectRatio > 1.0;
+          if (landscape) {
+            UISettings().orientation = Orientation.landscape;
+          } else {
+            UISettings().orientation = Orientation.portrait;
+          }
+
           return ToastificationWrapper(
             child: MaterialApp(
               navigatorObservers: [NavigationChangeObserver(), SentryNavigatorObserver()],

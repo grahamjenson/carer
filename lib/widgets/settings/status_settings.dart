@@ -24,6 +24,8 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           statusTile(context, Status.powerLow),
           statusTile(context, Status.silentOn),
           statusTile(context, Status.lowReservoir),
+          statusTile(context, Status.disabledAlarms),
+          statusTile(context, Status.disabledAudioAlarms),
         ];
 
         List<SettingsTile> filteredTiles = tiles.whereType<SettingsTile>().toList();

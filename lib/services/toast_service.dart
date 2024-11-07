@@ -1,3 +1,4 @@
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:toastification/toastification.dart';
 
@@ -10,6 +11,11 @@ class ToastService {
 
   // Stopping the same error flodding the screen with cascading errors
   void showError(String msg, {String? description}) {
+    if (AppLifecycleService().wasResumed2SecondsAgo) {
+      // Dont log errors for the first 2 seconds
+      return;
+    }
+
     if (_toasts[msg] != null) {
       return;
     }

@@ -64,6 +64,8 @@ Future<T> executeWithRetry<T>(
 ////
 
 class ASignal<T> extends Signal<T> {
+  DateTime lastSet = DateTime.now();
+
   ASignal(
     super.val, {
     required super.debugLabel,
@@ -74,10 +76,13 @@ class ASignal<T> extends Signal<T> {
   bool set(T val, {bool force = false}) {
     bool ret = super.set(val, force: force);
     if (ret) {
+      lastSet = DateTime.now();
       alog(truncateString("ASignal: $debugLabel set to $val", 100));
     }
     return ret;
   }
+
+  Duration get lastSetAgo => DateTime.now().difference(lastSet);
 }
 
 class ATimerSignal extends TimerSignal {

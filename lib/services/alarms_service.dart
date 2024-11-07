@@ -56,6 +56,7 @@ class AlarmsService {
 
     List<Signal> checkAlarmsDependencies = allSettingsSignals + additionalDeps;
 
+    // Calculate the alarms and then set Pending and Alerting Alarms values
     aeffect(() {
       try {
         var (newPendingAlarms, newAlertingAlarms) = calculateAlarms();
@@ -74,6 +75,8 @@ class AlarmsService {
       return true;
     }, debugLabel: "CheckAlarms", dependencies: checkAlarmsDependencies);
 
+    // Alert when there are alarms to alert for.
+    // When there is an alaerting alarm we can fix this.
     aeffect(
       () async {
         if (isCheckingAlarms) {
@@ -109,6 +112,27 @@ class AlarmsService {
         TimerService().tenSecondSignal,
       ],
     );
+
+    // Auto Snooze Turn off
+    aeffect(() {
+      if (!AlarmAlertSettings().enableAutoSnoozeOff) {
+        return;
+      }
+      if (AlarmAlertSettings().snoozeDuration == null) {
+        return;
+      }
+
+      Duration snoozeLastSet = AlarmAlertSettings().snoozeLastSet;
+      Duration pendingAlarmsLastSet = pendingAlarms.lastSetAgo;
+      int pendingAlarmsSize = pendingAlarms.value.length;
+
+      bool pendingAlarmsBeenEmptyFor20Mins = pendingAlarmsLastSet.inMinutes > 20 && pendingAlarmsSize == 0;
+
+      if (snoozeLastSet.inMinutes > 20 && pendingAlarmsBeenEmptyFor20Mins) {
+        alog("Auto Snooze Off turning off snooze");
+        AlarmAlertSettings().setSnoozeDurationSeconds(null, "Auto Snooze Off");
+      }
+    }, debugLabel: "AutoSnoozeOff", dependencies: [TimerService().minuteSignal]);
 
     // Writing the logs of alarms to the database
     AlarmSet pendingAlarmsCheck = AlarmSet({});

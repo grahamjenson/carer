@@ -19,6 +19,7 @@ enum _AANames {
   // Other ALARM
   enableFlashOnAlarm,
   brightnessAdjustAtNight,
+  enableAutoSnoozeOff,
 
   // ephemeral
   snoozeUntil,
@@ -32,6 +33,7 @@ class AlarmAlertSettings {
     _AANames.smartSnoozeHigh: ASignal<bool>(true, debugLabel: 'smartSnoozeHigh'),
     _AANames.brightnessAdjustAtNight: ASignal<bool>(true, debugLabel: 'brightnessAdjustAtNight'),
     _AANames.enableFlashOnAlarm: ASignal<bool>(true, debugLabel: 'enableFlashOnAlarm'),
+    _AANames.enableAutoSnoozeOff: ASignal<bool>(true, debugLabel: 'enableAutoSnoozeOff'),
     _AANames.enableAudioAlarm: ASignal<bool>(true, debugLabel: 'enableAudioAlarm'),
     _AANames.volumeOveride: ASignal<bool>(true, debugLabel: 'volumeOveride'),
     _AANames.volumeOverrideValue: ASignal<int>(50, debugLabel: 'volumeOverrideValue'),
@@ -67,6 +69,9 @@ class AlarmAlertSettings {
 
   bool get enableFlashOnAlarm => _signals[_AANames.enableFlashOnAlarm]!.value as bool;
   set enableFlashOnAlarm(bool value) => _signals[_AANames.enableFlashOnAlarm]!.value = value;
+
+  bool get enableAutoSnoozeOff => _signals[_AANames.enableAutoSnoozeOff]!.value as bool;
+  set enableAutoSnoozeOff(bool value) => _signals[_AANames.enableAutoSnoozeOff]!.value = value;
 
   ASignal<DateTime?> get snoozeUntilSignal => _signals[_AANames.snoozeUntil]! as ASignal<DateTime?>;
 
@@ -126,6 +131,7 @@ class AlarmAlertSettings {
 
     brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: true)!;
     enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: true)!;
+    enableAutoSnoozeOff = prefs.getBool(_AANames.enableAutoSnoozeOff.name, defaultValue: true)!;
 
     aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'smartSnoozeHigh');
 
@@ -149,11 +155,20 @@ class AlarmAlertSettings {
     aeffect(() {
       prefs.setBool(_AANames.enableFlashOnAlarm.name, enableFlashOnAlarm);
     }, debugLabel: 'enableFlashOnAlarm');
+
+    aeffect(() {
+      prefs.setBool(_AANames.enableAutoSnoozeOff.name, enableAutoSnoozeOff);
+    }, debugLabel: 'enableAutoSnoozeOff');
   }
 
   Timer? snoozeTimer;
+
   Duration? get snoozeDuration {
     return _calculateSnoozeDuration(snoozeUntilSignal.value);
+  }
+
+  Duration get snoozeLastSet {
+    return snoozeUntilSignal.lastSetAgo;
   }
 
   Duration? get snoozeDurationPeek {

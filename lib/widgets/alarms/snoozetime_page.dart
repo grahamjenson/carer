@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/common/dialogs.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeTimePage extends StatefulWidget {
@@ -25,6 +28,21 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     _timer = Timer(Duration(seconds: widget.popTime), () {
       setSnooze(null);
     });
+  }
+
+  setSnoozeWithConfirmation(BuildContext context, int snoozeTime) async {
+    bool? areYouSure =
+        await Dialogs.areYouSureDialog(context, "Confirm sleep", "Are you sure you want to snooze for ${snoozeTime ~/ 3600} hours?", "Snooze");
+    if (areYouSure == true) {
+      AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, "SnoozeDialogReturned");
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    } else {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }
   }
 
   setSnooze(int? snoozeTime) {
@@ -69,27 +87,33 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
               color: Colors.transparent, // Ensure the container is transparent
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            // Generate 100 widgets that display their index in the List.
-            children: getSnoozeButtonsLayout(context, buttonStyle, textStyle) +
-                [
-                  const Divider(),
-                  Flexible(
-                    flex: 3,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setSnooze(null);
-                        },
-                        child: Text("Cancel", style: textStyle),
+          AWatch(
+            (context) {
+              var children = getSnoozeButtonsLayout(context, buttonStyle, textStyle) +
+                  [
+                    const Divider(),
+                    Flexible(
+                      flex: 3,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setSnooze(null);
+                          },
+                          child: Text("Cancel", style: textStyle),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ];
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              );
+            },
+            debugLabel: "SleepPage",
+            dependencies: [UISettings().orientationSignal],
           ),
         ],
       ),
@@ -97,26 +121,11 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
   }
 
   List<Widget> getSnoozeButtonsLayout(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
-    final horizontal = MediaQuery.of(context).size.aspectRatio > 1.0;
+    final orientation = UISettings().orientation;
     var mins = getMinuteButtons(context, buttonStyle, textStyle);
     var hours = getHourButtons(context, buttonStyle, textStyle);
-    if (horizontal) {
-      return [
-        Expanded(
-          flex: 2,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: mins,
-          ),
-        ),
-        const Divider(),
-        Expanded(
-          flex: 2,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: hours),
-        ),
-      ];
-    }
-    return [
+
+    List<Widget> minsChildren = [
       Expanded(
         flex: 2,
         child: Row(
@@ -131,7 +140,9 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
           children: [mins[3], mins[4], const SizedBox.shrink()],
         ),
       ),
-      const Divider(),
+    ];
+
+    List<Widget> hoursChildren = [
       Expanded(
         flex: 2,
         child: Row(
@@ -147,6 +158,34 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
         ),
       ),
     ];
+
+    if (orientation == Orientation.landscape) {
+      return [
+        Expanded(
+          flex: 6,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: minsChildren,
+                ),
+              ),
+              const VerticalDivider(),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: hoursChildren,
+                ),
+              ),
+            ],
+          ),
+        )
+      ];
+    } else {
+      return minsChildren + [const Divider()] + hoursChildren;
+    }
   }
 
   List<Widget> getMinuteButtons(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
@@ -182,8 +221,8 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
           padding: const EdgeInsets.all(5),
           child: ElevatedButton(
             style: buttonStyle,
-            onPressed: () {
-              setSnooze(time * 60 * 60);
+            onPressed: () async {
+              await setSnoozeWithConfirmation(context, time * 60 * 60);
             },
             child: Text(
               "${time}h",

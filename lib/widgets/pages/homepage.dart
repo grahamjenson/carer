@@ -1,4 +1,3 @@
-import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
@@ -13,47 +12,41 @@ class HomePage extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        UISettings().orientation = orientation;
-
-        return Stack(children: [
-          Scaffold(
-            backgroundColor: backgroundColor(context),
-            body: SafeArea(
-              left: false,
-              right: false,
-              bottom: false,
-              minimum: const EdgeInsets.all(0),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      alog("Forcing Update");
-                      UpdateService().forceUpdateAll();
-                      // just to see something is happening
-                      await Future.delayed(const Duration(seconds: 1));
-                    },
-                    displacement: 10,
-                    child: SingleChildScrollView(
-                      physics: const StickyRefreshPhysics(),
-                      padding: EdgeInsets.zero,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: constraints.maxHeight, maxHeight: constraints.maxHeight),
-                        child: HomeLayout(),
-                      ),
-                    ),
-                  );
+    return Stack(children: [
+      Scaffold(
+        backgroundColor: backgroundColor(context),
+        body: SafeArea(
+          left: false,
+          right: false,
+          bottom: false,
+          minimum: const EdgeInsets.all(0),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return RefreshIndicator(
+                onRefresh: () async {
+                  alog("Forcing Update");
+                  UpdateService().forceUpdateAll();
+                  // just to see something is happening
+                  await Future.delayed(const Duration(seconds: 1));
                 },
-              ),
-            ),
-            appBar: const BarTop(),
-            bottomNavigationBar: const BarBottom(),
+                displacement: 10,
+                child: SingleChildScrollView(
+                  physics: const StickyRefreshPhysics(),
+                  padding: EdgeInsets.zero,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight, maxHeight: constraints.maxHeight),
+                    child: HomeLayout(),
+                  ),
+                ),
+              );
+            },
           ),
-          const FlasthingWidget(),
-        ]);
-      },
-    );
+        ),
+        appBar: const BarTop(),
+        bottomNavigationBar: const BarBottom(),
+      ),
+      const FlasthingWidget(),
+    ]);
   }
 }
 

@@ -1,5 +1,7 @@
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/platform_info_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
@@ -21,7 +23,9 @@ enum Status {
   notCharging(_NotCharging()),
   powerLow(_PowerLow()),
   silentOn(_SilentOn()),
-  lowReservoir(_LowReservoir());
+  lowReservoir(_LowReservoir()),
+  disabledAlarms(_DisabledAlarms()),
+  disabledAudioAlarms(_DisabledAudioAlarms());
 
   final _StatusMethods _methods;
 
@@ -37,6 +41,52 @@ enum Status {
       return _methods.triggered();
     }
     return false;
+  }
+}
+
+class _DisabledAudioAlarms extends _StatusMethods {
+  const _DisabledAudioAlarms();
+
+  @override
+  String get title => "Disabled Audio Alarms";
+
+  @override
+  String get description => "Shows When Audio Alarms are Disabled";
+
+  @override
+  IconData get icon => UniconsLine.volume_mute;
+
+  @override
+  String get reason {
+    return "Audio Alarms Disabled";
+  }
+
+  @override
+  bool triggered() {
+    return !AlarmAlertSettings().enableAudioAlarm;
+  }
+}
+
+class _DisabledAlarms extends _StatusMethods {
+  const _DisabledAlarms();
+
+  @override
+  String get title => "Disabled Alarms";
+
+  @override
+  String get description => "Shows When Alarms are Disabled";
+
+  @override
+  IconData get icon => UniconsLine.bell_slash;
+
+  @override
+  String get reason {
+    return "Alarms Disabled";
+  }
+
+  @override
+  bool triggered() {
+    return AlarmSettings().disableAlarms;
   }
 }
 

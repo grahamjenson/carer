@@ -20,6 +20,8 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
           getStatusIcon(context, Status.powerLow),
           getStatusIcon(context, Status.silentOn),
           getStatusIcon(context, Status.lowReservoir),
+          getStatusIcon(context, Status.disabledAlarms),
+          getStatusIcon(context, Status.disabledAudioAlarms),
         ];
         List<Widget> rows = rowsMaybe.whereType<Widget>().toList();
 
