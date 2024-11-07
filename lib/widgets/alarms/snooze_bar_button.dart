@@ -18,9 +18,14 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
           return const SizedBox.shrink();
         }
 
+        Color buttonBackGroundColor = accentColor(context);
+        if (AlarmAlertSettings().snoozeDuration != null) {
+          buttonBackGroundColor = primaryColor(context);
+        }
+
         ButtonStyle buttonStyle = ElevatedButton.styleFrom(
           foregroundColor: Colors.black,
-          backgroundColor: primaryColor(context),
+          backgroundColor: buttonBackGroundColor,
           padding: const EdgeInsets.all(5),
           minimumSize: const Size(100, 50),
           shape: RoundedRectangleBorder(
