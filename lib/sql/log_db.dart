@@ -52,7 +52,7 @@ class LogDB {
   }
 
   static int logCounter = 0;
-  static int maxLogRows = 10000;
+  static int maxLogRows = 50000;
 
   static Future<bool> writeLog(DateTime dt, String message, int level) async {
     var ldb = await LogDB.instance;

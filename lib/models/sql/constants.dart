@@ -31,7 +31,7 @@ enum Unit {
       case Unit.mg:
         return value.toDouble();
       case Unit.mmol:
-        return (value / MGtoMMOL).toDouble();
+        return (value.toDouble() / MGtoMMOL).toDouble();
     }
   }
 
@@ -40,7 +40,7 @@ enum Unit {
       case Unit.mg:
         return value.toStringAsFixed(0);
       case Unit.mmol:
-        return (value / MGtoMMOL).toStringAsFixed(1);
+        return (value.toDouble() / MGtoMMOL).toStringAsFixed(1);
     }
   }
 

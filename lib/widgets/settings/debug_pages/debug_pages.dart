@@ -176,9 +176,6 @@ class DebugSettingsPage extends StatelessWidget {
             paths.add(await KeyValueStore.getPath());
             paths.add(await LogDB.getPath());
 
-            // Add logs
-            paths.add(await writeFile(ALogger().getPrettyLogs(), "app_logs.txt"));
-
             // Add the last raw value from all updaters
             for (var updater in UpdateService().updaters) {
               paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));

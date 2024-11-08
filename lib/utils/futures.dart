@@ -98,7 +98,7 @@ class AWatch<T extends Widget> extends StatelessWidget {
   final String debugLabel;
   final bool doLog;
 
-  const AWatch(this.builder, {super.key, this.dependencies = const [], required this.debugLabel, this.doLog = true});
+  const AWatch(this.builder, {super.key, this.dependencies = const [], required this.debugLabel, this.doLog = false});
 
   /// The widget to rebuild when any signals change
   final T Function(BuildContext context) builder;
@@ -161,7 +161,7 @@ EffectCleanup aeffect(
   required String debugLabel,
   EffectCallback? onDispose,
   List<ReadonlySignal<dynamic>> dependencies = const [],
-  doLog = true,
+  doLog = false,
 }) {
   return effect(() {
     try {

@@ -115,6 +115,11 @@ class AlarmsService {
 
     // Auto Snooze Turn off
     aeffect(() {
+      // The reason for this feature is that snooze should be turned off as quickly as possible once the "danger is gone"
+      // There are two reasons to snooze
+      // 1. There is an alarm
+      // 2. There is assumed to be an alarm
+
       if (!AlarmAlertSettings().enableAutoSnoozeOff) {
         return;
       }
@@ -122,15 +127,18 @@ class AlarmsService {
         return;
       }
 
+      int mins = 20;
       Duration snoozeLastSet = AlarmAlertSettings().snoozeLastSet;
       Duration pendingAlarmsLastSet = pendingAlarms.lastSetAgo;
       int pendingAlarmsSize = pendingAlarms.value.length;
 
-      bool pendingAlarmsBeenEmptyFor20Mins = pendingAlarmsLastSet.inMinutes > 20 && pendingAlarmsSize == 0;
+      bool pendingAlarmsBeenEmptyForMins = pendingAlarmsLastSet.inMinutes > mins && pendingAlarmsSize == 0;
 
-      if (snoozeLastSet.inMinutes > 20 && pendingAlarmsBeenEmptyFor20Mins) {
-        alog("Auto Snooze Off turning off snooze");
-        AlarmAlertSettings().setSnoozeDurationSeconds(null, "Auto Snooze Off");
+      if (snoozeLastSet.inMinutes > mins && pendingAlarmsBeenEmptyForMins) {
+        var reason =
+            "Auto Snooze Off Last Snooze ${snoozeLastSet.inMinutes} mins ago, Pending Alarms ($pendingAlarmsSize) last changed ${pendingAlarmsLastSet.inMinutes} mins ago";
+        alog("Snooze: $reason");
+        AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
       }
     }, debugLabel: "AutoSnoozeOff", dependencies: [TimerService().minuteSignal]);
 

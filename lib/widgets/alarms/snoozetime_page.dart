@@ -11,8 +11,7 @@ class SnoozeTimePage extends StatefulWidget {
   const SnoozeTimePage(this.popTime, {super.key});
 
   final int popTime;
-  static const List<int> minutesTimes = [5, 10, 20, 30, 45];
-  static const List<int> hoursTimes = [1, 2, 3, 6, 12];
+  static const List<int> minutesTimes = [5, 10, 20, 30, 45, 60];
 
   @override
   State<SnoozeTimePage> createState() => _SnoozeTimePageState();
@@ -123,68 +122,48 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
   List<Widget> getSnoozeButtonsLayout(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
     final orientation = UISettings().orientation;
     var mins = getMinuteButtons(context, buttonStyle, textStyle);
-    var hours = getHourButtons(context, buttonStyle, textStyle);
-
-    List<Widget> minsChildren = [
-      Expanded(
-        flex: 2,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [mins[0], mins[1], mins[2]],
-        ),
-      ),
-      Expanded(
-        flex: 2,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [mins[3], mins[4], const SizedBox.shrink()],
-        ),
-      ),
-    ];
-
-    List<Widget> hoursChildren = [
-      Expanded(
-        flex: 2,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [hours[0], hours[1], hours[2]],
-        ),
-      ),
-      Expanded(
-        flex: 2,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [hours[3], hours[4], const SizedBox.shrink()],
-        ),
-      ),
-    ];
 
     if (orientation == Orientation.landscape) {
       return [
         Expanded(
-          flex: 6,
+          flex: 2,
           child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: minsChildren,
-                ),
-              ),
-              const VerticalDivider(),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: hoursChildren,
-                ),
-              ),
-            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [mins[0], mins[1], mins[2]],
           ),
-        )
+        ),
+        Expanded(
+          flex: 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [mins[3], mins[4], mins[5]],
+          ),
+        ),
       ];
     } else {
-      return minsChildren + [const Divider()] + hoursChildren;
+      return [
+        Expanded(
+          flex: 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [mins[0], mins[1]],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [mins[2], mins[3]],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [mins[4], mins[5]],
+          ),
+        ),
+      ];
     }
   }
 
@@ -210,29 +189,5 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     }
 
     return minuteButtons;
-  }
-
-  List<Widget> getHourButtons(BuildContext context, ButtonStyle buttonStyle, TextStyle textStyle) {
-    List<Widget> hourButtons = [];
-
-    for (var time in SnoozeTimePage.hoursTimes) {
-      hourButtons.add(
-        Container(
-          padding: const EdgeInsets.all(5),
-          child: ElevatedButton(
-            style: buttonStyle,
-            onPressed: () async {
-              await setSnoozeWithConfirmation(context, time * 60 * 60);
-            },
-            child: Text(
-              "${time}h",
-              style: textStyle,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return hourButtons;
   }
 }

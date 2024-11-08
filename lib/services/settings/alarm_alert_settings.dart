@@ -198,18 +198,18 @@ class AlarmAlertSettings {
     }
 
     if (value == null) {
-      alog("Alarm: Snooze: Snooze Duration Seconds set to null from ${snoozeUntilSignal.peek} because $reason");
+      alog("Snooze: Duration Seconds set to null from ${snoozeUntilSignal.peek()} because $reason");
       snoozeUntilSignal.value = null;
       return;
     }
 
     snoozeTimer = Timer(Duration(seconds: value), () {
-      alog("Alarm: Snooze: Snooze Duration Seconds set to null from ${snoozeUntilSignal.peek} because timer expired");
+      alog("Snooze: Duration Seconds set to null from ${snoozeUntilSignal.peek()} because timer expired");
       snoozeUntilSignal.value = null;
     });
 
     var time = clock.now().add(Duration(seconds: value));
-    alog("Alarm: Snooze: Snooze Duration Seconds set to $time from ${snoozeUntilSignal.peek}");
+    alog("Snooze: Duration Seconds set to $time from ${snoozeUntilSignal.peek()} because $reason");
     snoozeUntilSignal.value = time;
   }
 

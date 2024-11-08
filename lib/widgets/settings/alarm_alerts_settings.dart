@@ -90,7 +90,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       title: const Text("Auto Snooze Off"),
       descriptionInlineIos: true,
       description: const Text(
-        "Stop Snoozing after 30 minutes if Not Alarming",
+        "Stop Snoozing after 20 minutes if Not Alarming",
       ),
       initialValue: AlarmAlertSettings().enableAutoSnoozeOff,
       onToggle: (bool value) {
