@@ -15,6 +15,7 @@ const dbTables = [
   temptargetsTable,
   profileTable,
   alarmLogsTable,
+  snoozeLogsTable,
 ];
 
 // Used for key values like iob...
@@ -130,10 +131,23 @@ const alarmLogsTable = DBTable(alarmLogsTableName, '''
       timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
       starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
       endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL
-      
-      
+    )
+  ''');
 
-      -- CONTRAINTS
+const String snoozeLogsTableName = 'snooze_logs';
+const snoozeLogsTable = DBTable(snoozeLogsTableName, '''
+    CREATE TABLE snooze_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      conditions TEXT,
+      reason TEXT,
+      start INTEGER,
+      end INTEGER,
+
+      -- VIRTUAL
+
+      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
+      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
+      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL
     )
   ''');
 

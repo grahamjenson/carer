@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:carer/mappers/sql/alarms_log.dart';
+import 'package:carer/mappers/sql/logs/alarms_log.dart';
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/details/alarms/alarms.dart';
-import 'package:carer/models/sql/alarm_logs.dart';
+import 'package:carer/models/sql/logs/alarm_logs.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
 import 'package:carer/services/app_lifecycle_service.dart';

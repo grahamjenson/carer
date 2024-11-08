@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:carer/mappers/sql/logs/snooze_log.dart';
+import 'package:carer/models/sql/logs/snooze_logs.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -192,6 +194,7 @@ class AlarmAlertSettings {
     return snoozeDuration?.inSeconds;
   }
 
+  // THIS IS THE ONLY METHOD TO UPDATE THE SNOOZE VALUE
   void setSnoozeDurationSeconds(int? value, String reason) {
     if (snoozeTimer != null) {
       snoozeTimer!.cancel(); // Always cancel
@@ -199,17 +202,20 @@ class AlarmAlertSettings {
 
     if (value == null) {
       alog("Snooze: Duration Seconds set to null from ${snoozeUntilSignal.peek()} because $reason");
+      SQLToSnoozeLogs().save(SnoozeLog(startDate: clock.now(), reason: reason, conditions: {}));
       snoozeUntilSignal.value = null;
       return;
     }
 
     snoozeTimer = Timer(Duration(seconds: value), () {
       alog("Snooze: Duration Seconds set to null from ${snoozeUntilSignal.peek()} because timer expired");
+      SQLToSnoozeLogs().save(SnoozeLog(startDate: clock.now(), reason: reason, conditions: {}));
       snoozeUntilSignal.value = null;
     });
 
     var time = clock.now().add(Duration(seconds: value));
     alog("Snooze: Duration Seconds set to $time from ${snoozeUntilSignal.peek()} because $reason");
+    SQLToSnoozeLogs().save(SnoozeLog(startDate: clock.now(), endDate: time, reason: reason, conditions: {}));
     snoozeUntilSignal.value = time;
   }
 

@@ -4,7 +4,6 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/common/dialogs.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeTimePage extends StatefulWidget {
@@ -29,24 +28,14 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     });
   }
 
-  setSnoozeWithConfirmation(BuildContext context, int snoozeTime) async {
-    bool? areYouSure =
-        await Dialogs.areYouSureDialog(context, "Confirm sleep", "Are you sure you want to snooze for ${snoozeTime ~/ 3600} hours?", "Snooze");
-    if (areYouSure == true) {
-      AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, "SnoozeDialogReturned");
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
-    } else {
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
-    }
-  }
-
   setSnooze(int? snoozeTime) {
     snoozeTime ??= 0;
-    AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, "SnoozeDialogReturned");
+    if (snoozeTime == 0) {
+      AlarmAlertSettings().setSnoozeDurationSeconds(null, "SnoozeDialogReturned");
+    } else {
+      AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, "SnoozeDialogReturned");
+    }
+
     Navigator.of(context).pop();
   }
 

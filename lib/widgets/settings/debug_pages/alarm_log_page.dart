@@ -1,4 +1,8 @@
-import 'package:carer/mappers/sql/alarms_log.dart';
+import 'package:carer/mappers/sql/logs/alarms_log.dart';
+import 'package:carer/mappers/sql/logs/snooze_log.dart';
+import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/models/sql/logs/alarm_logs.dart';
+import 'package:carer/models/sql/logs/snooze_logs.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
@@ -17,31 +21,56 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
       body: AWatch(
         (context) {
           var alarmLogs = SQLToAlarmLogs().lastCoupleDays.value;
+          var snoozeLogs = SQLToSnoozeLogs().lastCoupleDays.value;
+
+          List<DBModel> items = [];
+          items.addAll(alarmLogs);
+          items.addAll(snoozeLogs);
+
+          items.sort((a, b) => b.date.compareTo(a.date));
+
           return Container(
             margin: const EdgeInsets.all(12),
             child: Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: alarmLogs.length,
+                    itemCount: items.length,
                     itemBuilder: (context, index) {
-                      final alarmLog = alarmLogs[index];
-                      List<String> conditionsText = [];
-                      List<TextStyle> conditionsStyle = [];
-                      alarmLog.conditions.forEach((key, value) {
-                        conditionsText.add(key);
-                        conditionsStyle.add(TextStyle(fontSize: 8, color: primaryColor(context)));
-                        conditionsText.add("\t${truncateString(value.toString(), 100)}\n");
-                        conditionsStyle.add(const TextStyle(fontSize: 8));
-                      });
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${alarmLog.type.name}\n${alarmLog.stage.name}\n${formatDate(alarmLog.startDate)}-${formatDate(alarmLog.endDate)}'),
+                      final logModel = items[index];
+
+                      List<Widget> children = [];
+
+                      if (logModel is AlarmLog) {
+                        List<String> conditionsText = [];
+                        List<TextStyle> conditionsStyle = [];
+                        logModel.conditions.forEach((key, value) {
+                          conditionsText.add(key);
+                          conditionsStyle.add(TextStyle(fontSize: 8, color: primaryColor(context)));
+                          conditionsText.add("\t${truncateString(value.toString(), 100)}\n");
+                          conditionsStyle.add(const TextStyle(fontSize: 8));
+                        });
+                        children = [
+                          Text('${logModel.type.name}\n${logModel.stage.name}\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}'),
                           SmartText(texts: conditionsText, styles: conditionsStyle),
-                        ],
-                      );
+                        ];
+                      }
+
+                      if (logModel is SnoozeLog) {
+                        String text = 'Snooze\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}';
+
+                        if (logModel.endDate == null) {
+                          // Snooze was stopped
+                          text = 'SnoozeStopped\n${formatDate(logModel.startDate)}';
+                        }
+                        children = [Text(text)];
+                      }
+
+                      return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: children);
                     },
                   ),
                 ),

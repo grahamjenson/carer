@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/details/alarms/alarms.dart';
-import 'package:carer/models/sql/alarm_logs.dart';
+import 'package:carer/models/sql/logs/alarm_logs.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
