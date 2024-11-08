@@ -34,7 +34,8 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
             child: Column(
               children: [
                 Expanded(
-                  child: ListView.builder(
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) => const Divider(),
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final logModel = items[index];
@@ -51,8 +52,14 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                           conditionsStyle.add(const TextStyle(fontSize: 8));
                         });
                         children = [
-                          Text('${logModel.type.name}\n${logModel.stage.name}\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}'),
-                          SmartText(texts: conditionsText, styles: conditionsStyle),
+                          Flexible(
+                              flex: 1,
+                              child: Text(
+                                  '${logModel.type.name}\n${logModel.stage.name}\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}')),
+                          Expanded(
+                            flex: 3,
+                            child: SmartText(texts: conditionsText, styles: conditionsStyle),
+                          )
                         ];
                       }
 
@@ -63,7 +70,10 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                           // Snooze was stopped
                           text = 'SnoozeStopped\n${formatDate(logModel.startDate)}';
                         }
-                        children = [Text(text)];
+                        children = [
+                          Flexible(flex: 1, child: Text(text)),
+                          Expanded(flex: 3, child: Text(logModel.reason)),
+                        ];
                       }
 
                       return Row(
