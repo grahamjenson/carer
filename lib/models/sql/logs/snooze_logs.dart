@@ -1,22 +1,11 @@
-import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/models/sql/logs/log.dart';
 
 // This is a record of all triggered alarms.
-class SnoozeLog extends DBModel {
-  @override
-  get date => startDate;
-  final DateTime startDate;
-
-  // If no end Date then it has been stopped
-  DateTime? endDate;
-
-  final String reason;
-  final Map<String, dynamic> conditions;
-
+class SnoozeLog extends LogDBModel {
   SnoozeLog({
     super.id,
-    required this.startDate,
-    this.endDate,
-    required this.reason,
-    required this.conditions,
+    required super.startDate,
+    super.endDate,
+    required super.conditions,
   });
 }

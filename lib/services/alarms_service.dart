@@ -15,7 +15,6 @@ import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -138,7 +137,7 @@ class AlarmsService {
         var reason =
             "Auto Snooze Off Last Snooze ${snoozeLastSet.inMinutes} mins ago, Pending Alarms ($pendingAlarmsSize) last changed ${pendingAlarmsLastSet.inMinutes} mins ago";
         alog("Snooze: $reason");
-        AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
+        AlarmAlertSettings().setSnoozeDurationSeconds(null, SnoozeReason.autoRemoved);
       }
     }, debugLabel: "AutoSnoozeOff", dependencies: [TimerService().minuteSignal]);
 
@@ -149,12 +148,12 @@ class AlarmsService {
     aeffect(() async {
       if (pendingAlarmsCheck != pendingAlarms.value) {
         pendingAlarmsCheck = pendingAlarms.value;
-        updateAlarmLog(pendingAlarms.value, pendingAlarms.previousValue, AlarmStage.pending);
+        SQLToAlarmLogs().updateAlarmLog(pendingAlarms.value, pendingAlarms.previousValue, AlarmStage.pending);
       }
 
       if (alertingAlarmsCheck != alertingAlarms.value) {
         alertingAlarmsCheck = alertingAlarms.value;
-        updateAlarmLog(alertingAlarms.value, alertingAlarms.previousValue, AlarmStage.alerting);
+        SQLToAlarmLogs().updateAlarmLog(alertingAlarms.value, alertingAlarms.previousValue, AlarmStage.alerting);
       }
     }, debugLabel: "WriteAlarmLogs");
   }
@@ -260,37 +259,5 @@ class AlarmsService {
     }
     alog("Playing test alarm");
     testAlarmPlaying = true;
-  }
-
-  Future<void> updateAlarmLog(AlarmSet alarms, AlarmSet? previousAlarms, AlarmStage stage) async {
-    var newAlarms = alarms;
-    var removedAlarms = AlarmSet({});
-    if (previousAlarms != null) {
-      newAlarms = alarms.difference(previousAlarms);
-      removedAlarms = previousAlarms.difference(alarms);
-    }
-
-    // Write the alarms
-
-    // // if there is a new value then create a new alarm
-    for (var newAlarm in newAlarms) {
-      var log = AlarmLog(
-        type: newAlarm,
-        conditions: newAlarm.conditions(),
-        stage: stage,
-        startDate: clock.now(),
-      );
-      await SQLToAlarmLogs().save(log);
-    }
-
-    // If there is a removed Value then remove the alarm
-    for (var removedAlarm in removedAlarms) {
-      var log = await SQLToAlarmLogs().findUnfinishedAlarmOfTypeAndStage(removedAlarm, stage);
-      if (log == null) {
-        continue;
-      }
-      log.endDate = clock.now();
-      await SQLToAlarmLogs().save(log);
-    }
   }
 }

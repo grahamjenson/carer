@@ -7,9 +7,8 @@ import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeTimePage extends StatefulWidget {
-  const SnoozeTimePage(this.popTime, {super.key});
+  const SnoozeTimePage({super.key});
 
-  final int popTime;
   static const List<int> minutesTimes = [5, 10, 20, 30, 45, 60];
 
   @override
@@ -23,17 +22,18 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
   void initState() {
     super.initState();
 
-    _timer = Timer(Duration(seconds: widget.popTime), () {
-      setSnooze(null);
+    _timer = Timer(const Duration(seconds: 10), () {
+      // If they dont select a sleep tim within 10 seconds the snooze is cancelled and page is poped
+      setSnooze(null, SnoozeReason.noButtonPressed);
     });
   }
 
-  setSnooze(int? snoozeTime) {
+  setSnooze(int? snoozeTime, SnoozeReason reason) {
     snoozeTime ??= 0;
     if (snoozeTime == 0) {
-      AlarmAlertSettings().setSnoozeDurationSeconds(null, "SnoozeDialogReturned");
+      AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
     } else {
-      AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, "SnoozeDialogReturned");
+      AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, reason);
     }
 
     Navigator.of(context).pop();
@@ -69,7 +69,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
         children: [
           GestureDetector(
             onTap: () {
-              setSnooze(null);
+              setSnooze(null, SnoozeReason.buttonMissed);
             },
             child: Container(
               color: Colors.transparent, // Ensure the container is transparent
@@ -87,7 +87,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                         height: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            setSnooze(null);
+                            setSnooze(null, SnoozeReason.buttonPressed);
                           },
                           child: Text("Cancel", style: textStyle),
                         ),
@@ -166,7 +166,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
           child: ElevatedButton(
             style: buttonStyle,
             onPressed: () {
-              setSnooze(time * 60);
+              setSnooze(time * 60, SnoozeReason.buttonPressed);
             },
             child: Text(
               "${time}m",

@@ -92,6 +92,38 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
     return query(after: startOfYesterdayEpoch);
   }
 
+  Future<void> updateAlarmLog(AlarmSet alarms, AlarmSet? previousAlarms, AlarmStage stage) async {
+    var newAlarms = alarms;
+    var removedAlarms = AlarmSet({});
+    if (previousAlarms != null) {
+      newAlarms = alarms.difference(previousAlarms);
+      removedAlarms = previousAlarms.difference(alarms);
+    }
+
+    // Write the alarms
+
+    // // if there is a new value then create a new alarm
+    for (var newAlarm in newAlarms) {
+      var log = AlarmLog(
+        type: newAlarm,
+        conditions: newAlarm.conditions(),
+        stage: stage,
+        startDate: clock.now(),
+      );
+      await SQLToAlarmLogs().save(log);
+    }
+
+    // If there is a removed Value then remove the alarm
+    for (var removedAlarm in removedAlarms) {
+      var log = await SQLToAlarmLogs().findUnfinishedAlarmOfTypeAndStage(removedAlarm, stage);
+      if (log == null) {
+        continue;
+      }
+      log.endDate = clock.now();
+      await SQLToAlarmLogs().save(log);
+    }
+  }
+
   Future<AlarmLog?> findUnfinishedAlarmOfTypeAndStage(AlarmType type, AlarmStage stage) async {
     var res = await query(conditions: {
       "type = ?": type.name,

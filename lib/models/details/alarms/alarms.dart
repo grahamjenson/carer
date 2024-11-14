@@ -1,5 +1,6 @@
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
+import 'package:carer/services/app_state_service.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
@@ -97,22 +98,18 @@ abstract class AlarmMethods {
   get numberOfReadingsToTrigger => minutesToTrigger ~/ 5;
 
   Map<String, dynamic> conditions() {
-    CleanSGV? lastSGV = CleanSGV.lastSGV.value;
-    return {
-      "lastSGV": lastSGV?.toString(),
-      "LastSGVStr": lastSGVStr(),
-      "lastSGVAgeInMinutes": lastSGV?.age.inMinutes,
+    var map = AppStateService().appState();
+    map.addAll({
       "targetRange5": targetRange5.name,
       "prediction": getPredictedValue(numberOfReadingsToTrigger)?.toString(),
-      "previousReadings": lastSGV?.before12.map((e) => e.toString()).toList(),
-      "predictions": lastSGV?.predictions?.map((e) => e?.toString()).toList(),
       "minutesToTrigger": minutesToTrigger,
       "numberOfReadingsToTriggerPrediction": numberOfReadingsToTrigger,
       "targetRange5ForReadings": targetRange5ForReadings(numberOfReadingsToTrigger).map((e) => e.name).toList(),
       "diffs": diffPer5MinuteForReadings(numberOfReadingsToTrigger),
       "targets": [TargetSettings().lowUrgent, TargetSettings().lowTarget, TargetSettings().highTarget, TargetSettings().highUrgent],
       "fastDropRise": [TargetSettings().fastDropDelta, TargetSettings().fastRiseDelta],
-    };
+    });
+    return map;
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:carer/mappers/sql/logs/alarms_log.dart';
 import 'package:carer/mappers/sql/logs/snooze_log.dart';
-import 'package:carer/models/sql/db_model.dart';
 import 'package:carer/models/sql/logs/alarm_logs.dart';
+import 'package:carer/models/sql/logs/log.dart';
 import 'package:carer/models/sql/logs/snooze_logs.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -20,10 +20,10 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
       ),
       body: AWatch(
         (context) {
-          var alarmLogs = SQLToAlarmLogs().lastCoupleDays.value;
-          var snoozeLogs = SQLToSnoozeLogs().lastCoupleDays.value;
+          List<AlarmLog> alarmLogs = SQLToAlarmLogs().lastCoupleDays.value;
+          List<SnoozeLog> snoozeLogs = SQLToSnoozeLogs().lastCoupleDays.value;
 
-          List<DBModel> items = [];
+          List<LogDBModel> items = [];
           items.addAll(alarmLogs);
           items.addAll(snoozeLogs);
 
@@ -43,14 +43,6 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                       List<Widget> children = [];
 
                       if (logModel is AlarmLog) {
-                        List<String> conditionsText = [];
-                        List<TextStyle> conditionsStyle = [];
-                        logModel.conditions.forEach((key, value) {
-                          conditionsText.add(key);
-                          conditionsStyle.add(TextStyle(fontSize: 8, color: primaryColor(context)));
-                          conditionsText.add("\t${truncateString(value.toString(), 100)}\n");
-                          conditionsStyle.add(const TextStyle(fontSize: 8));
-                        });
                         children = [
                           Flexible(
                               flex: 1,
@@ -58,7 +50,7 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                                   '${logModel.type.name}\n${logModel.stage.name}\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}')),
                           Expanded(
                             flex: 3,
-                            child: SmartText(texts: conditionsText, styles: conditionsStyle),
+                            child: conditionsWidget(context, logModel.conditions),
                           )
                         ];
                       }
@@ -66,13 +58,12 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                       if (logModel is SnoozeLog) {
                         String text = 'Snooze\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}';
 
-                        if (logModel.endDate == null) {
-                          // Snooze was stopped
-                          text = 'SnoozeStopped\n${formatDate(logModel.startDate)}';
-                        }
                         children = [
                           Flexible(flex: 1, child: Text(text)),
-                          Expanded(flex: 3, child: Text(logModel.reason)),
+                          Expanded(
+                            flex: 3,
+                            child: conditionsWidget(context, logModel.conditions),
+                          )
                         ];
                       }
 
@@ -91,6 +82,18 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
         debugLabel: "AlarmLogPage",
       ),
     );
+  }
+
+  Widget conditionsWidget(BuildContext context, Map<String, dynamic> conditions) {
+    List<String> conditionsText = [];
+    List<TextStyle> conditionsStyle = [];
+    conditions.forEach((key, value) {
+      conditionsText.add(key);
+      conditionsStyle.add(TextStyle(fontSize: 8, color: primaryColor(context)));
+      conditionsText.add("\t${truncateString(value.toString(), 100)}\n");
+      conditionsStyle.add(const TextStyle(fontSize: 8));
+    });
+    return SmartText(texts: conditionsText, styles: conditionsStyle);
   }
 
   String formatDate(DateTime? date) {

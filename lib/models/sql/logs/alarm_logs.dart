@@ -1,5 +1,5 @@
 import 'package:carer/models/details/alarms/alarms.dart';
-import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/models/sql/logs/log.dart';
 
 enum AlarmStage {
   pending,
@@ -16,23 +16,16 @@ enum AlarmStage {
 }
 
 // This is a record of all triggered alarms.
-class AlarmLog extends DBModel {
-  @override
-  get date => startDate;
-  final DateTime startDate;
-
-  DateTime? endDate;
-
+class AlarmLog extends LogDBModel {
   final AlarmType type;
   final AlarmStage stage;
-  final Map<String, dynamic> conditions;
 
   AlarmLog({
     super.id,
-    required this.startDate,
-    this.endDate,
+    required super.startDate,
+    super.endDate,
     required this.type,
     required this.stage,
-    required this.conditions,
+    required super.conditions,
   });
 }

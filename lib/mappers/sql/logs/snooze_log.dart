@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/sql/logs/snooze_logs.dart';
+import 'package:carer/services/app_state_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
 import 'package:carer/utils/futures.dart';
@@ -25,13 +27,11 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes([
-      "reason",
       "conditions",
       "start",
     ]));
 
     errors.addAll(row.validateTypes([
-      ("reason", String),
       ("conditions", String),
       ("start", int),
       ("end", int),
@@ -56,7 +56,6 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
 
     return SnoozeLog(
       id: row["id"] as int?,
-      reason: row["reason"] as String,
       conditions: conditions,
       startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
       endDate: endDate,
@@ -66,7 +65,6 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
   @override
   SQLRow bToA(SnoozeLog model) {
     var row = SQLRow({
-      "reason": model.reason,
       "conditions": jsonEncode(model.conditions),
       "start": model.date.millisecondsSinceEpoch,
     });
@@ -83,5 +81,44 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
     int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
 
     return query(after: startOfYesterdayEpoch);
+  }
+
+  Future<void> startSnooze(Duration duration, SnoozeReason reason) async {
+    // This might extend a previous snooze, which we can find
+    SnoozeLog? unfinished = await findUnfinishedSnoozeLog();
+    if (unfinished != null) {
+      // Extend the previous snooze
+      unfinished.endDate = clock.now();
+      save(unfinished);
+    }
+    var time = clock.now().add(duration);
+    var map = AppStateService().appState();
+    map.addAll({
+      "until": time.toIso8601String(),
+      "duration": duration.inSeconds,
+      "startReason": reason.name,
+    });
+    save(SnoozeLog(startDate: clock.now(), conditions: map));
+  }
+
+  Future<void> endSnooze(SnoozeReason reason) async {
+    // Find a previous snooze
+    SnoozeLog? unfinished = await findUnfinishedSnoozeLog();
+    if (unfinished != null) {
+      // Extend the previous snooze
+      unfinished.endDate = clock.now();
+      unfinished.conditions["endReason"] = reason.name;
+      save(unfinished);
+    }
+  }
+
+  Future<SnoozeLog?> findUnfinishedSnoozeLog() async {
+    var res = await query(conditions: {
+      "end IS NULL": null,
+    }, limit: 1);
+    if (res.isEmpty) {
+      return null;
+    }
+    return res.first;
   }
 }

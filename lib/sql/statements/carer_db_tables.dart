@@ -139,10 +139,8 @@ const snoozeLogsTable = DBTable(snoozeLogsTableName, '''
     CREATE TABLE snooze_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       conditions TEXT,
-      reason TEXT,
       start INTEGER,
       end INTEGER,
-
       -- VIRTUAL
 
       timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,

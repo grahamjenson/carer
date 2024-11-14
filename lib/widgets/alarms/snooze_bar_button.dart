@@ -50,7 +50,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) {
-                return const SnoozeTimePage(10);
+                return const SnoozeTimePage();
               }),
             );
           },
