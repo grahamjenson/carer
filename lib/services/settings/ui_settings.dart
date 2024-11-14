@@ -20,7 +20,7 @@ class UISettings {
   final Map<_UINames, ASignal> _signals = {
     _UINames.screenActive: ASignal<bool>(false, debugLabel: 'screenActive'),
     _UINames.unit: ASignal<Unit>(Unit.mg, debugLabel: 'unit'),
-    _UINames.enableDim: ASignal<bool>(true, debugLabel: 'enableDim'),
+    _UINames.enableDim: ASignal<bool>(false, debugLabel: 'enableDim'),
     _UINames.orientation: ASignal<Orientation>(Orientation.portrait, debugLabel: 'orientation'),
   };
 
@@ -48,7 +48,7 @@ class UISettings {
 
     unit = Unit.fromBool(prefs.getBool(_UINames.unit.name, defaultValue: true)!);
 
-    enableDim = prefs.getBool(_UINames.enableDim.name, defaultValue: true)!;
+    enableDim = prefs.getBool(_UINames.enableDim.name, defaultValue: false)!;
 
     aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()), debugLabel: _UINames.unit.name);
 
