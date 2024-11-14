@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/sql/logs/snooze_logs.dart';
-import 'package:carer/services/app_state_service.dart';
+import 'package:carer/services/app_details_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
@@ -27,12 +27,12 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
     List<String> errors = [];
 
     errors.addAll(row.validateRequiredAttributes([
-      "conditions",
+      "details",
       "start",
     ]));
 
     errors.addAll(row.validateTypes([
-      ("conditions", String),
+      ("details", String),
       ("start", int),
       ("end", int),
     ]));
@@ -41,12 +41,12 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
       throw ArgumentError("Invalid Alarms Row: $row, Errors: $errors");
     }
 
-    // decode the conditions from json
-    Map<String, dynamic> conditions = {};
+    // decode the details from json
+    Map<String, dynamic> details = {};
     try {
-      conditions = jsonDecode(row["conditions"] as String);
+      details = jsonDecode(row["details"] as String);
     } catch (e) {
-      alog("TriggeredAlarm SQL MApper: Bad conditions json: ${row["conditions"]}", error: e);
+      alog("TriggeredAlarm SQL MApper: Bad details json: ${row["details"]}", error: e);
     }
 
     DateTime? endDate;
@@ -56,7 +56,7 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
 
     return SnoozeLog(
       id: row["id"] as int?,
-      conditions: conditions,
+      details: details,
       startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
       endDate: endDate,
     );
@@ -65,7 +65,7 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
   @override
   SQLRow bToA(SnoozeLog model) {
     var row = SQLRow({
-      "conditions": jsonEncode(model.conditions),
+      "details": jsonEncode(model.details),
       "start": model.date.millisecondsSinceEpoch,
     });
 
@@ -92,13 +92,13 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
       save(unfinished);
     }
     var time = clock.now().add(duration);
-    var map = AppStateService().appState();
+    var map = AppDetailsService().appDetails();
     map.addAll({
       "until": time.toIso8601String(),
       "duration": duration.inSeconds,
       "startReason": reason.name,
     });
-    save(SnoozeLog(startDate: clock.now(), conditions: map));
+    save(SnoozeLog(startDate: clock.now(), details: map));
   }
 
   Future<void> endSnooze(SnoozeReason reason) async {
@@ -107,7 +107,7 @@ class SQLToSnoozeLogs extends SQLMapper<SnoozeLog> {
     if (unfinished != null) {
       // Extend the previous snooze
       unfinished.endDate = clock.now();
-      unfinished.conditions["endReason"] = reason.name;
+      unfinished.details["endReason"] = reason.name;
       save(unfinished);
     }
   }

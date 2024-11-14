@@ -6,13 +6,13 @@ abstract class LogDBModel extends DBModel {
 
   final DateTime startDate;
   DateTime? endDate;
-  final Map<String, dynamic> conditions;
+  final Map<String, dynamic> details;
 
   LogDBModel({
     super.id,
     super.eid,
     required this.startDate,
     this.endDate,
-    required this.conditions,
+    required this.details,
   });
 }

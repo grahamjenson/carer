@@ -8,7 +8,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
-class CleanSGV with DateMixin implements ASGV {
+class CleanSGV extends ASGV with DateMixin {
   @override
   final int value;
 
@@ -90,10 +90,6 @@ class CleanSGV with DateMixin implements ASGV {
   @override
   String toString() {
     return "SGV($value@${date.hour}:${date.minute})";
-  }
-
-  String unitStr() {
-    return UISettings().unit.str(value);
   }
 
   bool get withinLast3Hours => date.isAfter(clock.now().subtract(const Duration(hours: 3)));

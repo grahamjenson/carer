@@ -23,7 +23,7 @@ void main() async {
       var al = AlarmLog(
         type: AlarmType.low,
         stage: AlarmStage.pending,
-        conditions: {},
+        details: {},
         startDate: startTime,
       );
       expect(await SQLToAlarmLogs().save(al), true);
@@ -32,7 +32,7 @@ void main() async {
         expect(value.length, 1);
         expect(value[0].type, AlarmType.low);
         expect(value[0].stage, AlarmStage.pending);
-        expect(value[0].conditions, {});
+        expect(value[0].details, {});
         expect(value[0].startDate, startTime);
       });
 

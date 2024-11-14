@@ -1,6 +1,6 @@
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
-import 'package:carer/services/app_state_service.dart';
+import 'package:carer/services/app_details_service.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
@@ -64,7 +64,7 @@ enum AlarmType {
 
   bool smartSnooze() => _methods.smartSnooze();
 
-  Map<String, dynamic> conditions() => _methods.conditions();
+  Map<String, dynamic> details() => _methods.details();
 
   String get description => _methods.description;
   String get title => _methods.title;
@@ -97,17 +97,26 @@ abstract class AlarmMethods {
   get minutesToTrigger => -1;
   get numberOfReadingsToTrigger => minutesToTrigger ~/ 5;
 
-  Map<String, dynamic> conditions() {
-    var map = AppStateService().appState();
+  Map<String, dynamic> details() {
+    var map = AppDetailsService().appDetails();
+
     map.addAll({
       "targetRange5": targetRange5.name,
       "prediction": getPredictedValue(numberOfReadingsToTrigger)?.toString(),
       "minutesToTrigger": minutesToTrigger,
       "numberOfReadingsToTriggerPrediction": numberOfReadingsToTrigger,
       "targetRange5ForReadings": targetRange5ForReadings(numberOfReadingsToTrigger).map((e) => e.name).toList(),
-      "diffs": diffPer5MinuteForReadings(numberOfReadingsToTrigger),
-      "targets": [TargetSettings().lowUrgent, TargetSettings().lowTarget, TargetSettings().highTarget, TargetSettings().highUrgent],
-      "fastDropRise": [TargetSettings().fastDropDelta, TargetSettings().fastRiseDelta],
+      "diffs": diffPer5MinuteForReadings(numberOfReadingsToTrigger).map(unitStr).toList(),
+      "targets": [
+        unitStr(TargetSettings().lowUrgent),
+        unitStr(TargetSettings().lowTarget),
+        unitStr(TargetSettings().highTarget),
+        unitStr(TargetSettings().highUrgent),
+      ],
+      "fastDropRise": [
+        unitStr(TargetSettings().fastDropDelta),
+        unitStr(TargetSettings().fastRiseDelta),
+      ],
     });
     return map;
   }
@@ -612,8 +621,8 @@ class _LowBatteryAlarm extends AlarmMethods {
   IconData icon() => UniconsLine.battery_empty;
 
   @override
-  Map<String, dynamic> conditions() {
-    return super.conditions()
+  Map<String, dynamic> details() {
+    return super.details()
       ..addAll({
         "thisCharging": PlatformInfoService().thisPhoneIsCharging(),
         "thisBattery": PlatformInfoService().thisPhonesBatteryLevel(),

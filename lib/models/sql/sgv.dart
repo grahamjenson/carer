@@ -17,6 +17,10 @@ abstract class ASGV {
   int get minsAgo;
   Duration get age;
   String sgvStr();
+
+  String unitStr() {
+    return UISettings().unit.str(value);
+  }
 }
 
 class SGV extends DBModel implements ASGV {
@@ -62,5 +66,10 @@ class SGV extends DBModel implements ASGV {
 
   static setupSQLSignals() {
     signalAssign(last2Days, () async => SQLToSGV().last2Days(), debugLabel: "SGVlast2Days", dependencies: [SQLToSGV().writeSignal]);
+  }
+
+  @override
+  String unitStr() {
+    return UISettings().unit.str(value);
   }
 }

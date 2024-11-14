@@ -26,6 +26,6 @@ class AlarmLog extends LogDBModel {
     super.endDate,
     required this.type,
     required this.stage,
-    required super.conditions,
+    required super.details,
   });
 }

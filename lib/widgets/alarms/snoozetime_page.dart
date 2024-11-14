@@ -87,7 +87,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                         height: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            setSnooze(null, SnoozeReason.buttonPressed);
+                            setSnooze(null, SnoozeReason.cancelPressed);
                           },
                           child: Text("Cancel", style: textStyle),
                         ),

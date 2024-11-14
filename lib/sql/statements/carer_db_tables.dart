@@ -121,7 +121,7 @@ const alarmLogsTable = DBTable(alarmLogsTableName, '''
     CREATE TABLE alarm_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       type TEXT,
-      conditions TEXT,
+      details TEXT,
       stage TEXT, -- Like pending, alerting
       start INTEGER,
       end INTEGER,
@@ -138,7 +138,7 @@ const String snoozeLogsTableName = 'snooze_logs';
 const snoozeLogsTable = DBTable(snoozeLogsTableName, '''
     CREATE TABLE snooze_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      conditions TEXT,
+      details TEXT,
       start INTEGER,
       end INTEGER,
       -- VIRTUAL

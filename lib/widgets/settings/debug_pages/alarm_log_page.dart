@@ -50,7 +50,7 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                                   '${logModel.type.name}\n${logModel.stage.name}\n${formatDate(logModel.startDate)}-${formatDate(logModel.endDate)}')),
                           Expanded(
                             flex: 3,
-                            child: conditionsWidget(context, logModel.conditions),
+                            child: detailsWidget(context, logModel.details),
                           )
                         ];
                       }
@@ -62,7 +62,7 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
                           Flexible(flex: 1, child: Text(text)),
                           Expanded(
                             flex: 3,
-                            child: conditionsWidget(context, logModel.conditions),
+                            child: detailsWidget(context, logModel.details),
                           )
                         ];
                       }
@@ -84,16 +84,16 @@ class AlarmLogPage extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget conditionsWidget(BuildContext context, Map<String, dynamic> conditions) {
-    List<String> conditionsText = [];
-    List<TextStyle> conditionsStyle = [];
-    conditions.forEach((key, value) {
-      conditionsText.add(key);
-      conditionsStyle.add(TextStyle(fontSize: 8, color: primaryColor(context)));
-      conditionsText.add("\t${truncateString(value.toString(), 100)}\n");
-      conditionsStyle.add(const TextStyle(fontSize: 8));
+  Widget detailsWidget(BuildContext context, Map<String, dynamic> details) {
+    List<String> detailsText = [];
+    List<TextStyle> detailsStyle = [];
+    details.forEach((key, value) {
+      detailsText.add(key);
+      detailsStyle.add(TextStyle(fontSize: 8, color: primaryColor(context)));
+      detailsText.add("\t${truncateString(value.toString(), 100)}\n");
+      detailsStyle.add(const TextStyle(fontSize: 8));
     });
-    return SmartText(texts: conditionsText, styles: conditionsStyle);
+    return SmartText(texts: detailsText, styles: detailsStyle);
   }
 
   String formatDate(DateTime? date) {

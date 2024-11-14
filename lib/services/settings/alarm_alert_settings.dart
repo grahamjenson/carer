@@ -28,6 +28,7 @@ enum _AANames {
 
 enum SnoozeReason {
   buttonPressed,
+  cancelPressed,
   buttonMissed,
   timerExpired,
   autoRemoved,

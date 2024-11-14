@@ -28,14 +28,14 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
     errors.addAll(row.validateRequiredAttributes([
       "type",
       "stage",
-      "conditions",
+      "details",
       "start",
     ]));
 
     errors.addAll(row.validateTypes([
       ("type", String),
       ("stage", String),
-      ("conditions", String),
+      ("details", String),
       ("start", int),
       ("end", int),
     ]));
@@ -46,12 +46,12 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
 
     AlarmType type = AlarmType.fromName(row["type"] as String);
     AlarmStage stage = AlarmStage.fromName(row["stage"] as String);
-    // decode the conditions from json
-    Map<String, dynamic> conditions = {};
+    // decode the details from json
+    Map<String, dynamic> details = {};
     try {
-      conditions = jsonDecode(row["conditions"] as String);
+      details = jsonDecode(row["details"] as String);
     } catch (e) {
-      alog("TriggeredAlarm SQL MApper: Bad conditions json: ${row["conditions"]}", error: e);
+      alog("TriggeredAlarm SQL MApper: Bad details json: ${row["details"]}", error: e);
     }
 
     DateTime? endDate;
@@ -63,7 +63,7 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
       id: row["id"] as int?,
       type: type,
       stage: stage,
-      conditions: conditions,
+      details: details,
       startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
       endDate: endDate,
     );
@@ -74,7 +74,7 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
     var row = SQLRow({
       "type": model.type.name,
       "stage": model.stage.name,
-      "conditions": jsonEncode(model.conditions),
+      "details": jsonEncode(model.details),
       "start": model.date.millisecondsSinceEpoch,
     });
 
@@ -106,7 +106,7 @@ class SQLToAlarmLogs extends SQLMapper<AlarmLog> {
     for (var newAlarm in newAlarms) {
       var log = AlarmLog(
         type: newAlarm,
-        conditions: newAlarm.conditions(),
+        details: newAlarm.details(),
         stage: stage,
         startDate: clock.now(),
       );

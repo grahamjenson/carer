@@ -6,6 +6,6 @@ class SnoozeLog extends LogDBModel {
     super.id,
     required super.startDate,
     super.endDate,
-    required super.conditions,
+    required super.details,
   });
 }

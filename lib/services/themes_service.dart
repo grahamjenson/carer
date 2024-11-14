@@ -37,14 +37,14 @@ class ColorSchemes {
 
   static var darkcolorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: colorScheme.primary.dim,
-    onPrimary: colorScheme.onPrimary.dim,
+    primary: colorScheme.primary.dim.dim,
+    onPrimary: Colors.black,
     secondary: colorScheme.secondary.dim,
-    onSecondary: colorScheme.onSecondary.dim,
-    tertiary: colorScheme.tertiary.dim,
-    onTertiary: colorScheme.onTertiary.dim,
+    onSecondary: Colors.black,
+    tertiary: colorScheme.tertiary.dim.dim,
+    onTertiary: Colors.black,
     surface: Colors.black,
-    onSurface: colorScheme.onSurface.dim,
+    onSurface: colorScheme.onSurface.dim.dim,
     error: colorScheme.error.dim,
     onError: colorScheme.onError.dim,
   );
