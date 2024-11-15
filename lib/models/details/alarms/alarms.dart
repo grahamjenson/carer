@@ -53,7 +53,8 @@ enum AlarmType {
   fastRise(_FastRiseAlarm()),
   fastDrop(_FastDropAlarm()),
   noData(_NoDataAlarm()),
-  lowBattery(_LowBatteryAlarm());
+  lowBattery(_LowBatteryAlarm()),
+  unknown(_Unkown());
 
   final AlarmMethods _methods;
   const AlarmType(this._methods);
@@ -203,6 +204,31 @@ abstract class AlarmMethods {
 
     return lastSGV.getPredictedValue(numberOfReadings);
   }
+}
+
+class _Unkown extends AlarmMethods {
+  const _Unkown();
+
+  @override
+  String get title => "Unknown Alarm";
+
+  @override
+  IconData icon() => UniconsLine.question_circle;
+
+  @override
+  String get description => "Unknown Alarm";
+
+  @override
+  String shortSummary() => "Unknown Alarm";
+
+  @override
+  String statment() => "Unknown Alarm";
+
+  @override
+  bool trigger() => false;
+
+  @override
+  bool active() => false;
 }
 
 class _UrgentLowAlarm extends AlarmMethods {

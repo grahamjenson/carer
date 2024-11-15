@@ -14,8 +14,7 @@ const dbTables = [
   tempbasalTable,
   temptargetsTable,
   profileTable,
-  alarmLogsTable,
-  snoozeLogsTable,
+  eventsTable,
 ];
 
 // Used for key values like iob...
@@ -116,28 +115,11 @@ const temptargetsTable = DBTable(temptargetsTableName, '''
     )
   ''');
 
-const String alarmLogsTableName = 'alarm_logs';
-const alarmLogsTable = DBTable(alarmLogsTableName, '''
-    CREATE TABLE alarm_logs (
+const String eventsTableName = 'events';
+const eventsTable = DBTable(eventsTableName, '''
+    CREATE TABLE events (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       type TEXT,
-      details TEXT,
-      stage TEXT, -- Like pending, alerting
-      start INTEGER,
-      end INTEGER,
-
-      -- VIRTUAL
-
-      timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,
-      starttime TEXT GENERATED ALWAYS AS (datetime(start / 1000, 'unixepoch')) VIRTUAL,
-      endtime TEXT GENERATED ALWAYS AS (datetime(end / 1000, 'unixepoch')) VIRTUAL
-    )
-  ''');
-
-const String snoozeLogsTableName = 'snooze_logs';
-const snoozeLogsTable = DBTable(snoozeLogsTableName, '''
-    CREATE TABLE snooze_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
       details TEXT,
       start INTEGER,
       end INTEGER,

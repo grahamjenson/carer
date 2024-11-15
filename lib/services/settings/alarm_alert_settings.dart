@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:carer/mappers/sql/logs/snooze_log.dart';
+import 'package:carer/models/sql/events/snooze_events.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -211,21 +211,21 @@ class AlarmAlertSettings {
 
     if (value == null) {
       alog("Snooze: Duration Seconds set to null from ${snoozeUntilSignal.peek()} because $reason");
-      SQLToSnoozeLogs().endSnooze(reason);
+      SnoozeEvent.endSnooze(reason);
       snoozeUntilSignal.value = null;
       return;
     }
 
     snoozeTimer = Timer(Duration(seconds: value), () {
       alog("Snooze: Duration Seconds set to null from ${snoozeUntilSignal.peek()} because timer expired");
-      SQLToSnoozeLogs().endSnooze(SnoozeReason.timerExpired);
+      SnoozeEvent.endSnooze(SnoozeReason.timerExpired);
       snoozeUntilSignal.value = null;
     });
 
     var duration = Duration(seconds: value);
     var time = clock.now().add(duration);
     alog("Snooze: Duration Seconds set to $time from ${snoozeUntilSignal.peek()} because $reason");
-    SQLToSnoozeLogs().startSnooze(duration, reason);
+    SnoozeEvent.startSnooze(duration, reason);
     snoozeUntilSignal.value = time;
   }
 

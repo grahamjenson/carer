@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:carer/mappers/sql/logs/alarms_log.dart';
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/details/alarms/alarms.dart';
-import 'package:carer/models/sql/logs/alarm_logs.dart';
+import 'package:carer/models/sql/events/alarm_event.dart';
 import 'package:carer/services/alarms/brightness.dart';
 import 'package:carer/services/alarms/player.dart';
 import 'package:carer/services/app_lifecycle_service.dart';
@@ -148,12 +147,12 @@ class AlarmsService {
     aeffect(() async {
       if (pendingAlarmsCheck != pendingAlarms.value) {
         pendingAlarmsCheck = pendingAlarms.value;
-        SQLToAlarmLogs().updateAlarmLog(pendingAlarms.value, pendingAlarms.previousValue, AlarmStage.pending);
+        AlarmEvent.updateAlarmEvent(pendingAlarms.value, pendingAlarms.previousValue, AlarmStage.pending);
       }
 
       if (alertingAlarmsCheck != alertingAlarms.value) {
         alertingAlarmsCheck = alertingAlarms.value;
-        SQLToAlarmLogs().updateAlarmLog(alertingAlarms.value, alertingAlarms.previousValue, AlarmStage.alerting);
+        AlarmEvent.updateAlarmEvent(alertingAlarms.value, alertingAlarms.previousValue, AlarmStage.alerting);
       }
     }, debugLabel: "WriteAlarmLogs");
   }

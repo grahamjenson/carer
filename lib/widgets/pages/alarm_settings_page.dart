@@ -5,7 +5,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
-import 'package:carer/widgets/settings/debug_pages/alarm_log_page.dart';
+import 'package:carer/widgets/settings/debug_pages/events_page.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -83,12 +83,12 @@ class AlarmsSettingsPage extends StatelessWidget {
       title: const Text('Logs'),
       tiles: [
         SettingsTile.navigation(
-          title: const Text("Alarm Log"),
+          title: const Text("Events"),
           descriptionInlineIos: true,
           onPressed: (context) async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AlarmLogPage()),
+              MaterialPageRoute(builder: (context) => const EventsPage()),
             );
           },
         )

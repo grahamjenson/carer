@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:carer/main.dart';
+import 'package:carer/models/sql/events/app_state_change_event.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
@@ -37,10 +38,12 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
         alog("AppLifecycleService: paused");
+        AppStateEvent.appStateChange(AppStateEventType.paused);
         lastPaused.value = clock.now();
         break;
       case AppLifecycleState.resumed:
         alog("AppLifecycleService: Resumed");
+        AppStateEvent.appStateChange(AppStateEventType.resumed);
         lastResumed.value = clock.now();
         break;
       case AppLifecycleState.hidden:

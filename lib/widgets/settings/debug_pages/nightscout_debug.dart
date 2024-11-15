@@ -12,7 +12,7 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alarm Log Page'),
+        title: const Text('NightScout Debug Page'),
       ),
       body: AWatch(
         (context) {

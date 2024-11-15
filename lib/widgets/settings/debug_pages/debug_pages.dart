@@ -10,7 +10,7 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/settings/debug_pages/alarm_log_page.dart';
+import 'package:carer/widgets/settings/debug_pages/events_page.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:carer/widgets/settings/debug_pages/nightscout_debug.dart';
 import 'package:clock/clock.dart';
@@ -152,7 +152,7 @@ class DebugSettingsPage extends StatelessWidget {
           onPressed: (context) async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AlarmLogPage()),
+              MaterialPageRoute(builder: (context) => const EventsPage()),
             );
           },
         )
