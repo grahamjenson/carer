@@ -1,4 +1,3 @@
-import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 
@@ -19,28 +18,27 @@ class FlowData {
 
   // Constructor
   Future<bool> setupDBPropagation() async {
-    final db = (await CarerDB.instance).db;
-    var kvdb = KeyValueStore(db);
-    await kvdb.internalPopulate();
+    var prefs = await KeyValueStore.instance;
+    await prefs.internalPopulate();
 
     agreedPrivacyPolicy = DateTime.fromMillisecondsSinceEpoch(
-      kvdb.getInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, defaultValue: 0)!,
+      prefs.getInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, defaultValue: 0)!,
     );
 
     agreedTermsAndConditions = DateTime.fromMillisecondsSinceEpoch(
-      kvdb.getInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, defaultValue: 0)!,
+      prefs.getInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, defaultValue: 0)!,
     );
 
     aeffect(
       () {
-        kvdb.setInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, _signals[FlowDataNames.agreedPrivacyPolicyTimeStamp]!.value);
+        prefs.setInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, _signals[FlowDataNames.agreedPrivacyPolicyTimeStamp]!.value);
       },
       debugLabel: "agreedPrivacyPolicyTimeStamp",
     );
 
     aeffect(
       () {
-        kvdb.setInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value);
+        prefs.setInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value);
       },
       debugLabel: "agreedTermsAndConditionsTimeStamp",
     );
@@ -75,8 +73,6 @@ class FlowData {
     }
     return dateTime;
   }
-
-  bool get needsOnboarding => agreedPrivacyPolicy == null || agreedTermsAndConditions == null;
 
   // Setters
   set agreedPrivacyPolicy(DateTime? value) {

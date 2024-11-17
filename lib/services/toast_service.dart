@@ -11,8 +11,8 @@ class ToastService {
 
   // Stopping the same error flodding the screen with cascading errors
   void showError(String msg, {String? description}) {
-    if (AppLifecycleService().wasResumed2SecondsAgo) {
-      // Dont log errors for the first 2 seconds
+    if (AppLifecycleService().wasResumed2SecondsAgo || AppLifecycleService().lastState.value != AppLifecycleState.resumed) {
+      // Dont show errors for the first 2 seconds or if app is in background
       return;
     }
 

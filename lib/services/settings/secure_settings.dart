@@ -34,7 +34,7 @@ class SecureSettings {
 
   String? get nightscoutURL => _signals[_SSNames.nightscoutUrl]!.value as String?;
   set nightscoutURL(String? value) {
-    if (value != null) {
+    if (value != null && value.isNotEmpty && value.length > 8) {
       ALogger().addCensoredString("NS_URL", value);
     }
     _signals[_SSNames.nightscoutUrl]!.value = value;
@@ -42,7 +42,7 @@ class SecureSettings {
 
   String? get nightscoutToken => _signals[_SSNames.nightscoutToken]!.value as String?;
   set nightscoutToken(String? value) {
-    if (value != null) {
+    if (value != null && value.isNotEmpty && value.length > 8) {
       ALogger().addCensoredString("NS_TOKEN", value);
     }
 
@@ -53,6 +53,10 @@ class SecureSettings {
     return (nightscoutURL ?? "", nightscoutToken ?? "");
   }
 
+  bool nightscoutURLAndTokenSet() {
+    return nightscoutURL != null && nightscoutToken != null && nightscoutURL!.isNotEmpty && nightscoutToken!.isNotEmpty;
+  }
+
   setupDBPropagation() async {
     // https://github.com/mogol/flutter_secure_storage/issues/709
     // read errors, read all doesn't
@@ -61,7 +65,7 @@ class SecureSettings {
     nightscoutToken = allKeys[_SSNames.nightscoutToken.name];
 
     aeffect(() {
-      if (nightscoutURL == null) {
+      if (nightscoutURL == null || nightscoutURL!.isEmpty || nightscoutURL!.length < 8) {
         return;
       }
 
@@ -69,11 +73,18 @@ class SecureSettings {
     }, debugLabel: 'nightscoutURL');
 
     aeffect(() {
-      if (nightscoutToken == null) {
+      if (nightscoutToken == null || nightscoutToken!.isEmpty || nightscoutToken!.length < 8) {
         return;
       }
 
       store.write(key: _SSNames.nightscoutToken.name, value: nightscoutToken!);
     }, debugLabel: 'nightscoutToken');
+  }
+
+  debugDeleteNSValues() {
+    nightscoutURL = null;
+    nightscoutToken = null;
+    store.delete(key: _SSNames.nightscoutUrl.name);
+    store.delete(key: _SSNames.nightscoutToken.name);
   }
 }

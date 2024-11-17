@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
   ASignal<DateTime> lastResumed = ASignal(clock.now(), debugLabel: "LastResumed");
   ASignal<DateTime> lastPaused = ASignal(clock.now(), debugLabel: "LastPaused");
+  ASignal<AppLifecycleState> lastState = ASignal(AppLifecycleState.resumed, debugLabel: "LastState");
   ASignal<DateTime> lastChangeScreen = ASignal(clock.now(), debugLabel: "changeScreen");
 
   //singleton
@@ -54,6 +55,7 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
         alog("AppLifecycleService: detached");
         break;
     }
+    lastState.value = state;
   }
 
   @override

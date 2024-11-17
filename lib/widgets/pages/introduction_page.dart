@@ -1,4 +1,5 @@
 import 'package:carer/models/flow_data.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/pages/homepage.dart';
@@ -11,6 +12,10 @@ class IntroductionPage extends StatefulWidget {
 
   @override
   State<IntroductionPage> createState() => _IntroductionPageState();
+
+  static bool needsOnboarding() {
+    return FlowData().agreedTermsAndConditions == null || FlowData().agreedPrivacyPolicy == null || !SecureSettings().nightscoutURLAndTokenSet();
+  }
 }
 
 class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
@@ -47,6 +52,26 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
         BorderSide(color: accentColor(context).dim.dim, width: 1), // Change border color here
       ),
     );
+
+    List<Widget> pages = [];
+    int nextPage = 1;
+    if (FlowData().agreedTermsAndConditions == null) {
+      nextPage += 1;
+      pages.add(_getTermsAndConditionsPage(btnStyle, nextPage));
+    }
+
+    if (FlowData().agreedPrivacyPolicy == null) {
+      nextPage += 1;
+      pages.add(_getPrivacyPolicyPage(btnStyle, nextPage));
+    }
+
+    if (!SecureSettings().nightscoutURLAndTokenSet()) {
+      nextPage += 1;
+      pages.add(_getNightScoutURLTokenPage(btnStyle, nextPage));
+    }
+
+    pages = [_getWelcomePage(btnStyle)] + pages + [_getFinalPage(btnStyle)];
+
     return Scaffold(
       backgroundColor: backgroundColor(context),
       body: SafeArea(
@@ -55,11 +80,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
           child: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _getWelcomePage(btnStyle),
-              _getTermsAndConditionsPage(btnStyle),
-              _getPrivacyPolicyPage(btnStyle),
-            ],
+            children: pages,
           ),
         ),
       ),
@@ -94,7 +115,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
     );
   }
 
-  Widget _getTermsAndConditionsPage(ButtonStyle btnStyle) {
+  Widget _getTermsAndConditionsPage(ButtonStyle btnStyle, int nextpage) {
     return Container(
       padding: const EdgeInsets.all(40),
       child: SingleChildScrollView(
@@ -108,7 +129,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
 
                 if (_pageController.hasClients) {
                   _pageController.animateToPage(
-                    2,
+                    nextpage,
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOut,
                   );
@@ -122,7 +143,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
     );
   }
 
-  Widget _getPrivacyPolicyPage(ButtonStyle btnStyle) {
+  Widget _getPrivacyPolicyPage(ButtonStyle btnStyle, int nextpage) {
     return Container(
       padding: const EdgeInsets.all(40),
       child: Column(
@@ -132,12 +153,61 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
             style: btnStyle,
             onPressed: () {
               FlowData().agreedPrivacyPolicy = clock.now();
+              if (_pageController.hasClients) {
+                _pageController.animateToPage(
+                  nextpage,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
+              }
+            },
+            child: const Text("Accept"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getNightScoutURLTokenPage(ButtonStyle btnStyle, int nextpage) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          const MarkdownBody(data: "Please enter your NightScout URL and API Token"),
+          ElevatedButton(
+            style: btnStyle,
+            onPressed: () {
+              if (_pageController.hasClients) {
+                _pageController.animateToPage(
+                  nextpage,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
+              }
+            },
+            child: const Text("Next"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getFinalPage(ButtonStyle btnStyle) {
+    // TODO about info, dontate into...
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          const MarkdownBody(data: "Thank you for using Carer"),
+          ElevatedButton(
+            style: btnStyle,
+            onPressed: () {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
               );
             },
-            child: const Text("Accept"),
+            child: const Text("Finish"),
           ),
         ],
       ),

@@ -40,7 +40,7 @@ abstract class Updater {
 
     Timer.periodic(intervalToCheck, (Timer t) async {
       // If this tries to update too quickly after reopening it will cause an OS error
-      if (AppLifecycleService().wasResumed1SecondsAgo) {
+      if (AppLifecycleService().wasResumed2SecondsAgo) {
         return;
       }
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/background_service.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
@@ -94,6 +95,13 @@ class DebugSettingsPage extends StatelessWidget {
           onPressed: (context) async {
             FlowData().agreedPrivacyPolicy = null;
             FlowData().agreedTermsAndConditions = null;
+          },
+        ),
+        SettingsTile(
+          title: const Text("Reset NightScout URL"),
+          leading: const Icon(UniconsLine.bug),
+          onPressed: (context) async {
+            SecureSettings().debugDeleteNSValues();
           },
         ),
       ],

@@ -21,9 +21,11 @@ class NightscoutSettingsPage extends StatelessWidget {
         (context) {
           var nsURL = SecureSettings().nightscoutURL;
           var nsToken = SecureSettings().nightscoutToken;
-          var currentURL = "Not Set";
+          var currentURL = "";
+          var viewURL = "Not Set";
           if (nsURL != null && nsURL.isNotEmpty && nsToken != null && nsToken.isNotEmpty) {
             currentURL = "$nsURL/?token=$nsToken";
+            viewURL = currentURL;
           }
 
           return SettingsList(
@@ -33,10 +35,10 @@ class NightscoutSettingsPage extends StatelessWidget {
                 tiles: [
                   SettingsTile.navigation(
                     title: const Text('URL'),
-                    value: Container(alignment: Alignment.centerRight, width: maxWidth, child: Text(currentURL, overflow: TextOverflow.ellipsis)),
+                    value: Container(alignment: Alignment.centerRight, width: maxWidth, child: Text(viewURL, overflow: TextOverflow.ellipsis)),
                     leading: const Icon(Icons.language),
                     onPressed: (context) async {
-                      final url = await openTextDialog(context, "Nightscout URL", hint: "URL", value: currentURL);
+                      final url = await openTextDialog(context, "Nightscout URL", hint: "Nightscout URL", value: currentURL);
                       if (url == null || url.isEmpty) return;
                       SecureSettings().setNSValuesFromURL(url);
                     },

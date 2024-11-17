@@ -107,9 +107,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    var doIntro = FlowData().needsOnboarding;
     Widget startingPage = const HomePage();
-    if (doIntro) {
+    if (IntroductionPage.needsOnboarding()) {
       startingPage = const IntroductionPage();
     }
 

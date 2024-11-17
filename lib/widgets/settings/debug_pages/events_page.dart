@@ -106,7 +106,7 @@ class EventsPage extends StatelessWidget with ThemeMixin {
             color: accentColor(context),
           ),
           label: Text(
-            " ${formatDate(model.startDate)}     ${model.stage.name}",
+            " ${formatDate(model.startDate)}     App ${model.stage.name}",
             style: style,
           ),
           onPressed: () {
