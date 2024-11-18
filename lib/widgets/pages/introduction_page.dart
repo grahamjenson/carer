@@ -1,6 +1,7 @@
 import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:clock/clock.dart';
@@ -25,6 +26,9 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
   @override
   void initState() {
     super.initState();
+    _nsTextController.addListener(() {
+      SecureSettings().setNSValuesFromURL(_nsTextController.text);
+    });
   }
 
   @override
@@ -138,11 +142,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
                 FlowData().agreedTermsAndConditions = clock.now();
 
                 if (_pageController.hasClients) {
-                  _pageController.animateToPage(
-                    nextpage,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                  );
+                  _pageController.animateToNextPage();
                 }
               },
               child: const Text("Accept"),
@@ -164,11 +164,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
             onPressed: () {
               FlowData().agreedPrivacyPolicy = clock.now();
               if (_pageController.hasClients) {
-                _pageController.animateToPage(
-                  nextpage,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
+                _pageController.animateToNextPage();
               }
             },
             child: const Text("Accept"),
@@ -179,36 +175,51 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
   }
 
   Widget _getNightScoutURLTokenPage(ButtonStyle btnStyle, int nextpage) {
-    return Container(
-      padding: const EdgeInsets.all(40),
-      child: Column(
-        children: [
-          const MarkdownBody(data: "Please enter your NightScout URL and API Token"),
-          TextField(
-            decoration: const InputDecoration(hintText: "NightScout URL"),
-            autofocus: true,
-            controller: _nsTextController,
+    return AWatch(
+      (context) {
+        VoidCallback? onPressed;
+        if (SecureSettings().nightscoutURLAndTokenSet()) {
+          onPressed = () {
+            if (_pageController.hasClients) {
+              _pageController.animateToNextPage();
+            }
+          };
+        }
+        return Container(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const MarkdownBody(data: "# Nightscout Setup\nNightScout URL with Token \n\n e.g. `https://nsurl.com?token=1234567890`"),
+              TextField(
+                decoration: const InputDecoration(hintText: "NightScout URL"),
+                autofocus: true,
+                controller: _nsTextController,
+              ),
+              Divider(
+                height: 40,
+                thickness: 10,
+                color: Colors.blue.dim,
+              ),
+              MarkdownBody(
+                  data: "**URL**: ${SecureSettings().nightscoutURL ?? ""}"
+                      "\n\n **TOKEN**: ${SecureSettings().nightscoutToken ?? ""}"),
+              Divider(
+                height: 40,
+                thickness: 10,
+                color: Colors.blue.dim,
+              ),
+              ElevatedButton(
+                style: btnStyle,
+                onPressed: onPressed,
+                child: const Text("Next"),
+              ),
+            ],
           ),
-          ElevatedButton(
-            style: btnStyle,
-            onPressed: () {
-              var url = _nsTextController.text;
-              if (url.isEmpty) return;
-
-              SecureSettings().setNSValuesFromURL(url);
-
-              if (_pageController.hasClients) {
-                _pageController.animateToPage(
-                  nextpage,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
-            child: const Text("Save"),
-          ),
-        ],
-      ),
+        );
+      },
+      debugLabel: "NightScoutIntroPage",
+      dependencies: SecureSettings().allSignals(),
     );
   }
 
@@ -236,7 +247,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     if (details.primaryDelta! < 0) {
-      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+      _pageController.animateToNextPage();
     } else if (details.primaryDelta! > 0) {
       _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     }
@@ -249,6 +260,10 @@ class IntroPageController extends PageController {
   IntroPageController() : super();
 
   List<AllowPageChangeFn> allowPageChangeFns = [];
+
+  Future<void> animateToNextPage() {
+    return animateToPage(page!.toInt() + 1, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  }
 
   @override
   Future<void> animateToPage(

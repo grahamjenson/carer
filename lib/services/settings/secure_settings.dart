@@ -15,6 +15,10 @@ class SecureSettings {
 
   late FlutterSecureStorage store;
 
+  List<ASignal> allSignals() {
+    return _signals.values.toList();
+  }
+
   SecureSettings._() {
     store = const FlutterSecureStorage(
         aOptions: AndroidOptions(
@@ -36,17 +40,16 @@ class SecureSettings {
   set nightscoutURL(String? value) {
     if (value != null && value.isNotEmpty && value.length > 8) {
       ALogger().addCensoredString("NS_URL", value);
+      _signals[_SSNames.nightscoutUrl]!.value = value;
     }
-    _signals[_SSNames.nightscoutUrl]!.value = value;
   }
 
   String? get nightscoutToken => _signals[_SSNames.nightscoutToken]!.value as String?;
   set nightscoutToken(String? value) {
     if (value != null && value.isNotEmpty && value.length > 8) {
       ALogger().addCensoredString("NS_TOKEN", value);
+      _signals[_SSNames.nightscoutToken]!.value = value;
     }
-
-    _signals[_SSNames.nightscoutToken]!.value = value;
   }
 
   (String, String) get nightscoutURLAndToken {
