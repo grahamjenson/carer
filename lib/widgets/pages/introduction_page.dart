@@ -19,17 +19,18 @@ class IntroductionPage extends StatefulWidget {
 }
 
 class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
-  late PageController _pageController;
+  final IntroPageController _pageController = IntroPageController();
+  final TextEditingController _nsTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _pageController = IntroPageController();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _nsTextController.dispose();
     super.dispose();
   }
 
@@ -53,24 +54,33 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
       ),
     );
 
-    List<Widget> pages = [];
-    int nextPage = 1;
+    // But of a hack, but there are two lists, one of the pages and the other functions that allow the pages to progress
+    // You should not be able to get into the app without agreeing to the terms and conditions and privacy policy
+    // And nothing will work without the nightscout URL so making sure that is setup is important
+
+    // If T&C or Privacy policy change will ask to re-accept
+    // Nightscot should be set on first run
+    List<Widget> pages = [_getWelcomePage(btnStyle)];
+    List<AllowPageChangeFn> allowPageChange = [() => true];
+
     if (FlowData().agreedTermsAndConditions == null) {
-      nextPage += 1;
-      pages.add(_getTermsAndConditionsPage(btnStyle, nextPage));
+      pages.add(_getTermsAndConditionsPage(btnStyle, pages.length + 1));
+      allowPageChange.add(() => FlowData().agreedTermsAndConditions != null);
     }
 
     if (FlowData().agreedPrivacyPolicy == null) {
-      nextPage += 1;
-      pages.add(_getPrivacyPolicyPage(btnStyle, nextPage));
+      pages.add(_getPrivacyPolicyPage(btnStyle, pages.length + 1));
+      allowPageChange.add(() => FlowData().agreedPrivacyPolicy != null);
     }
 
     if (!SecureSettings().nightscoutURLAndTokenSet()) {
-      nextPage += 1;
-      pages.add(_getNightScoutURLTokenPage(btnStyle, nextPage));
+      pages.add(_getNightScoutURLTokenPage(btnStyle, pages.length + 1));
+      allowPageChange.add(() => SecureSettings().nightscoutURLAndTokenSet());
     }
 
-    pages = [_getWelcomePage(btnStyle)] + pages + [_getFinalPage(btnStyle)];
+    pages.add(_getFinalPage(btnStyle));
+    allowPageChange.add(() => true);
+    _pageController.allowPageChangeFns = allowPageChange;
 
     return Scaffold(
       backgroundColor: backgroundColor(context),
@@ -174,9 +184,19 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
       child: Column(
         children: [
           const MarkdownBody(data: "Please enter your NightScout URL and API Token"),
+          TextField(
+            decoration: const InputDecoration(hintText: "NightScout URL"),
+            autofocus: true,
+            controller: _nsTextController,
+          ),
           ElevatedButton(
             style: btnStyle,
             onPressed: () {
+              var url = _nsTextController.text;
+              if (url.isEmpty) return;
+
+              SecureSettings().setNSValuesFromURL(url);
+
               if (_pageController.hasClients) {
                 _pageController.animateToPage(
                   nextpage,
@@ -185,7 +205,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
                 );
               }
             },
-            child: const Text("Next"),
+            child: const Text("Save"),
           ),
         ],
       ),
@@ -223,23 +243,12 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
   }
 }
 
-allowPageChange(int currentPage, int nextPage) {
-  if (currentPage == 0) {
-    return true;
-  }
-
-  if (currentPage == 1 && nextPage == 2) {
-    return FlowData().agreedTermsAndConditions != null;
-  }
-
-  if (currentPage == 2 && nextPage == 3) {
-    return FlowData().agreedPrivacyPolicy != null;
-  }
-  return true;
-}
+typedef AllowPageChangeFn = bool Function();
 
 class IntroPageController extends PageController {
   IntroPageController() : super();
+
+  List<AllowPageChangeFn> allowPageChangeFns = [];
 
   @override
   Future<void> animateToPage(
@@ -247,17 +256,30 @@ class IntroPageController extends PageController {
     required Duration duration,
     required Curve curve,
   }) {
-    if (!allowPageChange(this.page!.round(), page)) {
+    print("INTRO: animateToPage $page");
+    // Must pass all tests up until the page that is being animated to
+    if (!allowPageChange(page)) {
       return Future.value();
     }
+
     return super.animateToPage(page, duration: duration, curve: curve);
   }
 
   @override
   void jumpToPage(int page) {
-    if (!allowPageChange(this.page!.round(), page)) {
+    if (!allowPageChange(page)) {
       return;
     }
     super.jumpToPage(page);
+  }
+
+  bool allowPageChange(int pageTo) {
+    for (AllowPageChangeFn e in allowPageChangeFns.sublist(0, pageTo)) {
+      if (!e()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

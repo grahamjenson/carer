@@ -22,7 +22,7 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
   SettingsTile nightScoutSettings() {
     var description = "Not Set";
 
-    if (SecureSettings().nightscoutURL != null) {
+    if (SecureSettings().nightscoutURLAndTokenSet()) {
       var lastFetched = NSClient().lastFetched.value;
       var lastError = NSClient().lastError.value;
       var times = [];
