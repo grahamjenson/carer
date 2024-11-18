@@ -236,7 +236,7 @@ class CarePage extends StatelessWidget {
       descriptionInlineIos: true,
       onPressed: (context) async {
         bool? areYouSure =
-            await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', e.description);
+            await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Set Temp Target");
 
         if (areYouSure == true) {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
@@ -262,7 +262,7 @@ class CarePage extends StatelessWidget {
       title: Text('Add ${carbs}g Carb'),
       onPressed: (context) async {
         bool? areYouSure =
-            await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', e.description);
+            await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Add Carbs");
 
         if (areYouSure == true) {
           var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;

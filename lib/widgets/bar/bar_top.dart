@@ -17,12 +17,20 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
+        var fixedWidth = 100.0;
         List<Widget> tiles = [
-          const CurrentTimeWidget(),
-          const Spacer(),
-          const StatusesBar(),
-          const Spacer(),
-          AlarmsBarIcons(),
+          SizedBox(
+            width: fixedWidth,
+            child: const CurrentTimeWidget(),
+          ),
+          SizedBox(
+            width: fixedWidth,
+            child: const StatusesBar(),
+          ),
+          SizedBox(
+            width: fixedWidth,
+            child: AlarmsBarIcons(),
+          ),
         ];
 
         return BottomAppBar(

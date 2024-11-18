@@ -12,11 +12,11 @@ class ColorSchemes {
   // Trying to use the themes from Diabetes awareness month nz logo
   static const textColor = Color(0xFFefeeec);
   static const backgroundColor = Color(0xFF323231);
-  static const primaryColor = Color(0xFFFFCD36);
+  static const primaryColor = Colors.amber;
   static const primaryFgColor = Color(0xFF080705);
-  static const secondaryColor = Color(0xFFffb600);
+  static const secondaryColor = Colors.amberAccent;
   static const secondaryFgColor = Color(0xFF080705);
-  static const accentColor = Color(0xFF3accf8);
+  static const accentColor = Colors.lightBlueAccent;
   static const accentFgColor = Color(0xFF080705);
   static const errorColor = Color(0xffB3261E);
   static const onErrorColor = Color(0xffFFFFFF);

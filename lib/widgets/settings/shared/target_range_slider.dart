@@ -57,6 +57,7 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
                   height: 20,
                   child: RangeSlider(
                     values: RangeValues(low, high),
+                    activeColor: ColorSchemes.primaryColor, // static so not dim at night
                     divisions: 230,
                     min: minRange,
                     max: maxRange,
