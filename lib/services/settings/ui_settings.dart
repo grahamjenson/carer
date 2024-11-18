@@ -33,6 +33,7 @@ class UISettings {
 
   Unit get unit => _signals[_UINames.unit]!.value as Unit;
   set unit(Unit value) => _signals[_UINames.unit]!.value = value;
+  ASignal get unitSignal => _signals[_UINames.unit]!;
 
   bool get enableDim => _signals[_UINames.enableDim]!.value as bool;
   set enableDim(bool value) => _signals[_UINames.enableDim]!.value = value;

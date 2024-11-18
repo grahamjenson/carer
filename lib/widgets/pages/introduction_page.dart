@@ -271,7 +271,6 @@ class IntroPageController extends PageController {
     required Duration duration,
     required Curve curve,
   }) {
-    print("INTRO: animateToPage $page");
     // Must pass all tests up until the page that is being animated to
     if (!allowPageChange(page)) {
       return Future.value();

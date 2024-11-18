@@ -2,83 +2,101 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/shared/target_range_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
+import 'package:flutter/services.dart';
 
-class PlusMinusText extends StatelessWidget with ThemeMixin {
-  final GetStr getText;
+class PlusMinusText extends StatefulWidget with ThemeMixin {
+  final GetStr getStr;
+  final FromStr fromStr;
   final Getter getValue;
-  final double diff;
+
   final Setter setValue;
   final List<ASignal> dependencies;
 
   const PlusMinusText({
     super.key,
-    required this.getText,
+    required this.getStr,
+    required this.fromStr,
     required this.getValue,
-    required this.diff,
     required this.setValue,
     required this.dependencies,
   });
 
   @override
+  State<PlusMinusText> createState() => _PlusMinusTextState();
+}
+
+class _PlusMinusTextState extends State<PlusMinusText> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.getStr(widget.getValue());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      double value = getValue();
-      String text = getText(value);
+      // https://medium.com/@gabrieloranekwu/number-input-on-flutter-textfields-the-right-way-06441f7b5550
+      _controller.text = widget.getStr(widget.getValue());
 
-      var constraints = const BoxConstraints(
-        minWidth: 20,
-        minHeight: 20,
-        maxHeight: 20,
-        maxWidth: 20,
-      );
-      var style = ButtonStyle(
-        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(3),
+      return Container(
+        alignment: Alignment.center,
+        width: 50,
+        height: 30,
+        child: TextField(
+          controller: _controller,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            SinglePeriodEnforcer(),
+          ],
+          style: const TextStyle(
+            fontSize: 12,
+            height: 0.8,
+            color: ColorSchemes.primaryColor,
           ),
-        ),
-        backgroundColor: WidgetStateProperty.all(
-          primaryColor(context),
-        ),
-      );
-
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 14,
-            height: 14,
-            margin: const EdgeInsets.only(right: 2),
-            padding: const EdgeInsets.all(0),
-            alignment: Alignment.centerRight,
-            child: IconButton(
-              padding: const EdgeInsets.all(0),
-              constraints: constraints,
-              style: style,
-              onPressed: () => setValue(value - diff),
-              icon: const Icon(UniconsLine.minus, size: 13, color: Colors.black),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.all(0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(0),
             ),
           ),
-          Text(text, style: const TextStyle(fontSize: 14, height: 0.8)),
-          Container(
-            width: 14,
-            height: 14,
-            margin: const EdgeInsets.only(left: 2),
-            padding: const EdgeInsets.all(0),
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              padding: const EdgeInsets.all(0),
-              constraints: constraints,
-              style: style,
-              onPressed: () => setValue(value + diff),
-              icon: const Icon(UniconsLine.plus, size: 13, color: Colors.black),
-            ),
-          ),
-        ],
+          onEditingComplete: () => setValue(),
+          onTapOutside: (event) => setValue(),
+        ),
       );
-    }, debugLabel: "PlusMinusText", dependencies: dependencies);
+    }, debugLabel: "PlusMinusText", dependencies: widget.dependencies);
+  }
+
+  setValue() {
+    FocusScope.of(context).unfocus();
+    double? value = widget.fromStr(_controller.text);
+    if (value != null) {
+      widget.setValue(value);
+      _controller.text = widget.getStr(widget.getValue());
+    }
+  }
+}
+
+class SinglePeriodEnforcer extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final newText = newValue.text;
+    // Allow only one period
+    if ('.'.allMatches(newText).length <= 1) {
+      return newValue;
+    }
+    return oldValue;
   }
 }

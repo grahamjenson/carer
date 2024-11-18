@@ -148,8 +148,6 @@ class CarePage extends StatelessWidget {
               title: SettingsSlider(
                 title: e.description,
                 getValue: () => e.getCarbs().toDouble(),
-                getStr: (double val) => val.toString(),
-                getDiff: () => 1,
                 setValue: (double val) => e.setCarbs(val.toInt()),
                 minRange: CareSettings().MIN_CARBS.toDouble(),
                 maxRange: CareSettings().MAX_CARBS.toDouble(),
@@ -164,12 +162,6 @@ class CarePage extends StatelessWidget {
   }
 
   List<SettingsSection> getTempTargetEdit(TempTargetSettingsModel e) {
-    var unit = UISettings().unit;
-    double diff = 1;
-    if (unit == Unit.mmol) {
-      diff = MGtoMMOL / 10;
-    }
-
     return [
       SettingsSection(
         title: Text(e.name),
@@ -184,10 +176,10 @@ class CarePage extends StatelessWidget {
               title: "Range",
               getLow: () => e.getLow(),
               getHigh: () => e.getHigh(),
-              getStr: (double val) => unit.str(val),
-              getDiff: () => diff,
               setLow: (double val) => e.setLow(val),
               setHigh: (double val) => e.setHigh(val),
+              getStr: (double val) => UISettings().unit.str(val),
+              fromStr: (String str) => UISettings().unit.fromStr(str),
               minRange: 72,
               maxRange: 180,
               dependencies: const [],
@@ -197,8 +189,6 @@ class CarePage extends StatelessWidget {
             title: SettingsSlider(
               title: "Duration",
               getValue: () => e.getDuration().toDouble(),
-              getStr: (double val) => val.toString(),
-              getDiff: () => 5,
               setValue: (double val) => e.setDuration(val.toInt()),
               minRange: 1,
               maxRange: 120,

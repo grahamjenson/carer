@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 typedef Setter = void Function(double);
 typedef Getter = double Function();
 typedef GetStr = String Function(double);
+typedef FromStr = double? Function(String);
 
 class SettingsSlider extends StatelessWidget with ThemeMixin {
   final String title;
@@ -16,8 +17,8 @@ class SettingsSlider extends StatelessWidget with ThemeMixin {
   final Getter getValue;
   final Setter setValue;
 
-  final Getter getDiff;
-  final GetStr getStr;
+  final FromStr? fromStr;
+  final GetStr? getStr;
 
   final List<ASignal> dependencies;
 
@@ -25,8 +26,8 @@ class SettingsSlider extends StatelessWidget with ThemeMixin {
     super.key,
     required this.title,
     required this.getValue,
-    required this.getStr,
-    required this.getDiff,
+    this.getStr,
+    this.fromStr,
     required this.setValue,
     required this.minRange,
     required this.maxRange,
@@ -38,20 +39,19 @@ class SettingsSlider extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var diff = getDiff();
         var value = getValue();
 
         return Row(children: [
-          Expanded(flex: 2, child: Text(title)),
+          Expanded(flex: 4, child: Text(title)),
           PlusMinusText(
-            getText: getStr,
+            getStr: getStr ?? (double val) => val.toString(),
+            fromStr: fromStr ?? (String str) => double.tryParse(str),
             getValue: getValue,
-            diff: diff,
             setValue: setValue,
             dependencies: dependencies,
           ),
           Expanded(
-              flex: 5,
+              flex: 11,
               child: Container(
                   alignment: Alignment.center,
                   height: 20,

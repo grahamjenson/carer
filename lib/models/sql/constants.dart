@@ -44,6 +44,20 @@ enum Unit {
     }
   }
 
+  double? fromStr(String val) {
+    double? maybeValue = double.tryParse(val);
+    if (maybeValue == null) {
+      return null;
+    }
+
+    switch (this) {
+      case Unit.mg:
+        return maybeValue;
+      case Unit.mmol:
+        return maybeValue * MGtoMMOL;
+    }
+  }
+
   String strWithUnit(num value) {
     return '${str(value)}$name';
   }

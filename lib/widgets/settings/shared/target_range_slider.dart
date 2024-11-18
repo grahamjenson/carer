@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 typedef Setter = void Function(double);
 typedef Getter = double Function();
+
 typedef GetStr = String Function(double);
+typedef FromStr = double? Function(String);
 
 class TargetRangeSlider extends StatelessWidget with ThemeMixin {
   final String title;
@@ -13,8 +15,9 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
   final double maxRange;
   final Getter getLow;
   final Getter getHigh;
-  final Getter getDiff;
-  final GetStr getStr;
+
+  final GetStr? getStr;
+  final FromStr? fromStr;
   final Setter setLow;
   final Setter setHigh;
   final List<ASignal> dependencies;
@@ -24,8 +27,8 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
     required this.title,
     required this.getLow,
     required this.getHigh,
-    required this.getStr,
-    required this.getDiff,
+    this.getStr,
+    this.fromStr,
     required this.setLow,
     required this.setHigh,
     required this.minRange,
@@ -37,16 +40,15 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var diff = getDiff();
         var low = getLow();
         var high = getHigh();
 
         return Row(children: [
           Expanded(flex: 2, child: Text(title)),
           PlusMinusText(
-            getText: getStr,
+            getStr: getStr ?? (double val) => val.toString(),
+            fromStr: fromStr ?? (String str) => double.tryParse(str),
             getValue: getLow,
-            diff: diff,
             setValue: setLow,
             dependencies: dependencies,
           ),
@@ -67,9 +69,9 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
                     },
                   ))),
           PlusMinusText(
-            getText: getStr,
+            getStr: getStr ?? (double val) => val.toString(),
+            fromStr: fromStr ?? (String str) => double.tryParse(str),
             getValue: getHigh,
-            diff: diff,
             setValue: setHigh,
             dependencies: dependencies,
           ),
