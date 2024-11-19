@@ -53,7 +53,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
         child: TextField(
           controller: _controller,
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            FilteringTextInputFormatter.allow(RegExp(r'-?[0-9.]?')),
             SinglePeriodEnforcer(),
           ],
           style: const TextStyle(
@@ -61,7 +61,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
             height: 0.8,
             color: ColorSchemes.primaryColor,
           ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
           textAlign: TextAlign.center,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(0),

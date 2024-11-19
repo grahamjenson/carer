@@ -149,6 +149,7 @@ class CarePage extends StatelessWidget {
                 title: e.description,
                 getValue: () => e.getCarbs().toDouble(),
                 setValue: (double val) => e.setCarbs(val.toInt()),
+                getStr: (double val) => val.toInt().toString(),
                 minRange: CareSettings().MIN_CARBS.toDouble(),
                 maxRange: CareSettings().MAX_CARBS.toDouble(),
                 divisions: CareSettings().MAX_CARBS - CareSettings().MIN_CARBS,

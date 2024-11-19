@@ -57,6 +57,7 @@ class SettingsSlider extends StatelessWidget with ThemeMixin {
                   height: 20,
                   child: Slider(
                     value: value,
+                    activeColor: ColorSchemes.primaryColor,
                     divisions: 100,
                     min: minRange,
                     max: maxRange,
