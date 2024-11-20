@@ -21,6 +21,18 @@ abstract class ASGV {
   String unitStr() {
     return UISettings().unit.str(value);
   }
+
+  // Override equals if same value and date it is the same
+  @override
+  bool operator ==(Object other) {
+    if (other is ASGV) {
+      return other.value == value && other.date == date;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => value.hashCode ^ date.hashCode;
 }
 
 class SGV extends DBModel implements ASGV {

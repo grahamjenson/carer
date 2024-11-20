@@ -104,6 +104,10 @@ abstract class SQLReadMapper<T extends DBModel> extends DataMapper<SQLRow, T> {
 abstract class SQLMapper<T extends DBModel> extends SQLReadMapper<T> {
   final ASignal<int> writeSignal = ASignal(0, debugLabel: "${T}Write");
 
+  void updateWriteSignal() {
+    writeSignal.value = writeSignal.peek() + 1;
+  }
+
   Future<bool> saveRow(SQLRow row) {
     return save(aToB(row));
   }
@@ -127,7 +131,7 @@ abstract class SQLMapper<T extends DBModel> extends SQLReadMapper<T> {
     if (ret) {
       model.id = id;
       if (withSignal) {
-        writeSignal.value = clock.now().millisecondsSinceEpoch;
+        updateWriteSignal();
       }
     }
     return ret;
@@ -165,7 +169,7 @@ abstract class SQLMapper<T extends DBModel> extends SQLReadMapper<T> {
 
     if (saves > 0) {
       if (withSignal) {
-        writeSignal.value = clock.now().millisecondsSinceEpoch;
+        updateWriteSignal();
       }
     }
     return saves;
@@ -292,7 +296,7 @@ abstract class SQLMapper<T extends DBModel> extends SQLReadMapper<T> {
     var ret = id != null && id != 0;
     if (ret) {
       if (withSignal) {
-        writeSignal.value = clock.now().millisecondsSinceEpoch;
+        updateWriteSignal();
       }
     }
 

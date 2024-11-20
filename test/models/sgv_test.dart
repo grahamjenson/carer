@@ -17,30 +17,37 @@ void main() async {
     Duration min5 = const Duration(minutes: 5);
     Duration hour48 = const Duration(hours: 48);
 
-    setUp(() async {});
-
-    tearDown(() async {
+    setUp(() async {
       await (await CarerDB.instance).deleteAll();
+      CleanSGV.setupSQLSignals();
     });
 
+    tearDown(() async {});
+
     test("lastSGV", () async {
-      var sgv = CleanSGV.lastSGV.value;
-      expect(sgv, null);
-      expect(CleanSGV.count(), 0);
+      await withClock(Clock.fixed(now), () async {
+        var stream = CleanSGV.lastSGV.stream;
+        expect(stream, emits((o) {
+          expect(o, null);
+          expect(CleanSGV.count(), 0);
+          return true;
+        }));
 
-      expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
-      expect(CleanSGV.count(), 1);
-      sgv = CleanSGV.lastSGV.value;
-      expect(sgv!.value, 2);
-      expect(sgv.rate5m, null);
+        expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
+        expect(stream, emits((o) {
+          expect(o, CleanSGV(2, now.subtract(min5)));
+          expect(CleanSGV.count(), 1);
+          return true;
+        }));
 
-      // Add more recent number
+        expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
 
-      expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
-      expect(CleanSGV.count(), 2);
-      sgv = CleanSGV.lastSGV.value;
-      expect(sgv!.value, 1);
-      expect(sgv.rate5m, -1);
+        expect(stream, emits((o) {
+          expect(o, CleanSGV(1, now));
+          expect(CleanSGV.count(), 2);
+          return true;
+        }));
+      });
     });
 
     test("percents", () async {

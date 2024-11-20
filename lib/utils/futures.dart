@@ -83,6 +83,8 @@ class ASignal<T> extends Signal<T> {
   }
 
   Duration get lastSetAgo => DateTime.now().difference(lastSet);
+
+  Stream<T> get stream => toStream();
 }
 
 class ATimerSignal extends TimerSignal {
