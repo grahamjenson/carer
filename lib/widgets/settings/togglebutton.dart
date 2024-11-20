@@ -10,7 +10,12 @@ class ToggleButton extends StatelessWidget with ThemeMixin {
   final GestureLongPressCallback? onLongPress;
 
   const ToggleButton(
-      {super.key, required this.text, this.height = 40, this.width = 40, this.textStyle = const TextStyle(fontSize: 10), this.onLongPress});
+      {super.key,
+      required this.text,
+      this.height = 40,
+      this.width = 40,
+      this.textStyle = const TextStyle(fontSize: 10, color: ColorSchemes.primaryColor),
+      this.onLongPress});
 
   @override
   Widget build(BuildContext context) {

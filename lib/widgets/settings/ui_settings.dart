@@ -21,9 +21,9 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
         var unit = UISettings().unit;
         var keepScreenActiveDescript = const Text('Keep the awake.\nWhen screen is asleep alarms wont work!');
         if (!UISettings().screenActive) {
-          keepScreenActiveDescript = Text(
+          keepScreenActiveDescript = const Text(
             'Alarms wont work when screen is asleep!',
-            style: TextStyle(color: primaryColor(context)),
+            style: TextStyle(color: ColorSchemes.primaryColor),
           );
         }
         return SettingsSection(
@@ -105,7 +105,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
           child: Text(
             "Cancel\nOverride",
             textAlign: TextAlign.center,
-            style: labelSmall(context).copyWith(color: primaryColor(context)),
+            style: labelSmall(context).copyWith(color: ColorSchemes.primaryColor),
           ),
         ),
       );
@@ -122,7 +122,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
           child: Text(
             "Set Night\nUntil Sunrise",
             textAlign: TextAlign.center,
-            style: labelSmall(context).copyWith(color: primaryColor(context)),
+            style: labelSmall(context).copyWith(color: ColorSchemes.primaryColor),
           ),
         ),
       );
@@ -138,7 +138,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
           child: Text(
             "Set Day\nUntil Sunset",
             textAlign: TextAlign.center,
-            style: labelSmall(context).copyWith(color: primaryColor(context)),
+            style: labelSmall(context).copyWith(color: ColorSchemes.primaryColor),
           ),
         ),
       );

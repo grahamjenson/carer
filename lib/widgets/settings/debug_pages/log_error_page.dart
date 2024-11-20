@@ -2,7 +2,6 @@ import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 
 class LogErrorPage extends StatefulWidget {
   const LogErrorPage({super.key});
@@ -14,25 +13,18 @@ class LogErrorPage extends StatefulWidget {
 class _LogErrorPageState extends State<LogErrorPage> {
   final TextEditingController controller = TextEditingController();
 
-  final ASignal<String> text = ASignal<String>('', debugLabel: "LogSearchText");
-  late Computed<String> predictionsSignal;
+  _LogErrorPageState();
 
-  _LogErrorPageState() {
-    controller.addListener(() {
-      text.value = controller.text;
-    });
-    predictionsSignal = acomputed(() {
-      String logString = ALogger().getPrettyLogs();
-      return logString.split('\n').where((line) => line.contains(text.value)).join('\n');
-    }, "", debugLabel: "DebugLogErrorPage", dependencies: [TimerService().secondSignal]);
+  String getFilteredLogLines() {
+    String logString = ALogger().getPrettyLogs();
+    return logString.split('\n').where((line) => line.contains(controller.text)).join('\n');
   }
 
   // on destroy dispose of the controller
   @override
   void dispose() {
     controller.dispose();
-    text.dispose();
-    predictionsSignal.dispose();
+
     super.dispose();
   }
 
@@ -54,16 +46,20 @@ class _LogErrorPageState extends State<LogErrorPage> {
               ),
             ),
             Expanded(
-              child: AWatch((_) {
-                return SingleChildScrollView(
-                    child: SelectableText(
-                  predictionsSignal.value,
-                  style: const TextStyle(
-                    fontSize: 8,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ));
-              }, debugLabel: "LogErrorPage"),
+              child: AWatch(
+                (_) {
+                  return SingleChildScrollView(
+                      child: SelectableText(
+                    getFilteredLogLines(),
+                    style: const TextStyle(
+                      fontSize: 8,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                  ));
+                },
+                debugLabel: "LogErrorPage",
+                dependencies: [TimerService().secondSignal],
+              ),
             )
           ],
         ),

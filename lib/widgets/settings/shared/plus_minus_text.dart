@@ -11,6 +11,7 @@ class PlusMinusText extends StatefulWidget with ThemeMixin {
 
   final Setter setValue;
   final List<ASignal> dependencies;
+  final bool signed;
 
   const PlusMinusText({
     super.key,
@@ -19,6 +20,7 @@ class PlusMinusText extends StatefulWidget with ThemeMixin {
     required this.getValue,
     required this.setValue,
     required this.dependencies,
+    this.signed = false,
   });
 
   @override
@@ -46,6 +48,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
       // https://medium.com/@gabrieloranekwu/number-input-on-flutter-textfields-the-right-way-06441f7b5550
       _controller.text = widget.getStr(widget.getValue());
 
+      var regex = widget.signed ? r'[-+]?[0-9.]?' : r'[0-9.]?';
       return Container(
         alignment: Alignment.center,
         width: 50,
@@ -53,7 +56,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
         child: TextField(
           controller: _controller,
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'-?[0-9.]?')),
+            FilteringTextInputFormatter.allow(RegExp(regex)),
             SinglePeriodEnforcer(),
           ],
           style: const TextStyle(
@@ -61,7 +64,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
             height: 0.8,
             color: ColorSchemes.primaryColor,
           ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+          keyboardType: TextInputType.numberWithOptions(decimal: true, signed: widget.signed),
           textAlign: TextAlign.center,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(0),

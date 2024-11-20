@@ -183,27 +183,6 @@ EffectCleanup aeffect(
   }, debugLabel: debugLabel, onDispose: onDispose);
 }
 
-Computed<T> acomputed<T>(
-  ComputedCallback<T> compute,
-  T onError, {
-  required String debugLabel,
-  bool autoDispose = false,
-  List<ReadonlySignal<dynamic>> dependencies = const [],
-}) {
-  registerSignal(debugLabel);
-  return computed(() {
-    try {
-      for (var dep in dependencies) {
-        dep.value;
-      }
-      return compute();
-    } catch (e, stackTrace) {
-      Errors.captureError(e, stackTrace);
-      return onError;
-    }
-  }, debugLabel: debugLabel, autoDispose: autoDispose);
-}
-
 class SignalsDevObserverWrapper extends DevToolsSignalsObserver {
   @override
   void log(String message) {

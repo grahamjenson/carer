@@ -22,6 +22,7 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
   final Setter setHigh;
   final List<ASignal> dependencies;
 
+  final bool signed;
   const TargetRangeSlider({
     super.key,
     required this.title,
@@ -34,6 +35,7 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
     required this.minRange,
     required this.maxRange,
     required this.dependencies,
+    this.signed = false,
   });
 
   @override
@@ -51,6 +53,7 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
             getValue: getLow,
             setValue: setLow,
             dependencies: dependencies,
+            signed: signed,
           ),
           Expanded(
               flex: 5,
@@ -74,6 +77,7 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
             getValue: getHigh,
             setValue: setHigh,
             dependencies: dependencies,
+            signed: signed,
           ),
         ]);
       },
