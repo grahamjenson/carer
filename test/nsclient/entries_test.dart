@@ -7,44 +7,44 @@ import '../test_utils.dart';
 import 'fixtures/files.dart';
 
 void main() async {
-  await sqfliteTestInit();
+  agroup('NSEntries', () {
+    atest('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
+      final file = File(files["entries_basic"]!);
+      final jsonString = await file.readAsString();
 
-  test('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
-    final file = File(files["entries_basic"]!);
-    final jsonString = await file.readAsString();
+      NSEntries entries = NSEntries.fromJson(jsonString);
 
-    NSEntries entries = NSEntries.fromJson(jsonString);
+      expect(entries.entries, isNotEmpty);
+      expect(entries.entries.length, equals(1));
 
-    expect(entries.entries, isNotEmpty);
-    expect(entries.entries.length, equals(1));
+      NSEntry entry = entries.entries[0];
+      expect(entry.id, equals("65a842f04b47405049900d0"));
+      expect(entry.app, equals("AAPS"));
+    });
 
-    NSEntry entry = entries.entries[0];
-    expect(entry.id, equals("65a842f04b47405049900d0"));
-    expect(entry.app, equals("AAPS"));
-  });
+    atest('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
+      final file = File(files["entries"]!);
+      final jsonString = await file.readAsString();
 
-  test('NSEntries.fromJson should parse JSON and create NSEntries object', () async {
-    final file = File(files["entries"]!);
-    final jsonString = await file.readAsString();
+      NSEntries entries = NSEntries.fromJson(jsonString);
 
-    NSEntries entries = NSEntries.fromJson(jsonString);
+      expect(entries.entries, isNotEmpty);
+      expect(entries.entries.length, equals(1000));
+    });
 
-    expect(entries.entries, isNotEmpty);
-    expect(entries.entries.length, equals(1000));
-  });
+    atest('parsing bad entries will return empty NSEntries object', () async {
+      final file = File(files["entries_bad"]!);
+      final jsonString = await file.readAsString();
 
-  test('parsing bad entries will return empty NSEntries object', () async {
-    final file = File(files["entries_bad"]!);
-    final jsonString = await file.readAsString();
+      bool caught = true;
+      try {
+        NSEntries.fromJson(jsonString);
+      } catch (e) {
+        expect(e, isA<TypeError>());
+        caught = true;
+      }
 
-    bool caught = true;
-    try {
-      NSEntries.fromJson(jsonString);
-    } catch (e) {
-      expect(e, isA<TypeError>());
-      caught = true;
-    }
-
-    expect(caught, isTrue);
+      expect(caught, isTrue);
+    });
   });
 }

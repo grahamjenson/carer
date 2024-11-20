@@ -2,56 +2,46 @@ import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/sql/sqlmodel.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../sql/utils.dart';
 import '../test_utils.dart';
 
 void main() async {
   agroup('SGV', () {
-    DateTime now = DateTime(2020, 1, 1, 12);
-    Duration min5 = const Duration(minutes: 5);
-    Duration hour48 = const Duration(hours: 48);
+    atest("lastSGV", (DateTime now) async {
+      var stream = CleanSGV.lastSGV.stream;
+      expect(stream, emits((o) {
+        expect(o, null);
+        expect(CleanSGV.count(), 0);
+        return true;
+      }));
 
-    test("lastSGV", () async {
-      await withClock(Clock.fixed(now), () async {
-        var stream = CleanSGV.lastSGV.stream;
-        expect(stream, emits((o) {
-          expect(o, null);
-          expect(CleanSGV.count(), 0);
-          return true;
-        }));
+      expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
+      expect(stream, emits((o) {
+        expect(o, CleanSGV(2, now.subtract(min5)));
+        expect(CleanSGV.count(), 1);
+        return true;
+      }));
 
-        expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
-        expect(stream, emits((o) {
-          expect(o, CleanSGV(2, now.subtract(min5)));
-          expect(CleanSGV.count(), 1);
-          return true;
-        }));
+      expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
 
-        expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
-
-        expect(stream, emits((o) {
-          expect(o, CleanSGV(1, now));
-          expect(CleanSGV.count(), 2);
-          return true;
-        }));
-      });
+      expect(stream, emits((o) {
+        expect(o, CleanSGV(1, now));
+        expect(CleanSGV.count(), 2);
+        return true;
+      }));
     });
 
-    test("percents", () async {
+    atest("percents", (DateTime now) async {
       expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(hour48), eid: "1")), true);
       expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5 + min5), eid: "2")), true);
       expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5), eid: "3")), true);
 
-      await withClock(Clock.fixed(now), () async {
-        var percent = CleanSGV.todaysPercentage.value;
-        expect(percent, 100.0);
-      });
+      var percent = CleanSGV.todaysPercentage.value;
+      expect(percent, 100.0);
     });
 
-    test('orderOFSVGs', () async {
+    atest('orderOFSVGs', () async {
       // create SGVs
       var ret = await Future.wait([
         SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})),
@@ -89,7 +79,7 @@ void main() async {
       expect(sgvs.first.value, 1);
     });
 
-    test('validation', () async {
+    atest('validation', () async {
       List<Map<String, Object>> badInputs = [
         {},
         {'value': 1},

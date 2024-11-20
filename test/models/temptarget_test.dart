@@ -1,26 +1,12 @@
 import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/models/sql/temptarget.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
 void main() async {
-  await sqfliteTestInit();
-
-  group('Temptargets', () {
-    DateTime now = DateTime(2020, 1, 1, 12);
-    Duration min1 = const Duration(minutes: 1);
-    Duration min5 = const Duration(minutes: 5);
-    Duration hour48 = const Duration(hours: 48);
-
-    setUp(() async {});
-
-    tearDown(() async {
-      await (await CarerDB.instance).deleteAll();
-    });
-
-    test("createAndupdate", () async {
+  agroup('Temptargets', () {
+    atest("createAndupdate", (DateTime now) async {
       var tt1 = TempTarget(
         startDate: now.add(min5),
         duration: 60,
@@ -86,7 +72,7 @@ void main() async {
       expect(ttl4[0].duration, 30); // Duration should be the only thing updated
     });
 
-    test('update duration to 0', () async {
+    atest('update duration to 0', (DateTime now) async {
       var tt1 = TempTarget(
         startDate: now.add(min5),
         duration: 60,

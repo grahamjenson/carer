@@ -8,9 +8,7 @@ import '../test_utils.dart';
 /// Initialize sqflite for test.
 
 void main() async {
-  await sqfliteTestInit();
-
-  group('KeyValueStore', () {
+  agroup('KeyValueStore', () {
     late KeyValueStore store;
 
     setUp(() async {
@@ -21,7 +19,7 @@ void main() async {
       await store.deleteAll();
     });
 
-    test('insert and upsert', () async {
+    atest('insert and upsert', () async {
       await store.setString('a', 'x');
       expect(store.get('a'), 'x');
 
@@ -29,7 +27,7 @@ void main() async {
       expect(store.get('a'), 'y');
     });
 
-    test('delete', () async {
+    atest('delete', () async {
       await store.setString('a', 'x');
       expect(store.get('a'), 'x');
 
@@ -37,7 +35,7 @@ void main() async {
       expect(store.get('a'), null);
     });
 
-    test('deleteAll', () async {
+    atest('deleteAll', () async {
       await store.setString('a', 'x');
       await store.setString('b', 'y');
       expect(store.get('a'), 'x');
@@ -48,14 +46,14 @@ void main() async {
       expect(store.get('b'), null);
     });
 
-    test('getKeys', () async {
+    atest('getKeys', () async {
       await store.setString('a', 'x');
       await store.setString('b', 'y');
       expect(store.getKeys(), ['a', 'b']);
     });
 
     // Test all the types work
-    test('storing bool', () async {
+    atest('storing bool', () async {
       expect(store.getBool('a'), null);
       expect(store.getBool('a', defaultValue: true), true);
       expect(store.getBool('a', defaultValue: false), false);
@@ -66,7 +64,7 @@ void main() async {
       expect(store.getBool('a'), true);
     });
 
-    test('storing int', () async {
+    atest('storing int', () async {
       expect(store.getInt('a'), null);
       expect(store.getInt('a', defaultValue: 3), 3);
 
@@ -76,7 +74,7 @@ void main() async {
       expect(store.getInt('a'), 1);
     });
 
-    test('storing double', () async {
+    atest('storing double', () async {
       expect(store.getDouble('a'), null);
       expect(store.getDouble('a', defaultValue: 1.5), 1.5);
 
@@ -86,7 +84,7 @@ void main() async {
       expect(store.getDouble('a'), 1.1);
     });
 
-    test('storing String', () async {
+    atest('storing String', () async {
       expect(store.getString('a'), null);
       expect(store.getString('a', defaultValue: "z"), 'z');
 

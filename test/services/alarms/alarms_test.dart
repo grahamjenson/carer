@@ -1,42 +1,16 @@
-import 'package:carer/mappers/sql/bolus.dart';
-import 'package:carer/mappers/sql/carbs.dart';
-import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/mappers/sql/sgv.dart';
-import 'package:carer/mappers/sql/tempbasal.dart';
-import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../test_utils.dart';
 
-cleanSignals() {
-  SQLToBolus().writeSignal.value = 0;
-  SQLToCarbs().writeSignal.value = 0;
-  SQLToProfile().writeSignal.value = 0;
-  SQLToSGV().writeSignal.value = 0;
-  SQLToTempBasal().writeSignal.value = 0;
-  SQLToTempTarget().writeSignal.value = 0;
-}
-
 void main() async {
-  await sqfliteTestInit();
-
-  group("Alarms", () {
-    setUp(() async {
-      cleanSignals();
-    });
-
-    tearDown(() async {
-      await (await CarerDB.instance).deleteAll();
-      cleanSignals();
-    });
-
-    test("HighAlarm", () async {
+  agroup("Alarms", () {
+    atest("HighAlarm", () async {
       AlarmType alarm = AlarmType.high;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -63,7 +37,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("LowAlarm", () async {
+    atest("LowAlarm", () async {
       AlarmType alarm = AlarmType.low;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -85,7 +59,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("UrgentHighAlarm", () async {
+    atest("UrgentHighAlarm", () async {
       AlarmType alarm = AlarmType.urgentHigh;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -106,7 +80,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("UrgentLowAlarm", () async {
+    atest("UrgentLowAlarm", () async {
       AlarmType alarm = AlarmType.urgentLow;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -127,7 +101,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("FastRiseAlarm", () async {
+    atest("FastRiseAlarm", () async {
       AlarmType alarm = AlarmType.fastRise;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -148,7 +122,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("FastDropAlarm", () async {
+    atest("FastDropAlarm", () async {
       AlarmType alarm = AlarmType.fastDrop;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -169,7 +143,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("NoDataAlarm", () async {
+    atest("NoDataAlarm", () async {
       AlarmType alarm = AlarmType.noData;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -189,7 +163,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    test("PredictiveLowAlarm", () async {
+    atest("PredictiveLowAlarm", () async {
       AlarmType alarm = AlarmType.low;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);

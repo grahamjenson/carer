@@ -1,29 +1,11 @@
 import 'package:carer/models/valueAtTime.dart';
-import 'package:carer/sql/carer_db.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
 void main() async {
-  await sqfliteTestInit();
-
-  group('ValueAtTime', () {
-    // TODO this will be flaky
-    DateTime now = clock.now(); // cant stub out sqlite date (uses system datetime)
-    DateTime nowMinPlus1 = DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
-    DateTime nowMin = DateTime(now.year, now.month, now.day, now.hour, now.minute);
-    DateTime now1Min = DateTime(now.year, now.month, now.day, now.hour, now.minute - 1);
-
-    DateTime now2Min = DateTime(now.year, now.month, now.day, now.hour, now.minute - 2);
-
-    setUp(() async {});
-
-    tearDown(() async {
-      await (await CarerDB.instance).deleteAll();
-    });
-
-    // test("getvaluesattime", () async {
+  agroup('ValueAtTime', () {
+    // atest("getvaluesattime", () async {
     //   var p = Profile(
     //     name: "Default",
     //     eid: "EID",

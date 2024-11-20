@@ -1,7 +1,6 @@
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/sgv.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../test_utils.dart';
 
 void main() async {
-  await sqfliteTestInit();
-
-  group('bgl', () {
-    setUp(() async {
-      CleanSGV.setupSQLSignals();
-    });
-
-    tearDown(() async {
-      await (await CarerDB.instance).deleteAll();
-    });
-
+  agroup('bgl', () {
     testWidgets('BGLWidget displays correct data', (WidgetTester tester) async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame

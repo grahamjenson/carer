@@ -1,40 +1,12 @@
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/profile.dart';
-import 'package:carer/nsclient/shared.dart';
-import 'package:carer/sql/carer_db.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
 
 void main() async {
-  await sqfliteTestInit();
-
-  NSProfile emptySummaryProfile = NSProfile(
-      id: "1",
-      name: "asd",
-      date: clock.now(),
-      dia: 1,
-      carbratio: const TimeValues(values: []),
-      sens: const TimeValues(values: []),
-      basal: const TimeValues(values: []),
-      targetLow: const TimeValues(values: []),
-      targetHigh: const TimeValues(values: []),
-      units: "",
-      timezone: "");
-
-  group('Profile', () {
-    DateTime now = DateTime(2020, 1, 1, 12);
-    Duration min5 = const Duration(minutes: 5);
-    Duration hour48 = const Duration(hours: 48);
-
-    setUp(() async {});
-
-    tearDown(() async {
-      await (await CarerDB.instance).deleteAll();
-    });
-
-    test("create", () async {
+  agroup('Profile', () {
+    atest("create", (DateTime now) async {
       var p = Profile(
         name: "Default",
         eid: "EID",
