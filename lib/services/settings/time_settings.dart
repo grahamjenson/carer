@@ -110,11 +110,11 @@ class TimeSettings {
 
     aeffect(() {
       prefs.setInt(_TimeSettingsNames.nightSunsetTime.name, tODtoInt(nightSunsetTime));
-    }, debugLabel: _TimeSettingsNames.nightSunsetTime.name);
+    }, debugLabel: "writeNightSunsetTime");
 
     aeffect(() {
       prefs.setInt(_TimeSettingsNames.nightSunriseTime.name, tODtoInt(nightSunriseTime));
-    }, debugLabel: _TimeSettingsNames.nightSunriseTime.name);
+    }, debugLabel: "writeNightSunriseTime");
   }
 
   void removeNightOverride() {

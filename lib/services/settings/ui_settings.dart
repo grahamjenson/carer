@@ -51,14 +51,14 @@ class UISettings {
 
     enableDim = prefs.getBool(_UINames.enableDim.name, defaultValue: false)!;
 
-    aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()), debugLabel: _UINames.unit.name);
+    aeffect(() => prefs.setBool(_UINames.unit.name, unit.toBool()), debugLabel: "writeUnit");
 
     aeffect(() {
       prefs.setBool(_UINames.screenActive.name, screenActive);
-    }, debugLabel: _UINames.screenActive.name);
+    }, debugLabel: 'writeCcreenActive');
 
     aeffect(() {
       prefs.setBool(_UINames.enableDim.name, enableDim);
-    }, debugLabel: _UINames.enableDim.name);
+    }, debugLabel: "writeEnableDim");
   }
 }

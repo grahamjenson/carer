@@ -211,21 +211,21 @@ class CareSettings {
     tempTargetEatingTop = prefs.getDouble(_CSNames.tempTargetEatingTop.name) ?? 90.0;
     tempTargetEatingDuration = prefs.getInt(_CSNames.tempTargetEatingDuration.name) ?? 30;
 
-    aeffect(() => prefs.setInt(_CSNames.carbs1Value.name, carbs1Value), debugLabel: 'carbs1Value');
-    aeffect(() => prefs.setInt(_CSNames.carbs2Value.name, carbs2Value), debugLabel: 'carbs2Value');
-    aeffect(() => prefs.setInt(_CSNames.carbs3Value.name, carbs3Value), debugLabel: 'carbs3Value');
-    aeffect(() => prefs.setInt(_CSNames.carbs4Value.name, carbs4Value), debugLabel: 'carbs4Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs1Value.name, carbs1Value), debugLabel: 'writecarbs1Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs2Value.name, carbs2Value), debugLabel: 'writecarbs2Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs3Value.name, carbs3Value), debugLabel: 'writecarbs3Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs4Value.name, carbs4Value), debugLabel: 'writecarbs4Value');
 
-    aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoBottom.name, tempTargetHypoBottom), debugLabel: 'tempTargetHypoBottom');
-    aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoTop.name, tempTargetHypoTop), debugLabel: 'tempTargetHypoTop');
-    aeffect(() => prefs.setInt(_CSNames.tempTargetHypoDuration.name, tempTargetHypoDuration), debugLabel: 'tempTargetHypoDuration');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoBottom.name, tempTargetHypoBottom), debugLabel: 'writetempTargetHypoBottom');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoTop.name, tempTargetHypoTop), debugLabel: 'writetempTargetHypoTop');
+    aeffect(() => prefs.setInt(_CSNames.tempTargetHypoDuration.name, tempTargetHypoDuration), debugLabel: 'writetempTargetHypoDuration');
 
-    aeffect(() => prefs.setDouble(_CSNames.tempTargetActivityBottom.name, tempTargetActivityBottom), debugLabel: 'tempTargetActivityBottom');
-    aeffect(() => prefs.setDouble(_CSNames.tempTargetActivityTop.name, tempTargetActivityTop), debugLabel: 'tempTargetActivityTop');
-    aeffect(() => prefs.setInt(_CSNames.tempTargetActivityDuration.name, tempTargetActivityDuration), debugLabel: 'tempTargetActivityDuration');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetActivityBottom.name, tempTargetActivityBottom), debugLabel: 'writetempTargetActivityBottom');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetActivityTop.name, tempTargetActivityTop), debugLabel: 'writetempTargetActivityTop');
+    aeffect(() => prefs.setInt(_CSNames.tempTargetActivityDuration.name, tempTargetActivityDuration), debugLabel: 'writetempTargetActivityDuration');
 
-    aeffect(() => prefs.setDouble(_CSNames.tempTargetEatingBottom.name, tempTargetEatingBottom), debugLabel: 'tempTargetEatingBottom');
-    aeffect(() => prefs.setDouble(_CSNames.tempTargetEatingTop.name, tempTargetEatingTop), debugLabel: 'tempTargetEatingTop');
-    aeffect(() => prefs.setInt(_CSNames.tempTargetEatingDuration.name, tempTargetEatingDuration), debugLabel: 'tempTargetEatingDuration');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetEatingBottom.name, tempTargetEatingBottom), debugLabel: 'writetempTargetEatingBottom');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetEatingTop.name, tempTargetEatingTop), debugLabel: 'writetempTargetEatingTop');
+    aeffect(() => prefs.setInt(_CSNames.tempTargetEatingDuration.name, tempTargetEatingDuration), debugLabel: 'writetempTargetEatingDuration');
   }
 }

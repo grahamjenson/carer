@@ -122,16 +122,16 @@ class TargetSettings {
     fastDropDelta = prefs.getDouble(_TNames.fastDropDelta.name, defaultValue: -20)!;
     fastRiseDelta = prefs.getDouble(_TNames.fastRiseDelta.name, defaultValue: 20)!;
 
-    aeffect(() => prefs.setDouble(_TNames.fastDropDelta.name, fastDropDelta), debugLabel: 'fastDropDelta');
+    aeffect(() => prefs.setDouble(_TNames.fastDropDelta.name, fastDropDelta), debugLabel: 'writeFastDropDelta');
 
-    aeffect(() => prefs.setDouble(_TNames.fastRiseDelta.name, fastRiseDelta), debugLabel: 'fastRiseDelta');
+    aeffect(() => prefs.setDouble(_TNames.fastRiseDelta.name, fastRiseDelta), debugLabel: 'writeFastRiseDelta');
 
-    aeffect(() => prefs.setDouble(_TNames.highTarget.name, highTarget), debugLabel: 'highTarget');
+    aeffect(() => prefs.setDouble(_TNames.highTarget.name, highTarget), debugLabel: 'writehighTarget');
 
-    aeffect(() => prefs.setDouble(_TNames.lowTarget.name, lowTarget), debugLabel: 'lowTarget');
+    aeffect(() => prefs.setDouble(_TNames.lowTarget.name, lowTarget), debugLabel: 'writelowTarget');
 
-    aeffect(() => prefs.setDouble(_TNames.highUrgent.name, highUrgent), debugLabel: 'highUrgent');
+    aeffect(() => prefs.setDouble(_TNames.highUrgent.name, highUrgent), debugLabel: 'writehighUrgent');
 
-    aeffect(() => prefs.setDouble(_TNames.lowUrgent.name, lowUrgent), debugLabel: 'lowUrgent');
+    aeffect(() => prefs.setDouble(_TNames.lowUrgent.name, lowUrgent), debugLabel: 'writelowUrgent');
   }
 }

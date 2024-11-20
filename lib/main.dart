@@ -12,13 +12,17 @@ import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/background_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/prediction_service.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
+import 'package:carer/sql/carer_db.dart';
+import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/pages/homepage.dart';
 import 'package:carer/widgets/pages/introduction_page.dart';
@@ -54,13 +58,37 @@ void runCarer() async {
   // Signals logging
   setupSignalsLogging();
 
+  await executeWithRetry(() async {
+    alog("Initilize Logging");
+  });
+
+  // Execute with retry setting up and initializing instances of the DB
+  await executeWithRetry(() async {
+    // Key value store in another db
+    var prefs = await KeyValueStore.instance;
+    await prefs.internalPopulate();
+  });
+
+  await executeWithRetry(() async {
+    final db = (await CarerDB.instance).db;
+    // Key Value store inside the main DB
+    var kvdb = KeyValueStore(db);
+    await kvdb.internalPopulate();
+  });
+
+  await executeWithRetry(() async {
+    // Setup secure storage for settings
+    await SecureSettings().store.readAll();
+  });
+
   // Load the settings from Shared Preferences before starting
-  await executeWithRetry(Settings().setupDBPropagation);
+  await Settings().setupDBPropagation();
 
   // Setup the StateData DB stuff
-  await executeWithRetry(PropertiesData().setupDBPropagation);
+  await PropertiesData().setupDBPropagation();
 
-  await executeWithRetry(FlowData().setupDBPropagation);
+  await FlowData().setupDBPropagation();
+
   // For some reason screens forget to stay awake
   aeffect(() {
     var _ = TimerService().fifteenSecondSignal.value;

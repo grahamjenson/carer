@@ -156,7 +156,7 @@ class ValueAtTime with DateMixin {
 
   static setupSQLSignals() {
     var dependencies = [TimerService().minuteSignal, SQLToProfile().writeSignal, SQLToTempBasal().writeSignal, SQLToTempTarget().writeSignal];
-    signalAssign(lastSixHours, () async => await updateValues(6), debugLabel: 'valueAtTimeLastSixHours', dependencies: dependencies);
-    signalAssign(last2Days, () async => await updateValues(48), debugLabel: 'valueAtTimeLast2Days', dependencies: dependencies);
+    signalAssign(lastSixHours, () async => await updateValues(6), debugLabel: 'fetchValueAtTimeLastSixHours', dependencies: dependencies);
+    signalAssign(last2Days, () async => await updateValues(48), debugLabel: 'fetchValueAtTimeLast2Days', dependencies: dependencies);
   }
 }

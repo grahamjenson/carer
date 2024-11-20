@@ -147,36 +147,36 @@ class AlarmSettings {
     t1dBatteryAlarm = prefs.getBool(_AlarmNames.t1dBatteryAlarm.name, defaultValue: true)!;
 
     // Turn off alarms
-    aeffect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms), debugLabel: 'disableAlarms');
+    aeffect(() => prefs.setBool(_AlarmNames.disableAlarms.name, disableAlarms), debugLabel: 'writedisableAlarms');
 
     // Target Alarms
-    aeffect(() => prefs.setBool(_AlarmNames.urgentLowAlarm.name, urgentLowAlarm), debugLabel: 'urgentLowAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.urgentLowAlarm.name, urgentLowAlarm), debugLabel: 'writeurgentLowAlarm');
 
-    aeffect(() => prefs.setBool(_AlarmNames.lowAlarm.name, lowAlarm), debugLabel: 'lowAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.lowAlarm.name, lowAlarm), debugLabel: 'writelowAlarm');
 
-    aeffect(() => prefs.setBool(_AlarmNames.highAlarm.name, highAlarm), debugLabel: 'highAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.highAlarm.name, highAlarm), debugLabel: 'writehighAlarm');
 
-    aeffect(() => prefs.setInt(_AlarmNames.highMinutes.name, highMinutes), debugLabel: 'highMinutes');
+    aeffect(() => prefs.setInt(_AlarmNames.highMinutes.name, highMinutes), debugLabel: 'writehighMinutes');
 
-    aeffect(() => prefs.setBool(_AlarmNames.urgentHighAlarm.name, urgentHighAlarm), debugLabel: 'urgentHighAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.urgentHighAlarm.name, urgentHighAlarm), debugLabel: 'writeurgentHighAlarm');
 
     // Diff alarms
 
-    aeffect(() => prefs.setInt(_AlarmNames.fastDropAlarmMinutes.name, fastDropAlarmMinutes), debugLabel: 'fastDropAlarmMinutes');
+    aeffect(() => prefs.setInt(_AlarmNames.fastDropAlarmMinutes.name, fastDropAlarmMinutes), debugLabel: 'writefastDropAlarmMinutes');
 
-    aeffect(() => prefs.setInt(_AlarmNames.fastRiseAlarmMinutes.name, fastRiseAlarmMinutes), debugLabel: 'fastRiseAlarmMinutes');
+    aeffect(() => prefs.setInt(_AlarmNames.fastRiseAlarmMinutes.name, fastRiseAlarmMinutes), debugLabel: 'writefastRiseAlarmMinutes');
 
     // No data alarms
-    aeffect(() => prefs.setInt(_AlarmNames.noDataAlarmMinutes.name, noDataAlarmMinutes), debugLabel: 'noDataAlarmMinutes');
+    aeffect(() => prefs.setInt(_AlarmNames.noDataAlarmMinutes.name, noDataAlarmMinutes), debugLabel: 'writenoDataAlarmMinutes');
 
     // Prediction alarms
-    aeffect(() => prefs.setBool(_AlarmNames.lowPredictionAlarm.name, lowPredictionAlarm), debugLabel: 'lowPredictionAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.lowPredictionAlarm.name, lowPredictionAlarm), debugLabel: 'writelowPredictionAlarm');
 
-    aeffect(() => prefs.setInt(_AlarmNames.lowPredictionMinutes.name, lowPredictionMinutes), debugLabel: 'lowPredictionMinutes');
+    aeffect(() => prefs.setInt(_AlarmNames.lowPredictionMinutes.name, lowPredictionMinutes), debugLabel: 'writelowPredictionMinutes');
 
     // Battery alarms
-    aeffect(() => prefs.setBool(_AlarmNames.carerBatteryAlarm.name, carerBatteryAlarm), debugLabel: 'carerBatteryAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.carerBatteryAlarm.name, carerBatteryAlarm), debugLabel: 'writecarerBatteryAlarm');
 
-    aeffect(() => prefs.setBool(_AlarmNames.t1dBatteryAlarm.name, t1dBatteryAlarm), debugLabel: 't1dBatteryAlarm');
+    aeffect(() => prefs.setBool(_AlarmNames.t1dBatteryAlarm.name, t1dBatteryAlarm), debugLabel: 'writet1dBatteryAlarm');
   }
 }

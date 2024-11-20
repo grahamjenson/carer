@@ -15,7 +15,7 @@ class SQLToEvents extends SQLMapper<EventModel> {
   static final SQLToEvents _singleton = SQLToEvents._();
   factory SQLToEvents() => _singleton;
   SQLToEvents._() {
-    signalAssign(lastCoupleDays, () async => await last2Days(), debugLabel: "AlarmLogslastCoupleDays", dependencies: [writeSignal]);
+    signalAssign(lastCoupleDays, () async => await last2Days(), debugLabel: "fetchAlarmLogslastCoupleDays", dependencies: [writeSignal]);
   }
 
   final ASignal<List<EventModel>> lastCoupleDays = ASignal<List<EventModel>>([], debugLabel: "AlarmLogslastCoupleDays");

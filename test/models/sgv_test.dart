@@ -1,7 +1,6 @@
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/sgv.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/sqlmodel.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,19 +9,10 @@ import '../sql/utils.dart';
 import '../test_utils.dart';
 
 void main() async {
-  await sqfliteTestInit();
-
-  group('SGV', () {
+  agroup('SGV', () {
     DateTime now = DateTime(2020, 1, 1, 12);
     Duration min5 = const Duration(minutes: 5);
     Duration hour48 = const Duration(hours: 48);
-
-    setUp(() async {
-      await (await CarerDB.instance).deleteAll();
-      CleanSGV.setupSQLSignals();
-    });
-
-    tearDown(() async {});
 
     test("lastSGV", () async {
       await withClock(Clock.fixed(now), () async {

@@ -144,32 +144,32 @@ class AlarmAlertSettings {
     enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: true)!;
     enableAutoSnoozeOff = prefs.getBool(_AANames.enableAutoSnoozeOff.name, defaultValue: true)!;
 
-    aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'smartSnoozeHigh');
+    aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'writesmartSnoozeHigh');
 
-    aeffect(() => prefs.setBool(_AANames.enableAudioAlarm.name, enableAudioAlarm), debugLabel: 'enableAudioAlarm');
+    aeffect(() => prefs.setBool(_AANames.enableAudioAlarm.name, enableAudioAlarm), debugLabel: 'writeenableAudioAlarm');
 
-    aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride), debugLabel: 'volumeOveride');
+    aeffect(() => prefs.setBool(_AANames.volumeOveride.name, volumeOveride), debugLabel: 'writevolumeOveride');
 
-    aeffect(() => prefs.setInt(_AANames.volumeOverrideValue.name, volumeOverrideValue), debugLabel: 'volumeOverrideValue');
+    aeffect(() => prefs.setInt(_AANames.volumeOverrideValue.name, volumeOverrideValue), debugLabel: 'writevolumeOverrideValue');
 
-    aeffect(() => prefs.setInt(_AANames.volumeProgressionSeconds.name, volumeProgressionSeconds), debugLabel: 'volumeProgressionSeconds');
+    aeffect(() => prefs.setInt(_AANames.volumeProgressionSeconds.name, volumeProgressionSeconds), debugLabel: 'writevolumeProgressionSeconds');
 
     aeffect(() {
       var value = (alarmAsset).name;
       prefs.setString(_AANames.alarmAsset.name, value);
-    }, debugLabel: 'alarmAsset');
+    }, debugLabel: 'writealarmAsset');
 
     aeffect(() {
       prefs.setBool(_AANames.brightnessAdjustAtNight.name, brightnessAdjustAtNight);
-    }, debugLabel: 'brightnessAdjustAtNight');
+    }, debugLabel: 'writebrightnessAdjustAtNight');
 
     aeffect(() {
       prefs.setBool(_AANames.enableFlashOnAlarm.name, enableFlashOnAlarm);
-    }, debugLabel: 'enableFlashOnAlarm');
+    }, debugLabel: 'writeenableFlashOnAlarm');
 
     aeffect(() {
       prefs.setBool(_AANames.enableAutoSnoozeOff.name, enableAutoSnoozeOff);
-    }, debugLabel: 'enableAutoSnoozeOff');
+    }, debugLabel: 'writeenableAutoSnoozeOff');
   }
 
   Timer? snoozeTimer;

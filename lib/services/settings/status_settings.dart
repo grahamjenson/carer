@@ -93,14 +93,14 @@ class StatusSettings {
     _signals[_StatusNames.statusEnabledSet]!.value =
         prefs.getString(_StatusNames.statusEnabledSet.name, defaultValue: defaultStatusString)!.split(',').toSet();
 
-    aeffect(() => prefs.setInt(_StatusNames.cannulaDays.name, cannulaDays), debugLabel: 'cannulaDays');
+    aeffect(() => prefs.setInt(_StatusNames.cannulaDays.name, cannulaDays), debugLabel: 'writecannulaDays');
 
-    aeffect(() => prefs.setInt(_StatusNames.sensorDays.name, sensorDays), debugLabel: 'sensorDays');
+    aeffect(() => prefs.setInt(_StatusNames.sensorDays.name, sensorDays), debugLabel: 'writesensorDays');
 
     aeffect(() => prefs.setString(_StatusNames.infoEnabledSet.name, _signals[_StatusNames.infoEnabledSet]!.value.join(',')),
-        debugLabel: 'infoEnabled');
+        debugLabel: 'writeinfoEnabled');
 
     aeffect(() => prefs.setString(_StatusNames.statusEnabledSet.name, _signals[_StatusNames.statusEnabledSet]!.value.join(',')),
-        debugLabel: 'statusEnabled');
+        debugLabel: 'writestatusEnabled');
   }
 }

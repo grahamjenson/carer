@@ -81,7 +81,7 @@ class Profile extends DateRangeDBModel {
     signalAssign(
       currentProfile,
       () => atTime(clock.now()),
-      debugLabel: 'currentProfile',
+      debugLabel: 'fetchCurrentProfile',
       dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
     );
   }

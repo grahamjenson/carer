@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -70,7 +69,9 @@ class ASignal<T> extends Signal<T> {
     super.val, {
     required super.debugLabel,
     super.autoDispose,
-  });
+  }) {
+    registerSignal(super.debugLabel!);
+  }
 
   @override
   bool set(T val, {bool force = false}) {
@@ -121,7 +122,7 @@ class AWatch<T extends Widget> extends StatelessWidget {
           // Only report stack for internal lines
           Errors.captureError(e, stackTrace);
 
-          if (kDebugMode) {
+          if (!Env.isProd) {
             return ErrorWidget(e);
           }
           // Return instructinos on reporting
@@ -165,6 +166,7 @@ EffectCleanup aeffect(
   List<ReadonlySignal<dynamic>> dependencies = const [],
   doLog = false,
 }) {
+  registerSignal(debugLabel);
   return effect(() {
     try {
       for (var dep in dependencies) {
@@ -184,10 +186,11 @@ EffectCleanup aeffect(
 Computed<T> acomputed<T>(
   ComputedCallback<T> compute,
   T onError, {
-  String? debugLabel,
+  required String debugLabel,
   bool autoDispose = false,
   List<ReadonlySignal<dynamic>> dependencies = const [],
 }) {
+  registerSignal(debugLabel);
   return computed(() {
     try {
       for (var dep in dependencies) {
@@ -199,25 +202,6 @@ Computed<T> acomputed<T>(
       return onError;
     }
   }, debugLabel: debugLabel, autoDispose: autoDispose);
-}
-
-// This is kind of shit, because while computing it sets the value to null
-FutureSignal<T> acomputedAsync<T>(
-  Future<T> Function() callback,
-  T initialValue, {
-  String? debugLabel,
-  bool autoDispose = false,
-  List<ReadonlySignal<dynamic>> dependencies = const [],
-  bool lazy = true,
-}) {
-  return computedAsync(() async {
-    try {
-      return callback();
-    } catch (e, stackTrace) {
-      Errors.captureError(e, stackTrace);
-      return initialValue;
-    }
-  }, initialValue: initialValue, debugLabel: debugLabel, autoDispose: autoDispose, dependencies: dependencies, lazy: lazy);
 }
 
 class SignalsDevObserverWrapper extends DevToolsSignalsObserver {
@@ -235,4 +219,22 @@ void setupSignalsLogging() {
     var newinstance = SignalsDevObserverWrapper();
     SignalsObserver.instance = newinstance;
   }
+}
+
+// To make sure initialization is good and DebugLabels are unique we keep track of all registered signals and force unique debugLabels
+Set<String> _registeredSignals = {};
+bool registerSignal(String debugLabel) {
+  if (_registeredSignals.contains(debugLabel)) {
+    var message = "VERY BAD: Signal with debugLabel $debugLabel already registered";
+    if (Env.isProd) {
+      // In prod dont be so mean
+      alog(message);
+      print(message);
+      return false;
+    } else {
+      throw message;
+    }
+  }
+  _registeredSignals.add(debugLabel);
+  return true;
 }

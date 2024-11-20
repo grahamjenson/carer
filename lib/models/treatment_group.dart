@@ -68,9 +68,9 @@ class Treatment with DateMixin {
 
   static setupSQLSignals() {
     var dependencies = [TimerService().minuteSignal, SQLToBolus().writeSignal, SQLToCarbs().writeSignal];
-    signalAssign(lastSixHours, () async => _getLastTime(360), debugLabel: 'treatmentsLastSixHours', dependencies: dependencies);
+    signalAssign(lastSixHours, () async => _getLastTime(360), debugLabel: 'fetchTreatmentsLastSixHours', dependencies: dependencies);
 
-    signalAssign(last2days, () async => _getLastTime(2880), debugLabel: 'treatmentsLast2days', dependencies: dependencies);
+    signalAssign(last2days, () async => _getLastTime(2880), debugLabel: 'fetchTreatmentsLast2days', dependencies: dependencies);
   }
 
   static Future<List<Treatment>> _getLastTime(int minsAgo) async {

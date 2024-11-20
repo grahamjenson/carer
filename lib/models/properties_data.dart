@@ -51,63 +51,63 @@ class PropertiesData {
       () {
         kvdb.setDouble(PropertiesDataName.battery.name, _signals[PropertiesDataName.battery]!.value);
       },
-      debugLabel: "Battery",
+      debugLabel: "writeBattery",
     );
 
     aeffect(
       () {
         kvdb.setBool(PropertiesDataName.isCharging.name, _signals[PropertiesDataName.isCharging]!.value);
       },
-      debugLabel: "isCharging",
+      debugLabel: "writeisCharging",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.iob.name, _signals[PropertiesDataName.iob]!.value);
       },
-      debugLabel: "IOB",
+      debugLabel: "writeIOB",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.basaliob.name, _signals[PropertiesDataName.basaliob]!.value);
       },
-      debugLabel: "BasalIOB",
+      debugLabel: "writeBasalIOB",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.treatmentiob.name, _signals[PropertiesDataName.treatmentiob]!.value);
       },
-      debugLabel: "TreatmentiOB",
+      debugLabel: "writeTreatmentiOB",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.cob.name, _signals[PropertiesDataName.cob]!.value);
       },
-      debugLabel: "COB",
+      debugLabel: "writeCOB",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.cage.name, _signals[PropertiesDataName.cage]!.value);
       },
-      debugLabel: "CAGE",
+      debugLabel: "writeCAGE",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.sage.name, _signals[PropertiesDataName.sage]!.value);
       },
-      debugLabel: "SAGE",
+      debugLabel: "writeSAGE",
     );
 
     aeffect(
       () {
         kvdb.setDouble(PropertiesDataName.reservoir.name, _signals[PropertiesDataName.reservoir]!.value);
       },
-      debugLabel: "Reservoir",
+      debugLabel: "writeReservoir",
     );
 
     return true;

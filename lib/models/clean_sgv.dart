@@ -188,13 +188,13 @@ class CleanSGV extends ASGV with DateMixin {
       var todaysSGVsInRange = todaysSGVs.where((e) => e.withinRange);
 
       return todaysSGVs.isEmpty ? 0.0 : (todaysSGVsInRange.length / todaysSGVs.length) * 100.0;
-    }, debugLabel: 'todaysPercentage', dependencies: [last2Days]);
+    }, debugLabel: 'writeTodaysPercentage', dependencies: [last2Days]);
 
     signalAssign(yesterdaysPercentage, () {
       var yesterdaysSGVs = last2Days.value.where((e) => e.isDuringYesterday);
       var yesterdaysSGVsInRange = yesterdaysSGVs.where((e) => e.withinRange);
 
       return yesterdaysSGVs.isEmpty ? 0.0 : (yesterdaysSGVsInRange.length / yesterdaysSGVs.length) * 100.0;
-    }, debugLabel: 'yesterdaysPercentage', dependencies: [last2Days]);
+    }, debugLabel: 'writeYesterdaysPercentage', dependencies: [last2Days]);
   }
 }

@@ -33,14 +33,14 @@ class FlowData {
       () {
         prefs.setInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, _signals[FlowDataNames.agreedPrivacyPolicyTimeStamp]!.value);
       },
-      debugLabel: "agreedPrivacyPolicyTimeStamp",
+      debugLabel: "writeAgreedPrivacyPolicyTimeStamp",
     );
 
     aeffect(
       () {
         prefs.setInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value);
       },
-      debugLabel: "agreedTermsAndConditionsTimeStamp",
+      debugLabel: "writeAgreedTermsAndConditionsTimeStamp",
     );
 
     return true;

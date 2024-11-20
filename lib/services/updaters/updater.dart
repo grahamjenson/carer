@@ -36,7 +36,7 @@ abstract class Updater {
 
         _forceUpdate = true;
       }
-    }, debugLabel: "LastResumedUpdaterEffect");
+    }, debugLabel: "${runtimeType}LastResumedUpdaterEffect");
 
     Timer.periodic(intervalToCheck, (Timer t) async {
       // If this tries to update too quickly after reopening it will cause an OS error
