@@ -48,7 +48,6 @@ class SQLToSGV extends SQLMapper<SGV> {
     DateTime now = clock.now();
     DateTime startOfYesterday = DateTime(now.year, now.month, now.day - 1);
     int startOfYesterdayEpoch = startOfYesterday.millisecondsSinceEpoch;
-
     return SQLToSGV().query(after: startOfYesterdayEpoch);
   }
 }

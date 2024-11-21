@@ -1,5 +1,6 @@
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
@@ -74,10 +75,33 @@ class SGV extends DBModel implements ASGV {
     return "SGV($value@${date.hour}:${date.minute})";
   }
 
+  bool get withinRange => value > TargetSettings().lowTarget && value < TargetSettings().highTarget;
+
+  static int count() {
+    return last2Days.value.length;
+  }
+
   static ASignal<List<SGV>> last2Days = ASignal<List<SGV>>([], debugLabel: "SGVLast2Days");
+
+  static ASignal<double?> todaysPercentage = ASignal(0.0, debugLabel: 'todaysPercentage');
+  static ASignal<double?> yesterdaysPercentage = ASignal(0.0, debugLabel: 'yesterdaysPercentage');
 
   static setupSQLSignals() {
     signalAssign(last2Days, () async => SQLToSGV().last2Days(), debugLabel: "SGVlast2Days", dependencies: [SQLToSGV().writeSignal]);
+
+    signalAssign(todaysPercentage, () {
+      var todaysSGVs = last2Days.value.where((e) => e.isDuringToday);
+      var todaysSGVsInRange = todaysSGVs.where((e) => e.withinRange);
+
+      return todaysSGVs.isEmpty ? 0.0 : (todaysSGVsInRange.length / todaysSGVs.length) * 100.0;
+    }, debugLabel: 'writeTodaysPercentage', dependencies: [last2Days]);
+
+    signalAssign(yesterdaysPercentage, () {
+      var yesterdaysSGVs = last2Days.value.where((e) => e.isDuringYesterday);
+      var yesterdaysSGVsInRange = yesterdaysSGVs.where((e) => e.withinRange);
+
+      return yesterdaysSGVs.isEmpty ? 0.0 : (yesterdaysSGVsInRange.length / yesterdaysSGVs.length) * 100.0;
+    }, debugLabel: 'writeYesterdaysPercentage', dependencies: [last2Days]);
   }
 
   @override

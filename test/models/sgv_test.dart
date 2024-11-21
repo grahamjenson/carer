@@ -7,32 +7,46 @@ import 'package:flutter_test/flutter_test.dart';
 import '../test_utils.dart';
 
 void main() async {
+  agroup("SGV", () {
+    atest("percents", (DateTime now) async {
+      var inRange = 120;
+      var outOfRange = 10;
+
+      var todaysSGVs = await createSVGs([(inRange, min20), (outOfRange, min10), (inRange, min5), (outOfRange, min0)]);
+      expect(todaysSGVs, 4);
+      expect(SGV.count(), 4);
+
+      var yesterdaysSGVs = await createSVGs([(outOfRange, hour24 + min20), (inRange, hour24 + min10), (inRange, hour24 + min5), (inRange, hour24)]);
+
+      expect(yesterdaysSGVs, 4);
+      expect(SGV.count(), 8);
+
+      var percent = SGV.todaysPercentage.value;
+      expect(percent, 50.0);
+
+      var ypercent = SGV.yesterdaysPercentage.value;
+
+      expect(ypercent, 75.0);
+    });
+  });
+
   agroup('CleanSGV', () {
     atest("lastSGV", (DateTime now) async {
-      await createSVGs([("a", 2, 5)]);
+      await createSVGs([(2, min5)]);
 
       expect(CleanSGV.lastSGV.value, CleanSGV(2, now.subtract(min5)));
       expect(CleanSGV.count(), 1);
 
-      await createSVGs([("b", 1, 0)]);
+      await createSVGs([(1, min0)]);
 
       expect(CleanSGV.lastSGV.value, CleanSGV(1, now));
       expect(CleanSGV.count(), 2);
       return true;
     });
 
-    atest("percents", (DateTime now) async {
-      expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(hour48), eid: "1")), true);
-      expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5 + min5), eid: "2")), true);
-      expect(await SQLToSGV().save(SGV(value: 100, date: now.subtract(min5), eid: "3")), true);
-
-      var percent = CleanSGV.todaysPercentage.value;
-      expect(percent, 100.0);
-    });
-
     atest('saveAll', () async {
       // create SGVs
-      var ret = await createSVGs([("a", 1, 20), ("b", 2, 15)]);
+      var ret = await createSVGsWithEIDs([("a", 1, min20), ("b", 2, min15)]);
       expect(ret, 2);
 
       expect(CleanSGV.count(), 2);
@@ -42,7 +56,7 @@ void main() async {
       expect(sgvs.first.value, 2);
 
       // fetch SGVs
-      ret = await createSVGs([("a", 1, 20), ("b", 2, 15)]);
+      ret = await createSVGsWithEIDs([("a", 1, min20), ("b", 2, min15)]);
 
       expect(ret, 0); // Nothing was changed
 
@@ -50,7 +64,7 @@ void main() async {
       expect(sgvs.length, 2);
       expect(sgvs.first.value, 2);
 
-      ret = await createSVGs([("b", 2, 15), ("c", 3, 10)]);
+      ret = await createSVGsWithEIDs([("b", 2, min15), ("c", 3, min10)]);
 
       expect(ret, 1); // only one new value
 

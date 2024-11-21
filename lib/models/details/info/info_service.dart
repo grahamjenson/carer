@@ -1,6 +1,6 @@
-import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/constants.dart';
+import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -204,7 +204,7 @@ class _CurrentProfile extends _InfoMethods {
 class _TodayInRange extends _InfoMethods {
   const _TodayInRange();
 
-  double get value => CleanSGV.todaysPercentage.value ?? 0.0;
+  double get value => SGV.todaysPercentage.value ?? 0.0;
 
   @override
   String get title => "TIR";
@@ -224,7 +224,7 @@ class _TodayInRange extends _InfoMethods {
 class _YesterdayInRange extends _InfoMethods {
   const _YesterdayInRange();
 
-  double get value => CleanSGV.yesterdaysPercentage.value ?? 0.0;
+  double get value => SGV.yesterdaysPercentage.value ?? 0.0;
 
   @override
   String get title => "YIR";

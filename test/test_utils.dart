@@ -96,17 +96,32 @@ int minTime(int min) {
 // Static stuff
 DateTime overrideNow = DateTime(2020, 1, 1, 12);
 
+Duration min0 = const Duration(minutes: 0);
 Duration min1 = const Duration(minutes: 1);
 Duration min5 = const Duration(minutes: 5);
+Duration min10 = const Duration(minutes: 10);
+Duration min15 = const Duration(minutes: 15);
+Duration min20 = const Duration(minutes: 20);
+
+Duration hour1 = const Duration(hours: 1);
+Duration hour24 = const Duration(hours: 24);
+Duration hour36 = const Duration(hours: 36);
 Duration hour48 = const Duration(hours: 48);
 
-// List<(eid, value, minutes_ago)>
-Future<int> createSVGs(List<(String, int, int)> values, {DateTime? now}) async {
+// List<(value, ago)>
+int eid = 0;
+Future<int> createSVGs(List<(int, Duration)> values, {DateTime? now}) async {
+  return createSVGsWithEIDs(values.map((v) => ("${eid++}", v.$1, v.$2)).toList(), now: now);
+}
+
+// List<(eid, value, ago)>
+Future<int> createSVGsWithEIDs(List<(String, int, Duration)> values, {DateTime? now}) async {
   now ??= overrideNow;
 
-  var lastSet = CleanSGV.lastSGV.lastSet;
+  var cleanlastSet = CleanSGV.lastSGV.lastSet;
+  var sgvLastSet = SGV.last2Days.lastSet;
 
-  var ret = SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(Duration(minutes: v.$3)), eid: v.$1)).toList());
+  var ret = SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(v.$3), eid: v.$1)).toList());
 
   // Because the SignalAssign for a bunch of signals are asyncrhnous we need to wait for them to complete
   // The easiest way is to just loop for a little bit waiting for the signals lastSet date to change
@@ -114,12 +129,16 @@ Future<int> createSVGs(List<(String, int, int)> values, {DateTime? now}) async {
   if (await ret == 0) {
     return ret;
   }
-  while (DateTime.now().difference(start).inMilliseconds < 100) {
-    if (lastSet != CleanSGV.lastSGV.lastSet) {
+
+  // Currently  100ms is pretty safe
+  int maxmilliseconds = 100;
+  int loops = 5;
+  while (DateTime.now().difference(start).inMilliseconds < maxmilliseconds) {
+    if (cleanlastSet != CleanSGV.lastSGV.lastSet && sgvLastSet != SGV.last2Days.lastSet) {
       return ret;
     }
 
-    await Future.delayed(const Duration(milliseconds: 1));
+    await Future.delayed(Duration(milliseconds: maxmilliseconds ~/ loops));
   }
 
   return ret;

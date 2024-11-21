@@ -24,8 +24,10 @@ mixin DateMixin {
 
   bool get isDuringYesterday {
     final now = clock.now();
+
     final startOfYesterday = DateTime(now.year, now.month, now.day - 1);
     final startOfToday = DateTime(now.year, now.month, now.day);
+
     return date.isAfter(startOfYesterday) && date.isBefore(startOfToday);
   }
 }
