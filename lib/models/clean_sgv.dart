@@ -161,16 +161,16 @@ class CleanSGV extends ASGV with DateMixin {
 
   static ASignal<CleanSGV?> lastSGV = ASignal(null, debugLabel: 'CleanSGVlastSGV');
 
-  static setupSQLSignals() {
-    signalAssign(last2Days, () async {
+  static Future<void> setupSQLSignals() async {
+    await signalAssign(last2Days, () async {
       List<SGV> rawSGVs = await SQLToSGV().last2Days();
 
       return _makeChained(rawSGVs.map((e) => CleanSGV(e.value, e.date)).toList());
     }, debugLabel: "Clean2DaysQuery", dependencies: [SQLToSGV().writeSignal]);
 
-    signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours).toList(), debugLabel: 'last3HoursQuery');
+    await signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours).toList(), debugLabel: 'last3HoursQuery');
 
-    signalAssign(lastSGV, () {
+    await signalAssign(lastSGV, () {
       var lastSGV = last2Days.value.firstOrNull;
       if (lastSGV == null) {
         return null;

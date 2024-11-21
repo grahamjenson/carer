@@ -1,3 +1,4 @@
+import 'package:carer/mappers/sql/events.dart';
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/profile.dart';
@@ -28,11 +29,13 @@ Future<void> setupSignals() async {
     return;
   }
   signalSetup = true;
+
   await CleanSGV.setupSQLSignals();
   await Profile.setupSQLSignals();
   await Treatment.setupSQLSignals();
   await ValueAtTime.setupSQLSignals();
   await SGV.setupSQLSignals();
+  await SQLToEvents().setupSQLSignals();
 }
 
 // Not sure of the point of this right now
@@ -136,6 +139,8 @@ typedef SignalChangeFunction = Future Function();
 // If I was fancy you could just input some signals and find all dpenedent signals, but that is a lot of complicated work
 // I will leave that fun for later
 waitForSignalChange(SignalChangeFunction fn, List<ASignal> signals, {Duration? timeout}) async {
+  signals.map((e) => e.value).toList();
+
   timeout ??= const Duration(milliseconds: 100);
   List<DateTime> lastSet = signals.map((e) => e.lastSet).toList();
 
@@ -153,7 +158,7 @@ waitForSignalChange(SignalChangeFunction fn, List<ASignal> signals, {Duration? t
         allDifferent = false;
       }
     }
-    print("LOOPP");
+
     if (allDifferent) {
       return;
     }

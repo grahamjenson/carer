@@ -12,7 +12,7 @@ void main() async {
     atest("getvaluesattime", (DateTime now) async {
       var p = Profile(
         name: "Default",
-        eid: "EID",
+        eid: "AProfile",
         dia: 5,
         source: "Test",
         percent: 100,
@@ -68,7 +68,6 @@ void main() async {
 }
 
 void valueAssertion(ValueAtTime v, {int? lowTarget, int? highTarget, bool? isTempTarget, DateTime? date}) {
-  print(v);
   if (isTempTarget != null) expect(v.isTempTarget, isTempTarget);
   if (lowTarget != null) expect(v.lowTarget, lowTarget);
   if (highTarget != null) expect(v.highTarget, highTarget);

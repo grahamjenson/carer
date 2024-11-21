@@ -132,12 +132,16 @@ class AWatch<T extends Widget> extends StatelessWidget {
   }
 }
 
-EffectCleanup signalAssign<T>(
+Future<EffectCleanup> signalAssign<T>(
   ASignal<T> signal,
   FutureOr<T> Function() fn, {
   required String debugLabel,
   List<ReadonlySignal<dynamic>> dependencies = const [],
-}) {
+  lazy = false,
+}) async {
+  if (!lazy) {
+    signal.value = await fn();
+  }
   return aeffect(
     () {
       final result = fn();

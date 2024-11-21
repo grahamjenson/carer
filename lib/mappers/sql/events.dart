@@ -14,11 +14,13 @@ import 'package:clock/clock.dart';
 class SQLToEvents extends SQLMapper<EventModel> {
   static final SQLToEvents _singleton = SQLToEvents._();
   factory SQLToEvents() => _singleton;
-  SQLToEvents._() {
-    signalAssign(lastCoupleDays, () async => await last2Days(), debugLabel: "fetchAlarmLogslastCoupleDays", dependencies: [writeSignal]);
-  }
+  SQLToEvents._();
 
   final ASignal<List<EventModel>> lastCoupleDays = ASignal<List<EventModel>>([], debugLabel: "AlarmLogslastCoupleDays");
+
+  Future<void> setupSQLSignals() async {
+    await signalAssign(lastCoupleDays, () async => await last2Days(), debugLabel: "fetchAlarmLogslastCoupleDays", dependencies: [writeSignal]);
+  }
 
   @override
   String get tableName => eventsTableName;

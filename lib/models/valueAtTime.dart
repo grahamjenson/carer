@@ -8,7 +8,6 @@ import 'package:carer/models/sql/tempbasal.dart';
 import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 
@@ -133,7 +132,6 @@ class ValueAtTime with DateMixin {
   }
 
   static Future<List<ValueAtTime>> updateValues(int hoursAgo) async {
-    alog('ValueAtTime.updateValues');
     var now = clock.now();
     // rounded to nearest minute
     now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
@@ -154,9 +152,9 @@ class ValueAtTime with DateMixin {
     return vats;
   }
 
-  static setupSQLSignals() {
+  static Future<void> setupSQLSignals() async {
     var dependencies = [TimerService().minuteSignal, SQLToProfile().writeSignal, SQLToTempBasal().writeSignal, SQLToTempTarget().writeSignal];
-    signalAssign(lastSixHours, () async => await updateValues(6), debugLabel: 'fetchValueAtTimeLastSixHours', dependencies: dependencies);
-    signalAssign(last2Days, () async => await updateValues(48), debugLabel: 'fetchValueAtTimeLast2Days', dependencies: dependencies);
+    await signalAssign(lastSixHours, () async => await updateValues(6), debugLabel: 'fetchValueAtTimeLastSixHours', dependencies: dependencies);
+    await signalAssign(last2Days, () async => await updateValues(48), debugLabel: 'fetchValueAtTimeLast2Days', dependencies: dependencies);
   }
 }

@@ -77,8 +77,8 @@ class Profile extends DateRangeDBModel {
 
   static ASignal<Profile?> currentProfile = ASignal<Profile?>(null, debugLabel: 'currentProfile');
 
-  static setupSQLSignals() {
-    signalAssign(
+  static Future<void> setupSQLSignals() async {
+    await signalAssign(
       currentProfile,
       () => atTime(clock.now()),
       debugLabel: 'fetchCurrentProfile',

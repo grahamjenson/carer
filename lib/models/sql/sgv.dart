@@ -86,17 +86,17 @@ class SGV extends DBModel implements ASGV {
   static ASignal<double?> todaysPercentage = ASignal(0.0, debugLabel: 'todaysPercentage');
   static ASignal<double?> yesterdaysPercentage = ASignal(0.0, debugLabel: 'yesterdaysPercentage');
 
-  static setupSQLSignals() {
-    signalAssign(last2Days, () async => SQLToSGV().last2Days(), debugLabel: "SGVlast2Days", dependencies: [SQLToSGV().writeSignal]);
+  static Future<void> setupSQLSignals() async {
+    await signalAssign(last2Days, () async => SQLToSGV().last2Days(), debugLabel: "SGVlast2Days", dependencies: [SQLToSGV().writeSignal]);
 
-    signalAssign(todaysPercentage, () {
+    await signalAssign(todaysPercentage, () {
       var todaysSGVs = last2Days.value.where((e) => e.isDuringToday);
       var todaysSGVsInRange = todaysSGVs.where((e) => e.withinRange);
 
       return todaysSGVs.isEmpty ? 0.0 : (todaysSGVsInRange.length / todaysSGVs.length) * 100.0;
     }, debugLabel: 'writeTodaysPercentage', dependencies: [last2Days]);
 
-    signalAssign(yesterdaysPercentage, () {
+    await signalAssign(yesterdaysPercentage, () {
       var yesterdaysSGVs = last2Days.value.where((e) => e.isDuringYesterday);
       var yesterdaysSGVsInRange = yesterdaysSGVs.where((e) => e.withinRange);
 
