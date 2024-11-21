@@ -80,7 +80,6 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
             (context) {
               var children = getSnoozeButtonsLayout(context, buttonStyle, textStyle) +
                   [
-                    const Divider(),
                     Flexible(
                       flex: 3,
                       child: SizedBox(
