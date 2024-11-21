@@ -7,29 +7,18 @@ import 'package:flutter_test/flutter_test.dart';
 import '../test_utils.dart';
 
 void main() async {
-  agroup('SGV', () {
+  agroup('CleanSGV', () {
     atest("lastSGV", (DateTime now) async {
-      var stream = CleanSGV.lastSGV.stream;
-      expect(stream, emits((o) {
-        expect(o, null);
-        expect(CleanSGV.count(), 0);
-        return true;
-      }));
+      await createSVGs([("a", 2, 5)]);
 
-      expect(await SQLToSGV().save(SGV(value: 2, date: now.subtract(min5), eid: "1")), true);
-      expect(stream, emits((o) {
-        expect(o, CleanSGV(2, now.subtract(min5)));
-        expect(CleanSGV.count(), 1);
-        return true;
-      }));
+      expect(CleanSGV.lastSGV.value, CleanSGV(2, now.subtract(min5)));
+      expect(CleanSGV.count(), 1);
 
-      expect(await SQLToSGV().save(SGV(value: 1, date: now, eid: "2")), true);
+      await createSVGs([("b", 1, 0)]);
 
-      expect(stream, emits((o) {
-        expect(o, CleanSGV(1, now));
-        expect(CleanSGV.count(), 2);
-        return true;
-      }));
+      expect(CleanSGV.lastSGV.value, CleanSGV(1, now));
+      expect(CleanSGV.count(), 2);
+      return true;
     });
 
     atest("percents", (DateTime now) async {
@@ -41,42 +30,35 @@ void main() async {
       expect(percent, 100.0);
     });
 
-    atest('orderOFSVGs', () async {
+    atest('saveAll', () async {
       // create SGVs
-      var ret = await Future.wait([
-        SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})),
-        SQLToSGV().saveRow(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})),
-      ]);
-      expect(ret.where((b) => b).length, 2);
+      var ret = await createSVGs([("a", 1, 20), ("b", 2, 15)]);
+      expect(ret, 2);
 
       expect(CleanSGV.count(), 2);
+
       var sgvs = CleanSGV.last2Days.value;
       expect(sgvs.length, 2);
       expect(sgvs.first.value, 2);
 
       // fetch SGVs
-      ret = await Future.wait([
-        SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(0), "eid": "1"})),
-        SQLToSGV().saveRow(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})),
-      ]);
+      ret = await createSVGs([("a", 1, 20), ("b", 2, 15)]);
 
-      expect(ret.where((b) => b).length, 0); // Nothing was changed
+      expect(ret, 0); // Nothing was changed
 
       sgvs = CleanSGV.last2Days.value;
       expect(sgvs.length, 2);
       expect(sgvs.first.value, 2);
 
-      ret = await Future.wait([
-        SQLToSGV().saveRow(SQLRow({'value': 2, 'timestamp': minTime(5), "eid": "2"})),
-        SQLToSGV().saveRow(SQLRow({'value': 1, 'timestamp': minTime(5), "eid": "3"})), // new at same date
-      ]);
+      ret = await createSVGs([("b", 2, 15), ("c", 3, 10)]);
 
-      expect(ret.where((b) => b).length, 1); // only one new value
+      expect(ret, 1); // only one new value
 
       // Should be ordered by date, then lowest value
       sgvs = CleanSGV.last2Days.value;
+
       expect(sgvs.length, 3);
-      expect(sgvs.first.value, 1);
+      expect(sgvs.first.value, 3);
     });
 
     atest('validation', () async {

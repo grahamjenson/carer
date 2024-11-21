@@ -1,3 +1,4 @@
+import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/sql/sgv.dart';
@@ -69,10 +70,9 @@ void atest(
   assert(body is Future Function(DateTime) || body is Future Function());
 
   test(description, () async {
-    DateTime now = DateTime(2020, 1, 1, 12);
-    await withClock(Clock.fixed(now), () async {
+    await withClock(Clock.fixed(overrideNow), () async {
       if (body is Future Function(DateTime)) {
-        await body(now);
+        await body(overrideNow);
       } else {
         await body();
       }
@@ -94,6 +94,34 @@ int minTime(int min) {
 }
 
 // Static stuff
+DateTime overrideNow = DateTime(2020, 1, 1, 12);
+
 Duration min1 = const Duration(minutes: 1);
 Duration min5 = const Duration(minutes: 5);
 Duration hour48 = const Duration(hours: 48);
+
+// List<(eid, value, minutes_ago)>
+Future<int> createSVGs(List<(String, int, int)> values, {DateTime? now}) async {
+  now ??= overrideNow;
+
+  var lastSet = CleanSGV.lastSGV.lastSet;
+
+  var ret = SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(Duration(minutes: v.$3)), eid: v.$1)).toList());
+
+  // Because the SignalAssign for a bunch of signals are asyncrhnous we need to wait for them to complete
+  // The easiest way is to just loop for a little bit waiting for the signals lastSet date to change
+  var start = DateTime.now();
+  if (await ret == 0) {
+    return ret;
+  }
+  while (DateTime.now().difference(start).inMilliseconds < 100) {
+    if (lastSet != CleanSGV.lastSGV.lastSet) {
+      return ret;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 1));
+  }
+
+  return ret;
+  // wait for CleanSGV signals to update
+}
