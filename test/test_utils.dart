@@ -5,6 +5,7 @@ import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/sql/carer_db.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -118,29 +119,46 @@ Future<int> createSVGs(List<(int, Duration)> values, {DateTime? now}) async {
 Future<int> createSVGsWithEIDs(List<(String, int, Duration)> values, {DateTime? now}) async {
   now ??= overrideNow;
 
-  var cleanlastSet = CleanSGV.lastSGV.lastSet;
-  var sgvLastSet = SGV.last2Days.lastSet;
-
-  var ret = SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(v.$3), eid: v.$1)).toList());
-
-  // Because the SignalAssign for a bunch of signals are asyncrhnous we need to wait for them to complete
-  // The easiest way is to just loop for a little bit waiting for the signals lastSet date to change
-  var start = DateTime.now();
-  if (await ret == 0) {
-    return ret;
-  }
-
-  // Currently  100ms is pretty safe
-  int maxmilliseconds = 100;
-  int loops = 5;
-  while (DateTime.now().difference(start).inMilliseconds < maxmilliseconds) {
-    if (cleanlastSet != CleanSGV.lastSGV.lastSet && sgvLastSet != SGV.last2Days.lastSet) {
-      return ret;
-    }
-
-    await Future.delayed(Duration(milliseconds: maxmilliseconds ~/ loops));
-  }
+  var ret = 0;
+  await waitForSignalChange(() async {
+    ret = await SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(v.$3), eid: v.$1)).toList());
+  }, [CleanSGV.lastSGV, SGV.last2Days]);
 
   return ret;
   // wait for CleanSGV signals to update
+}
+
+typedef SignalChangeFunction = Future Function();
+
+// Because the SignalAssign for a bunch of signals are asyncrhnous we need to wait for them to complete
+// The easiest way is to just loop for a little bit waiting for the signals lastSet date to change
+// This will wait for a bunch of Signals to complete
+// If I was fancy you could just input some signals and find all dpenedent signals, but that is a lot of complicated work
+// I will leave that fun for later
+waitForSignalChange(SignalChangeFunction fn, List<ASignal> signals, {Duration? timeout}) async {
+  timeout ??= const Duration(milliseconds: 100);
+  List<DateTime> lastSet = signals.map((e) => e.lastSet).toList();
+
+  await fn();
+
+  // We check 5 times
+  int loops = 10;
+  int delayTime = timeout.inMilliseconds ~/ loops;
+
+  for (int loop = 0; loop < loops; loop++) {
+    List<DateTime> newLastSet = signals.map((e) => e.lastSet).toList();
+    var allDifferent = true;
+    for (int i = 0; i < signals.length; i++) {
+      if (lastSet[i] == newLastSet[i]) {
+        allDifferent = false;
+      }
+    }
+    print("LOOPP");
+    if (allDifferent) {
+      return;
+    }
+    await Future.delayed(Duration(milliseconds: delayTime));
+  }
+
+  print("Didnt get signal change");
 }

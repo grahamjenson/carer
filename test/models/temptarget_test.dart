@@ -14,7 +14,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await SQLToTempTarget().upsertAll([tt1]), true);
+      expect(await SQLToTempTarget().upsertAll([tt1]), 1);
 
       var ttl1 = await TempTarget.query();
       expect(ttl1.length, 1);
@@ -33,7 +33,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await SQLToTempTarget().upsertAll([tt2]), true);
+      expect(await SQLToTempTarget().upsertAll([tt2]), 1);
 
       var ttl2 = await TempTarget.query();
       expect(ttl2.length, 1);
@@ -43,6 +43,7 @@ void main() async {
       expect(ttl2[0].highTarget, 120);
       expect(ttl2[0].duration, 30); // Duration should be the only thing updated
 
+      // Didnt change the temptarget
       var tt3 = TempTarget(
         startDate: now.add(min5),
         duration: 30,
@@ -50,7 +51,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await SQLToTempTarget().upsertAll([tt3]), false);
+      expect(await SQLToTempTarget().upsertAll([tt3]), 0);
 
       var tt4 = TempTarget(
         startDate: now.add(min5),
@@ -61,7 +62,7 @@ void main() async {
         eid: "1",
       );
 
-      expect(await SQLToTempTarget().upsertAll([tt4]), true);
+      expect(await SQLToTempTarget().upsertAll([tt4]), 1);
 
       var ttl4 = await TempTarget.query();
       expect(ttl4.length, 1);
@@ -80,7 +81,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await SQLToTempTarget().upsertAll([tt1]), true);
+      expect(await SQLToTempTarget().upsertAll([tt1]), 1);
 
       var ttl1 = await TempTarget.query();
       expect(ttl1.length, 1);
@@ -96,7 +97,7 @@ void main() async {
         highTarget: 120,
         eid: "1",
       );
-      expect(await SQLToTempTarget().upsertAll([tt4]), true);
+      expect(await SQLToTempTarget().upsertAll([tt4]), 1);
 
       var ttl2 = await TempTarget.query();
       expect(ttl2.length, 1);

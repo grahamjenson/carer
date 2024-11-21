@@ -77,7 +77,7 @@ class ASignal<T> extends Signal<T> {
   bool set(T val, {bool force = false}) {
     bool ret = super.set(val, force: force);
     if (ret) {
-      lastSet = DateTime.now();
+      lastSet = DateTime.now(); // Needs to be DateTime.now not Clock.now to stop the tests from stubbing the date
       alog(truncateString("ASignal: $debugLabel set to $val", 100));
     }
     return ret;
