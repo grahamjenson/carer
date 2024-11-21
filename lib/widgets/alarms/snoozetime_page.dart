@@ -47,13 +47,13 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = TextStyle(fontSize: 50, color: primaryColor(context));
+    TextStyle textStyle = const TextStyle(fontSize: 50, color: ColorSchemes.primaryColor);
     var buttonStyle = ElevatedButton.styleFrom(
       textStyle: textStyle,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8), // Square shape
-        side: BorderSide(
-          color: primaryColor(context),
+        side: const BorderSide(
+          color: ColorSchemes.primaryColor,
           width: 2,
         ), // Border color and width
       ),
@@ -62,6 +62,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     );
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Snooze Alarms'),
       ),
@@ -89,6 +90,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                           onPressed: () {
                             setSnooze(null, SnoozeReason.cancelPressed);
                           },
+                          style: buttonStyle,
                           child: Text("Cancel", style: textStyle),
                         ),
                       ),

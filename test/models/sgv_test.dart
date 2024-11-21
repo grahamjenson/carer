@@ -75,6 +75,22 @@ void main() async {
       expect(sgvs.first.value, 3);
     });
 
+    atest("rate5m", () async {
+      // Checking that the rate
+      var ret = await createSVGs([(100, min15), (120, min5)]);
+      expect(ret, 2);
+      expect(CleanSGV.count(), 2);
+
+      expect(CleanSGV.lastSGV.value!.rate5m, 10);
+
+      ret = await createSVGs([(140, min0)]);
+      expect(ret, 1);
+      expect(CleanSGV.count(), 3);
+      var last = CleanSGV.lastSGV.value!;
+
+      expect(last.rate5m, 20);
+    });
+
     atest('validation', () async {
       List<Map<String, Object>> badInputs = [
         {},

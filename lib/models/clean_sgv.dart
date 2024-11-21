@@ -38,6 +38,7 @@ class CleanSGV extends ASGV with DateMixin {
     this.date, {
     this.before,
   });
+
   int? get rate5m {
     if (before == null) {
       return null;
@@ -125,7 +126,6 @@ class CleanSGV extends ASGV with DateMixin {
     return pred;
   }
 
-  // TODO TEST THIS METHOD
   static List<CleanSGV> _makeChained(List<CleanSGV> sgvs) {
     if (sgvs.isEmpty || sgvs.length == 1) {
       return sgvs;
@@ -136,7 +136,9 @@ class CleanSGV extends ASGV with DateMixin {
     var dateBefore = sgvs.first.date;
     for (var i = 1; i < sgvs.length; i++) {
       var sgv = sgvs[i];
+
       var dinm = dateBefore.difference(sgv.date).inMinutes;
+
       // We dont want the chain to be too close together and we dont want to chain too far apart
       if (dinm > 3 && dinm < 20) {
         chainedSGVs.last.before = sgv;
