@@ -140,7 +140,7 @@ class CleanSGV extends ASGV with DateMixin {
       var dinm = dateBefore.difference(sgv.date).inMinutes;
 
       // We dont want the chain to be too close together and we dont want to chain too far apart
-      if (dinm > 3 && dinm < 20) {
+      if (dinm > 3 && dinm < 30) {
         chainedSGVs.last.before = sgv;
         dateBefore = sgv.date;
         chainedSGVs.add(sgv);
