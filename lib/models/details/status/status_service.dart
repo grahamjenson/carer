@@ -3,6 +3,7 @@ import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/status_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
@@ -25,7 +26,9 @@ enum Status {
   silentOn(_SilentOn()),
   lowReservoir(_LowReservoir()),
   disabledAlarms(_DisabledAlarms()),
-  disabledAudioAlarms(_DisabledAudioAlarms());
+  disabledAudioAlarms(_DisabledAudioAlarms()),
+  screenNotLocked(_ScreenNotLocked()),
+  ;
 
   final _StatusMethods _methods;
 
@@ -41,6 +44,29 @@ enum Status {
       return _methods.triggered();
     }
     return false;
+  }
+}
+
+class _ScreenNotLocked extends _StatusMethods {
+  const _ScreenNotLocked();
+
+  @override
+  String get title => "Screen Not Locked";
+
+  @override
+  String get description => "The Screen may sleep";
+
+  @override
+  IconData get icon => UniconsLine.lock_slash;
+
+  @override
+  String get reason {
+    return "Screen Not Locked";
+  }
+
+  @override
+  bool triggered() {
+    return !UISettings().screenActive;
   }
 }
 
