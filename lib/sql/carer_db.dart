@@ -1,5 +1,6 @@
 import 'package:carer/sql/db.dart';
 import 'package:carer/sql/statements/carer_db_tables.dart';
+import 'package:carer/utils/env.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common/sqflite_logger.dart';
@@ -40,6 +41,7 @@ class CarerDB {
 
   static Future<Database> _openDatabaseAndCreateTables() async {
     final path = await getPath();
+    var singleInstance = !Env.isTest;
     // This will grab all the db code and hash it, if it changes it drops all past stuff and replaces
     var version = getVersion();
 
@@ -47,7 +49,7 @@ class CarerDB {
     var db = await openDatabase(
       path,
       version: version, // TODO: replace this eventually with a version number
-      singleInstance: false,
+      singleInstance: singleInstance,
       onCreate: (db, version) async {
         alog("Creating database at version $version");
         await dropAll(db);

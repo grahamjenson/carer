@@ -1,5 +1,4 @@
-import 'package:carer/mappers/sql/sgv.dart';
-import 'package:carer/models/sql/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/predictors/sgv_predictors.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,22 +7,17 @@ import '../test_utils.dart';
 void main() async {
   agroup('Linear Prediction', () {
     atest("Linear2Predictor", (DateTime now) async {
-      DateTime min5ago = now.subtract(const Duration(minutes: 5));
-      DateTime min10ago = now.subtract(const Duration(minutes: 10));
-      DateTime min15ago = now.subtract(const Duration(minutes: 15));
-      DateTime min20ago = now.subtract(const Duration(minutes: 20));
+      await createSVGs([
+        (180, min20),
+        (170, min15),
+        (160, min10),
+        (150, min5),
+        (140, min0),
+        // Clearly should be 130 then 120-ish
+      ]);
 
-      DateTime min5fromNow = now.add(const Duration(minutes: 5));
-      DateTime min10fromNow = now.add(const Duration(minutes: 10));
-
-      expect(await SQLToSGV().save(SGV(value: 140, date: now, eid: "1")), true);
-      expect(await SQLToSGV().save(SGV(value: 150, date: min5ago, eid: "2")), true);
-      expect(await SQLToSGV().save(SGV(value: 160, date: min10ago, eid: "3")), true);
-      expect(await SQLToSGV().save(SGV(value: 170, date: min15ago, eid: "4")), true);
-      expect(await SQLToSGV().save(SGV(value: 180, date: min20ago, eid: "5")), true);
-
-      Linear2Predictor pr = Linear2Predictor();
-
+      Exp2Predictor pr = Exp2Predictor();
+      pr.init(lastSGVs: CleanSGV.last3Hours.value);
       var sgvs = pr.predictNextHour();
 
       expect(sgvs.length, 60);
@@ -31,9 +25,9 @@ void main() async {
       var firstSGV = sgvs[4];
       var secondSGV = sgvs[9];
       expect(firstSGV.value, 130);
-      expect(firstSGV.date, min5fromNow);
-      expect(secondSGV.value, 120);
-      expect(secondSGV.date, min10fromNow);
+      expect(firstSGV.date, now.add(min5));
+      expect(secondSGV.value, 121);
+      expect(secondSGV.date, now.add(min10));
     });
   });
 }

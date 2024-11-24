@@ -113,21 +113,6 @@ abstract class RegressionPredictor extends Predictor {
   }
 }
 
-class Linear2Predictor extends RegressionPredictor {
-  Linear2Predictor() : super();
-
-  @override
-  int get pastReadings => 2;
-
-  @override
-  Regression createRegression(List<double> x, List<double> y) {
-    return LinearRegression(x, y);
-  }
-
-  @override
-  String toString() => 'LinearRegression';
-}
-
 class Exp2Predictor extends RegressionPredictor {
   Exp2Predictor() : super();
 

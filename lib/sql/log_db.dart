@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:carer/sql/db.dart';
+import 'package:carer/utils/env.dart';
 import 'package:sqflite/sqflite.dart';
 
 const String logsTableName = 'logs';
@@ -39,9 +40,12 @@ class LogDB {
   // Open the database and create the tables
   static Future<Database> openDatabaseAndCreateTables() async {
     final path = await getPath();
+    var singleInstance = !Env.isTest;
+
     var db = await openDatabase(
       path,
       version: 1,
+      singleInstance: singleInstance,
       onCreate: (db, version) async {
         await db.execute(logsCreateTable);
         await truncateLogs(db);

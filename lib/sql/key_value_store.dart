@@ -4,6 +4,7 @@
 
 import 'package:carer/sql/db.dart';
 import 'package:carer/sql/statements/kv.dart';
+import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:sqflite/sqflite.dart';
@@ -33,11 +34,14 @@ class KeyValueStore {
   // Open the database and create the tables
   static Future<Database> openDatabaseAndCreateTables() async {
     final path = await getPath();
+    var singleInstance = !Env.isTest;
+
     alog("Opening keyvalue DB at $path");
 
     var db = await openDatabase(
       path,
       version: 1,
+      singleInstance: singleInstance,
       onCreate: (db, version) async {
         var batch = db.batch();
         batch.execute(KVTables.kvTable);
