@@ -13,4 +13,6 @@ class DB {
 
     return path;
   }
+
+  static get singleInstance => !Env.isTest;
 }
