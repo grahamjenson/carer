@@ -12,11 +12,11 @@ void main() async {
       var inRange = 120;
       var outOfRange = 10;
 
-      var todaysSGVs = await createSVGs([(inRange, min20), (outOfRange, min10), (inRange, min5), (outOfRange, min0)]);
+      var todaysSGVs = await createSGVsInOrder([inRange, outOfRange, inRange, outOfRange]);
       expect(todaysSGVs, 4);
       expect(SGV.count(), 4);
 
-      var yesterdaysSGVs = await createSVGs([(outOfRange, hour24 + min20), (inRange, hour24 + min10), (inRange, hour24 + min5), (inRange, hour24)]);
+      var yesterdaysSGVs = await createSGVsInOrder([outOfRange, inRange, inRange, inRange], now: now.subtract(hour24));
 
       expect(yesterdaysSGVs, 4);
       expect(SGV.count(), 8);

@@ -106,11 +106,24 @@ Duration min5 = const Duration(minutes: 5);
 Duration min10 = const Duration(minutes: 10);
 Duration min15 = const Duration(minutes: 15);
 Duration min20 = const Duration(minutes: 20);
+Duration min30 = const Duration(minutes: 30);
 
 Duration hour1 = const Duration(hours: 1);
 Duration hour24 = const Duration(hours: 24);
 Duration hour36 = const Duration(hours: 36);
 Duration hour48 = const Duration(hours: 48);
+
+Future<int> createSGVsInOrder(List<int> values, {DateTime? now}) async {
+  Duration currentDuration = min0;
+  List<(int, Duration)> valuesWithTime = [];
+
+  for (var v in values.reversed) {
+    valuesWithTime.add((v, currentDuration));
+    currentDuration += min5;
+  }
+
+  return createSVGs(valuesWithTime, now: now);
+}
 
 // List<(value, ago)>
 int eid = 0;

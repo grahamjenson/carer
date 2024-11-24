@@ -7,14 +7,7 @@ import '../test_utils.dart';
 void main() async {
   agroup('Linear Prediction', () {
     atest("Linear2Predictor", (DateTime now) async {
-      await createSVGs([
-        (180, min20),
-        (170, min15),
-        (160, min10),
-        (150, min5),
-        (140, min0),
-        // Clearly should be 130 then 120-ish
-      ]);
+      await createSGVsInOrder([180, 170, 160, 150, 140]);
 
       Exp2Predictor pr = Exp2Predictor();
       pr.init(lastSGVs: CleanSGV.last3Hours.value);
