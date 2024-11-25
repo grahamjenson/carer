@@ -1,10 +1,10 @@
-name: TestFlutter
+name: Test Carer
 
 on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
         - name: Clone repository
@@ -13,7 +13,7 @@ jobs:
           uses: subosito/flutter-action@v2
           with:
             channel: stable
-            flutter-version: 3.22.0
+            flutter-version: 3.24.5
             cache: true
             cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
             cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
