@@ -48,6 +48,9 @@ Future<void> setupSignals() async {
 //   SQLToTempTarget().writeSignal.value = 0;
 // }
 
+/////
+/// WRAPPERS
+/////
 void agroup(Object description, void Function() body, {dynamic skip, int? retry}) {
   group(description, () {
     setUp(() async {
@@ -84,6 +87,35 @@ void atest(
   }, testOn: testOn, timeout: timeout, skip: skip, tags: tags, onPlatform: onPlatform, retry: retry);
 }
 
+void atestWidgets(
+  String description,
+  WidgetTesterCallback callback, {
+  bool? skip,
+  bool semanticsEnabled = true,
+  TestVariant<Object?> variant = const DefaultTestVariant(),
+  dynamic tags,
+  Timeout? timeout,
+  int? retry,
+}) {
+  testWidgets(
+    description,
+    (WidgetTester tester) async {
+      await withClock(Clock.fixed(overrideNow), () async {
+        await callback(tester);
+      });
+    },
+    skip: skip,
+    timeout: timeout,
+    semanticsEnabled: semanticsEnabled,
+    variant: variant,
+    tags: tags,
+    retry: retry,
+  );
+}
+
+//////
+/// HELPERS
+//////
 double dp4(double x) {
   return (x * 1000).round() / 1000;
 }

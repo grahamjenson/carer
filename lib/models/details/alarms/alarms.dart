@@ -107,8 +107,8 @@ abstract class AlarmMethods {
       "prediction": getPredictedValue(numberOfReadingsToTrigger)?.toString(),
       "minutesToTrigger": minutesToTrigger,
       "numberOfReadingsToTriggerPrediction": numberOfReadingsToTrigger,
-      "targetRange5ForReadings": targetRange5ForReadings(numberOfReadingsToTrigger).map((e) => e.name).toList(),
-      "diffs": diffPer5MinuteForReadings(numberOfReadingsToTrigger).map(unitStr).toList(),
+      "targetRange5ForReadings": targetRange5s.map((e) => e.name).toList(),
+      "diffs": diffs.map(unitStr).toList(),
       "targets": [
         unitStr(TargetSettings().lowUrgent),
         unitStr(TargetSettings().lowTarget),
@@ -148,15 +148,18 @@ abstract class AlarmMethods {
     return lastSGV.range;
   }
 
-  List<Range5> targetRange5ForReadings(int numberOfReadings) {
+  List<Range5> get targetRange5s {
+    if (minutesToTrigger < 0) {
+      return [];
+    }
     var lastSGV = CleanSGV.lastSGV.value;
 
     if (lastSGV == null) {
       return [];
     }
 
-    var sgvs = lastSGV.lastNReadings(numberOfReadings);
-    if (sgvs.isEmpty || sgvs.length != numberOfReadings + 1) {
+    var sgvs = lastSGV.lastReadingsAfter(Duration(minutes: minutesToTrigger));
+    if (sgvs.isEmpty) {
       return [];
     }
     return sgvs.map((e) {
@@ -165,21 +168,28 @@ abstract class AlarmMethods {
     }).toList();
   }
 
-  List<int> diffPer5MinuteForReadings(int numberOfReadings) {
+  List<int> get diffs {
+    if (minutesToTrigger < 0) {
+      return [];
+    }
     var lastSGV = CleanSGV.lastSGV.value;
 
     if (lastSGV == null) {
       return [];
     }
 
-    var sgvs = lastSGV.lastNReadings(numberOfReadings);
-    if (sgvs.isEmpty || sgvs.length != numberOfReadings + 1) {
+    var sgvs = lastSGV.lastReadingsAfter(Duration(minutes: minutesToTrigger));
+    if (sgvs.isEmpty) {
       return [];
     }
 
     List<int> diffs = [];
+
     for (var sgv in sgvs) {
-      diffs.add(sgv.rate5m ?? 0);
+      if (sgv.rate5m == null) {
+        continue;
+      }
+      diffs.add(sgv.rate5m!);
     }
 
     return diffs;
@@ -415,9 +425,10 @@ class _HighAlarm extends AlarmMethods {
     if (!latest) {
       return false;
     }
-    List<Range5> targets = targetRange5ForReadings(numberOfReadingsToTrigger);
+    List<Range5> targets = targetRange5s;
     if (targets.isEmpty) {
-      return true;
+      // If targets is empty then we will have to wait for NoDataAlarm to trigger
+      return false;
     }
     return targets.every((e) => e == Range5.high || e == Range5.veryHigh);
   }
@@ -502,8 +513,6 @@ class _FastRiseAlarm extends AlarmMethods {
   @override
   int get minutesToTrigger => AlarmSettings().fastRiseAlarmMinutes;
 
-  List<int> get diffs => diffPer5MinuteForReadings(numberOfReadingsToTrigger);
-
   @override
   bool trigger() {
     // Dont trigger if low or Very Low, fast rise when low is what we want
@@ -554,11 +563,11 @@ class _FastDropAlarm extends AlarmMethods {
 
   @override
   int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;
-  List<int> get diffs => diffPer5MinuteForReadings(numberOfReadingsToTrigger);
 
   @override
   bool trigger() {
     var tr = targetRange5;
+
     // Dont trigger if High or Very High, fast drop when high is what we want
     if (tr == Range5.high || tr == Range5.veryHigh) {
       return false;
@@ -566,6 +575,7 @@ class _FastDropAlarm extends AlarmMethods {
 
     // Get the diffs for the last n minutes and make sure they are all below the set delta
     var d = diffs;
+
     if (d.isEmpty) {
       return false;
     }
@@ -607,13 +617,7 @@ class _NoDataAlarm extends AlarmMethods {
   String statment() => "No Data";
 
   @override
-  int get minutesToTrigger {
-    var mins = AlarmSettings().noDataAlarmMinutes;
-    if (mins == -1) {
-      mins = 20;
-    }
-    return mins;
-  }
+  int get minutesToTrigger => AlarmSettings().noDataAlarmMinutes;
 
   @override
   bool trigger() {

@@ -1,8 +1,5 @@
-import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
-import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,12 +7,12 @@ import '../../test_utils.dart';
 
 void main() async {
   agroup('bgl', () {
-    testWidgets('BGLWidget displays correct data', (WidgetTester tester) async {
+    atestWidgets('BGLWidget displays correct data', (WidgetTester tester) async {
       await tester.runAsync(() async {
         // Build our app and trigger a frame
-        expect(await SQLToSGV().save(SGV(value: 140, date: clock.now(), eid: "1")), true);
+        await createSGVsInOrder([140]);
 
-        expect(CleanSGV.lastSGV.value, 140);
+        expect(CleanSGV.lastSGV.value!.value, 140);
 
         await tester.pumpWidget(
           const MaterialApp(home: BGL()),

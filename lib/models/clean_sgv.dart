@@ -14,10 +14,15 @@ class CleanSGV extends ASGV with DateMixin {
   @override
   final DateTime date;
 
+  // The reason for these methods is that we take the most recent CleanSGV and find the previous one
+  // Sometimes there can be very close together values and may affect things like the rate of change
+  // This way we pick the latextest value and follow the chain back of appropriatly seperated values
+
   CleanSGV? before; // previous SVGs ID
   List<CleanSGV> get before5 => _beforeN(5);
   List<CleanSGV> get before12 => _beforeN(12);
-  List<CleanSGV> lastNReadings(int n) => _beforeN(n);
+
+  List<CleanSGV> lastReadingsAfter(Duration ago) => _beforeN(ago.inMinutes ~/ 5).where((e) => e.age < ago).toList();
 
   List<CleanSGV> _beforeN(int n) {
     var list = [this];

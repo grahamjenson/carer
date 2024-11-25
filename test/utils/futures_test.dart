@@ -2,8 +2,10 @@ import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../test_utils.dart';
+
 void main() async {
-  group("go", () {
+  agroup("go", () {
     setUp(() async {
       Env.catchErrors = false;
     });
@@ -12,7 +14,7 @@ void main() async {
       Env.catchErrors = true;
     }
 
-    test("go works", () async {
+    atest("go works", () async {
       var (x, err) = await go(Future.value(1), name: "t1");
       expect(x, 1);
       expect(err, null);
@@ -23,7 +25,7 @@ void main() async {
       expect(err, "ThisError");
     });
 
-    test("go profiles", () async {
+    atest("go profiles", () async {
       var (x, err) = await go(Future.delayed(const Duration(milliseconds: 100), () => 1), name: "t1", profile: true);
       expect(x, 1);
       expect(err, null);
@@ -37,8 +39,8 @@ void main() async {
     });
   });
 
-  group("executeWithRetry", () {
-    test("executeWithRetry works", () async {
+  agroup("executeWithRetry", () {
+    atest("executeWithRetry works", () async {
       var x = await executeWithRetry(() => Future.value(1));
       expect(x, 1);
 
