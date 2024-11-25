@@ -1,5 +1,6 @@
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
+import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/app_details_service.dart';
 import 'package:carer/services/platform_info_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
@@ -600,7 +601,7 @@ class _NoDataAlarm extends AlarmMethods {
   }
 
   @override
-  String shortSummary() => "No Data for ${age.inMinutes}m";
+  String shortSummary() => "No Data for ${ageInMinutes ?? "unknown"}m";
 
   @override
   String statment() => "No Data";
@@ -616,19 +617,27 @@ class _NoDataAlarm extends AlarmMethods {
 
   @override
   bool trigger() {
-    if (AlarmSettings().noDataAlarmMinutes > 0) {
+    if (AlarmSettings().noDataAlarmMinutes <= 1) {
       return false;
     }
 
-    return age.inMinutes > minutesToTrigger;
+    int? age = ageInMinutes;
+    if (age == null) {
+      // We dont know how old, must have at least 1 in the last couple days to trigger
+      return false;
+    }
+
+    return age > minutesToTrigger;
   }
 
-  Duration get age {
-    var lastSGV = CleanSGV.lastSGV.value;
+  int? get ageInMinutes {
+    var last2days = SGV.last2Days.value;
+    var lastSGV = last2days.firstOrNull;
     if (lastSGV == null) {
-      return Duration.zero;
+      return null;
     }
-    return lastSGV.age;
+
+    return lastSGV.age.inMinutes;
   }
 
   @override

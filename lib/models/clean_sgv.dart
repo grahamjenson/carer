@@ -1,4 +1,3 @@
-import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/prediction_service.dart';
@@ -163,10 +162,9 @@ class CleanSGV extends ASGV with DateMixin {
 
   static Future<void> setupSQLSignals() async {
     await signalAssign(last2Days, () async {
-      List<SGV> rawSGVs = await SQLToSGV().last2Days();
-
+      List<SGV> rawSGVs = SGV.last2Days.value;
       return _makeChained(rawSGVs.map((e) => CleanSGV(e.value, e.date)).toList());
-    }, debugLabel: "Clean2DaysQuery", dependencies: [SQLToSGV().writeSignal]);
+    }, debugLabel: "Clean2DaysQuery", dependencies: [SGV.last2Days]);
 
     await signalAssign(last3Hours, () => last2Days.value.where((e) => e.withinLast3Hours).toList(), debugLabel: 'last3HoursQuery');
 

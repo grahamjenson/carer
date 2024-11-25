@@ -100,6 +100,8 @@ int minTime(int min) {
 // Static stuff
 DateTime overrideNow = DateTime(2020, 1, 1, 12);
 
+Duration sec1 = const Duration(seconds: 1);
+
 Duration min0 = const Duration(minutes: 0);
 Duration min1 = const Duration(minutes: 1);
 Duration min5 = const Duration(minutes: 5);
@@ -138,7 +140,7 @@ Future<int> createSVGsWithEIDs(List<(String, int, Duration)> values, {DateTime? 
   var ret = 0;
   await waitForSignalChange(() async {
     ret = await SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(v.$3), eid: v.$1)).toList());
-  }, [CleanSGV.lastSGV, SGV.last2Days]);
+  }, [CleanSGV.lastSGV, SGV.last2Days, CleanSGV.last2Days]);
 
   return ret;
   // wait for CleanSGV signals to update

@@ -119,7 +119,7 @@ void main() async {
       alarm.shortSummary();
     });
 
-    atest("NoDataAlarm", () async {
+    atest("NoDataAlarm", (DateTime now) async {
       AlarmType alarm = AlarmType.noData;
       var (trigger, active, smartSnooze) = alarm.alarmStatus();
       expect(trigger, false);
@@ -128,13 +128,21 @@ void main() async {
 
       AlarmSettings().noDataAlarmMinutes = 20;
 
-      await createSGVsInOrder([220, 200, 187], now: DateTime.now().subtract(min30));
+      await createSGVsInOrder([220, 200, 187], now: now.subtract(min30));
 
       (trigger, active, smartSnooze) = alarm.alarmStatus();
+
       expect(trigger, true);
       expect(active, true);
       expect(smartSnooze, false);
       alarm.shortSummary();
+
+      await createSGVsInOrder([220, 200, 187], now: now);
+      (trigger, active, smartSnooze) = alarm.alarmStatus();
+
+      expect(trigger, false);
+      expect(active, true);
+      expect(smartSnooze, false);
     });
 
     atest("PredictiveLowAlarm", () async {
