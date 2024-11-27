@@ -94,7 +94,7 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        textStyle: WidgetStateProperty.all<TextStyle>(const TextStyle(fontSize: 12.0)),
+        textStyle: WidgetStateProperty.all<TextStyle>(const TextStyle(fontSize: 10.0)),
       ),
       onPressed: onPressed,
       child: Column(
@@ -104,7 +104,6 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
           Icon(
             icon,
             size: 28.0,
-            weight: 0.01,
           ),
           const SizedBox(height: 4.0),
           Text(label),
