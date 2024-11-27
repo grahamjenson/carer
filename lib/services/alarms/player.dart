@@ -5,7 +5,6 @@ import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
 class AlarmPlayer {
   final alarmAudioPlayer = AudioPlayer();
-  final testAudioPlayer = AudioPlayer();
 
   Future<bool> stopAlarm() async {
     return await stopAudioPlayer(alarmAudioPlayer);
@@ -20,19 +19,6 @@ class AlarmPlayer {
   }
 
   bool alarmPlaying() => alarmAudioPlayer.state == PlayerState.playing;
-  bool testAlarmPlaying() => testAudioPlayer.state == PlayerState.playing;
-
-  Future<bool> stopTestAlarm() async {
-    return stopAudioPlayer(testAudioPlayer);
-  }
-
-  // Return IF playing (regardless if call started to play)
-  Future<bool> playTestAlarm() async {
-    // We dont await because this will block until player stops
-    playAudioPlayer(testAudioPlayer);
-    await waitForPlaying(testAudioPlayer);
-    return true;
-  }
 
   Future<void> waitForPlaying(AudioPlayer player) async {
     var tries = 0;

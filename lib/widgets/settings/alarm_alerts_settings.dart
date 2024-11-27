@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -291,15 +290,16 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
   SettingsTile testAlert(BuildContext context, double width) {
     var button = ElevatedButton(
       onPressed: () async {
-        await AlarmsService().playTestAlarm();
+        AlarmAlertSettings().testAlarm = true;
+        Navigator.of(context).pop();
       },
       child: const Text("Test Alarm"),
     );
 
-    if (AlarmsService().testAlarmPlaying) {
+    if (AlarmAlertSettings().testAlarm) {
       button = ElevatedButton(
         onPressed: () async {
-          await AlarmsService().stopTestAlarm();
+          AlarmAlertSettings().testAlarm = false;
         },
         child: const Text("Stop Test Alarm"),
       );

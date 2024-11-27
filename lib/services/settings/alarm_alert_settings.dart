@@ -24,6 +24,7 @@ enum _AANames {
 
   // ephemeral
   snoozeUntil,
+  testAlarm,
 }
 
 enum SnoozeReason {
@@ -51,6 +52,7 @@ class AlarmAlertSettings {
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
     _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
     _AANames.snoozeUntil: ASignal<DateTime?>(null, debugLabel: "snoozeUntil"),
+    _AANames.testAlarm: ASignal<bool>(false, debugLabel: "testAlarm"),
   };
 
   AlarmAlertSettings._();
@@ -85,6 +87,10 @@ class AlarmAlertSettings {
   set enableAutoSnoozeOff(bool value) => _signals[_AANames.enableAutoSnoozeOff]!.value = value;
 
   ASignal<DateTime?> get snoozeUntilSignal => _signals[_AANames.snoozeUntil]! as ASignal<DateTime?>;
+
+  bool get testAlarm => _signals[_AANames.testAlarm]!.value as bool;
+  bool get testAlarmPeek => _signals[_AANames.testAlarm]!.peek() as bool;
+  set testAlarm(bool value) => _signals[_AANames.testAlarm]!.value = value;
 
   allValues() {
     for (var signal in _signals.values) {

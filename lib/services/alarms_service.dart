@@ -24,10 +24,6 @@ class AlarmsService {
   factory AlarmsService() => _singleton;
   final AlarmPlayer player = AlarmPlayer();
 
-  final ASignal<bool> _testAlarmPlayingSignal = ASignal<bool>(false, debugLabel: "TestAlarmPlaying");
-  bool get testAlarmPlaying => _testAlarmPlayingSignal.value;
-  set testAlarmPlaying(bool value) => _testAlarmPlayingSignal.value = value;
-
   ASignal<AlarmSet> pendingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "PendingAlarms");
   ASignal<AlarmSet> alertingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "AlertingAlarms");
 
@@ -36,12 +32,6 @@ class AlarmsService {
     allSettingsSignals.addAll(AlarmSettings().allSignals());
     allSettingsSignals.addAll(AlarmAlertSettings().allSignals());
     allSettingsSignals.addAll(TargetSettings().allSignals());
-
-    aeffect(() async {
-      // Stop test alarm
-      await stopTestAlarm();
-      return false;
-    }, debugLabel: "StopTestAlarmWhenSettingsChange", dependencies: allSettingsSignals);
 
     bool isCheckingAlarms = false;
     List<Signal> additionalDeps = [
@@ -187,6 +177,11 @@ class AlarmsService {
   }
 
   Set<AlarmType> filterAlarms(Set<AlarmType> alarms) {
+    // Remove test alarm if real alarm!
+    if (alarms.length > 1 && alarms.contains(AlarmType.test)) {
+      alarms.remove(AlarmType.test);
+    }
+
     // remove low if urgent low
     if (alarms.contains(AlarmType.low) && alarms.contains(AlarmType.urgentLow)) {
       alarms.remove(AlarmType.low);
@@ -238,25 +233,5 @@ class AlarmsService {
     alog("Starting Brightness Alarms");
     BrightnessAlert().start();
     return true;
-  }
-
-  Future<void> stopTestAlarm() async {
-    var (stopped, err) = await go(player.stopTestAlarm());
-    if (stopped == null || err != null) {
-      alog("Error stopping test alarm: $err");
-      return;
-    }
-    alog("Stopped test alarm");
-    testAlarmPlaying = false;
-  }
-
-  Future<void> playTestAlarm() async {
-    var (playing, err) = await go(player.playTestAlarm());
-    if (playing == null || err != null) {
-      alog("Error playing test alarm: $err");
-      return;
-    }
-    alog("Playing test alarm");
-    testAlarmPlaying = true;
   }
 }

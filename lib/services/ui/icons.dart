@@ -45,6 +45,7 @@ class CarerIcons {
   static const IconData ALARM_NO_DATA = UniconsLine.x;
   static const IconData ALARM_LOW_BATTERY = UniconsLine.battery_empty;
   static const IconData ALARM_UNKNOWN = UniconsLine.question_circle;
+  static const IconData ALARM_TEST = UniconsLine.bell;
 
   // EVENTS
   static const IconData EVENT_APP_RESUMED = CupertinoIcons.play;

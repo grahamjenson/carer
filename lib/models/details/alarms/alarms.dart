@@ -55,6 +55,7 @@ enum AlarmType {
   fastDrop(_FastDropAlarm()),
   noData(_NoDataAlarm()),
   lowBattery(_LowBatteryAlarm()),
+  test(_TestAlarm()),
   unknown(_Unkown());
 
   final AlarmMethods _methods;
@@ -240,6 +241,31 @@ class _Unkown extends AlarmMethods {
 
   @override
   bool active() => false;
+}
+
+class _TestAlarm extends AlarmMethods {
+  const _TestAlarm();
+
+  @override
+  String get title => "TEST ALARM";
+
+  @override
+  IconData icon() => CarerIcons.ALARM_TEST;
+
+  @override
+  String get description => "TEST ALARM";
+
+  @override
+  String shortSummary() => "TEST ALARM";
+
+  @override
+  String statment() => "TEST: Turn off in settings";
+
+  @override
+  bool trigger() => AlarmAlertSettings().testAlarm;
+
+  @override
+  bool active() => AlarmAlertSettings().testAlarm;
 }
 
 class _UrgentLowAlarm extends AlarmMethods {
