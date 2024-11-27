@@ -52,7 +52,7 @@ class AlarmAlertSettings {
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
     _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
     _AANames.snoozeUntil: ASignal<DateTime?>(null, debugLabel: "snoozeUntil"),
-    _AANames.testAlarm: ASignal<bool>(false, debugLabel: "testAlarm"),
+    _AANames.testAlarm: ASignal<DateTime?>(null, debugLabel: "testAlarm"),
   };
 
   AlarmAlertSettings._();
@@ -88,9 +88,26 @@ class AlarmAlertSettings {
 
   ASignal<DateTime?> get snoozeUntilSignal => _signals[_AANames.snoozeUntil]! as ASignal<DateTime?>;
 
-  bool get testAlarm => _signals[_AANames.testAlarm]!.value as bool;
-  bool get testAlarmPeek => _signals[_AANames.testAlarm]!.peek() as bool;
-  set testAlarm(bool value) => _signals[_AANames.testAlarm]!.value = value;
+  // Test alarm will be true for 5 minutes after it is set
+  bool get testAlarm {
+    var testDate = _signals[_AANames.testAlarm]!.value as DateTime?;
+    if (testDate == null) {
+      return false;
+    }
+    var diff = clock.now().difference(testDate);
+    if (diff.inMinutes < 2) {
+      return true;
+    }
+    return false;
+  }
+
+  set testAlarm(bool value) {
+    if (value) {
+      _signals[_AANames.testAlarm]!.value = clock.now();
+    } else {
+      _signals[_AANames.testAlarm]!.value = null;
+    }
+  }
 
   allValues() {
     for (var signal in _signals.values) {

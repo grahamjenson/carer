@@ -29,6 +29,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
           enableAutoSnoozeOff(),
           brightnessAdjust(),
           enableAudioAlarms(context),
+          testAlert(context, width),
         ].whereType<SettingsTile>().toList();
 
         if (AlarmAlertSettings().enableAudioAlarm) {

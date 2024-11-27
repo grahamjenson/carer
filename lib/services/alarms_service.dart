@@ -177,9 +177,10 @@ class AlarmsService {
   }
 
   Set<AlarmType> filterAlarms(Set<AlarmType> alarms) {
-    // Remove test alarm if real alarm!
+    // Remove and Stop test alarm if real alarm is present
     if (alarms.length > 1 && alarms.contains(AlarmType.test)) {
       alarms.remove(AlarmType.test);
+      AlarmAlertSettings().testAlarm = false;
     }
 
     // remove low if urgent low

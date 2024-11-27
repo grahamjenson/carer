@@ -1,8 +1,10 @@
 import 'package:carer/mappers/sql/events.dart';
+import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/events/alarm_event.dart';
 import 'package:carer/models/sql/events/app_state_change_event.dart';
 import 'package:carer/models/sql/events/event.dart';
 import 'package:carer/models/sql/events/snooze_events.dart';
+import 'package:carer/models/treatment_group.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
@@ -35,16 +37,67 @@ class EventsPage extends StatelessWidget with ThemeMixin {
   }
 
   Widget timelineRows(BuildContext context) {
-    List<EventModel> items = SQLToEvents().lastCoupleDays.value;
+    List<EventModel> events = SQLToEvents().lastCoupleDays.value;
+    List<Treatment> treatments = Treatment.last2days.value;
+
+    List<DateMixin> items = [...events, ...treatments];
+    items.sort((a, b) => b.date.compareTo(a.date));
+
+    List<Widget> children = items.map((model) {
+      if (model is AlarmEvent) {
+        return eventHistoryRow(
+          context,
+          "${formatDate(model.startDate)}-${formatDate(model.endDate)}     ${model.alarmType.title} ${model.stage.name} ",
+          model.alarmType.icon,
+          primaryColor(context),
+          () {
+            showLogModelDialog(context, model);
+          },
+        );
+      }
+      if (model is SnoozeEvent) {
+        return eventHistoryRow(
+          context,
+          " ${formatDate(model.startDate)}-${formatDate(model.endDate)}     Snooze",
+          CarerIcons.EVENT_SNOOZE,
+          accentColor(context),
+          () {
+            showLogModelDialog(context, model);
+          },
+        );
+      }
+      if (model is AppStateEvent) {
+        return eventHistoryRow(
+          context,
+          " ${formatDate(model.startDate)}     App ${model.stage.name}",
+          model.stage == AppStateEventType.paused ? CarerIcons.EVENT_APP_PAUSED : CarerIcons.EVENT_APP_RESUMED,
+          accentColor(context),
+          () {
+            showLogModelDialog(context, model);
+          },
+        );
+      }
+      if (model is Treatment) {
+        return eventHistoryRow(
+          context,
+          " ${formatDate(model.date)}     ${model.isBolus ? "Bolus" : "Carb"} ${model.treatmentStr}${model.isSmb ? "*" : ""}",
+          model.isBolus ? CarerIcons.EVENT_BOLUS : CarerIcons.EVENT_CARBS,
+          model.isBolus ? accentColor(context).dim : primaryColor(context).dim,
+          () {},
+        );
+      }
+
+      return const SizedBox.shrink();
+    }).toList();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: items.map((e) => logDbModelWidget(context, e)).toList(),
+      children: children,
     );
   }
 
-  Widget logDbModelWidget(BuildContext context, EventModel model) {
+  Widget eventHistoryRow(BuildContext context, String text, IconData icon, Color iconColor, VoidCallback onPressed) {
     TextStyle style = TextStyle(fontSize: 12, color: onBackgroundColor(context));
 
     // Square button with thick borders
@@ -60,63 +113,21 @@ class EventsPage extends StatelessWidget with ThemeMixin {
         padding: const EdgeInsets.all(10), // Remove default padding
         alignment: Alignment.centerLeft);
 
-    if (model is AlarmEvent) {
-      return Container(
-          margin: const EdgeInsets.all(2),
-          child: ElevatedButton.icon(
-            style: btnStyle,
-            icon: Icon(model.alarmType.icon, color: primaryColor(context)),
-            label: Text(
-              "${formatDate(model.startDate)}-${formatDate(model.endDate)}     ${model.alarmType.title} ${model.stage.name} ",
-              style: style,
-            ),
-            onPressed: () {
-              showLogModelDialog(context, model);
-            },
-          ));
-    }
-
-    if (model is SnoozeEvent) {
-      return Container(
-        margin: const EdgeInsets.all(2),
-        child: ElevatedButton.icon(
-          style: btnStyle,
-          icon: Icon(
-            CarerIcons.EVENT_SNOOZE,
-            color: accentColor(context),
-          ),
-          label: Text(
-            " ${formatDate(model.startDate)}-${formatDate(model.endDate)}     Snooze",
-            style: style,
-          ),
-          onPressed: () {
-            showLogModelDialog(context, model);
-          },
+    return Container(
+      margin: const EdgeInsets.all(2),
+      child: ElevatedButton.icon(
+        style: btnStyle,
+        icon: Icon(
+          icon,
+          color: iconColor,
         ),
-      );
-    }
-
-    if (model is AppStateEvent) {
-      return Container(
-        margin: const EdgeInsets.all(2),
-        child: ElevatedButton.icon(
-          style: btnStyle,
-          icon: Icon(
-            model.stage == AppStateEventType.paused ? CarerIcons.EVENT_APP_PAUSED : CarerIcons.EVENT_APP_RESUMED,
-            color: accentColor(context),
-          ),
-          label: Text(
-            " ${formatDate(model.startDate)}     App ${model.stage.name}",
-            style: style,
-          ),
-          onPressed: () {
-            showLogModelDialog(context, model);
-          },
+        label: Text(
+          text,
+          style: style,
         ),
-      );
-    }
-
-    return const SizedBox.shrink();
+        onPressed: onPressed,
+      ),
+    );
   }
 
   Widget detailsWidget(BuildContext context, Map<String, dynamic> details) {
