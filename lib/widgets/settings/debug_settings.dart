@@ -1,7 +1,7 @@
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/widgets/settings/debug_pages/debug_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:unicons/unicons.dart';
 
 class DebugSettingsWidget extends AbstractSettingsSection {
   const DebugSettingsWidget({super.key});
@@ -13,7 +13,7 @@ class DebugSettingsWidget extends AbstractSettingsSection {
       tiles: [
         SettingsTile.navigation(
             title: const Text("Debug"),
-            leading: const Icon(UniconsLine.bug),
+            leading: const Icon(CarerIcons.SETTINGS_DEBUG),
             onPressed: (context) {
               Navigator.push(
                 context,

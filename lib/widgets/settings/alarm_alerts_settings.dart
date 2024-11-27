@@ -5,6 +5,7 @@ import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
@@ -152,7 +153,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
               Expanded(
                   flex: 1,
                   child: InkWell(
-                      child: const Icon(Icons.volume_down),
+                      child: const Icon(CarerIcons.SETTINGS_VOLUME_DOWN),
                       onTap: () {
                         var ov = AlarmAlertSettings().volumeOverrideValuePeek;
                         AlarmAlertSettings().volumeOverrideValue = max(minRange, ov - 10).toInt();
@@ -172,7 +173,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
               Expanded(
                 flex: 1,
                 child: InkWell(
-                  child: const Icon(Icons.volume_up),
+                  child: const Icon(CarerIcons.SETTINGS_VOLUME_UP),
                   onTap: () {
                     var ov = AlarmAlertSettings().volumeOverrideValuePeek;
                     AlarmAlertSettings().volumeOverrideValue = min(maxRange, ov + 10).toInt();
@@ -193,28 +194,20 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         borderRadius: BorderRadius.circular(10),
         borderWidth: 4,
         isSelected: [
-          10 == AlarmAlertSettings().volumeProgressionSeconds,
           20 == AlarmAlertSettings().volumeProgressionSeconds,
-          30 == AlarmAlertSettings().volumeProgressionSeconds,
           60 == AlarmAlertSettings().volumeProgressionSeconds,
           120 == AlarmAlertSettings().volumeProgressionSeconds,
         ],
         onPressed: (int index) {
           var value = -1;
           switch (index) {
-            case 0:
-              value = 10;
-              break;
             case 1:
               value = 20;
               break;
             case 2:
-              value = 30;
-              break;
-            case 3:
               value = 60;
               break;
-            case 4:
+            case 3:
               value = 120;
               break;
           }
@@ -225,17 +218,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         },
         children: const [
           ToggleButton(
-            text: "10s",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
             text: "20s",
-            height: _size,
-            width: _size,
-          ),
-          ToggleButton(
-            text: "30s",
             height: _size,
             width: _size,
           ),

@@ -5,13 +5,13 @@ import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/background_service.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/toast_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/settings/debug_pages/events_page.dart';
 import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
 import 'package:carer/widgets/settings/debug_pages/nightscout_debug.dart';
 import 'package:clock/clock.dart';
@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:unicons/unicons.dart';
 
 Future<void> zipAndShare(List<String> filePaths, String zipFileName) async {
   // Create a zip file from the list of files
@@ -71,7 +70,6 @@ class DebugSettingsPage extends StatelessWidget {
   List<SettingsSection> getSections() {
     List<SettingsSection> sections = [
       getErrorLog(),
-      getAlarms(),
       getShareLogs(),
       getServices(),
       getTestButtons(),
@@ -91,7 +89,7 @@ class DebugSettingsPage extends StatelessWidget {
       tiles: [
         SettingsTile(
           title: const Text("Reset Onboarding Data"),
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             FlowData().agreedPrivacyPolicy = null;
             FlowData().agreedTermsAndConditions = null;
@@ -99,7 +97,7 @@ class DebugSettingsPage extends StatelessWidget {
         ),
         SettingsTile(
           title: const Text("Reset NightScout URL"),
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             SecureSettings().debugDeleteNSValues();
           },
@@ -114,14 +112,14 @@ class DebugSettingsPage extends StatelessWidget {
       tiles: [
         SettingsTile(
           title: const Text("Test Error Toast"),
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             ToastService().showError("Test Error", description: "this is a test error");
           },
         ),
         SettingsTile(
           title: const Text("Test Success Toast"),
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             ToastService().showSuccess("Test Success", description: "this is a test success");
           },
@@ -137,30 +135,11 @@ class DebugSettingsPage extends StatelessWidget {
         SettingsTile.navigation(
           title: const Text("Error Log"),
           descriptionInlineIos: true,
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const LogErrorPage()),
-            );
-          },
-        )
-      ],
-    );
-  }
-
-  SettingsSection getAlarms() {
-    return SettingsSection(
-      title: const Text('Alarms'),
-      tiles: [
-        SettingsTile.navigation(
-          title: const Text("Alarms"),
-          descriptionInlineIos: true,
-          leading: const Icon(UniconsLine.bug),
-          onPressed: (context) async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const EventsPage()),
             );
           },
         )
@@ -175,7 +154,7 @@ class DebugSettingsPage extends StatelessWidget {
         SettingsTile.navigation(
           title: const Text("Share Debug Files"),
           descriptionInlineIos: true,
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             List<String> paths = [];
 
@@ -203,7 +182,7 @@ class DebugSettingsPage extends StatelessWidget {
         SettingsTile.navigation(
           title: const Text("Background Do"),
           descriptionInlineIos: true,
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             BackgroundService().onFetch("com.transistorsoft.fetch");
           },
@@ -218,7 +197,7 @@ class DebugSettingsPage extends StatelessWidget {
       tiles: [
         SettingsTile(
           title: const Text("NightScout"),
-          leading: const Icon(UniconsLine.bug),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             Navigator.push(
               context,

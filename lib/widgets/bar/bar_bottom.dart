@@ -1,6 +1,7 @@
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snooze_bar_button.dart';
 import 'package:carer/widgets/pages/alarm_settings_page.dart';
@@ -18,10 +19,10 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     return AWatch(
       (context) {
         var children = [
-          createButton(context, "Care", Icons.back_hand, const CarePage()),
-          createButton(context, "Info", Icons.info, const InfoSettingsPage()),
-          createButton(context, "Alarms", Icons.alarm, const AlarmsSettingsPage()),
-          createButton(context, "Settings", Icons.settings, const SettingsPage()),
+          createButton(context, "Care", CarerIcons.BAR_CARE, const CarePage()),
+          createButton(context, "Info", CarerIcons.BAR_INFO, const InfoSettingsPage()),
+          createButton(context, "Alarms", CarerIcons.BAR_ALARMS, const AlarmsSettingsPage()),
+          createButton(context, "Settings", CarerIcons.BAR_SETTINGS, const SettingsPage()),
         ];
 
         NotchedShape? notchShape;
@@ -93,6 +94,7 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
+        textStyle: WidgetStateProperty.all<TextStyle>(const TextStyle(fontSize: 12.0)),
       ),
       onPressed: onPressed,
       child: Column(
@@ -101,13 +103,11 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
         children: [
           Icon(
             icon,
-            size: 32.0,
+            size: 28.0,
+            weight: 0.01,
           ),
           const SizedBox(height: 4.0),
-          Text(label,
-              style: const TextStyle(
-                fontSize: 10.0,
-              )),
+          Text(label),
         ],
       ),
     );

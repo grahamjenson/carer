@@ -5,7 +5,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
-import 'package:carer/widgets/settings/debug_pages/events_page.dart';
+import 'package:carer/widgets/settings/events_page.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -24,7 +24,7 @@ class AlarmsSettingsPage extends StatelessWidget {
           const TargetSettingsWidget(),
           const AlarmsSettingsWidget(),
           const AlarmsAlertSettingsWidget(),
-          getAlarms(),
+          getEventsPage(),
         ];
 
         if (AlarmSettings().disableAlarms) {
@@ -78,7 +78,7 @@ class AlarmsSettingsPage extends StatelessWidget {
     );
   }
 
-  SettingsSection getAlarms() {
+  SettingsSection getEventsPage() {
     return SettingsSection(
       title: const Text('Logs'),
       tiles: [

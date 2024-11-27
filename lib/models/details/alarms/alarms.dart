@@ -7,11 +7,11 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:unicons/unicons.dart';
 
 class AlarmSet extends Iterable<AlarmType> {
   final Set<AlarmType> _alarms;
@@ -224,7 +224,7 @@ class _Unkown extends AlarmMethods {
   String get title => "Unknown Alarm";
 
   @override
-  IconData icon() => UniconsLine.question_circle;
+  IconData icon() => CarerIcons.ALARM_UNKNOWN;
 
   @override
   String get description => "Unknown Alarm";
@@ -246,7 +246,7 @@ class _UrgentLowAlarm extends AlarmMethods {
   const _UrgentLowAlarm();
 
   @override
-  IconData icon() => UniconsLine.temperature_minus;
+  IconData icon() => CarerIcons.ALARM_URGENT_LOW;
 
   @override
   String get title => "Urgent Low Alarm";
@@ -327,7 +327,7 @@ class _LowAlarm extends AlarmMethods {
   }
 
   @override
-  IconData icon() => UniconsLine.temperature_empty;
+  IconData icon() => CarerIcons.ALARM_LOW;
 
   bool _lowTrigger() {
     return targetRange5 == Range5.low || targetRange5 == Range5.veryLow;
@@ -377,7 +377,7 @@ class _HighAlarm extends AlarmMethods {
   const _HighAlarm();
 
   @override
-  IconData icon() => UniconsLine.temperature;
+  IconData icon() => CarerIcons.ALARM_HIGH;
 
   @override
   String get title => "High Alarm";
@@ -457,7 +457,7 @@ class _UrgentHighAlarm extends AlarmMethods {
   String get title => "Urgent High Alarm";
 
   @override
-  IconData icon() => UniconsLine.temperature_plus;
+  IconData icon() => CarerIcons.ALARM_URGENT_HIGH;
 
   @override
   String get description {
@@ -493,7 +493,7 @@ class _FastRiseAlarm extends AlarmMethods {
   String get title => "Fast Rise Alarm";
 
   @override
-  IconData icon() => UniconsLine.angle_double_up;
+  IconData icon() => CarerIcons.ALARM_FAST_RISE;
 
   @override
   String get description {
@@ -544,7 +544,7 @@ class _FastDropAlarm extends AlarmMethods {
   String get title => "Fast Drop Alarm";
 
   @override
-  IconData icon() => UniconsLine.angle_double_down;
+  IconData icon() => CarerIcons.ALARM_FAST_DROP;
 
   @override
   String get description {
@@ -599,7 +599,7 @@ class _NoDataAlarm extends AlarmMethods {
   String get title => "No Data Alarm";
 
   @override
-  IconData icon() => UniconsLine.x;
+  IconData icon() => CarerIcons.ALARM_NO_DATA;
 
   @override
   String get description {
@@ -657,7 +657,7 @@ class _LowBatteryAlarm extends AlarmMethods {
   String get title => "Low Battery Alarm";
 
   @override
-  IconData icon() => UniconsLine.battery_empty;
+  IconData icon() => CarerIcons.ALARM_LOW_BATTERY;
 
   @override
   Map<String, dynamic> details() {

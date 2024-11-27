@@ -5,10 +5,10 @@ import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/math.dart';
 import 'package:flutter/widgets.dart';
-import 'package:unicons/unicons.dart';
 
 abstract class _InfoMethods with ThemeMixin {
   const _InfoMethods();
@@ -55,7 +55,7 @@ class _IOB extends _InfoMethods {
   String get description => "Insulin on board";
 
   @override
-  IconData get icon => UniconsLine.syringe;
+  IconData get icon => CarerIcons.INFO_INSULIN_ON_BOARD;
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
@@ -75,7 +75,7 @@ class _COB extends _InfoMethods {
   String get description => "Carbs on board";
 
   @override
-  IconData get icon => UniconsLine.restaurant;
+  IconData get icon => CarerIcons.INFO_CARBS_ON_BOARD;
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
@@ -87,13 +87,13 @@ class _Basal extends _InfoMethods {
   const _Basal();
 
   @override
-  String get title => "Basal";
+  String get title => "Basal Rate";
 
   @override
   String get description => "Current Basal Rate";
 
   @override
-  IconData get icon => UniconsLine.tear;
+  IconData get icon => CarerIcons.INFO_BASAL_RATE;
 
   @override
   bool get highlight {
@@ -132,7 +132,7 @@ class _Target extends _InfoMethods {
   String get description => "Current Target Range";
 
   @override
-  IconData get icon => UniconsLine.focus_target;
+  IconData get icon => CarerIcons.INFO_TARGET;
 
   @override
   bool get highlight {
@@ -172,7 +172,7 @@ class _CurrentProfile extends _InfoMethods {
   String get description => "Current Profile";
 
   @override
-  IconData get icon => UniconsLine.user;
+  IconData get icon => CarerIcons.INFO_PROFILE;
 
   @override
   bool get highlight {
@@ -213,7 +213,7 @@ class _TodayInRange extends _InfoMethods {
   String get description => "Today's Time in Range";
 
   @override
-  IconData get icon => UniconsLine.chart_pie;
+  IconData get icon => CarerIcons.INFO_TODAY_IN_RANGE;
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
@@ -233,7 +233,7 @@ class _YesterdayInRange extends _InfoMethods {
   String get description => "Yesterday's Time in Range";
 
   @override
-  IconData get icon => UniconsLine.chart_pie_alt;
+  IconData get icon => CarerIcons.INFO_YESTERDAY_IN_RANGE;
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {

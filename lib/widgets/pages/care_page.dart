@@ -4,6 +4,7 @@ import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/toast_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/shared/settings_slider.dart';
@@ -106,7 +107,7 @@ class CarePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AWatch((context) {
-      IconData actionIcon = _editing.value ? Icons.done : Icons.edit;
+      IconData actionIcon = _editing.value ? CarerIcons.BAR_DONE_CARE : CarerIcons.BAR_EDIT_CARE;
 
       return PopScope(
         onPopInvoked: (bool didPop) {

@@ -4,10 +4,10 @@ import 'package:carer/models/sql/events/app_state_change_event.dart';
 import 'package:carer/models/sql/events/event.dart';
 import 'package:carer/models/sql/events/snooze_events.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/smarttext.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EventsPage extends StatelessWidget with ThemeMixin {
@@ -82,7 +82,7 @@ class EventsPage extends StatelessWidget with ThemeMixin {
         child: ElevatedButton.icon(
           style: btnStyle,
           icon: Icon(
-            CupertinoIcons.zzz,
+            CarerIcons.EVENT_SNOOZE,
             color: accentColor(context),
           ),
           label: Text(
@@ -102,7 +102,7 @@ class EventsPage extends StatelessWidget with ThemeMixin {
         child: ElevatedButton.icon(
           style: btnStyle,
           icon: Icon(
-            model.stage == AppStateEventType.paused ? CupertinoIcons.pause : CupertinoIcons.play,
+            model.stage == AppStateEventType.paused ? CarerIcons.EVENT_APP_PAUSED : CarerIcons.EVENT_APP_RESUMED,
             color: accentColor(context),
           ),
           label: Text(

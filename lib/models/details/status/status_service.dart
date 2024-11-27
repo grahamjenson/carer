@@ -4,9 +4,9 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
-import 'package:unicons/unicons.dart';
 
 abstract class _StatusMethods {
   const _StatusMethods();
@@ -27,7 +27,7 @@ enum Status {
   lowReservoir(_LowReservoir()),
   disabledAlarms(_DisabledAlarms()),
   disabledAudioAlarms(_DisabledAudioAlarms()),
-  screenNotLocked(_ScreenNotLocked()),
+  screenCanSleep(_ScreenCanSleep()),
   ;
 
   final _StatusMethods _methods;
@@ -47,17 +47,17 @@ enum Status {
   }
 }
 
-class _ScreenNotLocked extends _StatusMethods {
-  const _ScreenNotLocked();
+class _ScreenCanSleep extends _StatusMethods {
+  const _ScreenCanSleep();
 
   @override
-  String get title => "Screen Not Locked";
+  String get title => "Screen Can Sleep";
 
   @override
-  String get description => "The Screen may sleep";
+  String get description => "If the Screen Sleeps Alarms will not work";
 
   @override
-  IconData get icon => UniconsLine.lock_slash;
+  IconData get icon => CarerIcons.STATUS_SCREEN_CAN_SLEEP;
 
   @override
   String get reason {
@@ -80,7 +80,7 @@ class _DisabledAudioAlarms extends _StatusMethods {
   String get description => "Shows When Audio Alarms are Disabled";
 
   @override
-  IconData get icon => UniconsLine.volume_mute;
+  IconData get icon => CarerIcons.STATUS_DISABLED_AUDIO_ALARMS;
 
   @override
   String get reason {
@@ -103,7 +103,7 @@ class _DisabledAlarms extends _StatusMethods {
   String get description => "Shows When Alarms are Disabled";
 
   @override
-  IconData get icon => UniconsLine.bell_slash;
+  IconData get icon => CarerIcons.STATUS_DISABLED_ALARMS;
 
   @override
   String get reason {
@@ -126,7 +126,7 @@ class _CannulaChange extends _StatusMethods {
   String get description => "Shows 24 hours before change";
 
   @override
-  IconData get icon => UniconsLine.mobile_android;
+  IconData get icon => CarerIcons.STATUS_CANNULA_CHANGE;
 
   @override
   String get status {
@@ -176,7 +176,7 @@ class _SensorChange extends _StatusMethods {
   String get description => "Shows 24 hours before change";
 
   @override
-  IconData get icon => UniconsLine.processor;
+  IconData get icon => CarerIcons.STATUS_SENSOR_CHANGE;
 
   @override
   String get status {
@@ -226,7 +226,7 @@ class _NotCharging extends _StatusMethods {
   String get description => "Shows When Phone is not Charging";
 
   @override
-  IconData get icon => UniconsLine.bolt_slash;
+  IconData get icon => CarerIcons.STATUS_NOT_CHARGING;
 
   @override
   String get status {
@@ -275,7 +275,7 @@ class _PowerLow extends _StatusMethods {
   String get description => "Shows When Phone Battery is below 30%";
 
   @override
-  IconData get icon => UniconsLine.battery_empty;
+  IconData get icon => CarerIcons.STATUS_BATTERY_LOW;
 
   @override
   String get status {
@@ -337,7 +337,7 @@ class _SilentOn extends _StatusMethods {
   String get description => "Shows When Silent Mode is On";
 
   @override
-  IconData get icon => UniconsLine.bell_slash;
+  IconData get icon => CarerIcons.STATUS_SILENT_MODE;
 
   @override
   String get reason {
@@ -364,7 +364,7 @@ class _LowReservoir extends _StatusMethods {
   String get description => "Shows When Reservoir below 20u";
 
   @override
-  IconData get icon => UniconsLine.water_drop_slash;
+  IconData get icon => CarerIcons.STATUS_LOW_RESERVOIR;
 
   @override
   String get reason {

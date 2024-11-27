@@ -36,7 +36,6 @@ class NightscoutSettingsPage extends StatelessWidget {
                   SettingsTile.navigation(
                     title: const Text('URL'),
                     value: Container(alignment: Alignment.centerRight, width: maxWidth, child: Text(viewURL, overflow: TextOverflow.ellipsis)),
-                    leading: const Icon(Icons.language),
                     onPressed: (context) async {
                       final url = await openTextDialog(context, "Nightscout URL", hint: "Nightscout URL", value: currentURL);
                       if (url == null || url.isEmpty) return;

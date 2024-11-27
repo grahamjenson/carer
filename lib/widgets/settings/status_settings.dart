@@ -2,11 +2,11 @@ import 'package:carer/models/details/status/status_service.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:unicons/unicons.dart';
 
 class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   const StatusSettingsWidget({super.key});
@@ -26,7 +26,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           statusTile(context, Status.lowReservoir),
           statusTile(context, Status.disabledAlarms),
           statusTile(context, Status.disabledAudioAlarms),
-          statusTile(context, Status.screenNotLocked),
+          statusTile(context, Status.screenCanSleep),
         ];
 
         List<SettingsTile> filteredTiles = tiles.whereType<SettingsTile>().toList();
@@ -102,7 +102,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
         InkWell(
             onTap: dec,
             child: const Icon(
-              UniconsLine.minus,
+              CarerIcons.SETTINGS_MINUS,
             )),
         SizedBox(
             width: 50,
@@ -120,7 +120,12 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
                 ),
               ), // Add padding inside the border
             )),
-        InkWell(onTap: inc, child: const Icon(UniconsLine.plus)),
+        InkWell(
+          onTap: inc,
+          child: const Icon(
+            CarerIcons.SETTINGS_PLUS,
+          ),
+        ),
       ]),
     );
   }

@@ -119,14 +119,6 @@ class AlarmSettings {
     signal.value = value;
   }
 
-  volumeProgressionSecondsSet(ASignal<int> signal, value) {
-    var validValues = [-1, 10, 20, 30, 60, 120];
-    if (!validValues.contains(value)) {
-      return false;
-    }
-    signal.value = value;
-  }
-
   setupDBPropagation(KeyValueStore prefs) {
     disableAlarms = prefs.getBool(_AlarmNames.disableAlarms.name, defaultValue: false)!;
     urgentLowAlarm = prefs.getBool(_AlarmNames.urgentLowAlarm.name, defaultValue: true)!;

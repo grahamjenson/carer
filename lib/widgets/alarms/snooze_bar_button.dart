@@ -3,6 +3,7 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snoozetime_page.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
 
         Widget snoozeIcon = const Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(Icons.bedtime_outlined), Text("Snooze")],
+          children: [Icon(CarerIcons.BAR_SNOOZE), Text("Snooze")],
         );
 
         List<Widget> children = [snoozeIcon];

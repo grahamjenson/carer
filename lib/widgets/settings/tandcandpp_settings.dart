@@ -1,9 +1,9 @@
 import 'package:carer/models/flow_data.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-import 'package:unicons/unicons.dart';
 
 class TermsAndConditionsPrivacyPolicyWidget extends AbstractSettingsSection {
   const TermsAndConditionsPrivacyPolicyWidget({super.key});
@@ -17,14 +17,14 @@ class TermsAndConditionsPrivacyPolicyWidget extends AbstractSettingsSection {
           title: const Text("Terms and Conditions"),
           descriptionInlineIos: true,
           description: Text("Agreed on ${_formatDate(FlowData().agreedTermsAndConditions)}"),
-          leading: const Icon(UniconsLine.document_info),
+          leading: const Icon(CarerIcons.SETTINGS_TERMS_AND_CONDITIONS),
           onPressed: (BuildContext context) async {
             await showDocument(context, "Terms and Conditions", StringAssets().termsAndConditions);
           },
         ),
         SettingsTile.navigation(
             title: const Text("Privacy Policy"),
-            leading: const Icon(UniconsLine.document_info),
+            leading: const Icon(CarerIcons.SETTINGS_PRIVACY_POLICY),
             descriptionInlineIos: true,
             description: Text("Agreed on ${_formatDate(FlowData().agreedPrivacyPolicy)}"),
             onPressed: (context) async {
