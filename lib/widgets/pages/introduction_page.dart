@@ -1,4 +1,5 @@
 import 'package:carer/models/flow_data.dart';
+import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -22,12 +23,23 @@ class IntroductionPage extends StatefulWidget {
 class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
   final IntroPageController _pageController = IntroPageController();
   final TextEditingController _nsTextController = TextEditingController();
+  final ASignal<String> nightscoutMessage = ASignal("", debugLabel: "NightScoutMessage");
+  final ASignal<bool> nightscoutValid = ASignal(false, debugLabel: "NightScoutValid");
 
   @override
   void initState() {
     super.initState();
-    _nsTextController.addListener(() {
-      SecureSettings().setNSValuesFromURL(_nsTextController.text);
+    _nsTextController.addListener(() async {
+      var (url, token) = SecureSettings().nightscoutURLAndTokenFromString(_nsTextController.text);
+
+      var errMsg = await NSClient().testNSUrlAndToken(url, token);
+      if (errMsg != null) {
+        nightscoutMessage.value = errMsg;
+        nightscoutValid.value = false;
+      } else {
+        nightscoutMessage.value = "";
+        nightscoutValid.value = true;
+      }
     });
   }
 
@@ -178,13 +190,20 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
     return AWatch(
       (context) {
         VoidCallback? onPressed;
-        if (SecureSettings().nightscoutURLAndTokenSet()) {
+        if (nightscoutValid.value) {
           onPressed = () {
+            SecureSettings().setNSValuesFromURL(_nsTextController.text);
             if (_pageController.hasClients) {
               _pageController.animateToNextPage();
             }
           };
         }
+
+        String errMessageString = "";
+        if (nightscoutMessage.value.isNotEmpty) {
+          errMessageString = "\n\n **Error**: ${nightscoutMessage.value}";
+        }
+        var (nsURL, token) = SecureSettings().nightscoutURLAndTokenFromString(_nsTextController.text);
         return Container(
           padding: const EdgeInsets.all(40),
           child: Column(
@@ -201,9 +220,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
                 thickness: 10,
                 color: Colors.blue.dim,
               ),
-              MarkdownBody(
-                  data: "**URL**: ${SecureSettings().nightscoutURL ?? ""}"
-                      "\n\n **TOKEN**: ${SecureSettings().nightscoutToken ?? ""}"),
+              MarkdownBody(data: "**URL**: $nsURL \n\n **TOKEN**: $token$errMessageString"),
               Divider(
                 height: 40,
                 thickness: 10,
@@ -248,7 +265,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     if (details.primaryDelta! < 0) {
       _pageController.animateToNextPage();
-    } else if (details.primaryDelta! > 0) {
+    } else if (details.primaryDelta! > 0 && _pageController.page! > 0.0) {
       _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     }
   }

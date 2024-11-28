@@ -149,7 +149,7 @@ class DebugSettingsPage extends StatelessWidget {
 
   SettingsSection getShareLogs() {
     return SettingsSection(
-      title: const Text('Alarms'),
+      title: const Text('Share'),
       tiles: [
         SettingsTile.navigation(
           title: const Text("Share Debug Files"),

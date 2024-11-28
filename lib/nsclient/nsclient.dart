@@ -24,6 +24,8 @@ String toNSDateString(DateTime dt) {
   return "$year-$month-${day}T$hour:$minute";
 }
 
+Uri testEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
+
 Uri entryEndpoint(nsURL, token, DateTime gteCreatedAt) =>
     Uri.parse('$nsURL/api/v1/entries.json?token=$token&find[created_at][\$gte]=${toNSDateString(gteCreatedAt)}&count=1000');
 
@@ -59,6 +61,29 @@ class NSClient {
 
   String? jwt;
   DateTime? jwtExpire;
+
+  ///
+  // Test API Call
+  ///
+
+  Future<String?> testNSUrlAndToken(String nsURL, String token) async {
+    if (nsURL.isEmpty || nsURL.length < 8) {
+      return "NightScout URL not valid";
+    }
+    if (token.isEmpty || nsURL.length < 10) {
+      return "NightScout Token not valid";
+    }
+
+    var ep = testEndpoint(nsURL, token);
+    final (response, err) = await go(http.get(ep));
+    if (err != null || response == null) {
+      return "Error: $err";
+    }
+    if (response.statusCode != 200) {
+      return "Bad Response: ${response.body}";
+    }
+    return null;
+  }
 
   ///
   // API V3 Calls
@@ -182,6 +207,7 @@ class NSClient {
   ///
   // API  V1 CALLS
   ///
+
   Future<NSEntries> getEntries(String nsURL, String token, DateTime gteCreateAt) async {
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");

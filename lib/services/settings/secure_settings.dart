@@ -26,13 +26,18 @@ class SecureSettings {
     ));
   }
 
-  void setNSValuesFromURL(String url) {
+  (String, String) nightscoutURLAndTokenFromString(String url) {
     var uri = Uri.parse(url);
     var token = uri.queryParameters["token"];
     token ??= '';
     var base = '${uri.scheme}://${uri.host}';
 
-    nightscoutURL = base.toString();
+    return (base.toString(), token);
+  }
+
+  void setNSValuesFromURL(String url) {
+    var (base, token) = nightscoutURLAndTokenFromString(url);
+    nightscoutURL = base;
     nightscoutToken = token;
   }
 
