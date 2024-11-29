@@ -55,7 +55,7 @@ class CarerIcons {
   static const IconData EVENT_CARBS = UniconsLine.restaurant;
 
   // SETTINGS
-  static const IconData SETTINGS_TERMS_AND_CONDITIONS = UniconsLine.document_info;
+  static const IconData SETTINGS_TERMS_OF_SERVICE = UniconsLine.document_info;
   static const IconData SETTINGS_PRIVACY_POLICY = UniconsLine.document_info;
   static const IconData SETTINGS_DEBUG = UniconsLine.bug;
   static const IconData SETTINGS_PLUS = UniconsLine.plus;

@@ -16,7 +16,7 @@ class IntroductionPage extends StatefulWidget {
   State<IntroductionPage> createState() => _IntroductionPageState();
 
   static bool needsOnboarding() {
-    return FlowData().agreedTermsAndConditions == null || FlowData().agreedPrivacyPolicy == null || !SecureSettings().nightscoutURLAndTokenSet();
+    return FlowData().agreedTermsOfService == null || FlowData().agreedPrivacyPolicy == null || !SecureSettings().nightscoutURLAndTokenSet();
   }
 }
 
@@ -71,7 +71,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
     );
 
     // But of a hack, but there are two lists, one of the pages and the other functions that allow the pages to progress
-    // You should not be able to get into the app without agreeing to the terms and conditions and privacy policy
+    // You should not be able to get into the app without agreeing to the terms of service and privacy policy
     // And nothing will work without the nightscout URL so making sure that is setup is important
 
     // If T&C or Privacy policy change will ask to re-accept
@@ -79,9 +79,9 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
     List<Widget> pages = [_getWelcomePage(btnStyle)];
     List<AllowPageChangeFn> allowPageChange = [() => true];
 
-    if (FlowData().agreedTermsAndConditions == null) {
-      pages.add(_getTermsAndConditionsPage(btnStyle, pages.length + 1));
-      allowPageChange.add(() => FlowData().agreedTermsAndConditions != null);
+    if (FlowData().agreedTermsOfService == null) {
+      pages.add(_getTermsOfServicePage(btnStyle, pages.length + 1));
+      allowPageChange.add(() => FlowData().agreedTermsOfService != null);
     }
 
     if (FlowData().agreedPrivacyPolicy == null) {
@@ -141,17 +141,17 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
     );
   }
 
-  Widget _getTermsAndConditionsPage(ButtonStyle btnStyle, int nextpage) {
+  Widget _getTermsOfServicePage(ButtonStyle btnStyle, int nextpage) {
     return Container(
       padding: const EdgeInsets.all(40),
       child: SingleChildScrollView(
         child: Column(
           children: [
-            MarkdownBody(data: StringAssets().termsAndConditions),
+            MarkdownBody(data: StringAssets().termsOfService),
             ElevatedButton(
               style: btnStyle,
               onPressed: () {
-                FlowData().agreedTermsAndConditions = clock.now();
+                FlowData().agreedTermsOfService = clock.now();
 
                 if (_pageController.hasClients) {
                   _pageController.animateToNextPage();

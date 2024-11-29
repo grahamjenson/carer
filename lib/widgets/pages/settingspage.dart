@@ -22,7 +22,7 @@ class SettingsPage extends StatelessWidget {
             ServicesSettingsWidget(),
             const TargetSettingsWidget(),
             const UISettingsWidget(),
-            const TermsAndConditionsPrivacyPolicyWidget(),
+            const TermsOfServicePrivacyPolicyWidget(),
             getEventsPage(),
             const DebugSettingsWidget(),
           ],

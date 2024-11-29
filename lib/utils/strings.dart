@@ -63,13 +63,13 @@ class StringAssets {
   StringAssets._();
 
   void loadStrings() async {
-    termsAndConditions = await rootBundle.loadString(termsAndConditionsFile);
+    termsOfService = await rootBundle.loadString(termsOfServiceFile);
     privacyPolicy = await rootBundle.loadString(privacyPolicyFile);
   }
 
-  static const String termsAndConditionsFile = "assets/TERMS_AND_CONDITIONS.md";
+  static const String termsOfServiceFile = "assets/TERMS_OF_SERVICE.md";
   static const String privacyPolicyFile = "assets/PRIVACY_POLICY.md";
 
-  String termsAndConditions = "";
+  String termsOfService = "";
   String privacyPolicy = "";
 }

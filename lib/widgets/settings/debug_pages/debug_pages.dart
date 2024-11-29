@@ -92,7 +92,7 @@ class DebugSettingsPage extends StatelessWidget {
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             FlowData().agreedPrivacyPolicy = null;
-            FlowData().agreedTermsAndConditions = null;
+            FlowData().agreedTermsOfService = null;
           },
         ),
         SettingsTile(

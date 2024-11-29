@@ -2,7 +2,7 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 
 enum FlowDataNames {
-  agreedTermsAndConditionsTimeStamp,
+  agreedTermsOfServiceTimeStamp,
   agreedPrivacyPolicyTimeStamp,
 }
 
@@ -13,7 +13,7 @@ class FlowData {
 
   final Map<FlowDataNames, ASignal> _signals = {
     FlowDataNames.agreedPrivacyPolicyTimeStamp: ASignal<int>(0, debugLabel: "agreedPrivacyPolicyTimeStamp"),
-    FlowDataNames.agreedTermsAndConditionsTimeStamp: ASignal<int>(0, debugLabel: "agreedTermsAndConditionsTimeStamp"),
+    FlowDataNames.agreedTermsOfServiceTimeStamp: ASignal<int>(0, debugLabel: "agreedTermsOfServiceTimeStamp"),
   };
 
   // Constructor
@@ -25,8 +25,8 @@ class FlowData {
       prefs.getInt(FlowDataNames.agreedPrivacyPolicyTimeStamp.name, defaultValue: 0)!,
     );
 
-    agreedTermsAndConditions = DateTime.fromMillisecondsSinceEpoch(
-      prefs.getInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, defaultValue: 0)!,
+    agreedTermsOfService = DateTime.fromMillisecondsSinceEpoch(
+      prefs.getInt(FlowDataNames.agreedTermsOfServiceTimeStamp.name, defaultValue: 0)!,
     );
 
     aeffect(
@@ -38,9 +38,9 @@ class FlowData {
 
     aeffect(
       () {
-        prefs.setInt(FlowDataNames.agreedTermsAndConditionsTimeStamp.name, _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value);
+        prefs.setInt(FlowDataNames.agreedTermsOfServiceTimeStamp.name, _signals[FlowDataNames.agreedTermsOfServiceTimeStamp]!.value);
       },
-      debugLabel: "writeAgreedTermsAndConditionsTimeStamp",
+      debugLabel: "writeAgreedTermsOfServiceTimeStamp",
     );
 
     return true;
@@ -62,8 +62,8 @@ class FlowData {
     return dateTime;
   }
 
-  DateTime? get agreedTermsAndConditions {
-    var timeStamp = _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value;
+  DateTime? get agreedTermsOfService {
+    var timeStamp = _signals[FlowDataNames.agreedTermsOfServiceTimeStamp]!.value;
     if (timeStamp == 0) {
       return null;
     }
@@ -83,11 +83,11 @@ class FlowData {
     _signals[FlowDataNames.agreedPrivacyPolicyTimeStamp]!.value = value.millisecondsSinceEpoch;
   }
 
-  set agreedTermsAndConditions(DateTime? value) {
+  set agreedTermsOfService(DateTime? value) {
     if (value == null) {
-      _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value = 0;
+      _signals[FlowDataNames.agreedTermsOfServiceTimeStamp]!.value = 0;
       return;
     }
-    _signals[FlowDataNames.agreedTermsAndConditionsTimeStamp]!.value = value.millisecondsSinceEpoch;
+    _signals[FlowDataNames.agreedTermsOfServiceTimeStamp]!.value = value.millisecondsSinceEpoch;
   }
 }

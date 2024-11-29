@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class TermsAndConditionsPrivacyPolicyWidget extends AbstractSettingsSection {
-  const TermsAndConditionsPrivacyPolicyWidget({super.key});
+class TermsOfServicePrivacyPolicyWidget extends AbstractSettingsSection {
+  const TermsOfServicePrivacyPolicyWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +14,12 @@ class TermsAndConditionsPrivacyPolicyWidget extends AbstractSettingsSection {
       title: const Text('Documents'),
       tiles: [
         SettingsTile.navigation(
-          title: const Text("Terms and Conditions"),
+          title: const Text("Terms of Service"),
           descriptionInlineIos: true,
-          description: Text("Agreed on ${_formatDate(FlowData().agreedTermsAndConditions)}"),
-          leading: const Icon(CarerIcons.SETTINGS_TERMS_AND_CONDITIONS),
+          description: Text("Agreed on ${_formatDate(FlowData().agreedTermsOfService)}"),
+          leading: const Icon(CarerIcons.SETTINGS_TERMS_OF_SERVICE),
           onPressed: (BuildContext context) async {
-            await showDocument(context, "Terms and Conditions", StringAssets().termsAndConditions);
+            await showDocument(context, "Terms of Service", StringAssets().termsOfService);
           },
         ),
         SettingsTile.navigation(
