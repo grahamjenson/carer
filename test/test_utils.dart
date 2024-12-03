@@ -6,6 +6,7 @@ import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/models/valueAtTime.dart';
 import 'package:carer/sql/carer_db.dart';
+import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -51,15 +52,29 @@ Future<void> setupSignals() async {
 /////
 /// WRAPPERS
 /////
+bool setupOnce = false;
 void agroup(Object description, void Function() body, {dynamic skip, int? retry}) {
-  group(description, () {
-    setUp(() async {
+  if (!setupOnce) {
+    // This will make sure to only run once per process
+    // Important if you have multiple groups per file
+    // FTI: Flutter runs each test in different process so can be run multiple times per run
+    setUpAll(() async {
       await setupDB();
       await setupSignals();
+    });
+    setupOnce = true;
+  }
 
+  group(description, () {
+    setUp(() async {
       // Delete all data before each test
       await (await CarerDB.instance).deleteAll();
+      await (await KeyValueStore.instance).deleteAll();
+
+      // This will reset all these signal values to the default
+      resetAllSignals();
     });
+
     body();
   }, skip: skip, retry: retry);
 }
@@ -129,13 +144,15 @@ int minTime(int min) {
   return 1000 * 60 * min;
 }
 
-// Static stuff
-DateTime overrideNow = DateTime(2020, 1, 1, 12);
+// NOW is 12:02 so that the SGVs end up on perfect 5 mins
+DateTime overrideNow = DateTime(2020, 1, 1, 12, 02);
 
 Duration sec1 = const Duration(seconds: 1);
 
 Duration min0 = const Duration(minutes: 0);
 Duration min1 = const Duration(minutes: 1);
+Duration min2 = const Duration(minutes: 2);
+Duration min3 = const Duration(minutes: 3);
 Duration min5 = const Duration(minutes: 5);
 Duration min10 = const Duration(minutes: 10);
 Duration min15 = const Duration(minutes: 15);
@@ -147,11 +164,17 @@ Duration hour24 = const Duration(hours: 24);
 Duration hour36 = const Duration(hours: 36);
 Duration hour48 = const Duration(hours: 48);
 
-Future<int> createSGVsInOrder(List<int> values, {DateTime? now}) async {
-  Duration currentDuration = min0;
+Future<int> createSGVsInOrder(List<int?> values, {DateTime? now, Duration? offset}) async {
+  // Start 2 mins ago Just to remove edge case problems
+
+  Duration currentDuration = offset ?? min0;
   List<(int, Duration)> valuesWithTime = [];
 
   for (var v in values.reversed) {
+    if (v == null) {
+      currentDuration += min5;
+      continue;
+    }
     valuesWithTime.add((v, currentDuration));
     currentDuration += min5;
   }
@@ -172,7 +195,7 @@ Future<int> createSVGsWithEIDs(List<(String, int, Duration)> values, {DateTime? 
   var ret = 0;
   await waitForSignalChange(() async {
     ret = await SQLToSGV().saveAll(values.map((v) => SGV(value: v.$2, date: now!.subtract(v.$3), eid: v.$1)).toList());
-  }, [CleanSGV.lastSGV, SGV.last2Days, CleanSGV.last2Days]);
+  }, [CleanSGV.lastSGV, SGV.last2Days, CleanSGV.last2Days, CleanSGV.last3Hours]);
 
   return ret;
   // wait for CleanSGV signals to update

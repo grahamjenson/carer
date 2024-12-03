@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:battery_plus/battery_plus.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:sound_mode/sound_mode.dart';
 import 'package:sound_mode/utils/ringer_mode_statuses.dart';
@@ -13,6 +14,10 @@ class PlatformInfoService {
   }
 
   PlatformInfoService._() {
+    if (Env.isTest) {
+      return;
+    }
+
     signalAssign(
       ringerMode,
       getRingerMode,
@@ -22,7 +27,14 @@ class PlatformInfoService {
 
     var battery = Battery();
 
-    signalAssign(batteryLevel, () => battery.batteryLevel, debugLabel: "BatteryLevelSignal", dependencies: [TimerService().fiveSecondSignal]);
+    signalAssign(
+      batteryLevel,
+      () {
+        return battery.batteryLevel;
+      },
+      debugLabel: "BatteryLevelSignal",
+      dependencies: [TimerService().fiveSecondSignal],
+    );
 
     battery.onBatteryStateChanged.listen((BatteryState state) {
       switch (state) {

@@ -1,4 +1,7 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:carer/models/details/alarms/alarms.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,161 +9,153 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../test_utils.dart';
 
 void main() async {
-  agroup("Alarms", () {
-    atest("HighAlarm", () async {
-      AlarmType alarm = AlarmType.high;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, true);
-      expect(smartSnooze, false);
+  agroup("AlarmsWHarness", () {
+    // Want to be explicit about the values
+    int URGENTHIGH = 200;
 
-      AlarmSettings().highMinutes = 10;
-      TargetSettings().highTarget = 180;
+    int HIGH = 180;
+    int HIGHMINUTES = 20;
 
-      await createSGVsInOrder([220, 200, 185]);
+    int LOW = 70;
+    int LOWPREDICIONTMINUTES = 10;
+    int URGENTLOW = 50;
 
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, true);
+    int FASTRISE = 10;
+    int FASTRISEMINUTES = 10;
 
-      alarm.shortSummary();
+    int FASTDROP = -10;
+    int FASTDROPMINUTES = 10;
+
+    int NODATAMINUTES = 20;
+
+    // EXAMPLE
+    int INRANGE = 80;
+
+    setUp(() {
+      // Turn on all alarms
+      AlarmSettings().urgentLowAlarm = true;
+      AlarmSettings().lowAlarm = true;
+      AlarmSettings().highAlarm = true;
+      AlarmSettings().urgentHighAlarm = true;
+      AlarmSettings().lowPredictionAlarm = true;
+      AlarmSettings().carerBatteryAlarm = true;
+      AlarmSettings().t1dBatteryAlarm = true;
+      AlarmAlertSettings().smartSnoozeHigh = true;
+
+      AlarmSettings().fastRiseAlarmMinutes = FASTRISEMINUTES;
+      AlarmSettings().fastDropAlarmMinutes = FASTDROPMINUTES;
+      AlarmSettings().noDataAlarmMinutes = NODATAMINUTES;
+      AlarmSettings().lowPredictionMinutes = LOWPREDICIONTMINUTES;
+      AlarmSettings().highMinutes = HIGHMINUTES;
+
+      TargetSettings().highUrgent = URGENTHIGH.toDouble();
+      TargetSettings().highTarget = HIGH.toDouble();
+      TargetSettings().lowTarget = LOW.toDouble();
+      TargetSettings().lowUrgent = URGENTLOW.toDouble();
+      TargetSettings().fastRiseDelta = FASTRISE.toDouble();
+      TargetSettings().fastDropDelta = FASTDROP.toDouble();
     });
 
-    atest("LowAlarm", () async {
-      AlarmType alarm = AlarmType.low;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, true);
-      expect(smartSnooze, false);
+    var tests = [
+      // NEGATIVE CASES
+      AlarmTest(
+        "Blank Data",
+        sgvs: [INRANGE, null, null, null],
+        expectedAlarms: {}, // predictive low
+      ),
+      AlarmTest(
+        "Normal operation",
+        sgvs: [INRANGE, INRANGE, INRANGE, INRANGE],
+        expectedAlarms: {},
+      ),
+      AlarmTest(
+        "Limited Data Fast Drop Ignored",
+        sgvs: [HIGH - 10, HIGH - 30, HIGH - 50, null],
+        expectedAlarms: {},
+      ),
+      AlarmTest(
+        "Not High Enough",
+        sgvs: [INRANGE, INRANGE, HIGH + 10, HIGH + 10],
+        expectedAlarms: {},
+      ),
+      //
+      //
+      // POSITIVE ALARM CASES
+      //
+      AlarmTest(
+        "Predictive Alarm triggering",
+        sgvs: [LOW + 40, LOW + 20, LOW + 1],
+        expectedAlarms: {AlarmType.low, AlarmType.fastDrop}, // predictive low
+      ),
+      AlarmTest(
+        "Blank Data Causing No Data Alarm",
+        sgvs: [INRANGE, null, null, null, null],
+        expectedAlarms: {AlarmType.noData}, // predictive low
+      ),
+      AlarmTest(
+        "Fast Drop",
+        sgvs: [HIGH - 10, HIGH - 30, HIGH - 50],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Fast Rise",
+        sgvs: [LOW + 10, LOW + 30, LOW + 50],
+        expectedAlarms: {AlarmType.fastRise},
+      ),
+      AlarmTest(
+        "Urgent High",
+        sgvs: [INRANGE, INRANGE, URGENTHIGH + 10],
+        expectedAlarms: {AlarmType.urgentHigh},
+      ),
+      AlarmTest(
+        "Urgent Low",
+        sgvs: [URGENTLOW - 10],
+        expectedAlarms: {AlarmType.urgentLow, AlarmType.low},
+      ),
 
-      TargetSettings().lowTarget = 72;
+      AlarmTest(
+        "Low",
+        sgvs: [LOW - 10],
+        expectedAlarms: {AlarmType.low},
+      ),
+      AlarmTest(
+        "HIGH",
+        sgvs: [INRANGE, HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10],
+        expectedAlarms: {AlarmType.high},
+      ),
+    ];
 
-      await createSGVsInOrder([50, 60, 70]);
+    for (var t in tests) {
+      atest("${t.name} est ${tests.indexOf(t)}", () async {
+        // Pre-Test
+        expect(AlarmType.triggeredAlarms(), <AlarmType>{});
+        expect(AlarmType.activeAlarms(), AlarmType.values.toSet()..removeAll([AlarmType.test, AlarmType.unknown]));
+        expect(AlarmType.smartSnoozeAlarms(), <AlarmType>{});
 
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-    });
+        await createSGVsInOrder(t.sgvs, offset: min2);
 
-    atest("UrgentHighAlarm", () async {
-      AlarmType alarm = AlarmType.urgentHigh;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, true);
-      expect(smartSnooze, false);
+        Set<AlarmType> triggeredAlarms = {};
+        for (var alarm in AlarmType.values) {
+          var (triggered, active, smartSnooze) = alarm.alarmStatus();
+          if (triggered) {
+            triggeredAlarms.add(alarm);
+          }
 
-      TargetSettings().highUrgent = 180;
-
-      await createSGVsInOrder([220, 200, 185]);
-
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-    });
-
-    atest("UrgentLowAlarm", () async {
-      AlarmType alarm = AlarmType.urgentLow;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, true);
-      expect(smartSnooze, false);
-
-      TargetSettings().lowUrgent = 72;
-
-      await createSGVsInOrder([50, 60, 70]);
-
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-    });
-
-    atest("FastRiseAlarm", () async {
-      AlarmType alarm = AlarmType.fastRise;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, false);
-      expect(smartSnooze, false);
-
-      AlarmSettings().fastRiseAlarmMinutes = 10;
-      TargetSettings().fastRiseDelta = 10;
-
-      await createSGVsInOrder([170, 181, 192]);
-
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-    });
-
-    atest("FastDropAlarm", () async {
-      AlarmType alarm = AlarmType.fastDrop;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, false);
-      expect(smartSnooze, false);
-
-      AlarmSettings().fastDropAlarmMinutes = 10;
-      TargetSettings().fastDropDelta = -10;
-
-      await createSGVsInOrder([150, 130, 110]);
-
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-    });
-
-    atest("NoDataAlarm", (DateTime now) async {
-      AlarmType alarm = AlarmType.noData;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, false);
-      expect(smartSnooze, false);
-
-      AlarmSettings().noDataAlarmMinutes = 20;
-
-      await createSGVsInOrder([220, 200, 187], now: now.subtract(min30));
-
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-
-      await createSGVsInOrder([220, 200, 187], now: now);
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-
-      expect(trigger, false);
-      expect(active, true);
-      expect(smartSnooze, false);
-    });
-
-    atest("PredictiveLowAlarm", () async {
-      AlarmType alarm = AlarmType.low;
-      var (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, false);
-      expect(active, true);
-      expect(smartSnooze, false);
-
-      TargetSettings().lowTarget = 72;
-
-      await createSGVsInOrder([120, 100, 80]);
-
-      (trigger, active, smartSnooze) = alarm.alarmStatus();
-      expect(trigger, true);
-      expect(active, true);
-      expect(smartSnooze, false);
-      alarm.shortSummary();
-    });
+          // just checking for errors here
+          expect(alarm.description, isNotNull);
+          expect(alarm.title, isNotNull);
+          expect(alarm.shortSummary, isNotNull);
+          expect(alarm.statment, isNotNull);
+        }
+        expect(triggeredAlarms, t.expectedAlarms);
+      });
+    }
   });
+}
+
+class AlarmTest {
+  List<int?> sgvs;
+  Set<AlarmType> expectedAlarms;
+  String name;
+  AlarmTest(this.name, {required this.sgvs, required this.expectedAlarms});
 }

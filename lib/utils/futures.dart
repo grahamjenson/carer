@@ -64,13 +64,14 @@ Future<T> executeWithRetry<T>(
 
 class ASignal<T> extends Signal<T> {
   DateTime lastSet = DateTime.now();
+  T defaultVal;
 
   ASignal(
-    super.val, {
+    this.defaultVal, {
     required super.debugLabel,
     super.autoDispose,
-  }) {
-    registerSignal(super.debugLabel!);
+  }) : super(defaultVal) {
+    registerSignal(super.debugLabel!, signal: this);
   }
 
   @override
@@ -84,6 +85,11 @@ class ASignal<T> extends Signal<T> {
   }
 
   Duration get lastSetAgo => DateTime.now().difference(lastSet);
+
+  // For Test Purposes Mostly
+  void reset() {
+    set(defaultVal);
+  }
 }
 
 class ATimerSignal extends TimerSignal {
@@ -204,7 +210,9 @@ void setupSignalsLogging() {
 
 // To make sure initialization is good and DebugLabels are unique we keep track of all registered signals and force unique debugLabels
 Set<String> _registeredSignals = {};
-bool registerSignal(String debugLabel) {
+Set<ASignal> _allSignals = {};
+
+bool registerSignal(String debugLabel, {ASignal? signal}) {
   if (_registeredSignals.contains(debugLabel)) {
     var message = "VERY BAD: Signal with debugLabel $debugLabel already registered";
     if (Env.isProd) {
@@ -217,5 +225,14 @@ bool registerSignal(String debugLabel) {
     }
   }
   _registeredSignals.add(debugLabel);
+  if (signal != null) {
+    _allSignals.add(signal);
+  }
   return true;
+}
+
+void resetAllSignals() {
+  for (var signal in _allSignals) {
+    signal.reset();
+  }
 }

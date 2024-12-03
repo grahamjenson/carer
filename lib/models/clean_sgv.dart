@@ -22,7 +22,9 @@ class CleanSGV extends ASGV with DateMixin {
   List<CleanSGV> get before5 => _beforeN(5);
   List<CleanSGV> get before12 => _beforeN(12);
 
-  List<CleanSGV> lastReadingsAfter(Duration ago) => _beforeN(ago.inMinutes ~/ 5).where((e) => e.age < ago).toList();
+  List<CleanSGV> lastReadingsAfter(Duration ago) {
+    return _beforeN(ago.inMinutes ~/ 5).where((e) => e.age <= ago).toList();
+  }
 
   List<CleanSGV> _beforeN(int n) {
     var list = [this];

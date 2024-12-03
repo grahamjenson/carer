@@ -86,6 +86,18 @@ enum AlarmType {
     }
     throw ArgumentError("Invalid Alarm Name: $name");
   }
+
+  static Set<AlarmType> triggeredAlarms() {
+    return AlarmType.values.where((alarm) => alarm.trigger()).toSet();
+  }
+
+  static Set<AlarmType> activeAlarms() {
+    return AlarmType.values.where((alarm) => alarm.active()).toSet();
+  }
+
+  static Set<AlarmType> smartSnoozeAlarms() {
+    return AlarmType.values.where((alarm) => alarm.smartSnooze()).toSet();
+  }
 }
 
 abstract class AlarmMethods {
@@ -98,16 +110,16 @@ abstract class AlarmMethods {
   }
 
   get minutesToTrigger => -1;
-  get numberOfReadingsToTrigger => minutesToTrigger ~/ 5;
+  get readingsToTrigger => minutesToTrigger ~/ 5;
 
   Map<String, dynamic> details() {
     var map = AppDetailsService().appDetails();
 
     map.addAll({
       "targetRange5": targetRange5.name,
-      "prediction": getPredictedValue(numberOfReadingsToTrigger)?.toString(),
+      "prediction": getPredictedValue(readingsToTrigger)?.toString(),
       "minutesToTrigger": minutesToTrigger,
-      "numberOfReadingsToTriggerPrediction": numberOfReadingsToTrigger,
+      "readingsToTriggerPrediction": readingsToTrigger,
       "targetRange5ForReadings": targetRange5s.map((e) => e.name).toList(),
       "diffs": diffs.map(unitStr).toList(),
       "targets": [
@@ -149,7 +161,7 @@ abstract class AlarmMethods {
     return lastSGV.range;
   }
 
-  List<Range5> get targetRange5s {
+  List<CleanSGV> lastMinsToTrigger() {
     if (minutesToTrigger < 0) {
       return [];
     }
@@ -159,7 +171,11 @@ abstract class AlarmMethods {
       return [];
     }
 
-    var sgvs = lastSGV.lastReadingsAfter(Duration(minutes: minutesToTrigger));
+    return lastSGV.lastReadingsAfter(Duration(minutes: minutesToTrigger));
+  }
+
+  List<Range5> get targetRange5s {
+    var sgvs = lastMinsToTrigger();
     if (sgvs.isEmpty) {
       return [];
     }
@@ -170,16 +186,7 @@ abstract class AlarmMethods {
   }
 
   List<int> get diffs {
-    if (minutesToTrigger < 0) {
-      return [];
-    }
-    var lastSGV = CleanSGV.lastSGV.value;
-
-    if (lastSGV == null) {
-      return [];
-    }
-
-    var sgvs = lastSGV.lastReadingsAfter(Duration(minutes: minutesToTrigger));
+    var sgvs = lastMinsToTrigger();
     if (sgvs.isEmpty) {
       return [];
     }
@@ -332,7 +339,7 @@ class _LowAlarm extends AlarmMethods {
       return "Low <${unitStr(TargetSettings().lowTarget)}";
     }
     if (_predictiveTrigger()) {
-      var sgv = getPredictedValue(numberOfReadingsToTrigger);
+      var sgv = getPredictedValue(readingsToTrigger);
       if (sgv == null) {
         return "?";
       }
@@ -384,7 +391,7 @@ class _LowAlarm extends AlarmMethods {
     }
 
     // Check prediction
-    var sgv = getPredictedValue(numberOfReadingsToTrigger);
+    var sgv = getPredictedValue(readingsToTrigger);
 
     if (sgv == null) {
       return false;
@@ -452,10 +459,12 @@ class _HighAlarm extends AlarmMethods {
       return false;
     }
     List<Range5> targets = targetRange5s;
+
     if (targets.isEmpty) {
       // If targets is empty then we will have to wait for NoDataAlarm to trigger
       return false;
     }
+
     return targets.every((e) => e == Range5.high || e == Range5.veryHigh);
   }
 
@@ -546,11 +555,14 @@ class _FastRiseAlarm extends AlarmMethods {
       return false;
     }
 
-    // Get the diffs for the last n minutes and make sure they are all above the set delta
+    // Get the diffs for the last n minutes
     var d = diffs;
-    if (d.isEmpty) {
+
+    // Can only trigger the alarm with enough information
+    if (d.isEmpty || d.length == 1) {
       return false;
     }
+
     if (d.every((element) => element > TargetSettings().fastRiseDelta)) {
       return true;
     }
@@ -588,7 +600,7 @@ class _FastDropAlarm extends AlarmMethods {
   String statment() => "Fast Drop";
 
   @override
-  int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;
+  int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes + 1;
 
   @override
   bool trigger() {
@@ -599,10 +611,11 @@ class _FastDropAlarm extends AlarmMethods {
       return false;
     }
 
-    // Get the diffs for the last n minutes and make sure they are all below the set delta
+    // Get the diffs for the last n minutes
     var d = diffs;
 
-    if (d.isEmpty) {
+    // Can only trigger the alarm with enough information
+    if (d.isEmpty || d.length == 1) {
       return false;
     }
 
@@ -657,7 +670,7 @@ class _NoDataAlarm extends AlarmMethods {
       return false;
     }
 
-    return age > minutesToTrigger;
+    return age >= minutesToTrigger;
   }
 
   int? get ageInMinutes {

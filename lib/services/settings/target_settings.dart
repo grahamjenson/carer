@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 
