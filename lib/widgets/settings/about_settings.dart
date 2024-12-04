@@ -11,7 +11,7 @@ class AboutSettingsWidget extends AbstractSettingsSection {
   @override
   Widget build(BuildContext context) {
     return SettingsSection(
-      title: const Text('Documents'),
+      title: const Text('About'),
       tiles: [
         SettingsTile.navigation(
           title: const Text("Terms of Service"),
