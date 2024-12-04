@@ -1,8 +1,8 @@
+import 'package:carer/widgets/settings/about_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/events_page.dart';
 import 'package:carer/widgets/settings/services_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
-import 'package:carer/widgets/settings/tandcandpp_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -22,7 +22,7 @@ class SettingsPage extends StatelessWidget {
             ServicesSettingsWidget(),
             const TargetSettingsWidget(),
             const UISettingsWidget(),
-            const TermsOfServicePrivacyPolicyWidget(),
+            const AboutSettingsWidget(),
             getEventsPage(),
             const DebugSettingsWidget(),
           ],

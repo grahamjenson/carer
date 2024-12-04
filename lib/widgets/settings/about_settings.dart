@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class TermsOfServicePrivacyPolicyWidget extends AbstractSettingsSection {
-  const TermsOfServicePrivacyPolicyWidget({super.key});
+class AboutSettingsWidget extends AbstractSettingsSection {
+  const AboutSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +29,22 @@ class TermsOfServicePrivacyPolicyWidget extends AbstractSettingsSection {
             description: Text("Agreed on ${_formatDate(FlowData().agreedPrivacyPolicy)}"),
             onPressed: (context) async {
               await showDocument(context, "Privacy Policy", StringAssets().privacyPolicy);
+            }),
+        SettingsTile.navigation(
+            title: const Text("About"),
+            leading: const Icon(CarerIcons.SETTINGS_ABOUT),
+            descriptionInlineIos: true,
+            description: const Text("About Carer"),
+            onPressed: (context) async {
+              showAboutDialog(
+                  context: context,
+                  applicationName: "Carer",
+                  applicationVersion: "0.0.1",
+                  applicationIcon: const Icon(CarerIcons.SETTINGS_ABOUT),
+                  applicationLegalese: "© 2021 Carer",
+                  children: <Widget>[
+                    const Text("Carer is a diabetes management app"),
+                  ]);
             }),
       ],
     );
