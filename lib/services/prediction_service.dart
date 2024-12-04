@@ -17,7 +17,7 @@ class PredictionService {
 
   // Returns a list of readings every 5 minutes from the last reading
   List<CleanSGV> getPredictedReadings(CleanSGV lastSGV, {int numberOfReadings = 5}) {
-    var predictions = getPredictions(lastSGV.before5);
+    var predictions = getPredictions(lastSGV.beforeN(5));
 
     List<CleanSGV> prs = [];
     for (int i = 0; i <= numberOfReadings; i++) {

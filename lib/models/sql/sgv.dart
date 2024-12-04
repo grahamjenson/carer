@@ -50,9 +50,8 @@ class SGV extends DBModel implements ASGV {
     super.id,
   });
 
-  (Range5, double) get rangeProporation => targetRange(value);
   @override
-  Range5 get range => rangeProporation.$1;
+  Range5 get range => targetRange(value);
 
   @override
   bool get isUrgentLow => range == Range5.veryLow;

@@ -11,7 +11,7 @@ class AppDetailsService {
     CleanSGV? lastSGV = CleanSGV.lastSGV.value;
     return {
       "lastSGV": sgvPrinter(lastSGV),
-      "previousReadings": lastSGV?.before12.map((e) => shortSGVPrinter(e)).toList(),
+      "previousReadings": lastSGV?.beforeN(12).map((e) => shortSGVPrinter(e)).toList(),
       "predictions": lastSGV?.predictions?.map((e) => shortSGVPrinter(e)).toList(),
     };
   }

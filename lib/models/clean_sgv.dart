@@ -19,14 +19,12 @@ class CleanSGV extends ASGV with DateMixin {
   // This way we pick the latextest value and follow the chain back of appropriatly seperated values
 
   CleanSGV? before; // previous SVGs ID
-  List<CleanSGV> get before5 => _beforeN(5);
-  List<CleanSGV> get before12 => _beforeN(12);
 
   List<CleanSGV> lastReadingsAfter(Duration ago) {
-    return _beforeN(ago.inMinutes ~/ 5).where((e) => e.age <= ago).toList();
+    return beforeN(ago.inMinutes ~/ 5).where((e) => e.age <= ago).toList();
   }
 
-  List<CleanSGV> _beforeN(int n) {
+  List<CleanSGV> beforeN(int n) {
     var list = [this];
     var before = this.before;
     for (var i = 0; i < n; i++) {
@@ -52,9 +50,8 @@ class CleanSGV extends ASGV with DateMixin {
     return ((diff! / (minuteTimestamp - before!.minuteTimestamp)) * 5).toInt();
   }
 
-  (Range5, double) get rangeProporation => targetRange(value);
   @override
-  Range5 get range => rangeProporation.$1;
+  Range5 get range => targetRange(value);
 
   @override
   bool get isUrgentLow => range == Range5.veryLow;
@@ -67,7 +64,12 @@ class CleanSGV extends ASGV with DateMixin {
   @override
   bool get isUrgentHigh => range == Range5.veryHigh;
 
-  Range5 get diffRange => diffRange5(rate5m ?? 0);
+  Range5 get diffRange {
+    var fastDrop = TargetSettings().fastDropDelta;
+    var fastRise = TargetSettings().fastRiseDelta;
+    var diff = rate5m ?? 0;
+    return range5(fastDrop, fastDrop * 0.8, fastRise * 0.8, fastRise, diff.toDouble());
+  }
 
   int? get diff {
     if (before == null) {

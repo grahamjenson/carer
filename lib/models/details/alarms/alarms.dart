@@ -120,8 +120,8 @@ abstract class AlarmMethods {
       "prediction": getPredictedValue(readingsToTrigger)?.toString(),
       "minutesToTrigger": minutesToTrigger,
       "readingsToTriggerPrediction": readingsToTrigger,
-      "targetRange5ForReadings": targetRange5s.map((e) => e.name).toList(),
-      "diffs": diffs.map(unitStr).toList(),
+      "targetRange5ForReadings": range5s.map((e) => e.name).toList(),
+      "diffs": diffs.map((e) => e.name).toList(),
       "targets": [
         unitStr(TargetSettings().lowUrgent),
         unitStr(TargetSettings().lowTarget),
@@ -171,37 +171,22 @@ abstract class AlarmMethods {
       return [];
     }
 
-    return lastSGV.lastReadingsAfter(Duration(minutes: minutesToTrigger));
+    // We grab the last SGV and all SGVs before that for the minutes to trigger
+    // This solves a lot of missing data issues and edge case issues because it removes clock.now() from the number of sgvs to use
+
+    // We need to modulo the age of LastSGV by 5 minutes so that if the last reading is say 7 minutes old, we only add 2 minuts to lookback
+    var ageToAdd = Duration(milliseconds: lastSGV.age.inMilliseconds % 300000);
+
+    var age = Duration(minutes: minutesToTrigger) + ageToAdd;
+
+    var sgvs = lastSGV.lastReadingsAfter(age);
+
+    return sgvs;
   }
 
-  List<Range5> get targetRange5s {
-    var sgvs = lastMinsToTrigger();
-    if (sgvs.isEmpty) {
-      return [];
-    }
-    return sgvs.map((e) {
-      var (t, _) = targetRange(e.value);
-      return t;
-    }).toList();
-  }
+  List<Range5> get range5s => lastMinsToTrigger().map((e) => e.range).toList();
 
-  List<int> get diffs {
-    var sgvs = lastMinsToTrigger();
-    if (sgvs.isEmpty) {
-      return [];
-    }
-
-    List<int> diffs = [];
-
-    for (var sgv in sgvs) {
-      if (sgv.rate5m == null) {
-        continue;
-      }
-      diffs.add(sgv.rate5m!);
-    }
-
-    return diffs;
-  }
+  List<Range5> get diffs => lastMinsToTrigger().map((e) => e.diffRange).toList();
 
   String lastSGVStr() {
     var lastSGV = CleanSGV.lastSGV.value;
@@ -458,7 +443,7 @@ class _HighAlarm extends AlarmMethods {
     if (!latest) {
       return false;
     }
-    List<Range5> targets = targetRange5s;
+    List<Range5> targets = range5s;
 
     if (targets.isEmpty) {
       // If targets is empty then we will have to wait for NoDataAlarm to trigger
@@ -559,11 +544,11 @@ class _FastRiseAlarm extends AlarmMethods {
     var d = diffs;
 
     // Can only trigger the alarm with enough information
-    if (d.isEmpty || d.length == 1) {
+    if (d.isEmpty) {
       return false;
     }
 
-    if (d.every((element) => element > TargetSettings().fastRiseDelta)) {
+    if (d.every((diffRange) => diffRange == Range5.veryHigh || diffRange == Range5.high)) {
       return true;
     }
     return false;
@@ -600,7 +585,7 @@ class _FastDropAlarm extends AlarmMethods {
   String statment() => "Fast Drop";
 
   @override
-  int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes + 1;
+  int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;
 
   @override
   bool trigger() {
@@ -615,11 +600,11 @@ class _FastDropAlarm extends AlarmMethods {
     var d = diffs;
 
     // Can only trigger the alarm with enough information
-    if (d.isEmpty || d.length == 1) {
+    if (d.isEmpty) {
       return false;
     }
 
-    if (d.every((element) => element < TargetSettings().fastDropDelta)) {
+    if (d.every((diffRange) => diffRange == Range5.veryLow || diffRange == Range5.low)) {
       return true;
     }
     return false;

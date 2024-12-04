@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
+
 import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
@@ -9,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../test_utils.dart';
 
 void main() async {
-  agroup("AlarmsWHarness", () {
+  agroup("AlarmTest:", () {
     // Want to be explicit about the values
     int URGENTHIGH = 200;
 
@@ -69,11 +71,6 @@ void main() async {
         expectedAlarms: {},
       ),
       AlarmTest(
-        "Limited Data Fast Drop Ignored",
-        sgvs: [HIGH - 10, HIGH - 30, HIGH - 50, null],
-        expectedAlarms: {},
-      ),
-      AlarmTest(
         "Not High Enough",
         sgvs: [INRANGE, INRANGE, HIGH + 10, HIGH + 10],
         expectedAlarms: {},
@@ -85,7 +82,7 @@ void main() async {
       AlarmTest(
         "Predictive Alarm triggering",
         sgvs: [LOW + 40, LOW + 20, LOW + 1],
-        expectedAlarms: {AlarmType.low, AlarmType.fastDrop}, // predictive low
+        expectedAlarms: {AlarmType.low}, // predictive low
       ),
       AlarmTest(
         "Blank Data Causing No Data Alarm",
@@ -94,12 +91,32 @@ void main() async {
       ),
       AlarmTest(
         "Fast Drop",
-        sgvs: [HIGH - 10, HIGH - 30, HIGH - 50],
+        sgvs: [HIGH, HIGH - 10, HIGH - 30, HIGH - 50],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Fast Drop When last reading shows massive drop",
+        sgvs: [HIGH, HIGH - 10, null, HIGH - 50],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Fast Drop When last Value is null should still trigger",
+        sgvs: [HIGH - 10, HIGH - 30, HIGH - 50, null],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Lots of Blank Data",
+        sgvs: [HIGH, HIGH - 20, null, null],
         expectedAlarms: {AlarmType.fastDrop},
       ),
       AlarmTest(
         "Fast Rise",
-        sgvs: [LOW + 10, LOW + 30, LOW + 50],
+        sgvs: [LOW, LOW + 10, LOW + 30, LOW + 50],
+        expectedAlarms: {AlarmType.fastRise},
+      ),
+      AlarmTest(
+        "Fast Rise with missing data",
+        sgvs: [LOW, LOW + 15, null, LOW + 50],
         expectedAlarms: {AlarmType.fastRise},
       ),
       AlarmTest(
@@ -120,7 +137,7 @@ void main() async {
       ),
       AlarmTest(
         "HIGH",
-        sgvs: [INRANGE, HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10],
+        sgvs: [HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10],
         expectedAlarms: {AlarmType.high},
       ),
     ];
@@ -144,8 +161,11 @@ void main() async {
           // just checking for errors here
           expect(alarm.description, isNotNull);
           expect(alarm.title, isNotNull);
-          expect(alarm.shortSummary, isNotNull);
-          expect(alarm.statment, isNotNull);
+          expect(alarm.shortSummary(), isNotNull);
+          expect(alarm.statment(), isNotNull);
+          expect(alarm.details(), isNotNull);
+          // This has tripped me up a few times accidentally adding objects to the map
+          expect(jsonEncode(alarm.details()), isNotNull);
         }
         expect(triggeredAlarms, t.expectedAlarms);
       });
