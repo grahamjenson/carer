@@ -1,0 +1,15 @@
+[
+    {
+        "_id": "67512455db18d84d3b7790e4",
+        "sgv": 107,
+        "date": 1733370942306,
+        "dateString": "2024-12-05T03:55:42.306Z",
+        "trend": 4,
+        "direction": "Flat",
+        "device": "share2",
+        "type": "sgv",
+        "utcOffset": 0,
+        "sysTime": "2024-12-05T03:55:42.306Z",
+        "mills": 1733370942306
+    }
+]

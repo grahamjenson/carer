@@ -168,20 +168,22 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
   Widget _getPrivacyPolicyPage(ButtonStyle btnStyle, int nextpage) {
     return Container(
       padding: const EdgeInsets.all(40),
-      child: Column(
-        children: [
-          SingleChildScrollView(child: MarkdownBody(data: StringAssets().privacyPolicy)),
-          ElevatedButton(
-            style: btnStyle,
-            onPressed: () {
-              FlowData().agreedPrivacyPolicy = clock.now();
-              if (_pageController.hasClients) {
-                _pageController.animateToNextPage();
-              }
-            },
-            child: const Text("Accept"),
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SingleChildScrollView(child: MarkdownBody(data: StringAssets().privacyPolicy)),
+            ElevatedButton(
+              style: btnStyle,
+              onPressed: () {
+                FlowData().agreedPrivacyPolicy = clock.now();
+                if (_pageController.hasClients) {
+                  _pageController.animateToNextPage();
+                }
+              },
+              child: const Text("Accept"),
+            ),
+          ],
+        ),
       ),
     );
   }
