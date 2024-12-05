@@ -50,7 +50,7 @@ class NSProfile {
       return NSProfile.fromJson(
         profileName!,
         json["_id"]!,
-        DateTime.fromMillisecondsSinceEpoch(json['date']),
+        DateTime.fromMillisecondsSinceEpoch(json['date'] ?? 0),
         profileValues,
         raw: jsonString,
       );
