@@ -57,7 +57,7 @@ class NSProperties {
     required this.raw,
   });
 
-  static NSProperties? fromJson(String jsonString) {
+  static NSProperties fromJson(String jsonString) {
     try {
       var json = jsonDecode(jsonString);
 
@@ -74,7 +74,17 @@ class NSProperties {
       );
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
-      return null;
+      return NSProperties(
+        battery: null,
+        batteryDisplay: null,
+        iob: null,
+        basaliob: null,
+        treatmentIob: null,
+        cob: null,
+        sensorChangeTime: null,
+        cannulaChangeTime: null,
+        raw: jsonString,
+      );
     }
   }
 }

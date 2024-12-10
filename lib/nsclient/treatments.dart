@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:carer/nsclient/ns_type.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/utils/logs.dart';
 
@@ -12,7 +13,7 @@ class NSRawTreatment {
   String? type;
   bool? isReadOnly;
   bool? isValid;
-  int utcOffset;
+  int? utcOffset;
   DateTime createdAt;
   String? identifier;
   int? srvModified;
@@ -23,6 +24,7 @@ class NSRawTreatment {
   int? duration;
   int? durationInMilliseconds;
   double? absolute;
+  double? rate;
 
   double? targetBottom;
   double? targetTop;
@@ -57,6 +59,7 @@ class NSRawTreatment {
     required this.duration,
     required this.durationInMilliseconds,
     required this.absolute,
+    required this.rate,
     required this.targetBottom,
     required this.targetTop,
     required this.reason,
@@ -70,42 +73,30 @@ class NSRawTreatment {
   });
 
   factory NSRawTreatment.fromJson(Map<String, dynamic> json) {
-    if (json["date"] == null) {
-      // nightguard carportal aparently doesnt add a date!!!
-      // e.g.
-      // "_id": "6682e197db18d84d3b13b4de",
-      // "eventType": "Carb Correction",
-      // "carbs": 1,
-      // "duration": 0,
-      // "enteredBy": "nightguard",
-      // "created_at": "2024-07-01T17:04:23.645Z",
-      // "utcOffset": 0,
-      // "insulin": null
+    var createdAt = NSType.getCreatedAtDate(json);
 
-      var date = DateTime.parse(json["created_at"]);
-      json["date"] = date.millisecondsSinceEpoch;
-    }
     return NSRawTreatment(
-      id: json['_id'],
+      id: json['_id'] ?? "",
       app: json['app'],
       carbs: json['carbs'],
-      date: DateTime.fromMillisecondsSinceEpoch(json['date']),
+      date: createdAt,
       type: json['type'],
-      eventType: json['eventType'],
+      eventType: json['eventType'] ?? "",
       utcOffset: json['utcOffset'],
       isReadOnly: json['isReadOnly'],
       isValid: json['isValid'],
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: createdAt,
       identifier: json['identifier'],
       srvModified: json['srvModified'],
       srvCreated: json['srvCreated'],
       subject: json['subject'],
-      insulin: json['insulin']?.toDouble(),
-      absolute: json['absolute']?.toDouble(),
+      insulin: NSType.getDouble(json['insulin']),
+      absolute: NSType.getDouble(json['absolute']),
+      rate: NSType.getDouble(json['rate']),
       duration: json['duration'],
       durationInMilliseconds: json['durationInMilliseconds'],
-      targetBottom: json['targetBottom']?.toDouble(),
-      targetTop: json['targetTop']?.toDouble(),
+      targetBottom: NSType.getDouble(json['targetBottom']),
+      targetTop: NSType.getDouble(json['targetTop']),
       reason: json['reason'],
       originalDuration: json['originalDuration'],
       originalProfileName: json['originalProfileName'],
@@ -117,14 +108,23 @@ class NSRawTreatment {
     );
   }
 
+  bool isValidAndComplete() {
+    if (id.isEmpty || eventType.isEmpty) {
+      return false;
+    }
+
+    return true;
+  }
+
   List<NSTreatment> toTreatments() {
     List<NSTreatment> treatments = [];
     switch (eventType) {
       case "Temp Basal":
-        if (absolute != null) {
+        if (absolute != null || rate != null) {
+          double r = absolute ?? rate ?? 0;
           treatments.add(NSTreatmentTempBasal(
             id: id,
-            absolute: absolute ?? 0,
+            absolute: r,
             date: date,
             durationInMilliseconds: durationInMilliseconds ?? 0,
           ));
@@ -332,6 +332,9 @@ class NSTreatments {
   String raw;
   NSTreatments({required this.treatments, required this.raw});
 
+  int get length => treatments.length;
+  NSTreatment operator [](int index) => treatments[index];
+
   factory NSTreatments.empty() {
     return NSTreatments(treatments: [], raw: "");
   }
@@ -339,7 +342,9 @@ class NSTreatments {
   factory NSTreatments.fromJson(String jsonString) {
     try {
       final List<dynamic> jsonList = json.decode(jsonString);
-      List<NSRawTreatment> rawTreatments = jsonList.map((json) => NSRawTreatment.fromJson(json)).toList();
+      List<NSRawTreatment> rawTreatments = jsonList.map((json) => NSRawTreatment.fromJson(json)).where((e) => e.isValidAndComplete()).toList();
+
+      rawTreatments.sort((a, b) => b.date.compareTo(a.date));
 
       List<NSTreatment> treatments = [];
       for (var rt in rawTreatments) {

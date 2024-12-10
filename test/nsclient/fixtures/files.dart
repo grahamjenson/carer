@@ -1,20 +1,21 @@
 var files = {
-  "treatments_basic": 'test/nsclient/fixtures/treatments_basic.json',
+  // Treatments
   "treatments": 'test/nsclient/fixtures/treatments.json',
   "treatments_bad": 'test/nsclient/fixtures/treatments_bad.json',
 
+  // Entries
   "entries": 'test/nsclient/fixtures/entries.json',
-  "entries_basic": 'test/nsclient/fixtures/entries_basic.json',
   "entries_bad": 'test/nsclient/fixtures/entries_bad.json',
 
-  //
-  "cob": 'test/nsclient/fixtures/cob.json',
-  "iob": 'test/nsclient/fixtures/iob.json',
-  "status": 'test/nsclient/fixtures/status.json',
-  "summary": 'test/nsclient/fixtures/summary.json',
-  "summary_bad": 'test/nsclient/fixtures/summary_bad.json',
-
+  //Current Profile
   "current_profile": 'test/nsclient/fixtures/current_profile.json',
+  "current_profile_bad": 'test/nsclient/fixtures/current_profile_bad.json',
+
+  // Properties
   "properties": 'test/nsclient/fixtures/properties.json',
+  "properties_bad": 'test/nsclient/fixtures/properties_bad.json',
+
+  // Device Status
   "devicestatus": 'test/nsclient/fixtures/devicestatus.json',
+  "devicestatus_bad": 'test/nsclient/fixtures/devicestatus_bad.json',
 };

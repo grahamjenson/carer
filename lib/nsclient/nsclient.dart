@@ -4,7 +4,6 @@ import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
-import 'package:carer/nsclient/summary.dart';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -35,8 +34,6 @@ Uri treatmentsEndpoint(nsURL, token, DateTime gteCreatedAt) =>
 Uri treatmentsProfileSwitch(nsURL, token, int count) =>
     Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[eventType]=Profile+Switch&count=$count');
 Uri treatmentsNote(nsURL, token, int count) => Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[eventType]=Note&count=$count');
-
-Uri summaryEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
 
 Uri currentProfile(nsURL, token) => Uri.parse('$nsURL/api/v1/profile/current.json?token=$token');
 
@@ -236,19 +233,6 @@ class NSClient {
     return NSTreatments.fromJson(response!.body);
   }
 
-  Future<Summary?> getSummary(String nsURL, String token) async {
-    if (nsURL == "" || token == "") {
-      alog("getSummary No NS URL");
-      return null;
-    }
-    var ep = summaryEndpoint(nsURL, token);
-    final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
-      return null;
-    }
-    return Summary.fromJson(response!.body);
-  }
-
   Future<NSProfile?> getCurrentProfile(String nsURL, String token) async {
     if (nsURL == "" || token == "") {
       alog("getCurrentProfile No NS URL");
@@ -287,15 +271,8 @@ class NSClient {
     if (_handleResponseError(ep, response, err)) {
       return null;
     }
-    List<dynamic> jsonList = json.decode(response!.body);
-    if (jsonList.isEmpty) {
-      return null;
-    }
-    var firstElem = jsonList.first;
-    if (firstElem is Map<String, dynamic>) {
-      return NSDeviceStatus.fromJson(firstElem);
-    }
-    return null;
+
+    return NSDeviceStatus.fromDeviceJson(response!.body);
   }
 
   bool _handleResponseError(Uri uri, Response? response, Object? err) {

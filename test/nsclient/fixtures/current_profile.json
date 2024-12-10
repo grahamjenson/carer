@@ -1,11 +1,11 @@
 {
     "_id": "668fbca35de9b880531dad48",
-    "defaultProfile": "SamDash-2023-11SMB",
+    "defaultProfile": "currentProfileName",
     "date": 1720695970212,
     "created_at": "2024-07-11T11:06:10.212Z",
     "startDate": "2024-07-11T11:06:10.2120000Z",
     "store": {
-        "SamDash-2023-11SMB": {
+        "currentProfileName": {
             "dia": 6,
             "carbratio": [
                 {

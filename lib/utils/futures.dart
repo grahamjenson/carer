@@ -10,6 +10,15 @@ import 'package:signals/signals_flutter.dart';
 // ASYNC wrapper
 ////
 
+T? trygo<T>(T Function() fn) {
+  try {
+    return fn();
+  } catch (e, stackTrace) {
+    Errors.captureError(e, stackTrace);
+    return null;
+  }
+}
+
 Future<(T?, Object?)> go<T>(Future<T> ft, {String? name, bool? profile}) async {
   Stopwatch? stopwatch;
 

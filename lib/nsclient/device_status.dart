@@ -11,6 +11,18 @@ class NSDeviceStatus {
 
   NSDeviceStatus({required this.reservoir, required this.isCharging, required this.battery, required this.raw});
 
+  static NSDeviceStatus fromDeviceJson(String jsonString) {
+    List<dynamic> jsonList = json.decode(jsonString);
+    if (jsonList.isEmpty) {
+      return NSDeviceStatus.fromJson({});
+    }
+    var firstElem = jsonList.first;
+    if (firstElem is Map<String, dynamic>) {
+      return NSDeviceStatus.fromJson(firstElem);
+    }
+    return NSDeviceStatus.fromJson({});
+  }
+
   factory NSDeviceStatus.fromJson(Map<String, dynamic> json) {
     double? reservoir;
     bool? isCharging;

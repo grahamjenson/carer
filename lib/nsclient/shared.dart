@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carer/models/sql/constants.dart';
+import 'package:carer/nsclient/ns_type.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +62,7 @@ class NSProfile {
   }
 
   factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json, {String raw = ""}) {
-    var units = json['units'];
+    String units = json['units'] ?? "mg/dL";
 
     var targetLow = TimeValues.fromJson(json['target_low']);
     var targetHigh = TimeValues.fromJson(json['target_high']);
@@ -83,14 +84,14 @@ class NSProfile {
       id: id,
       name: name,
       date: date,
-      dia: json['dia'],
+      dia: NSType.getInt(json['dia'], defaultValue: 5)!,
       carbratio: TimeValues.fromJson(json['carbratio']),
       sens: TimeValues.fromJson(json['sens']),
       basal: TimeValues.fromJson(json['basal']),
       targetLow: targetLow,
       targetHigh: targetHigh,
       units: units,
-      timezone: json['timezone'],
+      timezone: json['timezone'] ?? "Pacific/Auckland",
     );
   }
 }
@@ -127,7 +128,11 @@ class TimeValues {
     return TimeValues(values: newValues);
   }
 
-  factory TimeValues.fromJson(List<dynamic> json) {
+  factory TimeValues.fromJson(List<dynamic>? json) {
+    if (json == null) {
+      return const TimeValues(values: []);
+    }
+
     List<TimeValue> values = json.map((valueJson) => TimeValue.fromJson(valueJson)).toList();
 
     // Sort this to make the TimeValues chronologically ordered

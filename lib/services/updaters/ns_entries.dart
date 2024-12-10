@@ -1,4 +1,4 @@
-import 'package:carer/mappers/ns/profile.dart';
+import 'package:carer/mappers/ns/entry.dart';
 import 'package:carer/mappers/sql/sgv.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/sql/sgv.dart';

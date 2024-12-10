@@ -1,7 +1,5 @@
 import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/sql/profile.dart';
-import 'package:carer/models/sql/sgv.dart';
-import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/shared.dart';
 
 class NSProfileToProfileExtras {
@@ -38,20 +36,6 @@ class NSProfileToProfile extends DataMapper<(NSProfile, NSProfileToProfileExtras
 
   @override
   (NSProfile, NSProfileToProfileExtras) bToA(Profile model) {
-    throw UnimplementedError();
-  }
-}
-
-class NSEntryToSGV extends DataMapper<NSEntry, SGV> {
-  const NSEntryToSGV();
-
-  @override
-  SGV aToB(NSEntry model) {
-    return SGV(value: model.sgv!, date: model.date, eid: model.id);
-  }
-
-  @override
-  NSEntry bToA(SGV model) {
     throw UnimplementedError();
   }
 }
