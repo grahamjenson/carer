@@ -26,10 +26,10 @@ String toNSDateString(DateTime dt) {
 Uri testEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
 
 Uri entryEndpoint(nsURL, token, DateTime gteCreatedAt) =>
-    Uri.parse('$nsURL/api/v1/entries.json?token=$token&find[date][\$gte]=${gteCreatedAt.millisecondsSinceEpoch}&count=1000');
+    Uri.parse('$nsURL/api/v1/entries.json?token=$token&find[dateString][\$gte]=${toNSDateString(gteCreatedAt)}&count=1000');
 
 Uri treatmentsEndpoint(nsURL, token, DateTime gteCreatedAt) =>
-    Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[date][\$gte]=${gteCreatedAt.millisecondsSinceEpoch}&count=1000');
+    Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[created_at][\$gte]=${toNSDateString(gteCreatedAt)}&count=1000');
 
 Uri treatmentsProfileSwitch(nsURL, token, int count) =>
     Uri.parse('$nsURL/api/v1/treatments.json?token=$token&find[eventType]=Profile+Switch&count=$count');
