@@ -26,8 +26,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         }
         List<SettingsTile> tiles = [
           enableFlashOnAlarm(),
-          wakeUpInRange(),
-          wakeUpWhenUrgent(),
           brightnessAdjust(),
           enableAudioAlarms(context),
           volumeOverride(context),
@@ -73,34 +71,6 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       initialValue: AlarmAlertSettings().enableFlashOnAlarm,
       onToggle: (bool value) {
         AlarmAlertSettings().enableFlashOnAlarm = value;
-      },
-    );
-  }
-
-  SettingsTile wakeUpInRange() {
-    return SettingsTile.switchTile(
-      title: const Text("Stop Snoozing When In Range"),
-      descriptionInlineIos: true,
-      description: const Text(
-        "Stop Snoozing after 20 minutes in range",
-      ),
-      initialValue: AlarmAlertSettings().enableWakeUpInRange,
-      onToggle: (bool value) {
-        AlarmAlertSettings().enableWakeUpInRange = value;
-      },
-    );
-  }
-
-  SettingsTile wakeUpWhenUrgent() {
-    return SettingsTile.switchTile(
-      title: const Text("Stop Snoozing With Urgent Alarm"),
-      descriptionInlineIos: true,
-      description: const Text(
-        "Stop Snoozing for Urgent Alarms\nUrgent High, Urgent Low and No Data\nSnoozing an Urgent Alarm will snooze",
-      ),
-      initialValue: AlarmAlertSettings().enableWakeUpWhenUrgent,
-      onToggle: (bool value) {
-        AlarmAlertSettings().enableWakeUpWhenUrgent = value;
       },
     );
   }

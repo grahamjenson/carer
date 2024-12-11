@@ -9,9 +9,6 @@ import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 enum _AANames {
-  // Predictions
-  smartSnoozeHigh,
-
   // AUDIO SETTINGS
   enableAudioAlarm,
   volumeOveride,
@@ -47,11 +44,12 @@ class AlarmAlertSettings {
   factory AlarmAlertSettings() => _singleton;
 
   final Map<_AANames, ASignal> _signals = {
-    _AANames.smartSnoozeHigh: ASignal<bool>(true, debugLabel: 'smartSnoozeHigh'),
     _AANames.brightnessAdjustAtNight: ASignal<bool>(true, debugLabel: 'brightnessAdjustAtNight'),
     _AANames.enableFlashOnAlarm: ASignal<bool>(true, debugLabel: 'enableFlashOnAlarm'),
+    // Smart Wake Up
     _AANames.enableWakeUpInRange: ASignal<bool>(true, debugLabel: 'enableWakeUpInRange'),
     _AANames.enableWakeUpWhenUrgent: ASignal<bool>(true, debugLabel: 'enableWakeUpWhenUrgent'),
+    // Audio
     _AANames.enableAudioAlarm: ASignal<bool>(true, debugLabel: 'enableAudioAlarm'),
     _AANames.volumeOveride: ASignal<bool>(true, debugLabel: 'volumeOveride'),
     _AANames.volumeOverrideValue: ASignal<int>(50, debugLabel: 'volumeOverrideValue'),
@@ -63,9 +61,6 @@ class AlarmAlertSettings {
   };
 
   AlarmAlertSettings._();
-
-  bool get smartSnoozeHigh => _signals[_AANames.smartSnoozeHigh]!.value as bool;
-  set smartSnoozeHigh(bool value) => _signals[_AANames.smartSnoozeHigh]!.value = value;
 
   bool get enableAudioAlarm => _signals[_AANames.enableAudioAlarm]!.value as bool;
   set enableAudioAlarm(bool value) => _signals[_AANames.enableAudioAlarm]!.value = value;
@@ -164,8 +159,6 @@ class AlarmAlertSettings {
   }
 
   setupDBPropagation(KeyValueStore prefs) {
-    smartSnoozeHigh = prefs.getBool(_AANames.smartSnoozeHigh.name, defaultValue: true)!;
-
     enableAudioAlarm = prefs.getBool(_AANames.enableAudioAlarm.name, defaultValue: true)!;
     volumeOveride = prefs.getBool(_AANames.volumeOveride.name, defaultValue: true)!;
     volumeOverrideValue = prefs.getInt(_AANames.volumeOverrideValue.name, defaultValue: 50)!;
@@ -178,8 +171,6 @@ class AlarmAlertSettings {
     enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: true)!;
     enableWakeUpInRange = prefs.getBool(_AANames.enableWakeUpInRange.name, defaultValue: true)!;
     enableWakeUpWhenUrgent = prefs.getBool(_AANames.enableWakeUpWhenUrgent.name, defaultValue: true)!;
-
-    aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'writesmartSnoozeHigh');
 
     aeffect(() => prefs.setBool(_AANames.enableAudioAlarm.name, enableAudioAlarm), debugLabel: 'writeenableAudioAlarm');
 

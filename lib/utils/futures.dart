@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -85,15 +86,21 @@ class ASignal<T> extends Signal<T> {
 
   @override
   bool set(T val, {bool force = false}) {
+    // Tricky because this lastSet may be called in effects that are called by setting the signal
+    // So we set it and then revert if not properly set
+    var previousLastSet = lastSet;
+    lastSet = clock.now();
     bool ret = super.set(val, force: force);
     if (ret) {
-      lastSet = DateTime.now(); // Needs to be DateTime.now not Clock.now to stop the tests from stubbing the date
       alog(truncateString("ASignal: $debugLabel set to $val", 100));
+    } else {
+      //was not set so revert last set
+      lastSet = previousLastSet;
     }
     return ret;
   }
 
-  Duration get lastSetAgo => DateTime.now().difference(lastSet);
+  Duration get lastSetAgo => clock.now().difference(lastSet);
 
   // For Test Purposes Mostly
   void reset() {

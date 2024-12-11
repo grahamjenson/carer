@@ -20,6 +20,7 @@ enum _AlarmNames {
 
   carerBatteryAlarm,
   t1dBatteryAlarm,
+  smartSnoozeHigh,
 }
 
 class AlarmSettings {
@@ -32,6 +33,7 @@ class AlarmSettings {
     _AlarmNames.lowAlarm: ASignal<bool>(true, debugLabel: 'lowAlarm'),
     _AlarmNames.highAlarm: ASignal<bool>(true, debugLabel: 'highAlarm'),
     _AlarmNames.highMinutes: ASignal<int>(5, debugLabel: 'highMinutes'),
+    _AlarmNames.smartSnoozeHigh: ASignal<bool>(true, debugLabel: 'smartSnoozeHigh'),
     _AlarmNames.urgentHighAlarm: ASignal<bool>(true, debugLabel: 'urgentHighAlarm'),
     _AlarmNames.fastDropAlarmMinutes: ASignal<int>(-1, debugLabel: 'fastDropAlarmMinutes'),
     _AlarmNames.fastRiseAlarmMinutes: ASignal<int>(-1, debugLabel: 'fastRiseAlarmMinutes'),
@@ -59,6 +61,9 @@ class AlarmSettings {
 
   int get highMinutes => _signals[_AlarmNames.highMinutes]!.value as int;
   set highMinutes(int value) => minutesSet(_signals[_AlarmNames.highMinutes]! as ASignal<int>, value);
+
+  bool get smartSnoozeHigh => _signals[_AlarmNames.smartSnoozeHigh]!.value as bool;
+  set smartSnoozeHigh(bool value) => _signals[_AlarmNames.smartSnoozeHigh]!.value = value;
 
   bool get urgentHighAlarm => _signals[_AlarmNames.urgentHighAlarm]!.value as bool;
   set urgentHighAlarm(bool value) => _signals[_AlarmNames.urgentHighAlarm]!.value = value;
@@ -127,6 +132,8 @@ class AlarmSettings {
     urgentHighAlarm = prefs.getBool(_AlarmNames.urgentHighAlarm.name, defaultValue: true)!;
 
     highMinutes = prefs.getInt(_AlarmNames.highMinutes.name, defaultValue: 5)!;
+    smartSnoozeHigh = prefs.getBool(_AlarmNames.smartSnoozeHigh.name, defaultValue: true)!;
+
     lowPredictionAlarm = prefs.getBool(_AlarmNames.lowPredictionAlarm.name, defaultValue: true)!;
     lowPredictionMinutes = prefs.getInt(_AlarmNames.lowPredictionMinutes.name, defaultValue: 10)!;
 
@@ -149,6 +156,7 @@ class AlarmSettings {
     aeffect(() => prefs.setBool(_AlarmNames.highAlarm.name, highAlarm), debugLabel: 'writehighAlarm');
 
     aeffect(() => prefs.setInt(_AlarmNames.highMinutes.name, highMinutes), debugLabel: 'writehighMinutes');
+    aeffect(() => prefs.setBool(_AlarmNames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'writesmartSnoozeHigh');
 
     aeffect(() => prefs.setBool(_AlarmNames.urgentHighAlarm.name, urgentHighAlarm), debugLabel: 'writeurgentHighAlarm');
 

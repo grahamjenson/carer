@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/services/alarms_service.dart';
-import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,7 +42,7 @@ void main() async {
       AlarmSettings().lowPredictionAlarm = true;
       AlarmSettings().carerBatteryAlarm = true;
       AlarmSettings().t1dBatteryAlarm = true;
-      AlarmAlertSettings().smartSnoozeHigh = true;
+      AlarmSettings().smartSnoozeHigh = true;
 
       AlarmSettings().fastRiseAlarmMinutes = FASTRISEMINUTES;
       AlarmSettings().fastDropAlarmMinutes = FASTDROPMINUTES;

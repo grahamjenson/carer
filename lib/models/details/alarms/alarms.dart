@@ -411,7 +411,7 @@ class _HighAlarm extends AlarmMethods {
     if (AlarmSettings().highMinutes > 0) {
       description += " for ${AlarmSettings().highMinutes}m";
     }
-    if (AlarmAlertSettings().smartSnoozeHigh) {
+    if (AlarmSettings().smartSnoozeHigh) {
       description += " (w/ Smart Snooze)";
     }
     if (!AlarmSettings().highAlarm) {
@@ -470,7 +470,7 @@ class _HighAlarm extends AlarmMethods {
       return false;
     }
     var range = sgv.range;
-    return AlarmAlertSettings().smartSnoozeHigh && range == Range5.mid;
+    return AlarmSettings().smartSnoozeHigh && range == Range5.mid;
   }
 }
 
@@ -600,7 +600,7 @@ class _FastDropAlarm extends AlarmMethods {
 
     // Get the diffs for the last n minutes
     var d = diffs;
-    print("Diffs: $d");
+
     // Can only trigger the alarm with enough information
     if (d.isEmpty) {
       return false;

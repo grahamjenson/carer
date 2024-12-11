@@ -34,7 +34,7 @@ Future<void> zipAndShare(List<String> filePaths, String zipFileName) async {
   alog("Zip File location $zipFilePath");
 
   // Share the zip file
-  final result = await Share.shareXFiles([XFile(zipFilePath)], text: 'Here are the files');
+  final result = await Share.shareXFiles([XFile(zipFilePath)]);
   if (result.status == ShareResultStatus.success) {
     alog('Files shared successfully');
   }

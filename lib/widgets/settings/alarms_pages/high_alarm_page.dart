@@ -1,4 +1,3 @@
-import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
@@ -61,9 +60,9 @@ class HighAlarmSettingsPage extends StatelessWidget {
       description: const Text(
         "Snooze Alarm when predicticed to be in range in 10 minutes",
       ),
-      initialValue: AlarmAlertSettings().smartSnoozeHigh,
+      initialValue: AlarmSettings().smartSnoozeHigh,
       onToggle: (bool value) {
-        AlarmAlertSettings().smartSnoozeHigh = value;
+        AlarmSettings().smartSnoozeHigh = value;
       },
     );
   }

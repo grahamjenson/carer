@@ -39,7 +39,6 @@ class AlarmsService {
   AlarmsService._() {
     List<Signal> allSettingsSignals = [];
     allSettingsSignals.addAll(AlarmSettings().allSignals());
-    allSettingsSignals.addAll(AlarmAlertSettings().allSignals());
     allSettingsSignals.addAll(TargetSettings().allSignals());
 
     bool isCheckingAlarms = false;
@@ -107,20 +106,17 @@ class AlarmsService {
     aeffect(() {
       // This checks to see if we should wakeUpFromSnooze
       // Already not snoozing so can skip
-      if (AlarmAlertSettings().snoozeDuration == null) {
+      if (AlarmAlertSettings().snoozeDurationPeek == null) {
         return;
       }
 
       var (shouldWakeUpFromSnooze, reason, reasonString) = shouldWakeUp();
 
-      if (!shouldWakeUpFromSnooze) {
-        return;
+      if (shouldWakeUpFromSnooze) {
+        alog("Snooze: $reasonString");
+        AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
       }
-
-      alog("Snooze: $reasonString");
-      AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
-      //
-    }, debugLabel: "WakingUpCalculation", dependencies: [TimerService().minuteSignal]);
+    }, debugLabel: "WakingUpCalculation", dependencies: [TimerService().minuteSignal, pendingAlarms]);
 
     // Writing the logs of alarms to the database
     AlarmSet pendingAlarmsCheck = AlarmSet({});
@@ -203,6 +199,7 @@ class AlarmsService {
 
     int mins = 20;
     Duration snoozeLastSet = AlarmAlertSettings().snoozeLastSet;
+
     if (snoozeLastSet.inMinutes < mins) {
       return (false, SnoozeReason.unknown, "Snooze Last Set ${snoozeLastSet.inMinutes} mins ago");
     }
@@ -211,6 +208,7 @@ class AlarmsService {
     if (lastSGV == null) {
       return (false, SnoozeReason.unknown, "No SGV");
     }
+
     var lastReadings = lastSGV.lastReadingsAfter(Duration(minutes: mins));
     if (lastReadings.isEmpty) {
       // We skip here but Wake Up On Urgent will wake up if no data
@@ -235,12 +233,11 @@ class AlarmsService {
       return (false, SnoozeReason.unknown, "");
     }
 
-    if (!pendingAlarms.value.containsUrgentAlarm()) {
+    if (!pendingAlarms.peek().containsUrgentAlarm()) {
       return (false, SnoozeReason.unknown, "No Urgent Pending Alarms");
     }
 
-    var previouslyContainedUrgentAlarm = AlarmAlertSettings().snoozeUntilSignalAlarms.value.containsUrgentAlarm();
-
+    var previouslyContainedUrgentAlarm = AlarmAlertSettings().snoozeUntilSignalAlarms.peek().containsUrgentAlarm();
     if (!previouslyContainedUrgentAlarm) {
       return (true, SnoozeReason.wakeUpWhenUrgent, "Urgent Alarm");
     }
