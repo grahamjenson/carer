@@ -178,8 +178,8 @@ abstract class AlarmMethods {
     // We grab the last SGV and all SGVs before that for the minutes to trigger
     // This solves a lot of missing data issues and edge case issues because it removes clock.now() from the number of sgvs to use
 
-    // We need to modulo the age of LastSGV by 5 minutes so that if the last reading is say 7 minutes old, we only add 2 minuts to lookback
-    var ageToAdd = Duration(milliseconds: lastSGV.age.inMilliseconds % 300000);
+    // We need to modulo the age of LastSGV by 5+ minutes so that if the last reading is say 7 minutes old, we only add 2 minuts to lookback
+    var ageToAdd = Duration(milliseconds: (lastSGV.age.inMilliseconds % 300000) + 30000);
 
     var age = Duration(minutes: minutesToTrigger) + ageToAdd;
 
@@ -593,16 +593,14 @@ class _FastDropAlarm extends AlarmMethods {
 
   @override
   bool trigger() {
-    var tr = targetRange5;
-
     // Dont trigger if High or Very High, fast drop when high is what we want
-    if (tr == Range5.high || tr == Range5.veryHigh) {
+    if (targetRange5 == Range5.high || targetRange5 == Range5.veryHigh) {
       return false;
     }
 
     // Get the diffs for the last n minutes
     var d = diffs;
-
+    print("Diffs: $d");
     // Can only trigger the alarm with enough information
     if (d.isEmpty) {
       return false;

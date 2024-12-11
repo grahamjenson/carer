@@ -21,7 +21,7 @@ class CleanSGV extends ASGV with DateMixin {
   CleanSGV? before; // previous SVGs ID
 
   List<CleanSGV> lastReadingsAfter(Duration ago) {
-    return beforeN(ago.inMinutes ~/ 5).where((e) => e.age <= ago).toList();
+    return beforeN((ago.inMinutes ~/ 5) + 1).where((e) => e.age <= ago).toList();
   }
 
   List<CleanSGV> beforeN(int n) {

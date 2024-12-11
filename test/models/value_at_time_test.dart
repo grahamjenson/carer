@@ -55,7 +55,6 @@ void main() async {
 
       targets = ValueAtTime.lastSixHours.value;
 
-      //print(targets.sublist(0, 5));
       expect(targets.length, 360);
 
       // beginning will be 1 hour ahead

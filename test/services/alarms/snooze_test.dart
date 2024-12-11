@@ -46,8 +46,6 @@ void main() async {
       AlarmAlertSettings().snoozeUntilSignalAlarms.value = AlarmSet({AlarmType.high});
       // Alarms triggers "now"
       AlarmsService().pendingAlarms.value = AlarmSet({AlarmType.urgentHigh}); // order here matters
-
-      print("Pending alarms ${AlarmsService().pendingAlarms.value}");
       var (wakeUp, reason, reasonString) = AlarmsService().shouldWakeUpForUrgent();
       expect(wakeUp, true);
 
