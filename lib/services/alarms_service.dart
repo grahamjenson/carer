@@ -116,7 +116,11 @@ class AlarmsService {
         alog("Snooze: $reasonString");
         AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
       }
-    }, debugLabel: "WakingUpCalculation", dependencies: [TimerService().minuteSignal, pendingAlarms]);
+    }, debugLabel: "WakingUpCalculation", dependencies: [
+      TimerService().minuteSignal,
+      pendingAlarms,
+      CleanSGV.lastSGV,
+    ]);
 
     // Writing the logs of alarms to the database
     AlarmSet pendingAlarmsCheck = AlarmSet({});
