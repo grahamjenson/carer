@@ -79,7 +79,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
 
   SettingsTile wakeUpInRange() {
     return SettingsTile.switchTile(
-      title: const Text("Wake Up In Range"),
+      title: const Text("Stop Snoozing When In Range"),
       descriptionInlineIos: true,
       description: const Text(
         "Stop Snoozing after 20 minutes in range",
@@ -93,10 +93,10 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
 
   SettingsTile wakeUpWhenUrgent() {
     return SettingsTile.switchTile(
-      title: const Text("Wake Up When Urgent"),
+      title: const Text("Stop Snoozing With Urgent Alarm"),
       descriptionInlineIos: true,
       description: const Text(
-        "Stop Snoozing for new Urgent Alarm (or No Data).\nIf you snooze an urgent alarm it wont wake up",
+        "Stop Snoozing for Urgent Alarms\nUrgent High, Urgent Low and No Data\nSnoozing an Urgent Alarm will snooze",
       ),
       initialValue: AlarmAlertSettings().enableWakeUpWhenUrgent,
       onToggle: (bool value) {
