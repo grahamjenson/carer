@@ -8,10 +8,10 @@ import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 
 class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
-  ASignal<DateTime> lastResumed = ASignal(clock.now(), debugLabel: "LastResumed");
+  ASignal<DateTime> lastResumed = ASignal(clock.ago(days: 1), debugLabel: "LastResumed");
   ASignal<DateTime> lastPaused = ASignal(clock.now(), debugLabel: "LastPaused");
   ASignal<AppLifecycleState> lastState = ASignal(AppLifecycleState.resumed, debugLabel: "LastState");
-  ASignal<DateTime> lastChangeScreen = ASignal(clock.now(), debugLabel: "changeScreen");
+  ASignal<DateTime> lastChangeScreen = ASignal(clock.ago(days: 1), debugLabel: "changeScreen");
 
   //singleton
   static final AppLifecycleService _instance = AppLifecycleService._();

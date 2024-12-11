@@ -3,13 +3,38 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
-class AlarmPlayer {
+abstract class IAlarmPlayer {
+  Future<bool> stopAlarm();
+  Future<bool> playAlarm();
+  bool alarmPlaying();
+}
+
+class TestAlarmPlayer implements IAlarmPlayer {
+  @override
+  Future<bool> stopAlarm() async {
+    return true;
+  }
+
+  @override
+  Future<bool> playAlarm() async {
+    return true;
+  }
+
+  @override
+  bool alarmPlaying() {
+    return false;
+  }
+}
+
+class AlarmPlayer implements IAlarmPlayer {
   final alarmAudioPlayer = AudioPlayer();
 
+  @override
   Future<bool> stopAlarm() async {
     return await stopAudioPlayer(alarmAudioPlayer);
   }
 
+  @override
   Future<bool> playAlarm() async {
     // We dont await because this will block until player stops
     playAudioPlayer(alarmAudioPlayer);
@@ -18,6 +43,7 @@ class AlarmPlayer {
     return true;
   }
 
+  @override
   bool alarmPlaying() => alarmAudioPlayer.state == PlayerState.playing;
 
   Future<void> waitForPlaying(AudioPlayer player) async {

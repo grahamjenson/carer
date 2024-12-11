@@ -27,7 +27,7 @@ class AlarmSettings {
   factory AlarmSettings() => _singleton;
 
   final Map<_AlarmNames, ASignal> _signals = {
-    _AlarmNames.disableAlarms: ASignal<bool>(true, debugLabel: 'disableAlarms'),
+    _AlarmNames.disableAlarms: ASignal<bool>(false, debugLabel: 'disableAlarms'),
     _AlarmNames.urgentLowAlarm: ASignal<bool>(true, debugLabel: 'urgentLowAlarm'),
     _AlarmNames.lowAlarm: ASignal<bool>(true, debugLabel: 'lowAlarm'),
     _AlarmNames.highAlarm: ASignal<bool>(true, debugLabel: 'highAlarm'),

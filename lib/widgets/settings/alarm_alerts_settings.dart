@@ -26,25 +26,16 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         }
         List<SettingsTile> tiles = [
           enableFlashOnAlarm(),
-          enableAutoSnoozeOff(),
+          wakeUpInRange(),
+          wakeUpWhenUrgent(),
           brightnessAdjust(),
           enableAudioAlarms(context),
+          volumeOverride(context),
+          volumeSettings(context, width),
+          progressiveVolume(context),
+          alarmFileSelect(),
           testAlert(context, width),
         ].whereType<SettingsTile>().toList();
-
-        if (AlarmAlertSettings().enableAudioAlarm) {
-          tiles = [
-            enableFlashOnAlarm(),
-            enableAutoSnoozeOff(),
-            brightnessAdjust(),
-            enableAudioAlarms(context),
-            volumeOverride(context),
-            volumeSettings(context, width),
-            progressiveVolume(context),
-            alarmFileSelect(),
-            testAlert(context, width),
-          ].whereType<SettingsTile>().toList();
-        }
 
         return SettingsSection(
           title: const Text('Alarm Alerts'),
@@ -86,16 +77,30 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     );
   }
 
-  SettingsTile enableAutoSnoozeOff() {
+  SettingsTile wakeUpInRange() {
     return SettingsTile.switchTile(
-      title: const Text("Auto Snooze Off"),
+      title: const Text("Wake Up In Range"),
       descriptionInlineIos: true,
       description: const Text(
-        "Stop Snoozing after 20 minutes if Not Alarming",
+        "Stop Snoozing after 20 minutes in range",
       ),
-      initialValue: AlarmAlertSettings().enableAutoSnoozeOff,
+      initialValue: AlarmAlertSettings().enableWakeUpInRange,
       onToggle: (bool value) {
-        AlarmAlertSettings().enableAutoSnoozeOff = value;
+        AlarmAlertSettings().enableWakeUpInRange = value;
+      },
+    );
+  }
+
+  SettingsTile wakeUpWhenUrgent() {
+    return SettingsTile.switchTile(
+      title: const Text("Wake Up When Urgent"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Stop Snoozing for new Urgent Alarm (or No Data).\nIf you snooze an urgent alarm it wont wake up",
+      ),
+      initialValue: AlarmAlertSettings().enableWakeUpWhenUrgent,
+      onToggle: (bool value) {
+        AlarmAlertSettings().enableWakeUpWhenUrgent = value;
       },
     );
   }
@@ -123,7 +128,10 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     );
   }
 
-  SettingsTile volumeOverride(BuildContext context) {
+  SettingsTile? volumeOverride(BuildContext context) {
+    if (!AlarmAlertSettings().enableAudioAlarm) {
+      return null;
+    }
     return SettingsTile.switchTile(
       title: const Text("Volume Override"),
       initialValue: AlarmAlertSettings().volumeOveride,
@@ -133,7 +141,11 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     );
   }
 
-  SettingsTile volumeSettings(BuildContext context, double width) {
+  SettingsTile? volumeSettings(BuildContext context, double width) {
+    if (!AlarmAlertSettings().enableAudioAlarm) {
+      return null;
+    }
+
     int minRange = 0;
     int maxRange = 100;
 
@@ -185,7 +197,11 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         ));
   }
 
-  SettingsTile progressiveVolume(BuildContext context) {
+  SettingsTile? progressiveVolume(BuildContext context) {
+    if (!AlarmAlertSettings().enableAudioAlarm) {
+      return null;
+    }
+
     return SettingsTile(
       title: const Text("Volume Progression"),
       trailing: ToggleButtons(
@@ -237,7 +253,10 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     );
   }
 
-  SettingsTile alarmFileSelect() {
+  SettingsTile? alarmFileSelect() {
+    if (!AlarmAlertSettings().enableAudioAlarm) {
+      return null;
+    }
     return SettingsTile(
       title: const Text("Alarm Sound"),
       descriptionInlineIos: true,

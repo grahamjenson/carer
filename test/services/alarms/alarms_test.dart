@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:carer/models/details/alarms/alarms.dart';
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
@@ -128,6 +129,8 @@ void main() async {
         "Urgent Low",
         sgvs: [URGENTLOW - 10],
         expectedAlarms: {AlarmType.urgentLow, AlarmType.low},
+        calculatedExpectedActiveAlarms: {AlarmType.urgentLow},
+        calculatedExpectedPendingAlarms: {AlarmType.urgentLow},
       ),
 
       AlarmTest(
@@ -149,6 +152,10 @@ void main() async {
         expect(AlarmType.activeAlarms(), AlarmType.values.toSet()..removeAll([AlarmType.test, AlarmType.unknown]));
         expect(AlarmType.smartSnoozeAlarms(), <AlarmType>{});
 
+        var (pengindAlarms, activeAlarms) = AlarmsService().calculateAlarms();
+        expect(pengindAlarms.isEmpty, true);
+        expect(activeAlarms.isEmpty, true);
+
         await createSGVsInOrder(t.sgvs, offset: min2);
 
         Set<AlarmType> triggeredAlarms = {};
@@ -167,6 +174,11 @@ void main() async {
           // This has tripped me up a few times accidentally adding objects to the map
           expect(jsonEncode(alarm.details()), isNotNull);
         }
+
+        (pengindAlarms, activeAlarms) = AlarmsService().calculateAlarms();
+        expect(pengindAlarms.toSet(), t.calculatedExpectedPendingAlarms);
+        expect(activeAlarms.toSet(), t.calculatedExpectedActiveAlarms);
+
         expect(triggeredAlarms, t.expectedAlarms);
       });
     }
@@ -175,7 +187,25 @@ void main() async {
 
 class AlarmTest {
   List<int?> sgvs;
-  Set<AlarmType> expectedAlarms;
+  Set<AlarmType> _expectedAlarms = {};
+  Set<AlarmType> _calculatedExpectedPendingAlarms = {};
+  Set<AlarmType> _calculatedExpectedActiveAlarms = {};
+
   String name;
-  AlarmTest(this.name, {required this.sgvs, required this.expectedAlarms});
+  AlarmTest(
+    this.name, {
+    required this.sgvs,
+    required Set<AlarmType> expectedAlarms,
+    Set<AlarmType>? calculatedExpectedPendingAlarms,
+    Set<AlarmType>? calculatedExpectedActiveAlarms,
+  }) {
+    _expectedAlarms = expectedAlarms;
+    _calculatedExpectedActiveAlarms = calculatedExpectedActiveAlarms ?? expectedAlarms;
+    _calculatedExpectedPendingAlarms = calculatedExpectedPendingAlarms ?? expectedAlarms;
+  }
+
+  Set<AlarmType> get expectedAlarms => _expectedAlarms;
+
+  Set<AlarmType> get calculatedExpectedPendingAlarms => _calculatedExpectedPendingAlarms;
+  Set<AlarmType> get calculatedExpectedActiveAlarms => _calculatedExpectedActiveAlarms;
 }

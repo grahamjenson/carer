@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:carer/mappers/sql/sgv.dart';
+import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/models/sql/events/alarm_event.dart';
 import 'package:carer/services/alarms/brightness.dart';
@@ -12,6 +13,7 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/timer_service.dart';
+import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:collection/collection.dart';
@@ -22,7 +24,14 @@ const se = SetEquality();
 class AlarmsService {
   static final AlarmsService _singleton = AlarmsService._();
   factory AlarmsService() => _singleton;
-  final AlarmPlayer player = AlarmPlayer();
+  AlarmPlayer? _player;
+  IAlarmPlayer get player {
+    if (Env.isTest) {
+      return TestAlarmPlayer();
+    }
+    _player ??= AlarmPlayer();
+    return _player!;
+  }
 
   ASignal<AlarmSet> pendingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "PendingAlarms");
   ASignal<AlarmSet> alertingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "AlertingAlarms");
@@ -48,15 +57,8 @@ class AlarmsService {
     aeffect(() {
       try {
         var (newPendingAlarms, newAlertingAlarms) = calculateAlarms();
-
-        // If the app has only recently been resumed or a screen changed, we wipe all the active alarms
-        // because we want to give the app some time ot "warm up" and if the user is doing something give them time to finish
-        if (AppLifecycleService().wasResumed10SecondsAgo || AppLifecycleService().wasRecentlyScreenChanged) {
-          newAlertingAlarms = <AlarmType>{};
-        }
-
-        pendingAlarms.value = AlarmSet(newPendingAlarms);
-        alertingAlarms.value = AlarmSet(newAlertingAlarms);
+        pendingAlarms.value = newPendingAlarms;
+        alertingAlarms.value = newAlertingAlarms;
       } catch (err) {
         alog("CheckAlarms: Error checking alarms: $err");
       }
@@ -103,32 +105,22 @@ class AlarmsService {
 
     // Auto Snooze Turn off
     aeffect(() {
-      // The reason for this feature is that snooze should be turned off as quickly as possible once the "danger is gone"
-      // There are two reasons to snooze
-      // 1. There is an alarm
-      // 2. There is assumed to be an alarm
-
-      if (!AlarmAlertSettings().enableAutoSnoozeOff) {
-        return;
-      }
+      // This checks to see if we should wakeUpFromSnooze
+      // Already not snoozing so can skip
       if (AlarmAlertSettings().snoozeDuration == null) {
         return;
       }
 
-      int mins = 20;
-      Duration snoozeLastSet = AlarmAlertSettings().snoozeLastSet;
-      Duration pendingAlarmsLastSet = pendingAlarms.lastSetAgo;
-      int pendingAlarmsSize = pendingAlarms.value.length;
+      var (shouldWakeUpFromSnooze, reason, reasonString) = shouldWakeUp();
 
-      bool pendingAlarmsBeenEmptyForMins = pendingAlarmsLastSet.inMinutes > mins && pendingAlarmsSize == 0;
-
-      if (snoozeLastSet.inMinutes > mins && pendingAlarmsBeenEmptyForMins) {
-        var reason =
-            "Auto Snooze Off Last Snooze ${snoozeLastSet.inMinutes} mins ago, Pending Alarms ($pendingAlarmsSize) last changed ${pendingAlarmsLastSet.inMinutes} mins ago";
-        alog("Snooze: $reason");
-        AlarmAlertSettings().setSnoozeDurationSeconds(null, SnoozeReason.autoRemoved);
+      if (!shouldWakeUpFromSnooze) {
+        return;
       }
-    }, debugLabel: "AutoSnoozeOff", dependencies: [TimerService().minuteSignal]);
+
+      alog("Snooze: $reasonString");
+      AlarmAlertSettings().setSnoozeDurationSeconds(null, reason);
+      //
+    }, debugLabel: "WakingUpCalculation", dependencies: [TimerService().minuteSignal]);
 
     // Writing the logs of alarms to the database
     AlarmSet pendingAlarmsCheck = AlarmSet({});
@@ -147,33 +139,113 @@ class AlarmsService {
     }, debugLabel: "WriteAlarmLogs");
   }
 
-  (Set<AlarmType>, Set<AlarmType>) calculateAlarms() {
-    var notSnoozing = AlarmAlertSettings().snoozeDuration == null;
+  (AlarmSet, AlarmSet) calculateAlarms() {
     Set<AlarmType> newPendingAlarms = {};
     Set<AlarmType> newActiveAlarms = {};
 
-    var disabledAllAlarms = AlarmSettings().disableAlarms;
+    var notSnoozing = AlarmAlertSettings().snoozeDuration == null;
+    var allAlarmsEnabled = !AlarmSettings().disableAlarms;
+
+    // If the app has only recently been resumed or a screen changed, we wipe all the active alarms
+    // because we want to give the app some time ot "warm up" and if the user is doing something give them time to finish
+    var notRecentChange = !(AppLifecycleService().wasResumed10SecondsAgo || AppLifecycleService().wasRecentlyScreenChanged);
 
     for (var alarm in AlarmType.values) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
 
+      var notSmartSnoozing = !smartSnooze;
       // Build the lists
       if (triggered) {
         newPendingAlarms.add(alarm);
       }
 
-      var addToActive = !disabledAllAlarms && triggered && active && notSnoozing && !(smartSnooze);
+      // Do not add to active alarms if:
+      // 1. Alarms are enabled
+      // 2. Alarm is Triggered
+      // 3. Alarm is Active
+      // 4. App is Not snoozing
+      // 5. Alarm is not smart snoozing
+      // 6. App has not recently changed screens or resumed
+      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRecentChange;
 
       if (addToActive) {
         newActiveAlarms.add(alarm);
       }
     }
-    // Filter out doubles of alarms
+
+    // Filter out superceeding alarms
     newPendingAlarms = filterAlarms(newPendingAlarms);
     newActiveAlarms = filterAlarms(newActiveAlarms);
 
     // Set alarms that have been triggered
-    return (newPendingAlarms, newActiveAlarms);
+    return (AlarmSet(newPendingAlarms), AlarmSet(newActiveAlarms));
+  }
+
+  (bool, SnoozeReason, String) shouldWakeUp() {
+    var (wakeUpForRange, reasonForRange, reasonStringForRange) = shouldWakeUpForRange();
+    if (wakeUpForRange) {
+      return (true, reasonForRange, reasonStringForRange);
+    }
+
+    var (wakeUpForUrgent, reasonForUrgent, reasonStringForUrgent) = shouldWakeUpForUrgent();
+    if (wakeUpForUrgent) {
+      return (true, reasonForUrgent, reasonStringForUrgent);
+    }
+
+    return (false, SnoozeReason.unknown, "");
+  }
+
+  (bool, SnoozeReason, String) shouldWakeUpForRange() {
+    // This feature turns off snooze once the "danger is gone"
+    if (!AlarmAlertSettings().enableWakeUpInRange) {
+      return (false, SnoozeReason.unknown, "");
+    }
+
+    int mins = 20;
+    Duration snoozeLastSet = AlarmAlertSettings().snoozeLastSet;
+    if (snoozeLastSet.inMinutes < mins) {
+      return (false, SnoozeReason.unknown, "Snooze Last Set ${snoozeLastSet.inMinutes} mins ago");
+    }
+
+    var lastSGV = CleanSGV.lastSGV.value;
+    if (lastSGV == null) {
+      return (false, SnoozeReason.unknown, "No SGV");
+    }
+    var lastReadings = lastSGV.lastReadingsAfter(Duration(minutes: mins));
+    if (lastReadings.isEmpty) {
+      // We skip here but Wake Up On Urgent will wake up if no data
+      return (false, SnoozeReason.unknown, "No Readings");
+    }
+
+    var everyReadingWithinRange = lastReadings.every((sgv) => sgv.withinRange);
+
+    if (everyReadingWithinRange) {
+      var reason = "All readings for last 20 minutes are in range, snooze last set: ${snoozeLastSet.inMinutes}; lastReadings: $lastReadings";
+      return (true, SnoozeReason.wakeUpWhenInRange, reason);
+    }
+    return (false, SnoozeReason.unknown, "");
+  }
+
+  (bool, SnoozeReason, String) shouldWakeUpForUrgent() {
+    // This feature turns off snooze if "danger increases"
+    // 1. If you sleep a NON-URGENT Alarm, then an URGENT alarm happens, you should be woken up
+    // 2. If you sleep a URGENT alarm then it should stay slept
+
+    if (!AlarmAlertSettings().enableWakeUpWhenUrgent) {
+      return (false, SnoozeReason.unknown, "");
+    }
+
+    if (!pendingAlarms.value.containsUrgentAlarm()) {
+      return (false, SnoozeReason.unknown, "No Urgent Pending Alarms");
+    }
+
+    var previouslyContainedUrgentAlarm = AlarmAlertSettings().snoozeUntilSignalAlarms.value.containsUrgentAlarm();
+
+    if (!previouslyContainedUrgentAlarm) {
+      return (true, SnoozeReason.wakeUpWhenUrgent, "Urgent Alarm");
+    }
+
+    return (false, SnoozeReason.unknown, "");
   }
 
   Set<AlarmType> filterAlarms(Set<AlarmType> alarms) {

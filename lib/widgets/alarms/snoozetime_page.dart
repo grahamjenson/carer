@@ -101,7 +101,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                 children: children,
               );
             },
-            debugLabel: "SleepPage",
+            debugLabel: "SnoozePage",
             dependencies: [UISettings().orientationSignal],
           ),
         ],
@@ -116,19 +116,12 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
     if (orientation == Orientation.landscape) {
       return [
         Expanded(
-          flex: 2,
+          flex: 5,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [mins[0], mins[1], mins[2]],
+            children: mins,
           ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [mins[3], mins[4], mins[5]],
-          ),
-        ),
+        )
       ];
     } else {
       return [

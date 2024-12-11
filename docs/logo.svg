@@ -23,7 +23,7 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="0.70638742"
-     inkscape:cx="440.97614"
+     inkscape:cx="218.7185"
      inkscape:cy="605.8998"
      inkscape:window-width="1600"
      inkscape:window-height="1280"
@@ -42,7 +42,7 @@
          offset="0"
          id="stop1048" />
       <stop
-         style="stop-color:#2289ce;stop-opacity:1;"
+         style="stop-color:#187bb8;stop-opacity:1;"
          offset="1"
          id="stop1050" />
     </linearGradient>
@@ -168,15 +168,6 @@
        y1="120.30239"
        x2="282.34521"
        y2="120.30239" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1052"
-       id="linearGradient16406"
-       x1="-68.773575"
-       y1="407.32095"
-       x2="233.74359"
-       y2="680.80414"
-       gradientUnits="userSpaceOnUse" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient16640"
@@ -219,9 +210,20 @@
        fx="173.1627"
        fy="654.28296"
        r="34.863045" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1052"
+       id="radialGradient1112"
+       cx="179.98233"
+       cy="653.0202"
+       fx="179.98233"
+       fy="653.0202"
+       r="150"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0283131,0.00943769,-0.01047666,1.1415172,1.7456182,-94.112216)" />
   </defs>
   <rect
-     style="fill:url(#linearGradient16406);fill-opacity:1;stroke:none;stroke-width:3.77953"
+     style="fill:url(#radialGradient1112);fill-opacity:1;stroke:none;stroke-width:3.77953"
      id="rect15670"
      width="300"
      height="300"
@@ -279,7 +281,7 @@
      y="717.35474" />
   <g
      id="g2600"
-     transform="matrix(0.83210549,0,0,0.83210549,32.225345,110.43553)">
+     transform="matrix(0.9191619,0,0,0.9191619,17.062954,56.335269)">
     <path
        style="fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.946209;stroke-opacity:1"
        d="m 131.33714,569.5032 c -25.51288,23.24807 -37.188825,41.71915 -42.223862,56.97724 -10.597533,32.10485 10.899452,69.34861 16.349612,75.10156 5.45016,5.75295 33.30598,25.12976 48.44531,31.48828 15.13933,6.35852 13.77686,-2.87558 10.90039,-5.14648 -2.3466,-1.85457 -31.79182,-26.03987 -38.45313,-32.70117 -6.6613,-6.6613 -10.29544,-26.94776 -7.26757,-35.42578 3.33065,-4.54181 19.07686,15.44194 26.34374,23.61719 7.26689,8.17524 12.44277,4.16331 10.59766,0 -10.84355,-21.89526 -11.20318,-36.19175 -24.35547,-52.58008 -2.29928,-2.86701 -8.44251,-0.4273 -6.32301,-3.43623 6.52344,-9.24615 23.91158,-23.11334 42.95898,-35.88477 -12.49465,-8.37776 -25.61999,-16.21133 -36.97265,-22.00976 z"

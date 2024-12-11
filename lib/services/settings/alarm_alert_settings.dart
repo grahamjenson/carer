@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/models/sql/events/snooze_events.dart';
+import 'package:carer/services/alarms_service.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -20,10 +22,12 @@ enum _AANames {
   // Other ALARM
   enableFlashOnAlarm,
   brightnessAdjustAtNight,
-  enableAutoSnoozeOff,
+  enableWakeUpInRange,
+  enableWakeUpWhenUrgent,
 
   // ephemeral
   snoozeUntil,
+  snoozeUntilAlarms,
   testAlarm,
 }
 
@@ -32,7 +36,8 @@ enum SnoozeReason {
   cancelPressed,
   buttonMissed,
   timerExpired,
-  autoRemoved,
+  wakeUpWhenInRange,
+  wakeUpWhenUrgent,
   noButtonPressed,
   unknown,
 }
@@ -45,13 +50,15 @@ class AlarmAlertSettings {
     _AANames.smartSnoozeHigh: ASignal<bool>(true, debugLabel: 'smartSnoozeHigh'),
     _AANames.brightnessAdjustAtNight: ASignal<bool>(true, debugLabel: 'brightnessAdjustAtNight'),
     _AANames.enableFlashOnAlarm: ASignal<bool>(true, debugLabel: 'enableFlashOnAlarm'),
-    _AANames.enableAutoSnoozeOff: ASignal<bool>(true, debugLabel: 'enableAutoSnoozeOff'),
+    _AANames.enableWakeUpInRange: ASignal<bool>(true, debugLabel: 'enableWakeUpInRange'),
+    _AANames.enableWakeUpWhenUrgent: ASignal<bool>(true, debugLabel: 'enableWakeUpWhenUrgent'),
     _AANames.enableAudioAlarm: ASignal<bool>(true, debugLabel: 'enableAudioAlarm'),
     _AANames.volumeOveride: ASignal<bool>(true, debugLabel: 'volumeOveride'),
     _AANames.volumeOverrideValue: ASignal<int>(50, debugLabel: 'volumeOverrideValue'),
     _AANames.volumeProgressionSeconds: ASignal<int>(10, debugLabel: 'volumeProgressionSeconds'),
     _AANames.alarmAsset: ASignal<AlarmSounds>(AlarmSounds.nightguard, debugLabel: 'alarmAsset'),
     _AANames.snoozeUntil: ASignal<DateTime?>(null, debugLabel: "snoozeUntil"),
+    _AANames.snoozeUntilAlarms: ASignal<AlarmSet>(AlarmSet({}), debugLabel: "snoozeUntilAlarms"),
     _AANames.testAlarm: ASignal<DateTime?>(null, debugLabel: "testAlarm"),
   };
 
@@ -83,10 +90,14 @@ class AlarmAlertSettings {
   bool get enableFlashOnAlarm => _signals[_AANames.enableFlashOnAlarm]!.value as bool;
   set enableFlashOnAlarm(bool value) => _signals[_AANames.enableFlashOnAlarm]!.value = value;
 
-  bool get enableAutoSnoozeOff => _signals[_AANames.enableAutoSnoozeOff]!.value as bool;
-  set enableAutoSnoozeOff(bool value) => _signals[_AANames.enableAutoSnoozeOff]!.value = value;
+  bool get enableWakeUpInRange => _signals[_AANames.enableWakeUpInRange]!.value as bool;
+  set enableWakeUpInRange(bool value) => _signals[_AANames.enableWakeUpInRange]!.value = value;
+
+  bool get enableWakeUpWhenUrgent => _signals[_AANames.enableWakeUpWhenUrgent]!.value as bool;
+  set enableWakeUpWhenUrgent(bool value) => _signals[_AANames.enableWakeUpWhenUrgent]!.value = value;
 
   ASignal<DateTime?> get snoozeUntilSignal => _signals[_AANames.snoozeUntil]! as ASignal<DateTime?>;
+  ASignal<AlarmSet> get snoozeUntilSignalAlarms => _signals[_AANames.snoozeUntilAlarms]! as ASignal<AlarmSet>;
 
   // Test alarm will be true for 5 minutes after it is set
   bool get testAlarm {
@@ -165,7 +176,8 @@ class AlarmAlertSettings {
 
     brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: true)!;
     enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: true)!;
-    enableAutoSnoozeOff = prefs.getBool(_AANames.enableAutoSnoozeOff.name, defaultValue: true)!;
+    enableWakeUpInRange = prefs.getBool(_AANames.enableWakeUpInRange.name, defaultValue: true)!;
+    enableWakeUpWhenUrgent = prefs.getBool(_AANames.enableWakeUpWhenUrgent.name, defaultValue: true)!;
 
     aeffect(() => prefs.setBool(_AANames.smartSnoozeHigh.name, smartSnoozeHigh), debugLabel: 'writesmartSnoozeHigh');
 
@@ -191,8 +203,12 @@ class AlarmAlertSettings {
     }, debugLabel: 'writeenableFlashOnAlarm');
 
     aeffect(() {
-      prefs.setBool(_AANames.enableAutoSnoozeOff.name, enableAutoSnoozeOff);
-    }, debugLabel: 'writeenableAutoSnoozeOff');
+      prefs.setBool(_AANames.enableWakeUpInRange.name, enableWakeUpInRange);
+    }, debugLabel: 'writeenableWakeUpInRange');
+
+    aeffect(() {
+      prefs.setBool(_AANames.enableWakeUpWhenUrgent.name, enableWakeUpWhenUrgent);
+    }, debugLabel: 'writeenableWakeUpWhenUrgent');
   }
 
   Timer? snoozeTimer;
@@ -249,6 +265,7 @@ class AlarmAlertSettings {
     var time = clock.now().add(duration);
     alog("Snooze: Duration Seconds set to $time from ${snoozeUntilSignal.peek()} because $reason");
     SnoozeEvent.startSnooze(duration, reason);
+    snoozeUntilSignalAlarms.value = AlarmsService().pendingAlarms.peek();
     snoozeUntilSignal.value = time;
   }
 

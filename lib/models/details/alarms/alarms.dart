@@ -43,6 +43,10 @@ class AlarmSet extends Iterable<AlarmType> {
   AlarmSet difference(AlarmSet other) {
     return AlarmSet(_alarms.difference(other._alarms));
   }
+
+  bool containsUrgentAlarm() {
+    return _alarms.any((alarm) => alarm == AlarmType.urgentLow || alarm == AlarmType.urgentHigh || alarm == AlarmType.noData);
+  }
 }
 
 // TODO this is a step towards having all alarms as static
