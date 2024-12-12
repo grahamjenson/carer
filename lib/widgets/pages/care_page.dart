@@ -5,6 +5,7 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
+import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/shared/settings_slider.dart';
@@ -235,6 +236,7 @@ class CarePage extends StatelessWidget {
           NSClient().addTempTarget(nsURL, nsToken, bottom.toInt(), top.toInt(), duration, name).then((value) {
             if (value) {
               ToastService().showSuccess("Temp Target ${e.description}");
+              UpdateService().nsTreatmentUpdater.addExternalReason("Added Temp Target");
             } else {
               ToastService().showError("Failed to set TempTarget");
             }
@@ -261,6 +263,7 @@ class CarePage extends StatelessWidget {
           NSClient().addCarbs(nsURL, nsToken, carbs).then((value) {
             if (value) {
               ToastService().showSuccess("${carbs}g carbs added");
+              UpdateService().nsTreatmentUpdater.addExternalReason("Added Carbs");
             } else {
               ToastService().showError("Failed to add ${carbs}g carbs");
             }
