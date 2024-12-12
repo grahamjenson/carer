@@ -8,7 +8,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 
 class NSDeviceStatusUpdater extends Updater {
-  NSDeviceStatusUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 15)) {
+  NSDeviceStatusUpdater() : super(intervalToCheck: const Duration(seconds: 5), maxAgeBeforeChecking: const Duration(seconds: 15)) {
     aeffect(() {
       // Check signal to register
       var _ = SecureSettings().nightscoutURLAndToken;

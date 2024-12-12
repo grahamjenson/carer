@@ -53,9 +53,11 @@ class NSClient {
   factory NSClient() => _singleton;
   NSClient._internal();
 
-  ASignal<DateTime?> lastError = ASignal<DateTime?>(null, debugLabel: "NSClientLastError");
+  ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
   ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
 
+  String? jwtURL;
+  String? jwtToken;
   String? jwt;
   DateTime? jwtExpire;
 
@@ -92,6 +94,14 @@ class NSClient {
       return true;
     }
 
+    // Log to make sure that we refresh the JWT if the token or URL changes
+    if (jwtURL == nsURL && jwtToken == token) {
+      return false;
+    }
+    jwtURL = nsURL;
+    jwtToken = token;
+
+    // Bad URL or token
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
       return false;
@@ -99,7 +109,7 @@ class NSClient {
     alog("NSCLIENT: REFRESHING JWT");
     var ep = jwtEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("refreshJWT", ep, response, err)) {
       return false;
     }
 
@@ -149,7 +159,7 @@ class NSClient {
         },
         body: jsonEncode(bodyMap)));
 
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("addCarbs", ep, response, err)) {
       return false;
     }
 
@@ -194,7 +204,7 @@ class NSClient {
         },
         body: jsonEncode(bodyMap)));
 
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("addTempTarget", ep, response, err)) {
       return false;
     }
 
@@ -213,7 +223,7 @@ class NSClient {
     var ep = entryEndpoint(nsURL, token, gteCreateAt);
 
     final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("entries", ep, response, err)) {
       return NSEntries.empty();
     }
 
@@ -226,7 +236,7 @@ class NSClient {
     }
     var ep = treatmentsEndpoint(nsURL, token, gteCreateAt);
     final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("treatments", ep, response, err)) {
       return NSTreatments.empty();
     }
 
@@ -240,7 +250,7 @@ class NSClient {
     }
     var ep = currentProfile(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("currentProfile", ep, response, err)) {
       return null;
     }
 
@@ -254,7 +264,7 @@ class NSClient {
     }
     var ep = propertiesEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("properties", ep, response, err)) {
       return null;
     }
 
@@ -268,27 +278,49 @@ class NSClient {
     }
     var ep = deviceStatusEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));
-    if (_handleResponseError(ep, response, err)) {
+    if (_handleResponseError("deviceStatus", ep, response, err)) {
       return null;
     }
 
     return NSDeviceStatus.fromDeviceJson(response!.body);
   }
 
-  bool _handleResponseError(Uri uri, Response? response, Object? err) {
+  void incTotalErorrs() {
+    totalErrors.value = totalErrors.peek() + 1;
+  }
+
+  bool _handleResponseError(String route, Uri uri, Response? response, Object? err) {
+    alog("NSCLIENT: FETCHED $route ${uri.toString()}");
+
     if (err != null || response == null) {
-      lastError.value = clock.now();
-      ToastService().showError("Nightscout Error", description: err.toString());
+      incTotalErorrs();
+      alog("NSError: Unknown $route $err");
+      ToastService().showError("NSError", description: "$route: Unknown $err");
       return true;
     }
-    alog("NSCLIENT: FETCHED ${uri.toString()}");
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      lastError.value = clock.now();
-      alog("NSCLIENT: NON 200 responce code ${response.statusCode}");
 
-      String body = response.body;
-      var json = decodeJson(response.body);
-      if (json != null) {
+    String body = response.body;
+
+    if (response.statusCode == 500) {
+      alog("NSError: 500 Server error $body");
+      // Not our problem if the server is erroring Will log it though, just because we will see if easily
+      return true;
+    }
+
+    var (json, parseErr) = tryDecodeJson(response.body);
+    if (parseErr != null) {
+      incTotalErorrs();
+      alog("NSError: $route: Code ${response.statusCode} Bad JSON with Code $body");
+
+      ToastService().showError("NSError", description: "$route: Code ${response.statusCode} Bad JSON");
+      return true;
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      incTotalErorrs();
+      alog("NSError: NON 200 response code ${response.statusCode} $body");
+
+      if (json != null && json is Map) {
         if (json.containsKey("message") && json.containsKey("description")) {
           body = "${json["message"]} - ${json["description"]}";
         } else if (json.containsKey("message")) {
@@ -296,9 +328,10 @@ class NSClient {
         }
       }
 
-      ToastService().showError("Nightscout Error: Bad Response Code", description: "${response.statusCode}: $body");
+      ToastService().showError("NSError", description: "$route: Code (${response.statusCode}) $body");
       return true;
     }
+
     lastFetched.value = clock.now();
     return false;
   }

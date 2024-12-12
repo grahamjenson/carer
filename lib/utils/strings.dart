@@ -7,12 +7,11 @@ import 'package:flutter/services.dart';
 JsonDecoder decoder = const JsonDecoder();
 JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-Map<String, dynamic>? decodeJson(String input) {
+(dynamic, Object?) tryDecodeJson(String input) {
   try {
-    return decoder.convert(input);
-  } catch (e, stackTrace) {
-    Errors.captureError(e, stackTrace, name: "decodeJson");
-    return null;
+    return (decoder.convert(input), null);
+  } catch (e) {
+    return (null, e);
   }
 }
 

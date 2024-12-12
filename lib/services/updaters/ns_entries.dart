@@ -36,8 +36,8 @@ class NSEntriesUpdater extends Updater {
 
       // Check more frequently when the SGV is about to expire
       var fma = sgvage % 300;
-      // If age is above 5 mins, the first 30 seconds, check every 2 seconds
-      if (sgvage > 305 && fma > 0 && fma < 30 && fma % 2 == 0) {
+      // If age is above 5 mins, the first 30 seconds, check every 3 seconds
+      if (sgvage > 305 && fma > 0 && fma < 30 && fma % 3 == 0) {
         reasons.add("Last SGV is $sgvage's old ($fma's late)");
       }
     }
@@ -59,7 +59,7 @@ class NSEntriesUpdater extends Updater {
     List<SGV> sgvs = const NSEntryToSGV().mapAToB(entries.entries);
     var total = await SQLToSGV().saveAll(sgvs);
 
-    alog("Updated Entries $total");
+    alog("Entires: Total ${entries.entries.length}, Updated $total");
     return true;
   }
 }

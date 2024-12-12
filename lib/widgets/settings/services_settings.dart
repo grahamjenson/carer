@@ -1,6 +1,7 @@
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/service_pages/nightscout_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -11,11 +12,17 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsSection(
-      title: const Text('Services'),
-      tiles: [
-        nightScoutSettings(),
-      ],
+    return AWatch(
+      (context) {
+        return SettingsSection(
+          title: const Text('Services'),
+          tiles: [
+            nightScoutSettings(),
+          ],
+        );
+      },
+      debugLabel: "NightScoutSettingsWidget",
+      dependencies: [NSClient().lastFetched, NSClient().totalErrors],
     );
   }
 
@@ -24,7 +31,9 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
 
     if (SecureSettings().nightscoutURLAndTokenSet()) {
       var lastFetched = NSClient().lastFetched.value;
-      var lastError = NSClient().lastError.value;
+      var lastError = NSClient().totalErrors.lastSet;
+      var totalErrors = NSClient().totalErrors.value;
+
       var times = [];
       if (lastFetched != null) {
         times.add("Fetched ${Dates.dateAgoLongFromNow(lastFetched)} ago");
@@ -32,13 +41,12 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
         times.add("Not Fetched Yet");
       }
 
-      if (lastError != null) {
-        times.add("Errored ${Dates.dateAgoLongFromNow(lastError)} ago");
-      } else {
-        times.add("No Errors");
+      times.add("Total Errors $totalErrors");
+      if (totalErrors > 0) {
+        times.add("Last Error ${Dates.dateAgoLongFromNow(lastError)} ago");
       }
 
-      description = times.join(", ");
+      description = times.join("\n");
     }
 
     return SettingsTile.navigation(

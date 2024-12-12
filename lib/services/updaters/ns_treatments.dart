@@ -21,7 +21,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 class NSTreatmentsUpdater extends Updater {
-  NSTreatmentsUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 10)) {
+  NSTreatmentsUpdater() : super(intervalToCheck: const Duration(seconds: 3), maxAgeBeforeChecking: const Duration(seconds: 10)) {
     lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
       // Check signal to register

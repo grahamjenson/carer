@@ -9,7 +9,7 @@ import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
 
 class NSProfileUpdater extends Updater {
-  NSProfileUpdater() : super(intervalToCheck: const Duration(seconds: 1), maxAgeBeforeChecking: const Duration(seconds: 60)) {
+  NSProfileUpdater() : super(intervalToCheck: const Duration(seconds: 5), maxAgeBeforeChecking: const Duration(seconds: 60)) {
     lastSuccessfulUpdate = clock.daysAgo(1);
     aeffect(() {
       // Check signal to register

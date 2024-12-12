@@ -21,7 +21,7 @@ class PropertiesData {
 
   final Map<PropertiesDataName, ASignal> _signals = {
     PropertiesDataName.battery: ASignal(100.0, debugLabel: "Battery"),
-    PropertiesDataName.isCharging: ASignal(false, debugLabel: "isCharging"),
+    PropertiesDataName.isCharging: ASignal(true, debugLabel: "isCharging"),
     PropertiesDataName.iob: ASignal(0.0, debugLabel: "IOB"),
     PropertiesDataName.basaliob: ASignal(0.0, debugLabel: "BasalIOB"),
     PropertiesDataName.treatmentiob: ASignal(0.0, debugLabel: "TreatmentiOB"),
@@ -38,7 +38,7 @@ class PropertiesData {
     await kvdb.internalPopulate();
 
     battery = kvdb.getDouble(PropertiesDataName.battery.name, defaultValue: 100.0)!;
-    isCharging = kvdb.getBool(PropertiesDataName.isCharging.name, defaultValue: false)!;
+    isCharging = kvdb.getBool(PropertiesDataName.isCharging.name, defaultValue: true)!;
     iob = kvdb.getDouble(PropertiesDataName.iob.name, defaultValue: 0.0)!;
     basaliob = kvdb.getDouble(PropertiesDataName.basaliob.name, defaultValue: 0.0)!;
     treatmentiob = kvdb.getDouble(PropertiesDataName.treatmentiob.name, defaultValue: 0.0)!;
