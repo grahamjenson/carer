@@ -90,13 +90,9 @@ class NSClient {
 
   Future<bool> refreshJWT(String nsURL, String token) async {
     // check to see if we need a new JWT
-    if (jwt != null && jwtExpire != null && jwtExpire!.isAfter(clock.now().add(const Duration(minutes: 5)))) {
+    // Make sure that we refresh the JWT if the token or URL changes
+    if (jwt != null && jwtExpire != null && jwtExpire!.isAfter(clock.now().add(const Duration(minutes: 5))) && jwtURL == nsURL && jwtToken == token) {
       return true;
-    }
-
-    // Log to make sure that we refresh the JWT if the token or URL changes
-    if (jwtURL == nsURL && jwtToken == token) {
-      return false;
     }
     jwtURL = nsURL;
     jwtToken = token;
@@ -128,12 +124,13 @@ class NSClient {
 
   Future<bool> addCarbs(String nsURL, String token, int carbs) async {
     if (nsURL == "" || token == "") {
-      alog("No NS URL or token");
+      alog("NSError: addCarbs No NS URL or token");
       return false;
     }
 
     var jwtSuccess = await refreshJWT(nsURL, token);
     if (!jwtSuccess) {
+      alog("NSError: addCarbs jwt refresh failed");
       return false;
     }
 
