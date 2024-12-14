@@ -38,17 +38,29 @@ class PainterFunctions with ThemeMixin {
     }) {
       if (spot is BGLSpot) {
         var circle = FlDotCirclePainter(
-          radius: 3,
-          color: color,
-          strokeColor: Colors.black,
+          radius: 4,
+          color: Colors.black,
+          strokeColor: color,
           strokeWidth: 2,
         );
 
+        if (!spot.sgv.isNormal) {
+          circle = FlDotCirclePainter(
+            radius: 3,
+            color: badColor(context),
+            strokeColor: color,
+            strokeWidth: 2,
+          );
+        }
+        Color textColor = color;
+        if (!spot.sgv.isNormal) {
+          textColor = badColor(context);
+        }
         return FlTextPainterPainter(
           spot.sgv.sgvStr(),
           strokeColor: Colors.black,
-          size: 12,
-          color: color,
+          size: 24,
+          color: textColor,
           align: Alignment.topCenter,
           shapePainter: circle,
         );
@@ -58,7 +70,7 @@ class PainterFunctions with ThemeMixin {
         return FlTextPainterPainter(
           "${toMax2dp(spot.basal)}",
           strokeColor: Colors.black,
-          size: 8,
+          size: 16,
           color: color,
           align: Alignment.topCenter,
         );
@@ -81,7 +93,7 @@ class PainterFunctions with ThemeMixin {
           text,
           align: align,
           strokeColor: Colors.black,
-          size: 12,
+          size: 16,
           strokeWidth: 2,
           color: pcolor,
           shapePainter: painter,
@@ -141,8 +153,8 @@ class PainterFunctions with ThemeMixin {
   }
 
   GetDotPainterCallback bglDotPainter(BuildContext context) {
-    var color = primaryColor(context);
-    var outOfRangeColor = badColor(context);
+    Color color = primaryColor(context);
+    Color outOfRangeColor = badColor(context);
     return (
       FlSpot spot,
       double xPercentage,
@@ -151,14 +163,14 @@ class PainterFunctions with ThemeMixin {
       double? size,
     }) {
       BGLSpot bglspot = spot as BGLSpot;
-      var useColor = color;
+      var useColor = Colors.black;
       var useStrokeColor = color;
-      var useStokeWidth = 0.0;
-      var useRadius = 2.0;
+      double useStokeWidth = .8;
+      double useRadius = 3;
       if (!bglspot.sgv.isNormal) {
         useColor = outOfRangeColor;
-        useRadius = 2.5;
-        useStokeWidth = 1.0;
+        useRadius = 1.5;
+        useStokeWidth = 1;
         useStrokeColor = color;
       }
       return FlDotCirclePainter(

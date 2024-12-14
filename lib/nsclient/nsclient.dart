@@ -89,20 +89,20 @@ class NSClient {
   ////
 
   Future<bool> refreshJWT(String nsURL, String token) async {
-    // check to see if we need a new JWT
-    // Make sure that we refresh the JWT if the token or URL changes
-    if (jwt != null && jwtExpire != null && jwtExpire!.isAfter(clock.now().add(const Duration(minutes: 5))) && jwtURL == nsURL && jwtToken == token) {
-      return true;
-    }
-    jwtURL = nsURL;
-    jwtToken = token;
-
+    alog("NSCLIENT: JWT MAYBE REFRESHING");
     // Bad URL or token
     if (nsURL == "" || token == "") {
-      alog("No NS URL or token");
+      alog("NSCLIENT: JWT No NS URL or token");
       return false;
     }
-    alog("NSCLIENT: REFRESHING JWT");
+
+    var refreshNow = await shouldRefreshJWT(nsURL, token);
+    if (!refreshNow) {
+      alog("NSCLIENT: JWT is still valid until $jwtExpire");
+      return true;
+    }
+
+    alog("NSCLIENT: JWT REFRESHING");
     var ep = jwtEndpoint(nsURL, token);
     final (response, err) = await go(http.get(ep));
     if (_handleResponseError("refreshJWT", ep, response, err)) {
@@ -118,8 +118,33 @@ class NSClient {
     var body = jsonDecode(response!.body);
     jwt = body["token"] as String;
     var expts = body["exp"] as int;
-    jwtExpire = DateTime.fromMillisecondsSinceEpoch(expts * 1000);
+    var expiryWithWiggle = expts - 300;
+    jwtExpire = DateTime.fromMillisecondsSinceEpoch(expiryWithWiggle * 1000);
+
+    // Store the URL and token here
+    jwtURL = nsURL;
+    jwtToken = token;
+
     return true;
+  }
+
+  Future<bool> shouldRefreshJWT(String nsURL, String token) async {
+    // If the JWT is null then we should refresh
+    if (jwt == null || jwtExpire == null) {
+      return true;
+    }
+
+    // If it is a new URL or token then refresh
+    if (jwtURL != nsURL || jwtToken != token) {
+      return true;
+    }
+
+    // If JWT is before now then no need to refresh
+    if (jwtExpire!.isBefore(clock.now())) {
+      return true;
+    }
+
+    return false;
   }
 
   Future<bool> addCarbs(String nsURL, String token, int carbs) async {
