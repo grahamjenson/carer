@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/nsclient/ns_type.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:flutter/material.dart';
 
 class NSProfile {
@@ -43,22 +42,44 @@ class NSProfile {
   List<int> expandedTargetHigh() => targetHigh.expand().map((e) => e.round()).toList();
 
   static NSProfile? fromCurrentJson(String jsonString) {
-    try {
-      var json = jsonDecode(jsonString);
-      Map<String, dynamic> profileStore = json["store"];
-      var profileName = profileStore.keys.firstOrNull;
-      Map<String, dynamic> profileValues = profileStore[profileName];
-      return NSProfile.fromJson(
-        profileName!,
-        json["_id"]!,
-        DateTime.fromMillisecondsSinceEpoch(json['date'] ?? 0),
-        profileValues,
-        raw: jsonString,
-      );
-    } catch (e, stackTrace) {
-      Errors.captureError(e, stackTrace);
+    var (json, err) = tryDecodeJson(jsonString);
+    if (err != null) {
+      alog("NSError: Failed to decode profile json: $err $jsonString");
+      Errors.captureError(err, StackTrace.current);
       return null;
     }
+    // Return unless json is a Map<String, dynamic>
+
+    if (json is! Map<String, dynamic>) {
+      alog("NSError: Failed to decode profile json:  NOT A MAP $jsonString");
+      return null;
+    }
+
+    var store = json["store"];
+    if (store is! Map<String, dynamic>) {
+      alog("NSError: Failed to decode profile json: store key not found $jsonString");
+      return null;
+    }
+
+    var id = json["_id"];
+    if (id == null) {
+      alog("NSError: Failed to decode profile json: id key not found $jsonString");
+      return null;
+    }
+    Map<String, dynamic> profileStore = store;
+    var profileName = profileStore.keys.firstOrNull;
+    if (profileName == null) {
+      alog("NSError: Failed to decode profile json: profile name not found $jsonString");
+      return null;
+    }
+    Map<String, dynamic> profileValues = profileStore[profileName];
+    return NSProfile.fromJson(
+      profileName,
+      id!,
+      DateTime.fromMillisecondsSinceEpoch(json['date'] ?? 0),
+      profileValues,
+      raw: jsonString,
+    );
   }
 
   factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json, {String raw = ""}) {
