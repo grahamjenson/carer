@@ -1,3 +1,4 @@
+import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -120,9 +121,21 @@ class AFailedRequestClient extends BaseClient {
       statusCode = response.statusCode;
       return response;
     } catch (e, st) {
-      exception = e;
+      var newException = e;
+      if (newException is ClientException) {
+        var ddd = AHttpSanitizer.sanitizeUrl(newException.uri?.toString());
+        newException = ClientException(newException.message, Uri.tryParse(ddd?.url ?? ""));
+      }
+      // SanityCheck where we check the exception for sensitive strings and replace exception if found
+      var sExceptionString = ALogger().censorLogs(newException.toString());
+      if (newException.toString() != sExceptionString) {
+        newException = ClientException('${newException.runtimeType} $sExceptionString *censored*');
+      }
+
+      exception = newException;
       stackTrace = st;
-      rethrow;
+      // Throw rewritten sanitised exception with same stack trace
+      Error.throwWithStackTrace(newException, st);
     } finally {
       stopwatch.stop();
       await _captureEventIfNeeded(
@@ -195,6 +208,7 @@ class AFailedRequestClient extends BaseClient {
     );
 
     bool? snapshot;
+
     if (exception is SentryHttpClientError) {
       snapshot = true;
     }
