@@ -35,14 +35,18 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   await SentryFlutter.init(
-    (options) {
+    (SentryFlutterOptions options) {
       options.dsn = 'https://635c475aa48824327a23e3723e92a278@o4507178414243840.ingest.us.sentry.io/4507178416996352';
       // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
       // We recommend adjusting this value in production.
-      options.tracesSampleRate = 0.001;
+      options.tracesSampleRate = 1.0;
       // The sampling rate for profiling is relative to tracesSampleRate
       // Setting to 1.0 will profile 100% of sampled transactions:
-      options.profilesSampleRate = 0.001;
+      options.profilesSampleRate = 1.0;
+
+      // From the ASentryHTTPClient Migration
+      options.sdk.addIntegration('HTTPNetworkTracing');
+      options.sdk.addIntegration('HTTPClientError');
     },
     appRunner: () => runCarer(),
   );

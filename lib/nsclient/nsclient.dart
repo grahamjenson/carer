@@ -6,11 +6,11 @@ import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/services/toast_service.dart';
+import 'package:carer/utils/asentry_http_client.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 String toNSDateString(DateTime dt) {
@@ -61,10 +61,12 @@ class NSClient {
   String? jwt;
   DateTime? jwtExpire;
 
+  final http = ASentryHttpClient();
+
   ///
   // Test API Call
   ///
-
+  ///
   Future<String?> testNSUrlAndToken(String nsURL, String token) async {
     if (nsURL.isEmpty || nsURL.length < 8) {
       return "NightScout URL not valid";
