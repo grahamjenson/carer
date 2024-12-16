@@ -91,7 +91,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
 
     if (!SecureSettings().nightscoutURLAndTokenSet()) {
       pages.add(_getNightScoutURLTokenPage(btnStyle, pages.length + 1));
-      allowPageChange.add(() => SecureSettings().nightscoutURLAndTokenSet());
+      //allowPageChange.add(() => SecureSettings().nightscoutURLAndTokenSet());
     }
 
     pages.add(_getFinalPage(btnStyle));
@@ -232,6 +232,15 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
                 style: btnStyle,
                 onPressed: onPressed,
                 child: const Text("Next"),
+              ),
+              ElevatedButton(
+                style: btnStyle,
+                onPressed: onPressed = () {
+                  if (_pageController.hasClients) {
+                    _pageController.animateToNextPage();
+                  }
+                },
+                child: const Text("Skip"),
               ),
             ],
           ),
