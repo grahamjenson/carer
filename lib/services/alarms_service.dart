@@ -43,7 +43,7 @@ class AlarmsService {
 
     bool isCheckingAlarms = false;
     List<Signal> additionalDeps = [
-      TimerService().tenSecondSignal,
+      TimerService().fiveSecondSignal,
       AlarmAlertSettings().snoozeUntilSignal,
       SQLToSGV().writeSignal,
       AppLifecycleService().lastResumed,

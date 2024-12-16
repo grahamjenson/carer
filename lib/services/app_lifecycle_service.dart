@@ -28,34 +28,40 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
 
   bool get wasResumed10SecondsAgo => clock.now().difference(lastResumed.value).inSeconds < 9;
 
-  bool get wasRecentlyScreenChanged => clock.now().difference(lastChangeScreen.value).inSeconds < 9;
+  bool get wasRecentlyScreenChanged => clock.now().difference(lastChangeScreen.value).inSeconds < 5;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // WARNING: this works differently on all platforms, so anything complicated should be platform specific
-    switch (state) {
-      case AppLifecycleState.inactive:
-        alog("AppLifecycleService: Inactive");
-        break;
-      case AppLifecycleState.paused:
-        alog("AppLifecycleService: paused");
-        AppStateEvent.appStateChange(AppStateEventType.paused);
-        lastPaused.value = clock.now();
-        break;
-      case AppLifecycleState.resumed:
-        alog("AppLifecycleService: Resumed");
-        AppStateEvent.appStateChange(AppStateEventType.resumed);
-        lastResumed.value = clock.now();
-        break;
-      case AppLifecycleState.hidden:
-        alog("AppLifecycleService: hidden");
+    // Put into a microtask to avoid any issues with the lifecycle state
+    Future.microtask(() {
+      // WARNING: this works differently on all platforms, so anything complicated should be platform specific
 
-        break;
-      case AppLifecycleState.detached:
-        alog("AppLifecycleService: detached");
-        break;
-    }
-    lastState.value = state;
+      switch (state) {
+        case AppLifecycleState.inactive:
+          alog("AppLifecycleService: Inactive");
+          break;
+        case AppLifecycleState.paused:
+          alog("AppLifecycleService: paused");
+
+          AppStateEvent.appStateChange(AppStateEventType.paused);
+          lastPaused.value = clock.now();
+          break;
+        case AppLifecycleState.resumed:
+          alog("AppLifecycleService: Resumed");
+          AppStateEvent.appStateChange(AppStateEventType.resumed);
+          lastResumed.value = clock.now();
+          break;
+        case AppLifecycleState.hidden:
+          alog("AppLifecycleService: hidden");
+
+          break;
+        case AppLifecycleState.detached:
+          alog("AppLifecycleService: detached");
+          break;
+      }
+
+      lastState.value = state;
+    });
   }
 
   @override
@@ -68,20 +74,17 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
 class NavigationChangeObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    super.didPush(route, previousRoute);
-    AppLifecycleService().lastChangeScreen.value = clock.now();
+    // This may happen during a build of a widget, since signals are syncrhonous with drawing can cause errors.
+    // To stop that we are putting in an aynshconous call and not waiting
+    Future.microtask(() {
+      AppLifecycleService().lastChangeScreen.value = clock.now();
+    });
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    super.didPop(route, previousRoute);
-
-    // If poping to the inital route, then remove the lastScreenChange
-    if (previousRoute?.settings.name == "/") {
-      // TODO: a bit hacky, needs a rename like LastNotOnMainScreen
-      AppLifecycleService().lastChangeScreen.value = clock.now().subtract(const Duration(minutes: 1));
-    } else {
+    Future.microtask(() {
       AppLifecycleService().lastChangeScreen.value = clock.now();
-    }
+    });
   }
 }
