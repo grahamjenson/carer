@@ -1,6 +1,6 @@
+import 'package:carer/widgets/pages/pages.dart';
 import 'package:carer/widgets/settings/about_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
-import 'package:carer/widgets/settings/events_page.dart';
 import 'package:carer/widgets/settings/services_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
@@ -39,10 +39,7 @@ class SettingsPage extends StatelessWidget {
           title: const Text("Events"),
           descriptionInlineIos: true,
           onPressed: (context) async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const EventsPage()),
-            );
+            Navigator.pushNamed(context, Pages.events.route);
           },
         )
       ],

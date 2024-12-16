@@ -4,7 +4,7 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
-import 'package:carer/widgets/pages/homepage.dart';
+import 'package:carer/widgets/pages/pages.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -248,13 +248,13 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
       padding: const EdgeInsets.all(40),
       child: Column(
         children: [
-          const MarkdownBody(data: "Thank you for using Carer"),
+          const MarkdownBody(data: "Thank you for using Carer\n**THIS IS STILL BETA SOFTWARE"),
           ElevatedButton(
             style: btnStyle,
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.pushReplacementNamed(
                 context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
+                Pages.home.route,
               );
             },
             child: const Text("Finish"),

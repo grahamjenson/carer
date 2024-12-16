@@ -25,8 +25,15 @@ import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
+import 'package:carer/widgets/alarms/snoozetime_page.dart';
+import 'package:carer/widgets/pages/alarm_settings_page.dart';
+import 'package:carer/widgets/pages/care_page.dart';
+import 'package:carer/widgets/pages/events_page.dart';
 import 'package:carer/widgets/pages/homepage.dart';
+import 'package:carer/widgets/pages/info_settings_page.dart';
 import 'package:carer/widgets/pages/introduction_page.dart';
+import 'package:carer/widgets/pages/pages.dart';
+import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -141,9 +148,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    Widget startingPage = const HomePage();
+    Pages initialRoute = Pages.home;
+
     if (IntroductionPage.needsOnboarding()) {
-      startingPage = const IntroductionPage();
+      initialRoute = Pages.intro;
     }
 
     return ValueListenableBuilder<ThemeData>(
@@ -162,8 +170,17 @@ class _MyAppState extends State<MyApp> {
               title: 'Carer',
               debugShowCheckedModeBanner: false,
               theme: theme,
-              home: startingPage,
-              initialRoute: '/',
+              initialRoute: initialRoute.route,
+              routes: {
+                Pages.home.route: (context) => const HomePage(),
+                Pages.intro.route: (context) => const IntroductionPage(),
+                Pages.settings.route: (context) => const SettingsPage(),
+                Pages.alarms.route: (context) => const AlarmsSettingsPage(),
+                Pages.events.route: (context) => const EventsPage(),
+                Pages.info.route: (context) => const InfoSettingsPage(),
+                Pages.care.route: (context) => const CarePage(),
+                Pages.snooze.route: (context) => const SnoozeTimePage(),
+              },
             ),
           );
         });

@@ -5,7 +5,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/alarms/snoozetime_page.dart';
+import 'package:carer/widgets/pages/pages.dart';
 import 'package:flutter/material.dart';
 
 class SnoozeBarButton extends StatelessWidget with ThemeMixin {
@@ -36,7 +36,13 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
 
         Widget snoozeIcon = const Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(CarerIcons.BAR_SNOOZE), Text("Snooze")],
+          children: [
+            Icon(
+              CarerIcons.BAR_SNOOZE,
+              color: Colors.black,
+            ),
+            Text("Snooze")
+          ],
         );
 
         List<Widget> children = [snoozeIcon];
@@ -48,12 +54,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
           clipBehavior: Clip.antiAlias,
           style: buttonStyle,
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) {
-                return const SnoozeTimePage();
-              }),
-            );
+            Navigator.pushNamed(context, Pages.snooze.route);
           },
           child: Row(
               mainAxisSize: MainAxisSize.min,

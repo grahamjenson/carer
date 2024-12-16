@@ -4,10 +4,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snooze_bar_button.dart';
-import 'package:carer/widgets/pages/alarm_settings_page.dart';
-import 'package:carer/widgets/pages/care_page.dart';
-import 'package:carer/widgets/pages/info_settings_page.dart';
-import 'package:carer/widgets/pages/settingspage.dart';
+import 'package:carer/widgets/pages/pages.dart';
 import 'package:flutter/material.dart';
 
 class BarBottom extends StatelessWidget with ThemeMixin {
@@ -19,10 +16,10 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     return AWatch(
       (context) {
         var children = [
-          createButton(context, "Care", CarerIcons.BAR_CARE, const CarePage()),
-          createButton(context, "Info", CarerIcons.BAR_INFO, const InfoSettingsPage()),
-          createButton(context, "Alarms", CarerIcons.BAR_ALARMS, const AlarmsSettingsPage()),
-          createButton(context, "Settings", CarerIcons.BAR_SETTINGS, const SettingsPage()),
+          createButton(context, "Care", CarerIcons.BAR_CARE, Pages.care),
+          createButton(context, "Info", CarerIcons.BAR_INFO, Pages.info),
+          createButton(context, "Alarms", CarerIcons.BAR_ALARMS, Pages.alarms),
+          createButton(context, "Settings", CarerIcons.BAR_SETTINGS, Pages.settings),
         ];
 
         NotchedShape? notchShape;
@@ -53,17 +50,14 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget createButton(BuildContext context, String name, IconData id, Widget navigateTo) {
+  Widget createButton(BuildContext context, String name, IconData id, Pages navigateTo) {
     return Flexible(
       flex: 1,
       child: IconButtonWithText(
         icon: id,
         label: name,
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => navigateTo),
-          );
+          Navigator.pushNamed(context, navigateTo.route);
         },
       ),
     );
@@ -104,6 +98,7 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
           Icon(
             icon,
             size: 28.0,
+            color: onBackgroundColor(context),
           ),
           const SizedBox(height: 4.0),
           Text(label),
