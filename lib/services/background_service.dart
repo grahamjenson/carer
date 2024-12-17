@@ -24,7 +24,7 @@ class BackgroundService {
       requiredNetworkType: NetworkType.ANY);
 
   Future<bool> run() async {
-    print("Scheduling task");
+    doublelog("BackgroundFetch:  Scheduling task");
     return await BackgroundFetch.scheduleTask(TaskConfig(
       taskId: "com.transistorsoft.fetch",
       delay: 5000,
@@ -33,17 +33,16 @@ class BackgroundService {
 
   void setupBackgroundFetch() async {
     int status = await BackgroundFetch.configure(config, onFetch, onTimeout);
-    alog('BackgroundFetch: configure success: $status');
+    doublelog('BackgroundFetch: configure success: $status');
     // Andoird only
     BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   }
 
   void onFetch(String taskId) async {
     try {
-      print("Running Background Fetch");
-      alog("BackgroundFetch: Event received $taskId");
+      doublelog("BackgroundFetch: Event received $taskId");
       var x = await UpdateService().updateAll();
-      alog("BackgroundFetch: updateALL $x");
+      doublelog("BackgroundFetch: updateALL $x");
 
       var (newTriggeredAlarms, _) = AlarmsService().calculateAlarms();
       if (newTriggeredAlarms.isNotEmpty) {
@@ -58,13 +57,15 @@ class BackgroundService {
         for (var alarm in newTriggeredAlarms) {
           alarms += alarm.toString();
         }
-
+        doublelog("BackgroundFetch: Notification $svgstr $alarms");
         NotificationService().showNotification("Alarm", "$svgstr $alarms");
       }
+      doublelog("BackgroundFetch: FINISHED ");
     } catch (err, st) {
-      alog("BackgroundFetch: onFetch error: $err, $st");
+      doublelog("BackgroundFetch: onFetch error: $err, $st");
     } finally {
       BackgroundFetch.finish(taskId);
+      doublelog("BackgroundFetch: EXITING");
     }
   }
 
@@ -77,11 +78,16 @@ class BackgroundService {
 // ANDROID ONLY RUN WHEN PROGRAM EXITED
 @pragma('vm:entry-point')
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
-  alog("BackgroundFetch] backgroundFetchHeadlessTask");
+  doublelog("BackgroundFetch: backgroundFetchHeadlessTask");
   String taskId = task.taskId;
   bool isTimeout = task.timeout;
   // This task has exceeded its allowed running-time.
   // You must stop what you're doing and immediately .finish(taskId)
-  alog("BackgroundFetch: Headless task timed-out: $taskId $isTimeout");
+  doublelog("BackgroundFetch: Headless task timed-out: $taskId $isTimeout");
   BackgroundFetch.finish(taskId);
+}
+
+void doublelog(String message) {
+  print(message);
+  alog(message);
 }
