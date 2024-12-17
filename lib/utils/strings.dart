@@ -27,19 +27,6 @@ String prettyPrintDecodedJson(Map<String, dynamic> input) {
   }
 }
 
-String prettyPrintJson(String input) {
-  try {
-    var object = decoder.convert(input);
-    var prettyString = encoder.convert(object);
-    var str = "";
-    prettyString.split('\n').forEach((element) => str += "$element\n");
-    return str;
-  } catch (e, stackTrace) {
-    Errors.captureError(e, stackTrace, name: "prettyPrintJson");
-    return input;
-  }
-}
-
 String truncateString(String str, int maxLength) {
   if (str.length <= maxLength) {
     return str;

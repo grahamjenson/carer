@@ -49,7 +49,7 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('$name: ${updater.successfulAge.inMinutes}'),
-        Text(prettyPrintJson(updater.raw) ?? ''),
+        Text(prettyPrintJson(updater.raw)),
       ],
     );
   }
@@ -59,5 +59,17 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
       return '?';
     }
     return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  String prettyPrintJson(String input) {
+    try {
+      var object = decoder.convert(input);
+      var prettyString = encoder.convert(object);
+      var str = "";
+      prettyString.split('\n').forEach((element) => str += "$element\n");
+      return str;
+    } catch (e) {
+      return input;
+    }
   }
 }
