@@ -73,6 +73,7 @@ dependencies:
   flutter_markdown: ^0.7.4
 
   showcaseview: ^3.0.0
+  cupertino_http: ^2.0.1
 
   
 

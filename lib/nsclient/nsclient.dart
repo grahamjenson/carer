@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
@@ -11,6 +12,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
+import 'package:cupertino_http/cupertino_http.dart';
 import 'package:http/http.dart';
 
 String toNSDateString(DateTime dt) {
@@ -51,7 +53,17 @@ Uri jwtEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/authorization/request/
 class NSClient {
   static final NSClient _singleton = NSClient._internal();
   factory NSClient() => _singleton;
-  NSClient._internal();
+  NSClient._internal() {
+    var client = Client();
+    if (Platform.isIOS || Platform.isMacOS) {
+      final config = URLSessionConfiguration.ephemeralSessionConfiguration();
+      config.cache = URLCache.withCapacity(memoryCapacity: 2 * 1024 * 1024);
+
+      client = CupertinoClient.fromSessionConfiguration(config);
+    }
+
+    http = ASentryHttpClient(client: client);
+  }
 
   ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
   ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
@@ -61,7 +73,7 @@ class NSClient {
   String? jwt;
   DateTime? jwtExpire;
 
-  final http = ASentryHttpClient();
+  late Client http;
 
   ///
   // Test API Call

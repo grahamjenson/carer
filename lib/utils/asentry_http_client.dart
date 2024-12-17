@@ -12,7 +12,7 @@ class ASentryHttpClient extends BaseClient {
   static const defaultFailedRequestTargets = ['.*'];
 
   ASentryHttpClient({
-    Client? client,
+    required Client client,
     Hub? hub,
     List<ASentryStatusCode> failedRequestStatusCodes = defaultFailedRequestStatusCodes,
     List<String> failedRequestTargets = defaultFailedRequestTargets,
@@ -20,7 +20,7 @@ class ASentryHttpClient extends BaseClient {
   }) {
     _hub = hub ?? HubAdapter();
 
-    var innerClient = client ?? Client();
+    var innerClient = client;
 
     innerClient = AFailedRequestClient(
       failedRequestStatusCodes: failedRequestStatusCodes,
