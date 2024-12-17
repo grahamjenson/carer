@@ -45,6 +45,10 @@ class SecureSettings {
   set nightscoutURL(String? value) {
     if (value != null && value.isNotEmpty && value.length > 8) {
       ALogger().addCensoredString("NS_URL", value);
+      Uri? uri = Uri.tryParse(value);
+      if (uri != null) {
+        ALogger().addCensoredString("NS_HOST", uri.host);
+      }
       _signals[_SSNames.nightscoutUrl]!.value = value;
     }
   }
