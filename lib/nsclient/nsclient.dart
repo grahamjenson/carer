@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
@@ -12,7 +11,6 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
-import 'package:cupertino_http/cupertino_http.dart';
 import 'package:http/http.dart';
 
 String toNSDateString(DateTime dt) {
@@ -55,10 +53,14 @@ class NSClient {
   factory NSClient() => _singleton;
   NSClient._internal() {
     var client = Client();
-    if (Platform.isIOS || Platform.isMacOS) {
-      final config = URLSessionConfiguration.ephemeralSessionConfiguration();
-      client = CupertinoClient.fromSessionConfiguration(config);
-    }
+    // TODO: the cupertino client  is throing errors on 500 spamming error logging, dont know how to fix
+    // cupertino client would fix this though https://github.com/dart-lang/http/issues/197
+    // So maybe just use cupertino client on background fetchs?
+    // if (Platform.isIOS || Platform.isMacOS) {
+    //   final config = URLSessionConfiguration.ephemeralSessionConfiguration();
+
+    //   client = CupertinoClient.fromSessionConfiguration(config);
+    // }
 
     http = ASentryHttpClient(client: client);
   }
