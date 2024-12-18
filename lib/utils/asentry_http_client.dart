@@ -4,6 +4,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 const String replacementHost = "nsurl.com";
 final Uri replacementUri = Uri.parse("https://$replacementHost");
+
 Uri replacementUriWithPath(String path) => Uri.parse("https://$replacementHost$path");
 
 /// This is mostly copy pasted from the Sentry package because I dont want to write BaseURLs to Sentry

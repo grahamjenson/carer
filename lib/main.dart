@@ -54,6 +54,24 @@ void main() async {
       // From the ASentryHTTPClient Migration
       options.sdk.addIntegration('HTTPNetworkTracing');
       options.sdk.addIntegration('HTTPClientError');
+
+      options.beforeBreadcrumb = (Breadcrumb? breadcrumb, Hint hint) {
+        if (breadcrumb == null) {
+          return null; // nothgin in nothign out
+        }
+
+        // This stops some leaks from sentry sending host and query params out!!!
+        if (breadcrumb.type == 'http' && breadcrumb.data != null) {
+          for (var key in breadcrumb.data!.keys.toList()) {
+            var val = breadcrumb.data![key];
+            if (val is String) {
+              breadcrumb.data![key] = ALogger().censorLogs(val);
+            }
+          }
+        }
+
+        return breadcrumb; // Keep the breadcrumb
+      };
     },
     appRunner: () => runCarer(),
   );
