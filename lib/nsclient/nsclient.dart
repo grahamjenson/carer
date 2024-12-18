@@ -1,16 +1,20 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/utils/asentry_http_client.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
+import 'package:cupertino_http/cupertino_http.dart';
 import 'package:http/http.dart';
 
 String toNSDateString(DateTime dt) {
@@ -51,19 +55,7 @@ Uri jwtEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/authorization/request/
 class NSClient {
   static final NSClient _singleton = NSClient._internal();
   factory NSClient() => _singleton;
-  NSClient._internal() {
-    var client = Client();
-    // TODO: the cupertino client  is throing errors on 500 spamming error logging, dont know how to fix
-    // cupertino client would fix this though https://github.com/dart-lang/http/issues/197
-    // So maybe just use cupertino client on background fetchs?
-    // if (Platform.isIOS || Platform.isMacOS) {
-    //   final config = URLSessionConfiguration.ephemeralSessionConfiguration();
-
-    //   client = CupertinoClient.fromSessionConfiguration(config);
-    // }
-
-    http = ASentryHttpClient(client: client);
-  }
+  NSClient._internal();
 
   ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
   ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
@@ -73,7 +65,27 @@ class NSClient {
   String? jwt;
   DateTime? jwtExpire;
 
-  late Client http;
+  final Client _flutterClient = ASentryHttpClient(client: Client());
+  final Client _cupertinoClient =
+      ASentryHttpClient(client: CupertinoClient.fromSessionConfiguration(URLSessionConfiguration.ephemeralSessionConfiguration()));
+
+  Client get http {
+    // return normal client if in foreground
+    if (AppLifecycleService().lastState.value == AppLifecycleState.resumed) {
+      return _flutterClient;
+    }
+
+    // App is in background
+
+    // the cupertino client throws errors on 500 spamming error logging, dont know how to fix
+    // But normal http client throws bad file descripor errors in background (or startup) https://github.com/dart-lang/http/issues/197
+    // So we just use the cupertino client on background fetches
+    if (Platform.isIOS || Platform.isMacOS) {
+      return _cupertinoClient;
+    }
+
+    return _flutterClient;
+  }
 
   ///
   // Test API Call
