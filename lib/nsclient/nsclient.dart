@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
@@ -71,7 +70,8 @@ class NSClient {
 
   Client get http {
     // return normal client if in foreground
-    if (AppLifecycleService().lastState.value == AppLifecycleState.resumed) {
+    // Give the state a little wiggle room since it might have just changed and we still want the default
+    if (AppLifecycleService().stateResumed || AppLifecycleService().stateRecentlyChanged) {
       return _flutterClient;
     }
 
@@ -80,6 +80,7 @@ class NSClient {
     // the cupertino client throws errors on 500 spamming error logging, dont know how to fix
     // But normal http client throws bad file descripor errors in background (or startup) https://github.com/dart-lang/http/issues/197
     // So we just use the cupertino client on background fetches
+    // TODO: this is a bit of a hack
     if (Platform.isIOS || Platform.isMacOS) {
       return _cupertinoClient;
     }

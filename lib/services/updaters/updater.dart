@@ -39,6 +39,9 @@ abstract class Updater {
     }, debugLabel: "${runtimeType}LastResumedUpdaterEffect");
 
     Timer.periodic(intervalToCheck, (Timer t) async {
+      // When reopening the app immedialty this will immedialty update
+      // before the LifeCycle observer has a change to update the state!
+      await Future.delayed(const Duration(milliseconds: 100));
       // If this tries to update too quickly after reopening it will cause an OS error
       if (AppLifecycleService().wasResumed2SecondsAgo) {
         return;

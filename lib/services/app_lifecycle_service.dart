@@ -30,12 +30,19 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
 
   bool get wasRecentlyScreenChanged => clock.now().difference(lastChangeScreen.value).inSeconds < 5;
 
+  bool get stateResumed => lastState.value == AppLifecycleState.resumed;
+  bool get stateRecentlyChanged {
+    var diff = clock.now().difference(lastState.lastSet).inSeconds.abs();
+    return diff < 10;
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Put into a microtask to avoid any issues with the lifecycle state
     Future.microtask(() {
       // WARNING: this works differently on all platforms, so anything complicated should be platform specific
 
+      lastState.value = state;
       switch (state) {
         case AppLifecycleState.inactive:
           alog("AppLifecycleService: Inactive");
@@ -59,8 +66,6 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
           alog("AppLifecycleService: detached");
           break;
       }
-
-      lastState.value = state;
     });
   }
 
