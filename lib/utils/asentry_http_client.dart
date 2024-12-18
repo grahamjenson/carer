@@ -87,6 +87,7 @@ class AFailedRequestClient extends BaseClient {
         var ddd = AHttpSanitizer.sanitizeUrl(newException.uri?.toString());
         newException = ClientException(newException.message, Uri.tryParse(ddd?.url ?? ""));
       }
+
       // SanityCheck where we check the exception for sensitive strings and replace exception if found
       var sExceptionString = ALogger().censorLogs(newException.toString());
       if (newException.toString() != sExceptionString) {
@@ -131,6 +132,11 @@ class AFailedRequestClient extends BaseClient {
     if (statusCode == 500) {
       // TODO: improtve logic (native code actually throws exception on 500 so need this)
       // dont log on 500 because this is a server error and we dont control the error
+      return;
+    }
+
+    if (exception is ClientException && exception.toString().contains("The request timed out.")) {
+      // We dont capture client timeout exceptions.
       return;
     }
 

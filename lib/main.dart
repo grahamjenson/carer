@@ -51,6 +51,9 @@ void main() async {
       // Setting to 1.0 will profile 100% of sampled transactions:
       options.profilesSampleRate = 1.0;
 
+      // TODO: this is because the native cupertino_http is sending 500s as errors to sentry
+      options.enableNativeCrashHandling = false;
+
       options.beforeBreadcrumb = (Breadcrumb? breadcrumb, Hint hint) {
         if (breadcrumb == null) {
           return null; // nothgin in nothign out
