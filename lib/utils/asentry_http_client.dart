@@ -2,8 +2,9 @@ import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-const String replacementHost = "NSURL.com";
+const String replacementHost = "nsurl.com";
 final Uri replacementUri = Uri.parse("https://$replacementHost");
+Uri replacementUriWithPath(String path) => Uri.parse("https://$replacementHost$path");
 
 /// This is mostly copy pasted from the Sentry package because I dont want to write BaseURLs to Sentry
 /// NSURLS are private and there is no easy way to sanitize them out
@@ -193,7 +194,7 @@ class AFailedRequestClient extends BaseClient {
     final sentryRequest = SentryRequest.fromUri(
       method: request.method,
       headers: null,
-      uri: replacementUri,
+      uri: replacementUriWithPath(request.url.path),
       data: null,
       // ignore: deprecated_member_use_from_same_package
       other: {
@@ -225,7 +226,9 @@ class AFailedRequestClient extends BaseClient {
       timestamp: _hub.options.clock(),
     );
 
-    final hint = Hint.withMap({TypeCheckHint.httpRequest: request});
+    final hint = Hint.withMap({
+      TypeCheckHint.httpRequest: sentryRequest,
+    });
 
     if (response != null) {
       event.contexts.response = SentryResponse(
