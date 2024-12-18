@@ -57,8 +57,6 @@ class NSClient {
     var client = Client();
     if (Platform.isIOS || Platform.isMacOS) {
       final config = URLSessionConfiguration.ephemeralSessionConfiguration();
-      config.cache = URLCache.withCapacity(memoryCapacity: 2 * 1024 * 1024);
-
       client = CupertinoClient.fromSessionConfiguration(config);
     }
 
