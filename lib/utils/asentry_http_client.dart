@@ -135,7 +135,7 @@ class AFailedRequestClient extends BaseClient {
       return;
     }
 
-    if (exception is ClientException && exception.toString().contains("The request timed out.")) {
+    if (exception.toString().contains("The request timed out")) {
       // We dont capture client timeout exceptions.
       return;
     }
