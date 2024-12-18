@@ -10,13 +10,11 @@ Uri replacementUriWithPath(String path) => Uri.parse("https://$replacementHost$p
 /// This is mostly copy pasted from the Sentry package because I dont want to write BaseURLs to Sentry
 /// NSURLS are private and there is no easy way to sanitize them out
 class ASentryHttpClient extends BaseClient {
-  static const defaultFailedRequestStatusCodes = [ASentryStatusCode.defaultRange()];
   static const defaultFailedRequestTargets = ['.*'];
 
   ASentryHttpClient({
     required Client client,
     Hub? hub,
-    List<ASentryStatusCode> failedRequestStatusCodes = defaultFailedRequestStatusCodes,
     List<String> failedRequestTargets = defaultFailedRequestTargets,
     bool? captureFailedRequests,
   }) {
@@ -25,7 +23,6 @@ class ASentryHttpClient extends BaseClient {
     var innerClient = client;
 
     innerClient = AFailedRequestClient(
-      failedRequestStatusCodes: failedRequestStatusCodes,
       failedRequestTargets: failedRequestTargets,
       hub: _hub,
       client: innerClient,
@@ -54,40 +51,8 @@ class ASentryHttpClient extends BaseClient {
   void close() => _client.close();
 }
 
-class ASentryStatusCode {
-  static const _defaultMin = 500;
-  static const _defaultMax = 599;
-
-  const ASentryStatusCode.defaultRange()
-      : _min = _defaultMin,
-        _max = _defaultMax;
-
-  ASentryStatusCode.range(this._min, this._max)
-      : assert(_min <= _max),
-        assert(_min > 0 && _max > 0);
-
-  ASentryStatusCode(int statusCode)
-      : _min = statusCode,
-        _max = statusCode,
-        assert(statusCode > 0);
-
-  final int _min;
-  final int _max;
-
-  bool isInRange(int statusCode) => statusCode >= _min && statusCode <= _max;
-
-  @override
-  String toString() {
-    if (_min == _max) {
-      return _min.toString();
-    }
-    return '$_min..$_max';
-  }
-}
-
 class AFailedRequestClient extends BaseClient {
   AFailedRequestClient({
-    this.failedRequestStatusCodes = ASentryHttpClient.defaultFailedRequestStatusCodes,
     this.failedRequestTargets = ASentryHttpClient.defaultFailedRequestTargets,
     Client? client,
     Hub? hub,
@@ -99,12 +64,6 @@ class AFailedRequestClient extends BaseClient {
   final Client _client;
   final Hub _hub;
   final bool? _captureFailedRequests;
-
-  /// Describes which HTTP status codes should be considered as a failed
-  /// requests.
-  ///
-  /// Per default no status code is considered a failed request.
-  final List<ASentryStatusCode> failedRequestStatusCodes;
 
   final List<String> failedRequestTargets;
 
@@ -159,12 +118,20 @@ class AFailedRequestClient extends BaseClient {
 
     // Only check `failedRequestStatusCodes` & `failedRequestTargets` if no exception was thrown.
     if (exception == null) {
-      if (!failedRequestStatusCodes._containsStatusCode(statusCode)) {
-        return;
-      }
-      if (!containsTargetOrMatchesRegExp(failedRequestTargets, request.url.toString())) {
-        return;
-      }
+      // if (!failedRequestStatusCodes._containsStatusCode(statusCode)) {
+      //   return;
+      // }
+      // if (!containsTargetOrMatchesRegExp(failedRequestTargets, request.url.toString())) {
+      //   return;
+      // }
+      // Dont log if no exception
+      return;
+    }
+
+    if (statusCode == 500) {
+      // TODO: improtve logic (native code actually throws exception on 500 so need this)
+      // dont log on 500 because this is a server error and we dont control the error
+      return;
     }
 
     final reason = 'HTTP Client Error with status code: $statusCode';
@@ -245,15 +212,6 @@ class AFailedRequestClient extends BaseClient {
       stackTrace: stackTrace,
       hint: hint,
     );
-  }
-}
-
-extension _ListX on List<ASentryStatusCode> {
-  bool _containsStatusCode(int? statusCode) {
-    if (statusCode == null) {
-      return false;
-    }
-    return any((element) => element.isInRange(statusCode));
   }
 }
 

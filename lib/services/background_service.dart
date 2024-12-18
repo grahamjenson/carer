@@ -40,9 +40,12 @@ class BackgroundService {
 
   void onFetch(String taskId) async {
     try {
-      doublelog("BackgroundFetch: Event received $taskId");
+      doublelog("BackgroundFetch: Event received $taskId ${CleanSGV.lastSGV.value}");
       var x = await UpdateService().updateAll();
-      doublelog("BackgroundFetch: updateALL $x");
+      doublelog("BackgroundFetch: updateALL $x ${CleanSGV.lastSGV.value}");
+      // Because their are asynchronous signals we need to wait a little bit for all values to propagate
+      await Future.delayed(const Duration(milliseconds: 500));
+      doublelog("BackgroundFetch: updateALL After sleep $x ${CleanSGV.lastSGV.value}");
 
       var (newTriggeredAlarms, _) = AlarmsService().calculateAlarms();
       if (newTriggeredAlarms.isNotEmpty) {
