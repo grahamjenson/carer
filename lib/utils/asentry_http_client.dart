@@ -140,6 +140,11 @@ class AFailedRequestClient extends BaseClient {
       return;
     }
 
+    if (exception.toString().contains("The Internet connection appears to be offline")) {
+      // We dont capture clients without internet
+      return;
+    }
+
     final reason = 'HTTP Client Error with status code: $statusCode';
     exception ??= SentryHttpClientError(reason);
 
