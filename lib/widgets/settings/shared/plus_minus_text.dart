@@ -74,6 +74,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
           ),
           onEditingComplete: () => setValue(),
           onTapOutside: (event) => setValue(),
+          onTap: () => _controller.selection = TextSelection(baseOffset: 0, extentOffset: _controller.value.text.length),
         ),
       );
     }, debugLabel: "PlusMinusText", dependencies: widget.dependencies);
