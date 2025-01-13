@@ -5,6 +5,8 @@ import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
 
+import 'settings/alarm_settings.dart';
+
 class BackgroundService {
   static final BackgroundService _singleton = BackgroundService._();
   factory BackgroundService() => _singleton;
@@ -60,8 +62,12 @@ class BackgroundService {
         for (var alarm in newTriggeredAlarms) {
           alarms += alarm.toString();
         }
-        doublelog("BackgroundFetch: Notification $svgstr $alarms");
-        NotificationService().showNotification("Alarm", "$svgstr $alarms");
+        if (AlarmSettings().disableAlarms) {
+          doublelog("BackgroundFetch: Disabled Alarms $svgstr $alarms");
+        } else {
+          doublelog("BackgroundFetch: Notification $svgstr $alarms");
+          NotificationService().showNotification("Alarm", "$svgstr $alarms");
+        }
       }
       doublelog("BackgroundFetch: FINISHED ");
     } catch (err, st) {

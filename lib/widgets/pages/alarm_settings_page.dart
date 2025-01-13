@@ -32,6 +32,8 @@ class AlarmsSettingsPage extends StatelessWidget {
             SettingsSection(tiles: [
               disableAlarms(context),
             ]),
+            const TargetSettingsWidget(),
+            getEventsPage(),
           ];
         }
         return Scaffold(
