@@ -135,7 +135,8 @@ class _CannulaChange extends _StatusMethods {
     if (hours < 1) {
       hoursStr = "NOW";
     }
-    return "Cannula ($daysOld days old) change $hoursStr";
+    var (daysOld, hoursOld) = daysHoursOld;
+    return "Cannula (${daysOld}d${hoursOld}h) change $hoursStr";
   }
 
   @override
@@ -155,9 +156,10 @@ class _CannulaChange extends _StatusMethods {
     return hours;
   }
 
-  int get daysOld {
+  (int, int) get daysHoursOld {
     var cage = PropertiesData().cage;
-    return clock.now().difference(cage).inDays;
+    var diff = clock.now().difference(cage);
+    return (diff.inDays, diff.inHours % 24);
   }
 
   @override
@@ -185,7 +187,8 @@ class _SensorChange extends _StatusMethods {
     if (hours < 1) {
       hoursStr = "NOW";
     }
-    return "Sensor ($daysOld days old) Change $hoursStr";
+    var (daysOld, hoursOld) = daysHoursOld;
+    return "Sensor (${daysOld}d${hoursOld}h old) Change $hoursStr";
   }
 
   @override
@@ -205,9 +208,10 @@ class _SensorChange extends _StatusMethods {
     return hours;
   }
 
-  int get daysOld {
+  (int, int) get daysHoursOld {
     var sage = PropertiesData().sage;
-    return clock.now().difference(sage).inDays;
+    var diff = clock.now().difference(sage);
+    return (diff.inDays, diff.inHours % 24);
   }
 
   @override
