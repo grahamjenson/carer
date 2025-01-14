@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/background_service.dart';
+import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
@@ -122,6 +123,13 @@ class DebugSettingsPage extends StatelessWidget {
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             ToastService().showSuccess("Test Success", description: "this is a test success");
+          },
+        ),
+        SettingsTile(
+          title: const Text("Test Notification"),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
+          onPressed: (context) async {
+            NotificationService().showNotification("Alarm", "Text on the Notification");
           },
         ),
       ],

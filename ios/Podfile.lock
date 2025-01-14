@@ -113,7 +113,7 @@ SPEC CHECKSUMS:
   battery_plus: 1ff2e16ba75af2a78387f65476057a390b47885e
   cupertino_http: 947a233f40cfea55167a49f2facc18434ea117ba
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
+  flutter_local_notifications: df98d66e515e1ca797af436137b4459b160ad8c9
   flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
   Mute: 20135a96076f140cc82bfc8b810e2d6150d8ec7e

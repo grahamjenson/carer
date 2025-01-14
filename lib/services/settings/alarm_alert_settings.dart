@@ -18,6 +18,7 @@ enum _AANames {
 
   // Other ALARM
   enableFlashOnAlarm,
+  enableNotifications,
   brightnessAdjustAtNight,
   enableWakeUpInRange,
   enableWakeUpWhenUrgent,
@@ -49,6 +50,8 @@ class AlarmAlertSettings {
     // Smart Wake Up
     _AANames.enableWakeUpInRange: ASignal<bool>(true, debugLabel: 'enableWakeUpInRange'),
     _AANames.enableWakeUpWhenUrgent: ASignal<bool>(true, debugLabel: 'enableWakeUpWhenUrgent'),
+    // Notification
+    _AANames.enableNotifications: ASignal<bool>(true, debugLabel: 'enableNotifications'),
     // Audio
     _AANames.enableAudioAlarm: ASignal<bool>(true, debugLabel: 'enableAudioAlarm'),
     _AANames.volumeOveride: ASignal<bool>(true, debugLabel: 'volumeOveride'),
@@ -81,6 +84,9 @@ class AlarmAlertSettings {
 
   bool get brightnessAdjustAtNight => _signals[_AANames.brightnessAdjustAtNight]!.value as bool;
   set brightnessAdjustAtNight(bool value) => _signals[_AANames.brightnessAdjustAtNight]!.value = value;
+
+  bool get enableNotifications => _signals[_AANames.enableNotifications]!.value as bool;
+  set enableNotifications(bool value) => _signals[_AANames.enableNotifications]!.value = value;
 
   bool get enableFlashOnAlarm => _signals[_AANames.enableFlashOnAlarm]!.value as bool;
   set enableFlashOnAlarm(bool value) => _signals[_AANames.enableFlashOnAlarm]!.value = value;
@@ -169,6 +175,7 @@ class AlarmAlertSettings {
 
     brightnessAdjustAtNight = prefs.getBool(_AANames.brightnessAdjustAtNight.name, defaultValue: true)!;
     enableFlashOnAlarm = prefs.getBool(_AANames.enableFlashOnAlarm.name, defaultValue: true)!;
+    enableNotifications = prefs.getBool(_AANames.enableNotifications.name, defaultValue: true)!;
     enableWakeUpInRange = prefs.getBool(_AANames.enableWakeUpInRange.name, defaultValue: true)!;
     enableWakeUpWhenUrgent = prefs.getBool(_AANames.enableWakeUpWhenUrgent.name, defaultValue: true)!;
 
@@ -188,6 +195,10 @@ class AlarmAlertSettings {
     aeffect(() {
       prefs.setBool(_AANames.brightnessAdjustAtNight.name, brightnessAdjustAtNight);
     }, debugLabel: 'writebrightnessAdjustAtNight');
+
+    aeffect(() {
+      prefs.setBool(_AANames.enableNotifications.name, enableNotifications);
+    }, debugLabel: 'writeenableNotifications');
 
     aeffect(() {
       prefs.setBool(_AANames.enableFlashOnAlarm.name, enableFlashOnAlarm);

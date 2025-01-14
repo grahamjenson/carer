@@ -104,7 +104,7 @@ SPEC CHECKSUMS:
   battery_plus: 922e3d9686072259c8fbce6c4238561f769990ae
   cupertino_http: 947a233f40cfea55167a49f2facc18434ea117ba
   desktop_window: fb7c4f12c1129f947ac482296b6f14059d57a3c3
-  flutter_local_notifications: 3805ca215b2fb7f397d78b66db91f6a747af52e4
+  flutter_local_notifications: 7062189aabf7f50938a7b8b6614ffa97656eb0bf
   flutter_secure_storage_macos: 59459653abe1adb92abbc8ea747d79f8d19866c9
   flutter_volume_controller: 25d09126b0d695560f11c80b1311d5063fed882f
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24

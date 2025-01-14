@@ -1,3 +1,4 @@
+import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -5,8 +6,6 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/shared/target_range_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
-
-import '../../services/settings/alarm_settings.dart';
 
 class TargetSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   const TargetSettingsWidget({super.key});

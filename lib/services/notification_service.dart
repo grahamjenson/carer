@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -17,6 +19,9 @@ class NotificationService {
 
     // Initialization settings for iOS
     final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
       notificationCategories: [
         DarwinNotificationCategory(
           'demoCategory',
@@ -42,10 +47,24 @@ class NotificationService {
       linux: initializationSettingsLinux,
     );
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse details) async {
+        print('Received notification ressponse: $details');
+      },
+      onDidReceiveBackgroundNotificationResponse: (NotificationResponse details) {
+        print('Received background notification response: $details');
+      },
+    );
   }
 
   Future<void> showNotification(String title, String body) async {
+    var allowed = await requestPermissions();
+    if (allowed == null || allowed == false) {
+      print("Notification permission not granted $allowed");
+      return;
+    }
+    print("Showing notification: $title, $body");
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'your channel id',
       'your channel name',
@@ -66,5 +85,22 @@ class NotificationService {
       body,
       platformChannelSpecifics,
     );
+  }
+
+  Future<bool?>? requestPermissions() {
+    if (Platform.isIOS) {
+      return flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    } else if (Platform.isMacOS) {
+      return flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
+    return Future.value(true);
   }
 }

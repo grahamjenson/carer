@@ -2,6 +2,7 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/notification_service.dart';
+import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
 
@@ -64,6 +65,8 @@ class BackgroundService {
         }
         if (AlarmSettings().disableAlarms) {
           doublelog("BackgroundFetch: Disabled Alarms $svgstr $alarms");
+        } else if (!AlarmAlertSettings().enableNotifications) {
+          doublelog("BackgroundFetch: Disabled Notifications $svgstr $alarms");
         } else {
           doublelog("BackgroundFetch: Notification $svgstr $alarms");
           NotificationService().showNotification("Alarm", "$svgstr $alarms");

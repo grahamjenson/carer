@@ -26,6 +26,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         }
         List<SettingsTile> tiles = [
           enableFlashOnAlarm(),
+          enableNotifications(),
           brightnessAdjust(),
           enableAudioAlarms(context),
           volumeOverride(context),
@@ -71,6 +72,20 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       initialValue: AlarmAlertSettings().enableFlashOnAlarm,
       onToggle: (bool value) {
         AlarmAlertSettings().enableFlashOnAlarm = value;
+      },
+    );
+  }
+
+  SettingsTile enableNotifications() {
+    return SettingsTile.switchTile(
+      title: const Text("Notifications"),
+      descriptionInlineIos: true,
+      description: const Text(
+        "Notifications every 15 mintues if alarming (DANGER unreliable)",
+      ),
+      initialValue: AlarmAlertSettings().enableNotifications,
+      onToggle: (bool value) {
+        AlarmAlertSettings().enableNotifications = value;
       },
     );
   }
