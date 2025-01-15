@@ -47,15 +47,7 @@ class NotificationService {
       linux: initializationSettingsLinux,
     );
 
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse details) async {
-        print('Received notification ressponse: $details');
-      },
-      onDidReceiveBackgroundNotificationResponse: (NotificationResponse details) {
-        print('Received background notification response: $details');
-      },
-    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   Future<void> showNotification(String title, String body) async {

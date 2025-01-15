@@ -102,7 +102,6 @@ class AlarmPlayer implements IAlarmPlayer {
   Future<void> playerPlay(AudioPlayer player, double? volume) {
     return player.play(
       AssetSource(alarmFile),
-      ctx: audioContext,
       volume: volume,
     );
   }
@@ -116,11 +115,6 @@ class AlarmPlayer implements IAlarmPlayer {
     // progression
     VolumeProgressionController().startLoop(player);
   }
-
-  final audioContext = const AudioContext(
-    android: AudioContextAndroid(),
-    iOS: AudioContextIOS(),
-  );
 
   Future<void> playAlarmWithOverrideWithoutProgression(AudioPlayer player) async {
     // Override

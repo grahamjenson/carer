@@ -17,7 +17,7 @@ import screen_brightness_macos
 import sentry_flutter
 import share_plus
 import shared_preferences_foundation
-import sqflite
+import sqflite_darwin
 import wakelock_plus
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {

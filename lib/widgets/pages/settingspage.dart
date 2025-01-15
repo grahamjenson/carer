@@ -1,4 +1,3 @@
-import 'package:carer/widgets/pages/pages.dart';
 import 'package:carer/widgets/settings/about_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
 import 'package:carer/widgets/settings/services_settings.dart';
@@ -22,27 +21,11 @@ class SettingsPage extends StatelessWidget {
             ServicesSettingsWidget(),
             const TargetSettingsWidget(),
             const UISettingsWidget(),
-            getEventsPage(),
             const DebugSettingsWidget(),
             const AboutSettingsWidget(),
           ],
         ),
       ),
-    );
-  }
-
-  SettingsSection getEventsPage() {
-    return SettingsSection(
-      title: const Text('Logs'),
-      tiles: [
-        SettingsTile.navigation(
-          title: const Text("Events"),
-          descriptionInlineIos: true,
-          onPressed: (context) async {
-            Navigator.pushNamed(context, Pages.events.route);
-          },
-        )
-      ],
     );
   }
 }
