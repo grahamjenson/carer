@@ -1,7 +1,6 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
-import 'package:carer/widgets/pages/pages.dart';
 import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/snooze_alarms_settings.dart';
@@ -24,7 +23,6 @@ class AlarmsSettingsPage extends StatelessWidget {
           const AlarmsSettingsWidget(),
           const AlarmsAlertSettingsWidget(),
           const SnoozeAlarmsSettings(),
-          getEventsPage(),
         ];
 
         if (AlarmSettings().disableAlarms) {
@@ -33,7 +31,6 @@ class AlarmsSettingsPage extends StatelessWidget {
               disableAlarms(context),
             ]),
             const TargetSettingsWidget(),
-            getEventsPage(),
           ];
         }
         return Scaffold(
@@ -69,21 +66,6 @@ class AlarmsSettingsPage extends StatelessWidget {
           AlarmSettings().disableAlarms = true;
         }
       },
-    );
-  }
-
-  SettingsSection getEventsPage() {
-    return SettingsSection(
-      title: const Text('Logs'),
-      tiles: [
-        SettingsTile.navigation(
-          title: const Text("Events"),
-          descriptionInlineIos: true,
-          onPressed: (context) async {
-            Navigator.pushNamed(context, Pages.events.route);
-          },
-        )
-      ],
     );
   }
 }

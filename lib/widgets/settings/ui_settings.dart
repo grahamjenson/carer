@@ -66,6 +66,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
               },
             ),
             timeSettingTile(context),
+            overrideNightMode(context),
           ],
         );
       },
@@ -73,125 +74,91 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
     );
   }
 
-  SettingsTile timeSettingTile(BuildContext context) {
-    var buttonstyle = ElevatedButton.styleFrom(
-      padding: const EdgeInsets.all(5),
-      backgroundColor: Colors.transparent, // Remove padding
-      minimumSize: const Size(50, 50), // Shrink the tap target size
-      // Shrink the tap target size
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4)), // Remove rounded boundaries
-      ),
-    );
-
+  SettingsTile overrideNightMode(BuildContext context) {
     bool isNightModeOverride = TimeSettings().isNightModeOverride();
     bool isDayModeOverride = TimeSettings().isDayModeOverride();
 
-    Widget overrideButton = const SizedBox.shrink();
-
-    var btnH = 50.0;
-    var btnW = 100.0;
-
+    String description = "";
+    Function() onPressed = () => null;
     // Cancel The Override
     if (isNightModeOverride || isDayModeOverride) {
-      overrideButton = SizedBox(
-        height: btnH,
-        width: btnW,
-        child: ElevatedButton(
-          style: buttonstyle,
-          onPressed: () async {
-            TimeSettings().removeNightOverride();
-          },
-          child: Text(
-            "Cancel\nOverride",
-            textAlign: TextAlign.center,
-            style: labelSmall(context).copyWith(color: ColorSchemes.primaryColor),
-          ),
-        ),
-      );
+      description = "Cancel";
+      onPressed = () async {
+        TimeSettings().removeNightOverride();
+      };
     } else if (TimeSettings().isDay()) {
       // Set Night Time until Sunrise
-      overrideButton = SizedBox(
-        height: btnH,
-        width: btnW,
-        child: ElevatedButton(
-          style: buttonstyle,
-          onPressed: () async {
-            TimeSettings().nightModeOverride();
-          },
-          child: Text(
-            "Set Night\nUntil Sunrise",
-            textAlign: TextAlign.center,
-            style: labelSmall(context).copyWith(color: ColorSchemes.primaryColor),
-          ),
-        ),
-      );
+      description = "Night Until Sunrise";
+      onPressed = () async {
+        TimeSettings().nightModeOverride();
+      };
     } else if (TimeSettings().isNight()) {
-      overrideButton = SizedBox(
-        height: btnH,
-        width: btnW,
-        child: ElevatedButton(
-          style: buttonstyle,
-          onPressed: () async {
-            TimeSettings().dayModeOverride();
-          },
-          child: Text(
-            "Set Day\nUntil Sunset",
-            textAlign: TextAlign.center,
-            style: labelSmall(context).copyWith(color: ColorSchemes.primaryColor),
-          ),
-        ),
-      );
+      // Set Day Time until Sunset
+      description = "Day Until Sunset";
+      onPressed = () async {
+        TimeSettings().dayModeOverride();
+      };
     }
-
-    var timeSettings = ToggleButtons(
-      renderBorder: true,
-      constraints: const BoxConstraints(maxHeight: size, maxWidth: size),
-      borderRadius: BorderRadius.circular(10),
-      borderWidth: 0,
-      isSelected: const [true, true],
-      onPressed: (int index) async {
-        switch (index) {
-          case 0:
-            TimeOfDay? value = await showTimePicker(
-              context: context,
-              initialTime: TimeSettings().nightSunsetTime,
-              initialEntryMode: TimePickerEntryMode.inputOnly,
-            );
-            if (value != null) {
-              TimeSettings().nightSunsetTime = value;
-            }
-            break;
-          case 1:
-            TimeOfDay? value = await showTimePicker(
-              context: context,
-              initialTime: TimeSettings().nightSunriseTime,
-              initialEntryMode: TimePickerEntryMode.inputOnly,
-            );
-            if (value != null) {
-              TimeSettings().nightSunriseTime = value;
-            }
-            break;
-        }
-      },
-      children: [
-        ToggleButton(
-          text: "Start\n${Dates.tODToString(TimeSettings().nightSunsetTime)}",
-          height: size,
-          width: size,
+    return SettingsTile.switchTile(
+        title: const Text(
+          "Override Night",
         ),
-        ToggleButton(
-          text: "End\n${Dates.tODToString(TimeSettings().nightSunriseTime)}",
-          height: size,
-          width: size,
+        trailing: Text(
+          description,
         ),
-      ],
-    );
+        descriptionInlineIos: true,
+        activeSwitchColor: errorColor(context),
+        initialValue: isNightModeOverride || isDayModeOverride,
+        onToggle: (value) {
+          onPressed();
+        });
+  }
 
+  SettingsTile timeSettingTile(BuildContext context) {
     return SettingsTile(
       title: Container(alignment: Alignment.centerLeft, height: 40, child: const Text('Night')),
-      trailing: Row(
-        children: [overrideButton, const VerticalDivider(width: 20)] + [timeSettings],
+      trailing: ToggleButtons(
+        renderBorder: true,
+        constraints: const BoxConstraints(maxHeight: size, maxWidth: size),
+        borderRadius: BorderRadius.circular(10),
+        borderWidth: 0,
+        isSelected: const [true, true],
+        onPressed: (int index) async {
+          switch (index) {
+            case 0:
+              TimeOfDay? value = await showTimePicker(
+                context: context,
+                initialTime: TimeSettings().nightSunsetTime,
+                initialEntryMode: TimePickerEntryMode.inputOnly,
+              );
+              if (value != null) {
+                TimeSettings().nightSunsetTime = value;
+              }
+              break;
+            case 1:
+              TimeOfDay? value = await showTimePicker(
+                context: context,
+                initialTime: TimeSettings().nightSunriseTime,
+                initialEntryMode: TimePickerEntryMode.inputOnly,
+              );
+              if (value != null) {
+                TimeSettings().nightSunriseTime = value;
+              }
+              break;
+          }
+        },
+        children: [
+          ToggleButton(
+            text: "Start\n${Dates.tODToString(TimeSettings().nightSunsetTime)}",
+            height: size,
+            width: size,
+          ),
+          ToggleButton(
+            text: "End\n${Dates.tODToString(TimeSettings().nightSunriseTime)}",
+            height: size,
+            width: size,
+          ),
+        ],
       ),
     );
   }

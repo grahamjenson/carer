@@ -1,4 +1,5 @@
 import 'package:carer/services/ui/icons.dart';
+import 'package:carer/widgets/pages/pages.dart';
 import 'package:carer/widgets/settings/debug_pages/debug_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -11,6 +12,13 @@ class DebugSettingsWidget extends AbstractSettingsSection {
     return SettingsSection(
       title: const Text('Debug'),
       tiles: [
+        SettingsTile.navigation(
+          title: const Text("Events"),
+          descriptionInlineIos: true,
+          onPressed: (context) async {
+            Navigator.pushNamed(context, Pages.events.route);
+          },
+        ),
         SettingsTile.navigation(
             title: const Text("Debug"),
             leading: const Icon(CarerIcons.SETTINGS_DEBUG),

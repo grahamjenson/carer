@@ -1,6 +1,4 @@
-import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/ui/icons.dart';
-import 'package:carer/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -13,23 +11,6 @@ class AboutSettingsWidget extends AbstractSettingsSection {
     return SettingsSection(
       title: const Text('About'),
       tiles: [
-        SettingsTile.navigation(
-          title: const Text("Terms of Service"),
-          descriptionInlineIos: true,
-          description: Text("Agreed on ${_formatDate(FlowData().agreedTermsOfService)}"),
-          leading: const Icon(CarerIcons.SETTINGS_TERMS_OF_SERVICE),
-          onPressed: (BuildContext context) async {
-            await showDocument(context, "Terms of Service", StringAssets().termsOfService);
-          },
-        ),
-        SettingsTile.navigation(
-            title: const Text("Privacy Policy"),
-            leading: const Icon(CarerIcons.SETTINGS_PRIVACY_POLICY),
-            descriptionInlineIos: true,
-            description: Text("Agreed on ${_formatDate(FlowData().agreedPrivacyPolicy)}"),
-            onPressed: (context) async {
-              await showDocument(context, "Privacy Policy", StringAssets().privacyPolicy);
-            }),
         SettingsTile.navigation(
             title: const Text("About"),
             leading: const Icon(CarerIcons.SETTINGS_ABOUT),

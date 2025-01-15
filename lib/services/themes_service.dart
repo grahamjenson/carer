@@ -45,8 +45,8 @@ class ColorSchemes {
     onTertiary: Colors.black,
     surface: Colors.black,
     onSurface: colorScheme.onSurface.dim.dim,
-    error: colorScheme.error.dim,
-    onError: colorScheme.onError.dim,
+    error: colorScheme.error,
+    onError: colorScheme.onError,
   );
 }
 

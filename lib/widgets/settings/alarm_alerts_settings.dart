@@ -293,20 +293,25 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
   }
 
   SettingsTile testAlert(BuildContext context, double width) {
-    var button = ElevatedButton(
-      onPressed: () async {
-        AlarmAlertSettings().testAlarm = true;
-        Navigator.of(context).pop();
-      },
-      child: const Text("Test Alarm"),
+    var bStyle = ButtonStyle(
+      backgroundColor: WidgetStateProperty.all(errorColor(context)),
     );
+    var tStyle = TextStyle(color: onErrorColor(context));
+    var button = ElevatedButton(
+        onPressed: () async {
+          AlarmAlertSettings().testAlarm = true;
+          Navigator.of(context).pop();
+        },
+        style: bStyle,
+        child: Text("Test Alarm", style: tStyle));
 
     if (AlarmAlertSettings().testAlarm) {
       button = ElevatedButton(
         onPressed: () async {
           AlarmAlertSettings().testAlarm = false;
         },
-        child: const Text("Stop Test Alarm"),
+        style: bStyle,
+        child: Text("Stop Test Alarm", style: tStyle),
       );
     }
 
