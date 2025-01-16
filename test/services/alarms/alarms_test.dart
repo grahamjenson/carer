@@ -6,6 +6,7 @@ import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../test_utils.dart';
@@ -101,12 +102,12 @@ void main() async {
       ),
       AlarmTest(
         "Fast Drop When last Value is null should still trigger",
-        sgvs: [HIGH - 10, HIGH - 30, HIGH - 50, null],
+        sgvs: [HIGH, HIGH - 10, HIGH - 30, HIGH - 50, null],
         expectedAlarms: {AlarmType.fastDrop},
       ),
       AlarmTest(
         "Lots of Blank Data",
-        sgvs: [HIGH, HIGH - 20, null, null],
+        sgvs: [HIGH, HIGH - 10, HIGH - 30, null, null],
         expectedAlarms: {AlarmType.fastDrop},
       ),
       AlarmTest(
@@ -142,6 +143,24 @@ void main() async {
         sgvs: [HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10],
         expectedAlarms: {AlarmType.high},
       ),
+
+      // Fast Drop/Rise/High should not be true when we are waiting for the lag from last reading
+      AlarmTest(
+        "Lag: Fast Drop Control ON Reading",
+        sgvs: [HIGH, HIGH, HIGH - 10, HIGH - 20, HIGH - 30],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Lag: Fast Drop should not trigger if within lag from last window",
+        sgvs: [HIGH, HIGH, HIGH - 10, HIGH - 20, null],
+        expectedAlarms: {},
+      ),
+      AlarmTest(
+        "Lag: Fast Drop should trigger after 30 seconds waiting for lag",
+        sgvs: [HIGH, HIGH, HIGH - 10, HIGH - 20, null],
+        expectedAlarms: {AlarmType.fastDrop},
+        offset: const Duration(minutes: 1),
+      ),
     ];
 
     for (var t in tests) {
@@ -155,7 +174,7 @@ void main() async {
         expect(pengindAlarms.isEmpty, true);
         expect(activeAlarms.isEmpty, true);
 
-        await createSGVsInOrder(t.sgvs, offset: min2);
+        await createSGVsInOrder(t.sgvs, offset: t.offset);
 
         Set<AlarmType> triggeredAlarms = {};
         for (var alarm in AlarmType.values) {
@@ -184,20 +203,50 @@ void main() async {
   });
 }
 
+class TestAlarm extends AlarmMethods {
+  @override
+  int get minutesToTrigger => 10;
+
+  @override
+  String get title => "Test";
+
+  @override
+  IconData icon() => Icons.abc;
+
+  @override
+  String get description => "Test";
+
+  @override
+  String shortSummary() => "Test";
+
+  @override
+  String statment() => "Test";
+
+  @override
+  bool trigger() => false;
+
+  @override
+  bool active() => false;
+}
+
 class AlarmTest {
   List<int?> sgvs;
+  List<Duration>? sgvAges;
   Set<AlarmType> _expectedAlarms = {};
   Set<AlarmType> _calculatedExpectedPendingAlarms = {};
   Set<AlarmType> _calculatedExpectedActiveAlarms = {};
-
+  Duration offset;
   String name;
-  AlarmTest(
-    this.name, {
-    required this.sgvs,
-    required Set<AlarmType> expectedAlarms,
-    Set<AlarmType>? calculatedExpectedPendingAlarms,
-    Set<AlarmType>? calculatedExpectedActiveAlarms,
-  }) {
+  AlarmTest(this.name,
+      {required this.sgvs,
+      required Set<AlarmType> expectedAlarms,
+      this.sgvAges,
+      Set<AlarmType>? calculatedExpectedPendingAlarms,
+      Set<AlarmType>? calculatedExpectedActiveAlarms,
+      this.offset = Duration.zero}) {
+    if (sgvAges != null) {
+      assert(sgvAges!.length == sgvs.length);
+    }
     _expectedAlarms = expectedAlarms;
     _calculatedExpectedActiveAlarms = calculatedExpectedActiveAlarms ?? expectedAlarms;
     _calculatedExpectedPendingAlarms = calculatedExpectedPendingAlarms ?? expectedAlarms;

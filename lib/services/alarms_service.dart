@@ -213,7 +213,7 @@ class AlarmsService {
       return (false, SnoozeReason.unknown, "No SGV");
     }
 
-    var lastReadings = lastSGV.lastReadingsAfter(Duration(minutes: mins));
+    var lastReadings = CleanSGV.cleanAgoReadings(Duration(minutes: mins));
     if (lastReadings.isEmpty) {
       // We skip here but Wake Up On Urgent will wake up if no data
       return (false, SnoozeReason.unknown, "No Readings");

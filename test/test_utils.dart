@@ -145,18 +145,34 @@ int minTime(int min) {
 }
 
 // NOW is 12:02 so that the SGVs end up on perfect 5 mins
-DateTime overrideNow = DateTime(2020, 1, 1, 12, 02);
+DateTime overrideNow = DateTime(2020, 1, 1, 12, 05);
 
 Duration sec1 = const Duration(seconds: 1);
+Duration sec20 = const Duration(seconds: 20);
 
 Duration min0 = const Duration(minutes: 0);
 Duration min1 = const Duration(minutes: 1);
 Duration min2 = const Duration(minutes: 2);
 Duration min3 = const Duration(minutes: 3);
+Duration min4 = const Duration(minutes: 4);
 Duration min5 = const Duration(minutes: 5);
+Duration min6 = const Duration(minutes: 6);
+Duration min7 = const Duration(minutes: 7);
+Duration min8 = const Duration(minutes: 8);
+Duration min9 = const Duration(minutes: 9);
 Duration min10 = const Duration(minutes: 10);
+Duration min11 = const Duration(minutes: 11);
+Duration min12 = const Duration(minutes: 12);
+Duration min13 = const Duration(minutes: 13);
+Duration min14 = const Duration(minutes: 14);
+
 Duration min15 = const Duration(minutes: 15);
+Duration min16 = const Duration(minutes: 16);
+Duration min17 = const Duration(minutes: 17);
+Duration min18 = const Duration(minutes: 18);
+Duration min19 = const Duration(minutes: 19);
 Duration min20 = const Duration(minutes: 20);
+Duration min21 = const Duration(minutes: 21);
 Duration min30 = const Duration(minutes: 30);
 
 Duration hour1 = const Duration(hours: 1);
@@ -165,8 +181,6 @@ Duration hour36 = const Duration(hours: 36);
 Duration hour48 = const Duration(hours: 48);
 
 Future<int> createSGVsInOrder(List<int?> values, {DateTime? now, Duration? offset}) async {
-  // Start 2 mins ago Just to remove edge case problems
-
   Duration currentDuration = offset ?? min0;
   List<(int, Duration)> valuesWithTime = [];
 

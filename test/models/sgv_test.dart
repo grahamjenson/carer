@@ -110,4 +110,100 @@ void main() async {
       }
     });
   });
+
+  agroup("CleanSGV.cleanAgoReadings", () {
+    atest("works", () async {
+      await createSVGs([(80, min15), (90, min10), (100, min5), (110, min0)]);
+      var list = CleanSGV.cleanAgoReadings(min15);
+      expect(list.length, 4);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+      expect(values, [110, 100, 90, 80]);
+      expect(ages, [min0, min5, min10, min15]);
+    });
+
+    atest("doesnt select items too close", () async {
+      await createSVGs([(80, min15), (90, min10), (100, min5), (105, min1), (110, min0)]);
+      var list = CleanSGV.cleanAgoReadings(min15);
+      expect(list.length, 4);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+
+      expect(values, [110, 100, 90, 80]);
+      expect(ages, [min0, min5, min10, min15]);
+    });
+
+    atest("doesnt select items too close (elimination)", () async {
+      await createSVGs([(80, min15), (90, min10), (100, min5), (105, min3), (110, min0)]);
+      var list = CleanSGV.cleanAgoReadings(min15);
+      expect(list.length, 4);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+
+      expect(values, [110, 105, 90, 80]);
+      expect(ages, [min0, min3, min10, min15]);
+    });
+
+    atest("selects all values that are available value", () async {
+      await createSVGs([(80, min15), (90, min12), (95, min9), (100, min6), (105, min3), (110, min0)]);
+      var list = CleanSGV.cleanAgoReadings(min15);
+      expect(list.length, 6);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+
+      expect(values, [110, 105, 100, 95, 90, 80]);
+      expect(ages, [min0, min3, min6, min9, min12, min15]);
+    });
+  });
+
+  agroup("CleanSGV.triggerWindowAge", () {
+    atest("works", () async {
+      var age = CleanSGV.triggerWindowAge(min0, 10);
+      expect(age, min10 + LAG_WIGGLE_DURATION);
+
+      age = CleanSGV.triggerWindowAge(min3, 10);
+      expect(age, min10 + min3 + LAG_WIGGLE_DURATION);
+    });
+  });
+  agroup("CleanSGV.sgvsInTriggerWindow", () {
+    atest("works", () async {
+      await createSVGs([(80, min15), (90, min10), (100, min5), (110, min0)]);
+      var list = CleanSGV.sgvsInTriggerWindow(10);
+      expect(list.length, 3);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+      expect(values, [110, 100, 90]);
+      expect(ages, [min0, min5, min10]);
+    });
+
+    atest("works with window moving", () async {
+      await createSVGs([(80, min19), (90, min14), (100, min9), (110, min4)]);
+      var list = CleanSGV.sgvsInTriggerWindow(10);
+      expect(list.length, 3);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+      expect(values, [110, 100, 90]);
+      expect(ages, [min4, min9, min14]);
+    });
+
+    atest("works at edge window with Lag", () async {
+      await createSVGs([(80, min20 + sec20), (90, min15 + sec20), (100, min10 + sec20), (110, min5 + sec20)]);
+      var list = CleanSGV.sgvsInTriggerWindow(10);
+      expect(list.length, 3);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+      expect(values, [110, 100, 90]);
+      expect(ages, [min5 + sec20, min10 + sec20, min15 + sec20]);
+    });
+
+    atest("doest accept past lag", () async {
+      await createSVGs([(80, min21), (90, min16), (100, min11), (110, min6)]);
+      var list = CleanSGV.sgvsInTriggerWindow(10);
+      expect(list.length, 2);
+      var values = list.map((e) => e.value);
+      var ages = list.map((e) => e.age);
+      expect(values, [110, 100]);
+      expect(ages, [min6, min11]);
+    });
+  });
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/sgv.dart';
@@ -113,17 +115,17 @@ abstract class AlarmMethods {
     return false;
   }
 
-  get minutesToTrigger => -1;
-  get readingsToTrigger => minutesToTrigger ~/ 5;
+  int get triggerWindow => -1;
+  int get readingsTriggerWindow => triggerWindow ~/ 5;
 
   Map<String, dynamic> details() {
     var map = AppDetailsService().appDetails();
 
     map.addAll({
       "targetRange5": targetRange5.name,
-      "prediction": getPredictedValue(readingsToTrigger)?.toString(),
-      "minutesToTrigger": minutesToTrigger,
-      "readingsToTriggerPrediction": readingsToTrigger,
+      "prediction": getPredictedValue(readingsTriggerWindow)?.toString(),
+      "triggerWindow": triggerWindow,
+      "readingsTriggerWindowPrediction": readingsTriggerWindow,
       "targetRange5ForReadings": range5s.map((e) => e.name).toList(),
       "diffs": diffs.map((e) => e.name).toList(),
       "targets": [
@@ -165,32 +167,9 @@ abstract class AlarmMethods {
     return lastSGV.range;
   }
 
-  List<CleanSGV> lastMinsToTrigger() {
-    if (minutesToTrigger < 0) {
-      return [];
-    }
-    var lastSGV = CleanSGV.lastSGV.value;
+  List<Range5> get range5s => CleanSGV.sgvsInTriggerWindow(triggerWindow).map((e) => e.range).toList();
 
-    if (lastSGV == null) {
-      return [];
-    }
-
-    // We grab the last SGV and all SGVs before that for the minutes to trigger
-    // This solves a lot of missing data issues and edge case issues because it removes clock.now() from the number of sgvs to use
-
-    // We need to modulo the age of LastSGV by 5+ minutes so that if the last reading is say 7 minutes old, we only add 2 minuts to lookback
-    var ageToAdd = Duration(milliseconds: (lastSGV.age.inMilliseconds % 300000) + 30000);
-
-    var age = Duration(minutes: minutesToTrigger) + ageToAdd;
-
-    var sgvs = lastSGV.lastReadingsAfter(age);
-
-    return sgvs;
-  }
-
-  List<Range5> get range5s => lastMinsToTrigger().map((e) => e.range).toList();
-
-  List<Range5> get diffs => lastMinsToTrigger().map((e) => e.diffRange).toList();
+  List<Range5> get diffs => CleanSGV.sgvsInTriggerWindow(triggerWindow).map((e) => e.diffRange).toList();
 
   String lastSGVStr() {
     var lastSGV = CleanSGV.lastSGV.value;
@@ -304,7 +283,7 @@ class _LowAlarm extends AlarmMethods {
   const _LowAlarm();
 
   @override
-  get minutesToTrigger => AlarmSettings().lowPredictionMinutes;
+  get triggerWindow => AlarmSettings().lowPredictionMinutes;
 
   @override
   String get title => "Low Alarm";
@@ -328,7 +307,7 @@ class _LowAlarm extends AlarmMethods {
       return "Low <${unitStr(TargetSettings().lowTarget)}";
     }
     if (_predictiveTrigger()) {
-      var sgv = getPredictedValue(readingsToTrigger);
+      var sgv = getPredictedValue(readingsTriggerWindow);
       if (sgv == null) {
         return "?";
       }
@@ -380,7 +359,7 @@ class _LowAlarm extends AlarmMethods {
     }
 
     // Check prediction
-    var sgv = getPredictedValue(readingsToTrigger);
+    var sgv = getPredictedValue(readingsTriggerWindow);
 
     if (sgv == null) {
       return false;
@@ -437,7 +416,7 @@ class _HighAlarm extends AlarmMethods {
   }
 
   @override
-  get minutesToTrigger => AlarmSettings().highMinutes;
+  get triggerWindow => AlarmSettings().highMinutes;
 
   @override
   bool trigger() {
@@ -535,7 +514,7 @@ class _FastRiseAlarm extends AlarmMethods {
   String statment() => "Fast Rise";
 
   @override
-  int get minutesToTrigger => AlarmSettings().fastRiseAlarmMinutes;
+  int get triggerWindow => AlarmSettings().fastRiseAlarmMinutes;
 
   @override
   bool trigger() {
@@ -589,7 +568,7 @@ class _FastDropAlarm extends AlarmMethods {
   String statment() => "Fast Drop";
 
   @override
-  int get minutesToTrigger => AlarmSettings().fastDropAlarmMinutes;
+  int get triggerWindow => AlarmSettings().fastDropAlarmMinutes;
 
   @override
   bool trigger() {
@@ -643,7 +622,7 @@ class _NoDataAlarm extends AlarmMethods {
   String statment() => "No Data";
 
   @override
-  int get minutesToTrigger => AlarmSettings().noDataAlarmMinutes;
+  int get triggerWindow => AlarmSettings().noDataAlarmMinutes;
 
   @override
   bool trigger() {
@@ -657,7 +636,7 @@ class _NoDataAlarm extends AlarmMethods {
       return false;
     }
 
-    return age >= minutesToTrigger;
+    return age >= triggerWindow;
   }
 
   int? get ageInMinutes {

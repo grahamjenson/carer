@@ -1,3 +1,7 @@
+// ignore_for_file: constant_identifier_names
+
+import 'dart:math';
+
 import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/services/prediction_service.dart';
@@ -7,6 +11,9 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
 import 'package:clock/clock.dart';
 
+const MIN_BEFORE_MINS = 3;
+const LAG_WIGGLE_DURATION = Duration(seconds: 30);
+
 class CleanSGV extends ASGV with DateMixin {
   @override
   final int value;
@@ -14,16 +21,9 @@ class CleanSGV extends ASGV with DateMixin {
   @override
   final DateTime date;
 
-  // The reason for these methods is that we take the most recent CleanSGV and find the previous one
-  // Sometimes there can be very close together values and may affect things like the rate of change
-  // This way we pick the latextest value and follow the chain back of appropriatly seperated values
-
   CleanSGV? before; // previous SVGs ID
 
-  List<CleanSGV> lastReadingsAfter(Duration ago) {
-    return beforeN((ago.inMinutes ~/ 5) + 1).where((e) => e.age <= ago).toList();
-  }
-
+  // Create a list by following before
   List<CleanSGV> beforeN(int n) {
     var list = [this];
     var before = this.before;
@@ -148,7 +148,7 @@ class CleanSGV extends ASGV with DateMixin {
       var dinm = dateBefore.difference(sgv.date).inMinutes;
 
       // We dont want the chain to be too close together and we dont want to chain too far apart
-      if (dinm > 3 && dinm < 30) {
+      if (dinm >= MIN_BEFORE_MINS && dinm <= 30) {
         chainedSGVs.last.before = sgv;
         dateBefore = sgv.date;
         chainedSGVs.add(sgv);
@@ -188,5 +188,51 @@ class CleanSGV extends ASGV with DateMixin {
 
       return lastSGV;
     }, debugLabel: 'lastSGVQuery');
+  }
+
+  // The reason for cleanAgoReadings is that we want a minimal set of readings to get information from
+  // There can be multiple close SGV readings that muddy the waters on things like diffs
+  // e.g. if two readings are a millisecond apart, but only 1 difference in value, than the rate per 5 mins would be huge
+  static List<CleanSGV> cleanAgoReadings(Duration ago) {
+    var last = lastSGV.value; // Make sure lastSGV is up to date
+    if (last == null) {
+      return [];
+    }
+    // The max readings will be the amount of readings the min distance apart within the duration (+1 for goot measure)
+    var maxReadingsAgo = (ago.inMinutes ~/ MIN_BEFORE_MINS) + 1;
+    return last.beforeN(maxReadingsAgo).where((e) => e.age <= ago).toList();
+  }
+
+  // Trigger windows are tricky
+  // If for example you have a 10 minute trigger window then what you really want is the last 3 readings (0mins, 5mins, 10mins),
+  // But the window shifts because time keeps going forward, then you might want (4mins, 9mins, 14mins)
+  // What you want to happen is normalize to a new reading
+  // That is, for 10 minutes you want to look at the last 10 minutes when the latest reading is 0 minutes old.
+  // If the latest reading is 1 minute old, you want to look at the last 11 minutes.
+  static List<CleanSGV> sgvsInTriggerWindow(int minutesToTrigger) {
+    if (minutesToTrigger < 0) {
+      return [];
+    }
+    var lastSGV = CleanSGV.lastSGV.value;
+
+    if (lastSGV == null) {
+      return [];
+    }
+
+    var age = triggerWindowAge(lastSGV.age, minutesToTrigger);
+
+    var sgvs = cleanAgoReadings(age);
+    return sgvs;
+  }
+
+  static Duration triggerWindowAge(Duration lastSGVAge, int minutesToTrigger) {
+    var minutesDuration = Duration(minutes: minutesToTrigger);
+    // We grab the last SGV and all SGVs before that for the minutes to trigger
+    // This solves a lot of missing data issues and edge case issues because it removes clock.now() from the number of sgvs to use
+
+    // We max out the last reading at 5 minutes old
+    var normalizeToCurrentSGV = Duration(milliseconds: min(lastSGVAge.inMilliseconds, 300000));
+
+    return minutesDuration + normalizeToCurrentSGV + LAG_WIGGLE_DURATION;
   }
 }
