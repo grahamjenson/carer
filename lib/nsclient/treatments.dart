@@ -73,19 +73,19 @@ class NSRawTreatment {
   });
 
   factory NSRawTreatment.fromJson(Map<String, dynamic> json) {
-    var createdAt = NSType.getCreatedAtDate(json);
+    var guessDate = NSType.getBestGuessDate(json);
 
     return NSRawTreatment(
       id: json['_id'] ?? "",
       app: json['app'],
       carbs: json['carbs'],
-      date: createdAt,
+      date: guessDate,
       type: json['type'],
       eventType: json['eventType'] ?? "",
       utcOffset: json['utcOffset'],
       isReadOnly: json['isReadOnly'],
       isValid: json['isValid'],
-      createdAt: createdAt,
+      createdAt: guessDate,
       identifier: json['identifier'],
       srvModified: json['srvModified'],
       srvCreated: json['srvCreated'],

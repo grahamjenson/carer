@@ -2,13 +2,15 @@ import 'package:carer/utils/futures.dart';
 import 'package:clock/clock.dart';
 
 abstract class NSType {
-  static DateTime getCreatedAtDate(json) {
+  // The data can be a bit shaky with what is available, so just try to use the date, then the created at.
+  static DateTime getBestGuessDate(json) {
     DateTime? createdAtMaybe;
-    if (json["created_at"] != null) {
-      createdAtMaybe = trygo(() => DateTime.parse(json['created_at']));
-    }
-    if (json["date"] != null && createdAtMaybe == null) {
+    if (json["date"] != null) {
       createdAtMaybe = DateTime.fromMillisecondsSinceEpoch(json['date']);
+    }
+
+    if (json["created_at"] != null && createdAtMaybe == null) {
+      createdAtMaybe = trygo(() => DateTime.parse(json['created_at']));
     }
 
     return createdAtMaybe ?? clock.now();

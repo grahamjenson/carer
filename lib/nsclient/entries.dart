@@ -44,12 +44,12 @@ class NSEntry {
   });
 
   factory NSEntry.fromJson(Map<String, dynamic> json) {
-    var createdAt = NSType.getCreatedAtDate(json);
+    var guessDate = NSType.getBestGuessDate(json);
 
     return NSEntry(
       id: json['_id'],
       app: json['app'],
-      date: createdAt,
+      date: guessDate,
       device: json['device'],
       direction: json['direction'],
       isReadOnly: json['isReadOnly'],
@@ -59,7 +59,7 @@ class NSEntry {
       unfiltered: json['unfiltered'],
       units: json['units'],
       utcOffset: json['utcOffset'],
-      createdAt: createdAt,
+      createdAt: guessDate,
       identifier: json['identifier'],
       srvModified: json['srvModified'],
       srvCreated: json['srvCreated'],
