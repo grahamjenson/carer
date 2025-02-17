@@ -237,7 +237,7 @@ class CarePage extends StatelessWidget {
           });
 
           if (context.mounted) {
-            GoRouter.of(context).pop();
+            GoRouter.of(context).go("/display", extra: {'from': '/care'});
           }
         }
       },
@@ -263,7 +263,7 @@ class CarePage extends StatelessWidget {
             }
           });
           if (context.mounted) {
-            GoRouter.of(context).pop();
+            GoRouter.of(context).go("/display", extra: {'from': '/care'});
           }
         }
       },

@@ -32,15 +32,66 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-GoRouter? _router;
+CustomTransitionPage getUpDownSlideTransitionPage({required BuildContext context, required GoRouterState state, required Widget child}) {
+  return CustomTransitionPage(
+    child: child,
+    key: state.pageKey,
+    transitionDuration: const Duration(milliseconds: 300),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0.0, 1.0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset.zero,
+            end: const Offset(0.0, 1.0),
+          ).animate(secondaryAnimation),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+CustomTransitionPage getSideSideSlideTransitionPage({required BuildContext context, required GoRouterState state, required Widget child}) {
+  var str = state.uri.toString();
+
+  print("AAAA $str");
+  var x = state.extra;
+  print("BBBB $x");
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(.7, 0.0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-0.7, 0.0),
+          ).animate(secondaryAnimation),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+GoRouter? router;
 GoRouter getRouter() {
-  if (_router != null) {
-    return _router!;
+  if (router != null) {
+    return router!;
   }
   final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'main');
 
-  _router = GoRouter(
+  router = GoRouter(
     observers: [NavigationChangeObserver(), SentryNavigatorObserver()],
     navigatorKey: rootNavigatorKey,
     initialLocation: "/display",
@@ -69,51 +120,38 @@ GoRouter getRouter() {
             const FlasthingWidget()
           ]);
 
-          final extra = state.extra;
-          print("EEEE $extra");
-          return CustomTransitionPage<void>(
-              child: childStack,
-              transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
-                    opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
-                    child: child,
-                  ));
+          //final extra = state.extra; - might need this at some point
+          print("ALSO HERERE");
+          return CustomTransitionPage(
+              child: child,
+              transitionDuration: const Duration(milliseconds: 300),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: CurveTween(curve: Curves.easeInOut).animate(animation), child: childStack);
+              });
         },
         routes: <RouteBase>[
           GoRoute(
             path: '/',
-            builder: (BuildContext context, GoRouterState state) {
-              return const DisplayPage();
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              return getSideSideSlideTransitionPage(context: context, state: state, child: const DisplayPage());
             },
           ),
           GoRoute(
             path: '/display',
             pageBuilder: (BuildContext context, GoRouterState state) {
-              return CustomTransitionPage<void>(
-                key: state.pageKey,
-                fullscreenDialog: true,
-                child: const DisplayPage(),
-                transitionDuration: const Duration(milliseconds: 150),
-                transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
-                  // Change the opacity of the screen using a Curve based on the the animation's
-                  // value
-                  return FadeTransition(
-                    opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
-                    child: child,
-                  );
-                },
-              );
+              return getSideSideSlideTransitionPage(context: context, state: state, child: const DisplayPage());
             },
           ),
           GoRoute(
             path: '/care',
-            builder: (BuildContext context, GoRouterState state) {
-              return const CarePage();
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              return getSideSideSlideTransitionPage(context: context, state: state, child: const CarePage());
             },
           ),
           GoRoute(
             path: '/alarms',
-            builder: (BuildContext context, GoRouterState state) {
-              return const AlarmsSettingsPage();
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              return getSideSideSlideTransitionPage(context: context, state: state, child: const AlarmsSettingsPage());
             },
             routes: <RouteBase>[
               GoRoute(
@@ -168,8 +206,8 @@ GoRouter getRouter() {
           ),
           GoRoute(
             path: '/settings',
-            builder: (BuildContext context, GoRouterState state) {
-              return const SettingsPage();
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              return getSideSideSlideTransitionPage(context: context, state: state, child: const SettingsPage());
             },
             routes: <RouteBase>[
               GoRoute(
@@ -217,26 +255,17 @@ GoRouter getRouter() {
       GoRoute(
         path: '/snooze',
         pageBuilder: (BuildContext context, GoRouterState state) {
-          return CustomTransitionPage<void>(
-            key: state.pageKey,
-            fullscreenDialog: true,
+          return getUpDownSlideTransitionPage(
+            context: context,
+            state: state,
             child: const SnoozeTimePage(),
-            transitionDuration: const Duration(milliseconds: 150),
-            transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
-              // Change the opacity of the screen using a Curve based on the the animation's
-              // value
-              return FadeTransition(
-                opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
-                child: child,
-              );
-            },
           );
         },
       ),
     ],
   );
 
-  _router!.routerDelegate.addListener(updateOnRouteChange);
+  router!.routerDelegate.addListener(updateOnRouteChange);
 
-  return _router!;
+  return router!;
 }

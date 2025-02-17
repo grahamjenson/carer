@@ -51,13 +51,17 @@ class BarBottom extends StatelessWidget with ThemeMixin {
   }
 
   Widget createButton(BuildContext context, String name, IconData id, String navigateTo) {
+    var currentPath = GoRouterState.of(context).uri.toString();
+    var selected = currentPath == navigateTo;
+
     return Flexible(
       flex: 1,
       child: IconButtonWithText(
         icon: id,
+        selected: selected,
         label: name,
         onPressed: () {
-          GoRouter.of(context).go(navigateTo);
+          GoRouter.of(context).go(navigateTo, extra: {'from': currentPath});
         },
       ),
     );
@@ -68,16 +72,38 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
   final IconData icon;
   final String label;
   final VoidCallback onPressed;
+  final bool selected;
 
   const IconButtonWithText({
     super.key,
     required this.icon,
+    required this.selected,
     required this.label,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    var children = [
+      Icon(
+        icon,
+        size: 28.0,
+        color: onBackgroundColor(context),
+      ),
+      const SizedBox(height: 4.0),
+      Text(label),
+    ];
+    if (selected) {
+      children = [
+        Icon(
+          icon,
+          size: 40,
+          fill: 0.5,
+          color: accentColor(context),
+          weight: 10,
+        )
+      ];
+    }
     return ElevatedButton(
       style: ButtonStyle(
         foregroundColor: WidgetStateProperty.all<Color>(onBackgroundColor(context)),
@@ -94,15 +120,7 @@ class IconButtonWithText extends StatelessWidget with ThemeMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: 28.0,
-            color: onBackgroundColor(context),
-          ),
-          const SizedBox(height: 4.0),
-          Text(label),
-        ],
+        children: children,
       ),
     );
   }
