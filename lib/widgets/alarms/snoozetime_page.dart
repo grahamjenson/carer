@@ -37,7 +37,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
       AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, reason);
     }
 
-    GoRouter.of(context).go("/display");
+    GoRouter.of(context).go("/display", extra: {'from': '/snooze'});
   }
 
   @override
