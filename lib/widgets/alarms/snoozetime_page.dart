@@ -5,6 +5,7 @@ import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SnoozeTimePage extends StatefulWidget {
   const SnoozeTimePage({super.key});
@@ -36,7 +37,7 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
       AlarmAlertSettings().setSnoozeDurationSeconds(snoozeTime, reason);
     }
 
-    Navigator.of(context).pop();
+    GoRouter.of(context).go("/display");
   }
 
   @override

@@ -76,20 +76,20 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
   }
 }
 
+void updateOnRouteChange() {
+  AppLifecycleService().lastChangeScreen.value = clock.now();
+}
+
 class NavigationChangeObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     // This may happen during a build of a widget, since signals are syncrhonous with drawing can cause errors.
     // To stop that we are putting in an aynshconous call and not waiting
-    Future.microtask(() {
-      AppLifecycleService().lastChangeScreen.value = clock.now();
-    });
+    Future.microtask(updateOnRouteChange);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    Future.microtask(() {
-      AppLifecycleService().lastChangeScreen.value = clock.now();
-    });
+    Future.microtask(updateOnRouteChange);
   }
 }

@@ -5,8 +5,8 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/pages/pages.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SnoozeBarButton extends StatelessWidget with ThemeMixin {
   const SnoozeBarButton({super.key});
@@ -15,10 +15,6 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (BuildContext context) {
-        if (AlarmSettings().disableAlarms) {
-          return const SizedBox.shrink();
-        }
-
         Color buttonBackGroundColor = accentColor(context);
         if (AlarmAlertSettings().snoozeDuration != null) {
           buttonBackGroundColor = primaryColor(context);
@@ -54,7 +50,7 @@ class SnoozeBarButton extends StatelessWidget with ThemeMixin {
           clipBehavior: Clip.antiAlias,
           style: buttonStyle,
           onPressed: () {
-            Navigator.pushNamed(context, Pages.snooze.route);
+            GoRouter.of(context).go("/snooze");
           },
           child: Row(
               mainAxisSize: MainAxisSize.min,

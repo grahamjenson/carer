@@ -4,16 +4,9 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/settings/alarms_pages/battery_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/fast_fall_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/fast_rise_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/high_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/low_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/no_data_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/urgent_high_alarm_page.dart';
-import 'package:carer/widgets/settings/alarms_pages/urgent_low_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   const AlarmsSettingsWidget({super.key});
@@ -27,14 +20,14 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           return const SizedBox.shrink();
         }
         List<SettingsTile> tiles = [
-          alarmNavigationTile(context, AlarmType.urgentLow, const UrgentAlarmLowSettingsPage()),
-          alarmNavigationTile(context, AlarmType.low, const LowAlarmSettingsPage()),
-          alarmNavigationTile(context, AlarmType.high, const HighAlarmSettingsPage()),
-          alarmNavigationTile(context, AlarmType.urgentHigh, const UrgentAlarmHighSettingsPage()),
-          alarmNavigationTile(context, AlarmType.fastRise, const FastRiseAlarmSettingsPage()),
-          alarmNavigationTile(context, AlarmType.fastDrop, const FastFallAlarmSettingsPage()),
-          alarmNavigationTile(context, AlarmType.noData, const NoDataAlarmSettingsPage()),
-          alarmNavigationTile(context, AlarmType.lowBattery, const BatteryAlarmSettingsPage()),
+          alarmNavigationTile(context, AlarmType.urgentLow, "/alarms/urgent_low_alarm"),
+          alarmNavigationTile(context, AlarmType.low, "/alarms/low_alarm"),
+          alarmNavigationTile(context, AlarmType.high, "/alarms/high_alarm"),
+          alarmNavigationTile(context, AlarmType.urgentHigh, "/alarms/urgent_high_alarm"),
+          alarmNavigationTile(context, AlarmType.fastRise, "/alarms/fast_rise_alarm"),
+          alarmNavigationTile(context, AlarmType.fastDrop, "/alarms/fast_drop_alarm"),
+          alarmNavigationTile(context, AlarmType.noData, "/alarms/no_data_alarm"),
+          alarmNavigationTile(context, AlarmType.lowBattery, "/alarms/battery_alarm"),
         ];
 
         return SettingsSection(
@@ -47,7 +40,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     );
   }
 
-  SettingsTile alarmNavigationTile(BuildContext context, AlarmType alarmType, Widget page) {
+  SettingsTile alarmNavigationTile(BuildContext context, AlarmType alarmType, String page) {
     Color? iconColor;
     if (alarmType.trigger()) {
       iconColor = primaryColor(context);
@@ -57,7 +50,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
       leading: Icon(alarmType.icon, color: iconColor),
       description: Text(alarmType.description),
       descriptionInlineIos: true,
-      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => page)),
+      onPressed: (context) => GoRouter.of(context).go(page),
     );
   }
 }

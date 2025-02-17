@@ -4,6 +4,7 @@ import 'package:carer/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class DocumentsSettingsWidget extends AbstractSettingsSection {
   const DocumentsSettingsWidget({super.key});
@@ -50,7 +51,7 @@ class DocumentsSettingsWidget extends AbstractSettingsSection {
               TextButton(
                 child: const Text('Close'),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  GoRouter.of(context).pop();
                 },
               ),
             ],

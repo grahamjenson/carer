@@ -7,6 +7,7 @@ import 'package:unicons/unicons.dart';
 
 class CarerIcons {
   // BAR
+  static const IconData BAR_DISPLAY = CupertinoIcons.home;
   static const IconData BAR_CARE = CupertinoIcons.hand_raised;
   static const IconData BAR_SETTINGS = CupertinoIcons.settings;
   static const IconData BAR_ALARMS = CupertinoIcons.alarm;

@@ -2,9 +2,9 @@ import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/settings/service_pages/nightscout_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class ServicesSettingsWidget extends AbstractSettingsSection {
   ServicesSettingsWidget({super.key});
@@ -53,7 +53,7 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
       title: const Text("Nightscout"),
       description: Text(description),
       descriptionInlineIos: true,
-      onPressed: (context) => Navigator.push(context, MaterialPageRoute(builder: (context) => NightscoutSettingsPage())),
+      onPressed: (context) => GoRouter.of(context).go("/settings/nightscout"),
     );
   }
 }

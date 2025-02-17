@@ -11,6 +11,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class EventsPage extends StatelessWidget with ThemeMixin {
   const EventsPage({super.key});
@@ -159,7 +160,7 @@ class EventsPage extends StatelessWidget with ThemeMixin {
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
+                GoRouter.of(context).pop(); // Dismiss the dialog
               },
             ),
           ],

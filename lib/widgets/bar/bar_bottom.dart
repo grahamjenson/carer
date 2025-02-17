@@ -4,8 +4,8 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/snooze_bar_button.dart';
-import 'package:carer/widgets/pages/pages.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BarBottom extends StatelessWidget with ThemeMixin {
   final bool vertical;
@@ -16,10 +16,10 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     return AWatch(
       (context) {
         var children = [
-          createButton(context, "Care", CarerIcons.BAR_CARE, Pages.care),
-          createButton(context, "Info", CarerIcons.BAR_INFO, Pages.info),
-          createButton(context, "Alarms", CarerIcons.BAR_ALARMS, Pages.alarms),
-          createButton(context, "Settings", CarerIcons.BAR_SETTINGS, Pages.settings),
+          createButton(context, "Display", CarerIcons.BAR_DISPLAY, "/display"),
+          createButton(context, "Care", CarerIcons.BAR_CARE, "/care"),
+          createButton(context, "Alarms", CarerIcons.BAR_ALARMS, "/alarms"),
+          createButton(context, "Settings", CarerIcons.BAR_SETTINGS, "/settings"),
         ];
 
         NotchedShape? notchShape;
@@ -50,14 +50,14 @@ class BarBottom extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget createButton(BuildContext context, String name, IconData id, Pages navigateTo) {
+  Widget createButton(BuildContext context, String name, IconData id, String navigateTo) {
     return Flexible(
       flex: 1,
       child: IconButtonWithText(
         icon: id,
         label: name,
         onPressed: () {
-          Navigator.pushNamed(context, navigateTo.route);
+          GoRouter.of(context).go(navigateTo);
         },
       ),
     );

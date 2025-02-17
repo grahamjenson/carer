@@ -10,6 +10,7 @@ import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   const AlarmsAlertSettingsWidget({super.key});
@@ -300,7 +301,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     var button = ElevatedButton(
         onPressed: () async {
           AlarmAlertSettings().testAlarm = true;
-          Navigator.of(context).pop();
+          GoRouter.of(context).go("/display");
         },
         style: bStyle,
         child: Text("Test Alarm", style: tStyle));

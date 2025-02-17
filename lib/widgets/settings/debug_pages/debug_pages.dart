@@ -13,11 +13,10 @@ import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/settings/debug_pages/log_error_page.dart';
-import 'package:carer/widgets/settings/debug_pages/nightscout_debug.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -94,6 +93,7 @@ class DebugSettingsPage extends StatelessWidget {
           onPressed: (context) async {
             FlowData().agreedPrivacyPolicy = null;
             FlowData().agreedTermsOfService = null;
+            GoRouter.of(context).refresh();
           },
         ),
         SettingsTile(
@@ -145,10 +145,7 @@ class DebugSettingsPage extends StatelessWidget {
           descriptionInlineIos: true,
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const LogErrorPage()),
-            );
+            GoRouter.of(context).go("/settings/debug/log_errors");
           },
         )
       ],
@@ -203,14 +200,11 @@ class DebugSettingsPage extends StatelessWidget {
     return SettingsSection(
       title: const Text('Services'),
       tiles: [
-        SettingsTile(
+        SettingsTile.navigation(
           title: const Text("NightScout"),
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NightScoutServiceDebugPage()),
-            );
+            GoRouter.of(context).go("/settings/debug/nightscout_debug");
           },
         )
       ],

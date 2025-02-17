@@ -4,6 +4,7 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class NightscoutSettingsPage extends StatelessWidget {
   NightscoutSettingsPage({super.key});
@@ -65,7 +66,7 @@ class NightscoutSettingsPage extends StatelessWidget {
                 controller: controller,
               ),
               actions: [
-                TextButton(onPressed: () => {Navigator.of(context).pop(controller.text)}, child: const Text("Save"))
+                TextButton(onPressed: () => {GoRouter.of(context).pop(controller.text)}, child: const Text("Save"))
               ],
             ));
   }

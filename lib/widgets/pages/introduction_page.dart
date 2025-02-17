@@ -4,10 +4,10 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/strings.dart';
-import 'package:carer/widgets/pages/pages.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:go_router/go_router.dart';
 
 class IntroductionPage extends StatefulWidget {
   const IntroductionPage({super.key});
@@ -261,10 +261,7 @@ class _IntroductionPageState extends State<IntroductionPage> with ThemeMixin {
           ElevatedButton(
             style: btnStyle,
             onPressed: () {
-              Navigator.pushReplacementNamed(
-                context,
-                Pages.home.route,
-              );
+              GoRouter.of(context).go("/display");
             },
             child: const Text("Finish"),
           ),

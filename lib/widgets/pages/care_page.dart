@@ -12,6 +12,7 @@ import 'package:carer/widgets/settings/shared/settings_slider.dart';
 import 'package:carer/widgets/settings/shared/target_range_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 ASignal<bool> _editing = ASignal<bool>(false, debugLabel: "CarePageEditing");
 
@@ -110,33 +111,26 @@ class CarePage extends StatelessWidget {
     return AWatch((context) {
       IconData actionIcon = _editing.value ? CarerIcons.BAR_DONE_CARE : CarerIcons.BAR_EDIT_CARE;
 
-      return PopScope(
-        onPopInvoked: (bool didPop) {
-          if (didPop) {
-            _editing.value = false;
-          }
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Care'),
-            actions: [
-              IconButton(
-                icon: Icon(actionIcon),
-                onPressed: () {
-                  _editing.value = !_editing.peek();
-                },
-              ),
-            ],
-          ),
-          body: SettingsList(
-            sections: [
-                  SettingsSection(
-                    title: const Text('Carbs'),
-                    tiles: carbsActionTiles(),
-                  )
-                ] +
-                tempTargetSections(),
-          ),
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Care'),
+          actions: [
+            IconButton(
+              icon: Icon(actionIcon),
+              onPressed: () {
+                _editing.value = !_editing.peek();
+              },
+            ),
+          ],
+        ),
+        body: SettingsList(
+          sections: [
+                SettingsSection(
+                  title: const Text('Carbs'),
+                  tiles: carbsActionTiles(),
+                )
+              ] +
+              tempTargetSections(),
         ),
       );
     }, debugLabel: "CarePage");
@@ -243,7 +237,7 @@ class CarePage extends StatelessWidget {
           });
 
           if (context.mounted) {
-            Navigator.of(context).pop();
+            GoRouter.of(context).pop();
           }
         }
       },
@@ -269,7 +263,7 @@ class CarePage extends StatelessWidget {
             }
           });
           if (context.mounted) {
-            Navigator.of(context).pop();
+            GoRouter.of(context).pop();
           }
         }
       },

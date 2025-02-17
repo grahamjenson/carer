@@ -1,6 +1,8 @@
 import 'package:carer/widgets/settings/about_settings.dart';
 import 'package:carer/widgets/settings/debug_settings.dart';
+import 'package:carer/widgets/settings/info_settings.dart';
 import 'package:carer/widgets/settings/services_settings.dart';
+import 'package:carer/widgets/settings/status_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/ui_settings.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,8 @@ class SettingsPage extends StatelessWidget {
             ServicesSettingsWidget(),
             const TargetSettingsWidget(),
             const UISettingsWidget(),
+            const InfoSettingsWidget(),
+            const StatusSettingsWidget(),
             const DebugSettingsWidget(),
             const AboutSettingsWidget(),
           ],

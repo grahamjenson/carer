@@ -25,15 +25,7 @@ import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
-import 'package:carer/widgets/alarms/snoozetime_page.dart';
-import 'package:carer/widgets/pages/alarm_settings_page.dart';
-import 'package:carer/widgets/pages/care_page.dart';
-import 'package:carer/widgets/pages/events_page.dart';
-import 'package:carer/widgets/pages/homepage.dart';
-import 'package:carer/widgets/pages/info_settings_page.dart';
-import 'package:carer/widgets/pages/introduction_page.dart';
-import 'package:carer/widgets/pages/pages.dart';
-import 'package:carer/widgets/pages/settingspage.dart';
+import 'package:carer/widgets/router.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -159,15 +151,9 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
-    Pages initialRoute = Pages.home;
-
-    if (IntroductionPage.needsOnboarding()) {
-      initialRoute = Pages.intro;
-    }
-
     return ValueListenableBuilder<ThemeData>(
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
@@ -179,22 +165,11 @@ class _MyAppState extends State<MyApp> {
           }
 
           return ToastificationWrapper(
-            child: MaterialApp(
-              navigatorObservers: [NavigationChangeObserver(), SentryNavigatorObserver()],
+            child: MaterialApp.router(
               title: 'Carer',
               debugShowCheckedModeBanner: false,
               theme: theme,
-              initialRoute: initialRoute.route,
-              routes: {
-                Pages.home.route: (context) => const HomePage(),
-                Pages.intro.route: (context) => const IntroductionPage(),
-                Pages.settings.route: (context) => const SettingsPage(),
-                Pages.alarms.route: (context) => const AlarmsSettingsPage(),
-                Pages.events.route: (context) => const EventsPage(),
-                Pages.info.route: (context) => const InfoSettingsPage(),
-                Pages.care.route: (context) => const CarePage(),
-                Pages.snooze.route: (context) => const SnoozeTimePage(),
-              },
+              routerConfig: getRouter(),
             ),
           );
         });

@@ -260,6 +260,10 @@ mixin ThemeMixin {
   }
 }
 
+class _ThemeMixinStatic with ThemeMixin {}
+
+var themeMixin = _ThemeMixinStatic();
+
 extension ColorExtension on Color {
   Color get dim {
     var amount = 0.7;

@@ -1,5 +1,6 @@
 import 'package:carer/services/themes_service.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Dialogs {
   static Future<bool?> areYouSureDialog(BuildContext context, String title, String content, String confirmText) {
@@ -12,7 +13,7 @@ class Dialogs {
         style: style,
       ),
       onPressed: () {
-        Navigator.of(context).pop(false);
+        GoRouter.of(context).pop(false);
       },
     );
     Widget confirm = TextButton(
@@ -21,7 +22,7 @@ class Dialogs {
         style: style,
       ),
       onPressed: () {
-        Navigator.of(context).pop(true);
+        GoRouter.of(context).pop(true);
       },
     );
 

@@ -1,8 +1,7 @@
 import 'package:carer/services/ui/icons.dart';
-import 'package:carer/widgets/pages/pages.dart';
-import 'package:carer/widgets/settings/debug_pages/debug_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class DebugSettingsWidget extends AbstractSettingsSection {
   const DebugSettingsWidget({super.key});
@@ -16,17 +15,14 @@ class DebugSettingsWidget extends AbstractSettingsSection {
           title: const Text("Events"),
           descriptionInlineIos: true,
           onPressed: (context) async {
-            Navigator.pushNamed(context, Pages.events.route);
+            GoRouter.of(context).go("/settings/events");
           },
         ),
         SettingsTile.navigation(
             title: const Text("Debug"),
             leading: const Icon(CarerIcons.SETTINGS_DEBUG),
             onPressed: (context) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DebugSettingsPage()),
-              );
+              GoRouter.of(context).go("/settings/debug");
             }),
       ],
     );

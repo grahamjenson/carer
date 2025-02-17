@@ -1,26 +1,51 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
 import 'package:carer/widgets/alarms/alarm_widget.dart';
+import 'package:carer/widgets/bar/bar_top.dart';
 import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
 import 'package:carer/widgets/insights/info.dart';
 import 'package:carer/widgets/insights/treatments.dart';
 import 'package:flutter/material.dart';
 
-class HomeLayout extends StatelessWidget with ThemeMixin {
-  HomeLayout({super.key});
+class DisplayPage extends StatelessWidget with ThemeMixin {
+  const DisplayPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This needs hardcoding because the scrollable outer widget
-    return AWatch(
-      (context) {
-        return getLayout(context, UISettings().orientation);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scaffold(
+          appBar: const BarTop(),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              alog("Forcing Update");
+              UpdateService().forceUpdateAll();
+              // just to see something is happening
+              await Future.delayed(const Duration(seconds: 1));
+            },
+            displacement: 10,
+            child: SingleChildScrollView(
+              physics: const StickyRefreshPhysics(),
+              padding: EdgeInsets.zero,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 40, maxHeight: constraints.maxHeight - 40),
+                child: AWatch(
+                  (context) {
+                    return getLayout(context, UISettings().orientation);
+                  },
+                  dependencies: [AlarmSettings().disableAlarmsSignal, UISettings().orientationSignal],
+                  debugLabel: "HomeLayout",
+                ),
+              ),
+            ),
+          ),
+        );
       },
-      dependencies: [AlarmSettings().disableAlarmsSignal, UISettings().orientationSignal],
-      debugLabel: "HomeLayout",
     );
   }
 
@@ -84,4 +109,21 @@ class HomeLayout extends StatelessWidget with ThemeMixin {
       ],
     );
   }
+}
+
+class StickyRefreshPhysics extends ScrollPhysics {
+  const StickyRefreshPhysics({super.parent});
+
+  @override
+  StickyRefreshPhysics applyTo(ScrollPhysics? ancestor) {
+    return StickyRefreshPhysics(parent: buildParent(ancestor));
+  }
+
+  // Always draggable
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) => true;
+
+  // Increase the distance needed to pull down to start drag, so it doesn't interfere with other interactions like chart
+  @override
+  double get dragStartDistanceMotionThreshold => 50;
 }

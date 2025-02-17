@@ -30,3 +30,8 @@ To upload the symbols and such need `SENTRY_AUTH_TOKEN` in env and run `flutter 
 
 # setting up some debug stuff
 1. ln -s /Users/<user>/Library/Containers/nz.t1d.carer/Data/Documents macosData
+
+## Releasing The Iphone App
+
+1. `flutter build ipa`
+2. 
