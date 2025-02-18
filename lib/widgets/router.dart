@@ -33,6 +33,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+const int transitionTime = 200;
+
 class OffsetPairs {
   final Offset begin;
   final Offset end;
@@ -43,8 +45,8 @@ class OffsetPairs {
   const OffsetPairs(this.begin, this.end, this.beginReverse, this.endReverse);
 }
 
-const leftToRight = OffsetPairs(Offset(-1.0, 0.0), Offset.zero, Offset.zero, Offset(1.0, 0.0));
-const rightToLeft = OffsetPairs(Offset(1.0, 0.0), Offset.zero, Offset.zero, Offset(-1.0, 0.0));
+const leftToRight = OffsetPairs(Offset(-0.5, 0.0), Offset.zero, Offset.zero, Offset(0.5, 0.0));
+const rightToLeft = OffsetPairs(Offset(0.5, 0.0), Offset.zero, Offset.zero, Offset(-0.5, 0.0));
 const upToDown = OffsetPairs(Offset(0.0, 1.0), Offset.zero, Offset.zero, Offset(0.0, 1.0));
 const downToUp = OffsetPairs(Offset(0.0, 1.0), Offset.zero, Offset.zero, Offset(0.0, -1.0));
 
@@ -94,7 +96,8 @@ CustomTransitionPage getSimpleSlideTransitionPage(
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
-    transitionDuration: const Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: transitionTime),
+    reverseTransitionDuration: const Duration(milliseconds: transitionTime),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return SlideTransition(
         position: Tween<Offset>(
@@ -117,23 +120,62 @@ CustomTransitionPage getPageSlideTransitionPage({required BuildContext context, 
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
-    transitionDuration: const Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: transitionTime),
+    reverseTransitionDuration: const Duration(milliseconds: transitionTime),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return AWatch(
         (context) {
           var offset = getOffsetPairForState(state);
+
+          var slideAnimation = animation.drive(
+            Tween<Offset>(
+              begin: offset.begin,
+              end: offset.end,
+            ).chain(
+              CurveTween(curve: Curves.easeIn),
+            ),
+          );
+
+          var fadeAnimation = animation.drive(
+            Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).chain(
+              CurveTween(curve: Curves.easeIn),
+            ),
+          );
+
+          var secondarySlideAnimation = secondaryAnimation.drive(
+            Tween<Offset>(
+              begin: offset.beginReverse,
+              end: offset.endReverse,
+            ).chain(
+              CurveTween(curve: Curves.easeIn),
+            ),
+          );
+
+          var secondaryFadeAnimation = secondaryAnimation.drive(
+            Tween<double>(
+              begin: 1,
+              end: 0,
+            ).chain(
+              CurveTween(curve: Curves.easeIn),
+            ),
+          );
+
           return SlideTransition(
-              position: Tween<Offset>(
-                begin: offset.begin,
-                end: offset.end,
-              ).animate(animation),
+            position: slideAnimation,
+            child: FadeTransition(
+              opacity: fadeAnimation,
               child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: offset.beginReverse,
-                  end: offset.endReverse,
-                ).animate(secondaryAnimation),
-                child: child,
-              ));
+                position: secondarySlideAnimation,
+                child: FadeTransition(
+                  opacity: secondaryFadeAnimation,
+                  child: child,
+                ),
+              ),
+            ),
+          );
         },
         debugLabel: "PageTransitionReverse",
         dependencies: [currentRoute],
@@ -189,9 +231,33 @@ GoRouter getRouter() {
 
           return CustomTransitionPage(
               child: child,
-              transitionDuration: const Duration(milliseconds: 300),
+              transitionDuration: const Duration(milliseconds: transitionTime),
+              reverseTransitionDuration: const Duration(milliseconds: transitionTime),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: CurveTween(curve: Curves.easeInOut).animate(animation), child: childStack);
+                var fadeAnimation = animation.drive(
+                  Tween<double>(
+                    begin: 0.0,
+                    end: 1.0,
+                  ).chain(
+                    CurveTween(curve: Curves.easeIn),
+                  ),
+                );
+                var secondaryFadeAnimation = secondaryAnimation.drive(
+                  Tween<double>(
+                    begin: 1.0,
+                    end: 0.0,
+                  ).chain(
+                    CurveTween(curve: Curves.easeIn),
+                  ),
+                );
+
+                return FadeTransition(
+                  opacity: fadeAnimation,
+                  child: FadeTransition(
+                    opacity: secondaryFadeAnimation,
+                    child: childStack,
+                  ),
+                );
               });
         },
         routes: <RouteBase>[
@@ -259,15 +325,11 @@ GoRouter getRouter() {
                 routes: <RouteBase>[
                   GoRoute(
                     path: '/log_errors',
-                    builder: (BuildContext context, GoRouterState state) {
-                      return const LogErrorPage();
-                    },
+                    pageBuilder: pageBuilderBuilder(const LogErrorPage()),
                   ),
                   GoRoute(
                     path: '/nightscout_debug',
-                    builder: (BuildContext context, GoRouterState state) {
-                      return const NightScoutServiceDebugPage();
-                    },
+                    pageBuilder: pageBuilderBuilder(const NightScoutServiceDebugPage()),
                   ),
                 ],
               ),
