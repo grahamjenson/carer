@@ -7,6 +7,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
 import 'package:carer/widgets/settings/shared/settings_slider.dart';
@@ -45,9 +46,9 @@ class TempTargetSettingsModel {
     var top = getHigh();
     int duration = getDuration();
     Unit unit = UISettings().unit;
-    String description = "Set ${unit.str(bot)}-${unit.strWithUnit(top)} for $duration minutes";
+    String description = "${unit.str(bot)}-${unit.strWithUnit(top)} for $duration mins";
     if (unit.str(bot) == unit.str(top)) {
-      description = "Set ${unit.strWithUnit(bot)} for $duration minutes";
+      description = "${unit.strWithUnit(bot)} for $duration mins";
     }
     return description;
   }
@@ -114,21 +115,27 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var sections = SettingsList(
-      sections: [
-            SettingsSection(
-              title: const Text('Carbs'),
-              tiles: allCarbs.map((e) => carbsActionTile(context, e)).toList(),
-            )
-          ] +
-          tempTargetSections(context),
-    );
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Care'),
-        actions: [getActionButton(context)],
+    var sections = SettingsList(sections: [
+      SettingsSection(
+        title: const Text('Carbs'),
+        tiles: allCarbs.map((e) => carbsActionTile(context, e)).toList(),
       ),
-      body: AnimatedSwitcher(duration: const Duration(milliseconds: 1000), child: sections),
+      SettingsSection(
+        title: const Text('Temp Targets'),
+        tiles: allTempTargets.map((e) => tempTargetSections(context, e)).toList(),
+      )
+    ]);
+    return AWatch(
+      (context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Care'),
+            actions: [getActionButton(context)],
+          ),
+          body: AnimatedSwitcher(duration: const Duration(milliseconds: 1000), child: sections),
+        );
+      },
+      debugLabel: "CarePageWidget",
     );
   }
 
@@ -206,32 +213,7 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
 
     return SettingsTile(
       title: Text(e.description),
-      trailing: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: trailing,
-        transitionBuilder: (child, animation) {
-          var slideAnimation = animation.drive(
-            Tween<Offset>(
-              begin: const Offset(1, 0),
-              end: Offset.zero,
-            ).chain(
-              CurveTween(curve: Curves.easeIn),
-            ),
-          );
-          var fadeAnimation = animation.drive(
-            Tween<double>(
-              begin: 0,
-              end: 1,
-            ).chain(
-              CurveTween(curve: Curves.easeIn),
-            ),
-          );
-          return SlideTransition(
-            position: slideAnimation,
-            child: FadeTransition(opacity: fadeAnimation, child: child),
-          );
-        },
-      ),
+      trailing: animations(trailing),
       onPressed: onPressed,
     );
   }
@@ -280,64 +262,130 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
     ];
   }
 
-  List<SettingsSection> tempTargetSections(BuildContext context) {
-    if (_editing) {
-      return getTempTargetEdit(allTempTargets[0]) + getTempTargetEdit(allTempTargets[1]) + getTempTargetEdit(allTempTargets[2]);
-    }
-
-    return [
-      SettingsSection(
-        title: const Text('Temp Target'),
-        tiles: allTempTargets.map((e) => tempTargetActionTile(context, e)).toList(),
-      )
-    ];
-  }
-
-  SettingsTile tempTargetActionTile(BuildContext context, TempTargetSettingsModel e) {
+  SettingsTile tempTargetSections(BuildContext context, TempTargetSettingsModel e) {
     var name = e.name;
     var bottom = e.getLow();
     var top = e.getHigh();
     var duration = e.getDuration();
 
+    Function(BuildContext context)? onPressed = (context) async {
+      bool? areYouSure =
+          await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Set Temp Target");
+
+      if (areYouSure == true) {
+        var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
+        NSClient().addTempTarget(nsURL, nsToken, bottom.toInt(), top.toInt(), duration, name).then((value) {
+          if (value) {
+            ToastService().showSuccess("Temp Target ${e.description}");
+            UpdateService().nsTreatmentUpdater.addExternalReason("Added Temp Target");
+          } else {
+            ToastService().showError("Failed to set TempTarget");
+          }
+        });
+
+        if (context.mounted) {
+          GoRouter.of(context).go("/display", extra: {'from': '/care'});
+        }
+      }
+    };
+
+    Widget trailing = SizedBox(
+      key: ValueKey("care_add_temptarget_$name"),
+      width: 250,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [Text("${e.description} "), plusIcon(context)],
+      ),
+    );
+
+    if (_editing) {
+      onPressed = null;
+
+      trailing = SizedBox(
+          key: ValueKey("care_edit_temptarget_$name"),
+          width: 250,
+          child: Row(
+            children: [
+              const Text("Target "),
+              PlusMinusText(
+                getStr: (double val) => UISettings().unit.str(val),
+                fromStr: (String str) => UISettings().unit.fromStr(str),
+                getValue: () => e.getLow(),
+                setValue: (double val) => e.setLow(val),
+                dependencies: const [],
+              ),
+              const Text("-"),
+              PlusMinusText(
+                getStr: (double val) => UISettings().unit.str(val),
+                fromStr: (String str) => UISettings().unit.fromStr(str),
+                getValue: () => e.getHigh(),
+                setValue: (double val) => e.setHigh(val),
+                dependencies: const [],
+              ),
+              const Spacer(),
+              const Text("Time "),
+              PlusMinusText(
+                getStr: (double val) => val.toInt().toString(),
+                fromStr: (String str) => double.tryParse(str),
+                getValue: () => e.getDuration().toDouble(),
+                setValue: (double val) => e.setDuration(val.toInt()),
+                dependencies: const [],
+              ),
+            ],
+          ));
+    }
+
     return SettingsTile(
       title: Text(name),
-      description: Text(e.description),
       descriptionInlineIos: true,
-      trailing: plusIcon(context),
-      onPressed: (context) async {
-        bool? areYouSure =
-            await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Set Temp Target");
+      trailing: animations(trailing),
+      onPressed: onPressed,
+    );
+  }
 
-        if (areYouSure == true) {
-          var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
-          NSClient().addTempTarget(nsURL, nsToken, bottom.toInt(), top.toInt(), duration, name).then((value) {
-            if (value) {
-              ToastService().showSuccess("Temp Target ${e.description}");
-              UpdateService().nsTreatmentUpdater.addExternalReason("Added Temp Target");
-            } else {
-              ToastService().showError("Failed to set TempTarget");
-            }
-          });
+  // SHARED
 
-          if (context.mounted) {
-            GoRouter.of(context).go("/display", extra: {'from': '/care'});
-          }
-        }
+  Widget animations(Widget child) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: child,
+      transitionBuilder: (child, animation) {
+        var slideAnimation = animation.drive(
+          Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).chain(
+            CurveTween(curve: Curves.easeIn),
+          ),
+        );
+        var fadeAnimation = animation.drive(
+          Tween<double>(
+            begin: 0,
+            end: 1,
+          ).chain(
+            CurveTween(curve: Curves.easeIn),
+          ),
+        );
+        return SlideTransition(
+          position: slideAnimation,
+          child: FadeTransition(opacity: fadeAnimation, child: child),
+        );
       },
     );
   }
 
   Widget plusIcon(BuildContext context) {
-    return Center(
+    return Align(
+        alignment: Alignment.centerRight,
         child: Container(
-      decoration: BoxDecoration(
-        color: onBackgroundColor(context),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Icon(
-        CarerIcons.CARE_ADD,
-        color: backgroundColorShade(context),
-      ),
-    ));
+          decoration: BoxDecoration(
+            color: onBackgroundColor(context),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Icon(
+            CarerIcons.CARE_ADD,
+            color: backgroundColorShade(context),
+          ),
+        ));
   }
 }
