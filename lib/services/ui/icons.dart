@@ -13,8 +13,9 @@ class CarerIcons {
   static const IconData BAR_ALARMS = CupertinoIcons.alarm;
   static const IconData BAR_INFO = CupertinoIcons.info;
   static const IconData BAR_SNOOZE = CupertinoIcons.moon_zzz;
-  static const IconData BAR_EDIT_CARE = CupertinoIcons.pencil;
-  static const IconData BAR_DONE_CARE = CupertinoIcons.check_mark;
+
+  // CARE
+  static const IconData CARE_ADD = UniconsLine.plus;
 
   // INFO
   static const IconData INFO_INSULIN_ON_BOARD = UniconsLine.syringe;

@@ -3,18 +3,17 @@ import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
-import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
+import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
 import 'package:carer/widgets/settings/shared/settings_slider.dart';
 import 'package:carer/widgets/settings/shared/target_range_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:go_router/go_router.dart';
-
-ASignal<bool> _editing = ASignal<bool>(false, debugLabel: "CarePageEditing");
 
 typedef Setter = void Function(int);
 typedef Getter = int Function();
@@ -103,60 +102,143 @@ List<TempTargetSettingsModel> allTempTargets = [
   ),
 ];
 
-class CarePage extends StatelessWidget {
+class CarePage extends StatefulWidget {
   const CarePage({super.key});
 
   @override
+  State<CarePage> createState() => _CarePageState();
+}
+
+class _CarePageState extends State<CarePage> with ThemeMixin {
+  bool _editing = false;
+
+  @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      IconData actionIcon = _editing.value ? CarerIcons.BAR_DONE_CARE : CarerIcons.BAR_EDIT_CARE;
-
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Care'),
-          actions: [
-            IconButton(
-              icon: Icon(actionIcon),
-              onPressed: () {
-                _editing.value = !_editing.peek();
-              },
-            ),
-          ],
-        ),
-        body: SettingsList(
-          sections: [
-                SettingsSection(
-                  title: const Text('Carbs'),
-                  tiles: carbsActionTiles(),
-                )
-              ] +
-              tempTargetSections(),
-        ),
-      );
-    }, debugLabel: "CarePage");
+    var sections = SettingsList(
+      sections: [
+            SettingsSection(
+              title: const Text('Carbs'),
+              tiles: allCarbs.map((e) => carbsActionTile(context, e)).toList(),
+            )
+          ] +
+          tempTargetSections(context),
+    );
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Care'),
+        actions: [getActionButton(context)],
+      ),
+      body: AnimatedSwitcher(duration: const Duration(milliseconds: 1000), child: sections),
+    );
   }
 
-  List<SettingsTile> carbsActionTiles() {
-    if (_editing.value) {
-      return allCarbs
-          .map(
-            (e) => SettingsTile(
-              title: SettingsSlider(
-                title: e.description,
-                getValue: () => e.getCarbs().toDouble(),
-                setValue: (double val) => e.setCarbs(val.toInt()),
-                getStr: (double val) => val.toInt().toString(),
-                minRange: CareSettings().MIN_CARBS.toDouble(),
-                maxRange: CareSettings().MAX_CARBS.toDouble(),
-                divisions: CareSettings().MAX_CARBS - CareSettings().MIN_CARBS,
-                dependencies: const [],
-              ),
-            ),
+  Widget getActionButton(BuildContext context) {
+    Widget actionText = _editing
+        ? Text(
+            "Done",
+            style: TextStyle(color: accentColor(context), fontSize: 16),
           )
-          .toList();
-    }
-    return allCarbs.map((e) => carbsActionTile(e)).toList();
+        : Text(
+            "Edit",
+            style: TextStyle(color: accentColor(context), fontSize: 16),
+          );
+
+    return SizedBox(
+      width: 100,
+      child: IconButton(
+        icon: actionText,
+        onPressed: () {
+          setState(() {
+            _editing = !_editing;
+          });
+        },
+      ),
+    );
   }
+
+  @override
+  void dispose() {
+    _editing = false;
+    super.dispose();
+  }
+
+  ////
+  // CARBS
+  ////
+
+  SettingsTile carbsActionTile(BuildContext context, CarbsSettingsModel e) {
+    var carbs = e.getCarbs();
+
+    Function(BuildContext context)? onPressed = (context) async {
+      bool? areYouSure =
+          await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Add Carbs");
+
+      if (areYouSure == true) {
+        var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
+        NSClient().addCarbs(nsURL, nsToken, carbs).then((value) {
+          if (value) {
+            ToastService().showSuccess("${carbs}g carbs added");
+            UpdateService().nsTreatmentUpdater.addExternalReason("Added Carbs");
+          } else {
+            ToastService().showError("Failed to add ${carbs}g carbs");
+          }
+        });
+        if (context.mounted) {
+          GoRouter.of(context).go("/display", extra: {'from': '/care'});
+        }
+      }
+    };
+
+    Widget trailing = SizedBox(key: ValueKey("care_add_carbs_$carbs"), width: 50, child: plusIcon(context));
+    if (_editing) {
+      trailing = SizedBox(
+          key: ValueKey("care_edit_carbs_$carbs"),
+          width: 50,
+          child: PlusMinusText(
+            getStr: (double val) => val.toInt().toString(),
+            fromStr: (String str) => double.tryParse(str),
+            getValue: () => e.getCarbs().toDouble(),
+            setValue: (double val) => e.setCarbs(val.toInt()),
+            dependencies: const [],
+          ));
+      onPressed = null;
+    }
+
+    return SettingsTile(
+      title: Text(e.description),
+      trailing: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: trailing,
+        transitionBuilder: (child, animation) {
+          var slideAnimation = animation.drive(
+            Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).chain(
+              CurveTween(curve: Curves.easeIn),
+            ),
+          );
+          var fadeAnimation = animation.drive(
+            Tween<double>(
+              begin: 0,
+              end: 1,
+            ).chain(
+              CurveTween(curve: Curves.easeIn),
+            ),
+          );
+          return SlideTransition(
+            position: slideAnimation,
+            child: FadeTransition(opacity: fadeAnimation, child: child),
+          );
+        },
+      ),
+      onPressed: onPressed,
+    );
+  }
+
+  ////
+  // TempTargets
+  ////
 
   List<SettingsSection> getTempTargetEdit(TempTargetSettingsModel e) {
     return [
@@ -198,29 +280,30 @@ class CarePage extends StatelessWidget {
     ];
   }
 
-  List<SettingsSection> tempTargetSections() {
-    if (_editing.value) {
+  List<SettingsSection> tempTargetSections(BuildContext context) {
+    if (_editing) {
       return getTempTargetEdit(allTempTargets[0]) + getTempTargetEdit(allTempTargets[1]) + getTempTargetEdit(allTempTargets[2]);
     }
 
     return [
       SettingsSection(
         title: const Text('Temp Target'),
-        tiles: allTempTargets.map((e) => tempTargetActionTile(e)).toList(),
+        tiles: allTempTargets.map((e) => tempTargetActionTile(context, e)).toList(),
       )
     ];
   }
 
-  SettingsTile tempTargetActionTile(TempTargetSettingsModel e) {
+  SettingsTile tempTargetActionTile(BuildContext context, TempTargetSettingsModel e) {
     var name = e.name;
     var bottom = e.getLow();
     var top = e.getHigh();
     var duration = e.getDuration();
 
-    return SettingsTile.navigation(
+    return SettingsTile(
       title: Text(name),
       description: Text(e.description),
       descriptionInlineIos: true,
+      trailing: plusIcon(context),
       onPressed: (context) async {
         bool? areYouSure =
             await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Set Temp Target");
@@ -244,29 +327,17 @@ class CarePage extends StatelessWidget {
     );
   }
 
-  SettingsTile carbsActionTile(CarbsSettingsModel e) {
-    int carbs = e.getCarbs();
-    return SettingsTile.navigation(
-      title: Text('Add ${carbs}g Carb'),
-      onPressed: (context) async {
-        bool? areYouSure =
-            await Dialogs.areYouSureDialog(context, "Confirm ${e.description}", 'Are you sure you want to ${e.description}?', "Add Carbs");
-
-        if (areYouSure == true) {
-          var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
-          NSClient().addCarbs(nsURL, nsToken, carbs).then((value) {
-            if (value) {
-              ToastService().showSuccess("${carbs}g carbs added");
-              UpdateService().nsTreatmentUpdater.addExternalReason("Added Carbs");
-            } else {
-              ToastService().showError("Failed to add ${carbs}g carbs");
-            }
-          });
-          if (context.mounted) {
-            GoRouter.of(context).go("/display", extra: {'from': '/care'});
-          }
-        }
-      },
-    );
+  Widget plusIcon(BuildContext context) {
+    return Center(
+        child: Container(
+      decoration: BoxDecoration(
+        color: onBackgroundColor(context),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Icon(
+        CarerIcons.CARE_ADD,
+        color: backgroundColorShade(context),
+      ),
+    ));
   }
 }
