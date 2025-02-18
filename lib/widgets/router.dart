@@ -7,6 +7,7 @@
 
 import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/flashing_widget.dart';
 import 'package:carer/widgets/alarms/snoozetime_page.dart';
 import 'package:carer/widgets/bar/bar_bottom.dart';
@@ -32,21 +33,78 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-CustomTransitionPage getUpDownSlideTransitionPage({required BuildContext context, required GoRouterState state, required Widget child}) {
+class OffsetPairs {
+  final Offset begin;
+  final Offset end;
+
+  final Offset beginReverse;
+  final Offset endReverse;
+
+  const OffsetPairs(this.begin, this.end, this.beginReverse, this.endReverse);
+}
+
+const leftToRight = OffsetPairs(Offset(-1.0, 0.0), Offset.zero, Offset.zero, Offset(1.0, 0.0));
+const rightToLeft = OffsetPairs(Offset(1.0, 0.0), Offset.zero, Offset.zero, Offset(-1.0, 0.0));
+const upToDown = OffsetPairs(Offset(0.0, 1.0), Offset.zero, Offset.zero, Offset(0.0, 1.0));
+const downToUp = OffsetPairs(Offset(0.0, 1.0), Offset.zero, Offset.zero, Offset(0.0, -1.0));
+
+OffsetPairs getOffsetPairForState(GoRouterState state) {
+  var to = currentRoute.value;
+  var from = currentRoute.previousValue;
+
+  if (from == null || from == "") {
+    return rightToLeft;
+  }
+
+  var routeOrderFrom = routeOrder(from);
+  var routeOrderTo = routeOrder(to);
+
+  if (routeOrderFrom == routeOrderTo) {
+    return rightToLeft;
+  }
+
+  if (routeOrderFrom > routeOrderTo) {
+    return leftToRight;
+  }
+
+  return rightToLeft;
+}
+
+ASignal<String> currentRoute = ASignal<String>("/display", debugLabel: "CurrentRoute");
+double routeOrder(String route) {
+  if (route.startsWith("/display")) {
+    return 0;
+  }
+  if (route.startsWith("/care")) {
+    return 1;
+  }
+
+  if (route.startsWith("/alarms")) {
+    return 2;
+  }
+
+  if (route.startsWith("/settings")) {
+    return 3;
+  }
+  return 100;
+}
+
+CustomTransitionPage getSimpleSlideTransitionPage(
+    {required BuildContext context, required GoRouterState state, required Widget child, required OffsetPairs offset}) {
   return CustomTransitionPage(
-    child: child,
     key: state.pageKey,
-    transitionDuration: const Duration(milliseconds: 300),
+    child: child,
+    transitionDuration: const Duration(milliseconds: 200),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return SlideTransition(
         position: Tween<Offset>(
-          begin: const Offset(0.0, 1.0),
-          end: Offset.zero,
+          begin: offset.begin,
+          end: offset.end,
         ).animate(animation),
         child: SlideTransition(
           position: Tween<Offset>(
-            begin: Offset.zero,
-            end: const Offset(0.0, 1.0),
+            begin: offset.beginReverse,
+            end: offset.endReverse,
           ).animate(secondaryAnimation),
           child: child,
         ),
@@ -55,32 +113,39 @@ CustomTransitionPage getUpDownSlideTransitionPage({required BuildContext context
   );
 }
 
-CustomTransitionPage getSideSideSlideTransitionPage({required BuildContext context, required GoRouterState state, required Widget child}) {
-  var str = state.uri.toString();
-
-  print("AAAA $str");
-  var x = state.extra;
-  print("BBBB $x");
+CustomTransitionPage getPageSlideTransitionPage({required BuildContext context, required GoRouterState state, required Widget child}) {
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
     transitionDuration: const Duration(milliseconds: 200),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(.7, 0.0),
-          end: Offset.zero,
-        ).animate(animation),
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0.0, 0.0),
-            end: const Offset(-0.7, 0.0),
-          ).animate(secondaryAnimation),
-          child: child,
-        ),
+      return AWatch(
+        (context) {
+          var offset = getOffsetPairForState(state);
+          return SlideTransition(
+              position: Tween<Offset>(
+                begin: offset.begin,
+                end: offset.end,
+              ).animate(animation),
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: offset.beginReverse,
+                  end: offset.endReverse,
+                ).animate(secondaryAnimation),
+                child: child,
+              ));
+        },
+        debugLabel: "PageTransitionReverse",
+        dependencies: [currentRoute],
       );
     },
   );
+}
+
+pageBuilderBuilder(Widget widget) {
+  return (BuildContext context, GoRouterState state) {
+    return getPageSlideTransitionPage(context: context, state: state, child: widget);
+  };
 }
 
 GoRouter? router;
@@ -121,7 +186,7 @@ GoRouter getRouter() {
           ]);
 
           //final extra = state.extra; - might need this at some point
-          print("ALSO HERERE");
+
           return CustomTransitionPage(
               child: child,
               transitionDuration: const Duration(milliseconds: 300),
@@ -132,95 +197,65 @@ GoRouter getRouter() {
         routes: <RouteBase>[
           GoRoute(
             path: '/',
-            pageBuilder: (BuildContext context, GoRouterState state) {
-              return getSideSideSlideTransitionPage(context: context, state: state, child: const DisplayPage());
-            },
+            pageBuilder: pageBuilderBuilder(const DisplayPage()),
           ),
           GoRoute(
             path: '/display',
-            pageBuilder: (BuildContext context, GoRouterState state) {
-              return getSideSideSlideTransitionPage(context: context, state: state, child: const DisplayPage());
-            },
+            pageBuilder: pageBuilderBuilder(const DisplayPage()),
           ),
           GoRoute(
             path: '/care',
-            pageBuilder: (BuildContext context, GoRouterState state) {
-              return getSideSideSlideTransitionPage(context: context, state: state, child: const CarePage());
-            },
+            pageBuilder: pageBuilderBuilder(const CarePage()),
           ),
           GoRoute(
             path: '/alarms',
-            pageBuilder: (BuildContext context, GoRouterState state) {
-              return getSideSideSlideTransitionPage(context: context, state: state, child: const AlarmsSettingsPage());
-            },
+            pageBuilder: pageBuilderBuilder(const AlarmsSettingsPage()),
             routes: <RouteBase>[
               GoRoute(
                 path: '/urgent_low_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const UrgentAlarmLowSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const UrgentAlarmLowSettingsPage()),
               ),
               GoRoute(
                 path: '/low_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const LowAlarmSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const LowAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/high_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const HighAlarmSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const HighAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/urgent_high_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const UrgentAlarmHighSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const UrgentAlarmHighSettingsPage()),
               ),
               GoRoute(
                 path: '/fast_rise_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const FastRiseAlarmSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const FastRiseAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/fast_drop_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const FastFallAlarmSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const FastFallAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/no_data_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const NoDataAlarmSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const NoDataAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/battery_alarm',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const BatteryAlarmSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const BatteryAlarmSettingsPage()),
               ),
             ],
           ),
           GoRoute(
             path: '/settings',
-            pageBuilder: (BuildContext context, GoRouterState state) {
-              return getSideSideSlideTransitionPage(context: context, state: state, child: const SettingsPage());
-            },
+            pageBuilder: pageBuilderBuilder(const SettingsPage()),
             routes: <RouteBase>[
               GoRoute(
                 path: '/nightscout',
-                builder: (BuildContext context, GoRouterState state) {
-                  return NightscoutSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(NightscoutSettingsPage()),
               ),
               GoRoute(
                 path: '/debug',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const DebugSettingsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const DebugSettingsPage()),
                 routes: <RouteBase>[
                   GoRoute(
                     path: '/log_errors',
@@ -238,9 +273,7 @@ GoRouter getRouter() {
               ),
               GoRoute(
                 path: '/events',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const EventsPage();
-                },
+                pageBuilder: pageBuilderBuilder(const EventsPage()),
               ),
             ],
           ),
@@ -255,10 +288,11 @@ GoRouter getRouter() {
       GoRoute(
         path: '/snooze',
         pageBuilder: (BuildContext context, GoRouterState state) {
-          return getUpDownSlideTransitionPage(
+          return getSimpleSlideTransitionPage(
             context: context,
             state: state,
             child: const SnoozeTimePage(),
+            offset: upToDown,
           );
         },
       ),
@@ -266,6 +300,12 @@ GoRouter getRouter() {
   );
 
   router!.routerDelegate.addListener(updateOnRouteChange);
+  //router!.routeInformationProvider.addListener(updateCurrentPath);
+  router!.routerDelegate.addListener(updateCurrentPath);
 
   return router!;
+}
+
+void updateCurrentPath() {
+  currentRoute.value = router!.state.uri.toString();
 }
