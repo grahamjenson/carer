@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -27,6 +28,7 @@ class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin
     return AWatch(
       (context) {
         var alarmsPage = SettingsList(
+          key: const Key("AlarmsSettingsPageAlarms"),
           sections: [
             SettingsSection(tiles: [
               disableAlarms(context),
@@ -36,6 +38,7 @@ class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin
         );
 
         var alertsPage = SettingsList(
+          key: const Key("AlarmsSettingsPageAlerts"),
           sections: [
             SettingsSection(tiles: [
               disableAlarms(context),
@@ -45,6 +48,7 @@ class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin
         );
 
         var settingsPage = SettingsList(
+          key: const Key("AlarmsSettingsPageSettings"),
           sections: [
             SettingsSection(tiles: [
               disableAlarms(context),
@@ -70,6 +74,7 @@ class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin
 
         return Scaffold(
           appBar: AppBar(title: const Text('Alarms')),
+          backgroundColor: Colors.black,
           body: CupertinoPageScaffold(
             navigationBar: CupertinoNavigationBar(
               automaticallyImplyLeading: false,
@@ -105,7 +110,19 @@ class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin
                 },
               ),
             ),
-            child: Padding(padding: const EdgeInsets.only(top: 0), child: child),
+            child: PageTransitionSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: child,
+              transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+                return SharedAxisTransition(
+                  animation: primaryAnimation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.horizontal,
+                  fillColor: Colors.black,
+                  child: child,
+                );
+              },
+            ),
           ),
         );
       },
