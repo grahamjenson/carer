@@ -66,6 +66,7 @@ class _SettingsPageState extends State<SettingsPage> with ThemeMixin {
       backgroundColor: Colors.black,
       body: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+          transitionBetweenRoutes: false,
           automaticallyImplyLeading: false,
           automaticallyImplyMiddle: false,
           automaticBackgroundVisibility: false,
