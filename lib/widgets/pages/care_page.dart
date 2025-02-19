@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:carer/models/sql/constants.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/care_settings.dart';
@@ -132,7 +133,7 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
             title: const Text('Care'),
             actions: [getActionButton(context)],
           ),
-          body: AnimatedSwitcher(duration: const Duration(milliseconds: 1000), child: sections),
+          body: sections,
         );
       },
       debugLabel: "CarePageWidget",
@@ -196,18 +197,24 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
       }
     };
 
-    Widget trailing = SizedBox(key: ValueKey("care_add_carbs_$carbs"), width: 50, child: plusIcon(context));
+    Widget trailing = SizedBox(key: ValueKey("care_add_carbs_$carbs"), width: 60, child: plusIcon(context));
     if (_editing) {
       trailing = SizedBox(
-          key: ValueKey("care_edit_carbs_$carbs"),
-          width: 50,
-          child: PlusMinusText(
-            getStr: (double val) => val.toInt().toString(),
-            fromStr: (String str) => double.tryParse(str),
-            getValue: () => e.getCarbs().toDouble(),
-            setValue: (double val) => e.setCarbs(val.toInt()),
-            dependencies: const [],
-          ));
+        key: ValueKey("care_edit_carbs_$carbs"),
+        width: 60,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            PlusMinusText(
+              getStr: (double val) => "${val.toInt()}",
+              fromStr: (String str) => double.tryParse(str),
+              getValue: () => e.getCarbs().toDouble(),
+              setValue: (double val) => e.setCarbs(val.toInt()),
+              dependencies: const [],
+            ),
+          ],
+        ),
+      );
       onPressed = null;
     }
 
@@ -346,29 +353,37 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
   // SHARED
 
   Widget animations(Widget child) {
-    return AnimatedSwitcher(
+    return PageTransitionSwitcher(
       duration: const Duration(milliseconds: 200),
       child: child,
-      transitionBuilder: (child, animation) {
+      transitionBuilder: (child, animation, secondaryAnimation) {
+        var offset = const Offset(0, -1.5);
+        var soffset = const Offset(1.5, 0);
+        if (_editing) {
+          offset = const Offset(1.5, 0);
+          soffset = const Offset(0, -1.5);
+        }
         var slideAnimation = animation.drive(
           Tween<Offset>(
-            begin: const Offset(1, 0),
+            begin: offset,
             end: Offset.zero,
           ).chain(
             CurveTween(curve: Curves.easeIn),
           ),
         );
-        var fadeAnimation = animation.drive(
-          Tween<double>(
-            begin: 0,
-            end: 1,
+
+        var slideSecondaryAnimation = secondaryAnimation.drive(
+          Tween<Offset>(
+            begin: Offset.zero,
+            end: soffset,
           ).chain(
             CurveTween(curve: Curves.easeIn),
           ),
         );
+
         return SlideTransition(
           position: slideAnimation,
-          child: FadeTransition(opacity: fadeAnimation, child: child),
+          child: SlideTransition(position: slideSecondaryAnimation, child: child),
         );
       },
     );
