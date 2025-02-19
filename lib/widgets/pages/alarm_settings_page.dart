@@ -77,38 +77,39 @@ class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin
           backgroundColor: Colors.black,
           body: CupertinoPageScaffold(
             navigationBar: CupertinoNavigationBar(
-              transitionBetweenRoutes: false,
-              automaticallyImplyLeading: false,
-              automaticallyImplyMiddle: false,
               automaticBackgroundVisibility: false,
-              enableBackgroundFilterBlur: false,
+              transitionBetweenRoutes: false,
+              padding: const EdgeInsetsDirectional.all(0),
               backgroundColor: Colors.black,
               // This Cupertino segmented control has the enum "Sky" as the type.
-              middle: CupertinoSlidingSegmentedControl<AlarmSettingsPages>(
-                // This represents the currently selected segmented control.
-                groupValue: _selectedSegment,
-                // Callback that sets the selected segmented control.
-                onValueChanged: (AlarmSettingsPages? value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedSegment = value;
-                    });
-                  }
-                },
-                children: <AlarmSettingsPages, Widget>{
-                  AlarmSettingsPages.alarms: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Alarms', style: TextStyle(color: onBackgroundColor(context))),
-                  ),
-                  AlarmSettingsPages.alerts: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Alerting', style: TextStyle(color: onBackgroundColor(context))),
-                  ),
-                  AlarmSettingsPages.settings: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Settings', style: TextStyle(color: onBackgroundColor(context))),
-                  ),
-                },
+              middle: SizedBox(
+                width: double.infinity,
+                child: CupertinoSlidingSegmentedControl<AlarmSettingsPages>(
+                  // This represents the currently selected segmented control.
+                  groupValue: _selectedSegment,
+                  // Callback that sets the selected segmented control.
+                  onValueChanged: (AlarmSettingsPages? value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedSegment = value;
+                      });
+                    }
+                  },
+                  children: <AlarmSettingsPages, Widget>{
+                    AlarmSettingsPages.alarms: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text('Alarms', style: TextStyle(color: onBackgroundColor(context))),
+                    ),
+                    AlarmSettingsPages.alerts: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text('Alerting', style: TextStyle(color: onBackgroundColor(context))),
+                    ),
+                    AlarmSettingsPages.settings: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text('Settings', style: TextStyle(color: onBackgroundColor(context))),
+                    ),
+                  },
+                ),
               ),
             ),
             child: PageTransitionSwitcher(

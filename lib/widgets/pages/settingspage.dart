@@ -66,38 +66,38 @@ class _SettingsPageState extends State<SettingsPage> with ThemeMixin {
       backgroundColor: Colors.black,
       body: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          transitionBetweenRoutes: false,
-          automaticallyImplyLeading: false,
-          automaticallyImplyMiddle: false,
           automaticBackgroundVisibility: false,
-          enableBackgroundFilterBlur: false,
+          transitionBetweenRoutes: false,
           backgroundColor: Colors.black,
           // This Cupertino segmented control has the enum "Sky" as the type.
-          middle: CupertinoSlidingSegmentedControl<SettingPageTabs>(
-            // This represents the currently selected segmented control.
-            groupValue: _selectedSegment,
-            // Callback that sets the selected segmented control.
-            onValueChanged: (SettingPageTabs? value) {
-              if (value != null) {
-                setState(() {
-                  _selectedSegment = value;
-                });
-              }
-            },
-            children: <SettingPageTabs, Widget>{
-              SettingPageTabs.misc: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text('Settings', style: TextStyle(color: onBackgroundColor(context))),
-              ),
-              SettingPageTabs.info: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text('Info Bar', style: TextStyle(color: onBackgroundColor(context))),
-              ),
-              SettingPageTabs.status: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text('Status Bar', style: TextStyle(color: onBackgroundColor(context))),
-              ),
-            },
+          middle: SizedBox(
+            width: double.infinity,
+            child: CupertinoSlidingSegmentedControl<SettingPageTabs>(
+              // This represents the currently selected segmented control.
+              groupValue: _selectedSegment,
+              // Callback that sets the selected segmented control.
+              onValueChanged: (SettingPageTabs? value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedSegment = value;
+                  });
+                }
+              },
+              children: <SettingPageTabs, Widget>{
+                SettingPageTabs.misc: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Settings', style: TextStyle(color: onBackgroundColor(context))),
+                ),
+                SettingPageTabs.info: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Info Bar', style: TextStyle(color: onBackgroundColor(context))),
+                ),
+                SettingPageTabs.status: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Status Bar', style: TextStyle(color: onBackgroundColor(context))),
+                ),
+              },
+            ),
           ),
         ),
         child: PageTransitionSwitcher(
