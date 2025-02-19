@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -45,6 +46,9 @@ class HighAlarmSettingsPage extends StatelessWidget {
               SettingsSection(title: const Text('Predictive'), tiles: [
                 smartSnooze(),
               ]),
+              TargetSettingsWidget(
+                targets: const {TargetSettingsWidgetTargets.target},
+              ),
             ],
           );
         },

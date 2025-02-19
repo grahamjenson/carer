@@ -82,60 +82,55 @@ class NavigationButton extends StatefulWidget {
 }
 
 class _NavigationButtonState extends State<NavigationButton> with ThemeMixin {
-  bool selected = false;
-
-  @override
-  initState() {
-    super.initState();
-    selected = currentRoute.value == widget.navigateTo;
-    aeffect(() {
-      setState(() {
-        selected = currentRoute.value == widget.navigateTo;
-      });
-    }, debugLabel: "NavigationButton${widget.label}");
-  }
-
   @override
   Widget build(BuildContext context) {
-    var color = onBackgroundColor(context);
-    if (selected) {
-      color = accentColor(context);
-    }
-    var children = [
-      const Spacer(),
-      Icon(
-        widget.icon,
-        size: 28.0,
-        color: color,
-        fill: 0,
-      ),
-      const SizedBox(height: 4.0),
-      Text(
-        widget.label,
-        style: TextStyle(color: color),
-      ),
-    ];
+    return AWatch(
+      (context) {
+        var selected = currentRoute.value == widget.navigateTo;
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      child: GestureDetector(
-        key: ValueKey("bar_bottom_${widget.label}_$selected"),
-        onTap: () {
-          GoRouter.of(context).go(widget.navigateTo);
-        },
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: selected ? accentColor(context) : Colors.transparent, width: selected ? 2 : 0)),
-            shape: BoxShape.rectangle,
+        var color = onBackgroundColor(context);
+        if (selected) {
+          color = accentColor(context);
+        }
+        var children = [
+          const Spacer(),
+          Icon(
+            widget.icon,
+            size: 28.0,
+            color: color,
+            fill: 0,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: children,
+          const SizedBox(height: 4.0),
+          Text(
+            widget.label,
+            style: TextStyle(color: color),
           ),
-        ),
-      ),
+        ];
+
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: GestureDetector(
+            key: ValueKey("bar_bottom_${widget.label}_$selected"),
+            onTap: () {
+              GoRouter.of(context).go(widget.navigateTo);
+            },
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: selected ? accentColor(context) : Colors.transparent, width: selected ? 2 : 0)),
+                shape: BoxShape.rectangle,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: children,
+              ),
+            ),
+          ),
+        );
+      },
+      debugLabel: "NavigationButton${widget.label}",
+      dependencies: [currentRoute],
     );
   }
 }

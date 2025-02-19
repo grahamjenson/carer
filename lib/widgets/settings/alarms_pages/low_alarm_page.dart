@@ -1,5 +1,6 @@
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/t1d_settings.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -57,6 +58,9 @@ class LowAlarmSettingsPage extends StatelessWidget {
                         (value) => AlarmSettings().lowPredictionMinutes = value),
                   ),
                 ],
+              ),
+              TargetSettingsWidget(
+                targets: const {TargetSettingsWidgetTargets.target},
               ),
             ],
           );

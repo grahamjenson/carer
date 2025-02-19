@@ -1,44 +1,111 @@
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/alarm_alerts_settings.dart';
 import 'package:carer/widgets/settings/alarms_settings.dart';
 import 'package:carer/widgets/settings/snooze_alarms_settings.dart';
 import 'package:carer/widgets/settings/t1d_settings.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
-class AlarmsSettingsPage extends StatelessWidget {
+enum AlarmSettingsPages { alerts, alarms, settings }
+
+class AlarmsSettingsPage extends StatefulWidget {
   const AlarmsSettingsPage({super.key});
+
+  @override
+  State<AlarmsSettingsPage> createState() => _AlarmsSettingsPageState();
+}
+
+class _AlarmsSettingsPageState extends State<AlarmsSettingsPage> with ThemeMixin {
+  var _selectedSegment = AlarmSettingsPages.alarms;
 
   @override
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var sections = [
-          SettingsSection(tiles: [
-            disableAlarms(context),
-          ]),
-          const TargetSettingsWidget(),
-          const AlarmsSettingsWidget(),
-          const AlarmsAlertSettingsWidget(),
-          const SnoozeAlarmsSettings(),
-        ];
-
-        if (AlarmSettings().disableAlarms) {
-          sections = [
+        var alarmsPage = SettingsList(
+          sections: [
             SettingsSection(tiles: [
               disableAlarms(context),
             ]),
-            const TargetSettingsWidget(),
-          ];
+            const AlarmsSettingsWidget(),
+          ],
+        );
+
+        var alertsPage = SettingsList(
+          sections: [
+            SettingsSection(tiles: [
+              disableAlarms(context),
+            ]),
+            const AlarmsAlertSettingsWidget(),
+          ],
+        );
+
+        var settingsPage = SettingsList(
+          sections: [
+            SettingsSection(tiles: [
+              disableAlarms(context),
+            ]),
+            TargetSettingsWidget(),
+            const SnoozeAlarmsSettings(),
+          ],
+        );
+
+        var child = alarmsPage;
+        switch (_selectedSegment) {
+          case AlarmSettingsPages.alarms:
+            child = alarmsPage;
+            break;
+          case AlarmSettingsPages.alerts:
+            child = alertsPage;
+            break;
+          case AlarmSettingsPages.settings:
+            child = settingsPage;
+            break;
         }
+        // AlarmsPage
+
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Alarm Settings'),
-          ),
-          body: SettingsList(
-            sections: sections,
+          appBar: AppBar(title: const Text('Alarms')),
+          body: CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+              automaticallyImplyLeading: false,
+              automaticallyImplyMiddle: false,
+              automaticBackgroundVisibility: false,
+              enableBackgroundFilterBlur: false,
+              backgroundColor: Colors.black,
+              // This Cupertino segmented control has the enum "Sky" as the type.
+              middle: CupertinoSlidingSegmentedControl<AlarmSettingsPages>(
+                // This represents the currently selected segmented control.
+                groupValue: _selectedSegment,
+                // Callback that sets the selected segmented control.
+                onValueChanged: (AlarmSettingsPages? value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedSegment = value;
+                    });
+                  }
+                },
+                children: <AlarmSettingsPages, Widget>{
+                  AlarmSettingsPages.alarms: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text('Alarms', style: TextStyle(color: onBackgroundColor(context))),
+                  ),
+                  AlarmSettingsPages.alerts: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text('Alerting', style: TextStyle(color: onBackgroundColor(context))),
+                  ),
+                  AlarmSettingsPages.settings: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text('Settings', style: TextStyle(color: onBackgroundColor(context))),
+                  ),
+                },
+              ),
+            ),
+            child: Padding(padding: const EdgeInsets.only(top: 0), child: child),
           ),
         );
       },

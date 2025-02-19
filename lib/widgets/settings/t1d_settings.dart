@@ -7,8 +7,16 @@ import 'package:carer/widgets/settings/shared/target_range_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
+enum TargetSettingsWidgetTargets { target, dropRise }
+
 class TargetSettingsWidget extends AbstractSettingsSection with ThemeMixin {
-  const TargetSettingsWidget({super.key});
+  final Set<TargetSettingsWidgetTargets> targets;
+  TargetSettingsWidget(
+      {super.key,
+      this.targets = const {
+        TargetSettingsWidgetTargets.target,
+        TargetSettingsWidgetTargets.dropRise,
+      }});
 
   @override
   Widget build(BuildContext context) {
@@ -18,24 +26,25 @@ class TargetSettingsWidget extends AbstractSettingsSection with ThemeMixin {
 
     return AWatch(
       (context) {
+        // duplicate list to avoid modifying the original
+        var renderTargets = targets.toList();
         if (AlarmSettings().disableAlarms) {
-          // Target and Urgent are still useful even with disabled alarms
-          return SettingsSection(
-            title: const Text('Targets'),
-            tiles: [
-              getTargetSettings(dependencies),
-              getUrgentSettings(dependencies),
-            ],
-          );
+          renderTargets.remove(TargetSettingsWidgetTargets.dropRise);
+        }
+
+        List<SettingsTile> tiles = [];
+        if (renderTargets.contains(TargetSettingsWidgetTargets.target)) {
+          tiles.add(getTargetSettings(dependencies));
+          tiles.add(getUrgentSettings(dependencies));
+        }
+
+        if (renderTargets.contains(TargetSettingsWidgetTargets.dropRise)) {
+          tiles.add(getDropRiseSettings(dependencies));
         }
 
         return SettingsSection(
           title: const Text('Targets'),
-          tiles: [
-            getTargetSettings(dependencies),
-            getUrgentSettings(dependencies),
-            getDropRiseSettings(dependencies),
-          ],
+          tiles: tiles,
         );
       },
       debugLabel: "T1DSettingsWidget",
