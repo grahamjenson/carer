@@ -26,7 +26,7 @@ class BarBottom extends StatelessWidget with ThemeMixin {
         NotchedShape? notchShape;
         if (!AlarmSettings().disableAlarms) {
           // Add gap for floating button
-          children.insert(2, const Flexible(flex: 5, child: SnoozeBarButton()));
+          children.insert(2, const Flexible(flex: 4, child: SnoozeBarButton()));
 
           notchShape = const AutomaticNotchedShape(
             RoundedRectangleBorder(
@@ -104,6 +104,7 @@ class _NavigationButtonState extends State<NavigationButton> with ThemeMixin {
           Text(
             widget.label,
             style: TextStyle(color: color, fontSize: 10),
+            softWrap: false,
           ),
         ];
 

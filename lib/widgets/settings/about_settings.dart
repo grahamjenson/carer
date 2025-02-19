@@ -23,7 +23,7 @@ class AboutSettingsWidget extends AbstractSettingsSection {
                   applicationName: "Carer",
                   applicationVersion: "0.0.1",
                   applicationIcon: const Icon(CarerIcons.SETTINGS_ABOUT),
-                  applicationLegalese: "© 2021 Carer",
+                  applicationLegalese: "© 2025 Carer",
                   children: <Widget>[
                     const Text("Carer is a diabetes management app"),
                   ]);

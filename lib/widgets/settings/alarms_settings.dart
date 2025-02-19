@@ -48,7 +48,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile.navigation(
       title: Text(alarmType.title),
       leading: Icon(alarmType.icon, color: iconColor),
-      description: Text(alarmType.description),
+      description: Flexible(child: Text(alarmType.description)),
       descriptionInlineIos: true,
       onPressed: (context) => GoRouter.of(context).go(page),
     );

@@ -44,9 +44,9 @@ class TempTargetSettingsModel {
     var top = getHigh();
     int duration = getDuration();
     Unit unit = UISettings().unit;
-    String description = "${unit.str(bot)}-${unit.strWithUnit(top)} for $duration mins";
+    String description = "${unit.str(bot)}-${unit.strWithUnit(top)}\nfor $duration mins";
     if (unit.str(bot) == unit.str(top)) {
-      description = "${unit.strWithUnit(bot)} for $duration mins";
+      description = "${unit.strWithUnit(bot)}\nfor $duration mins";
     }
     return description;
   }
@@ -219,7 +219,10 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
     }
 
     return SettingsTile(
-      title: Text(e.description),
+      title: Text(
+        e.description,
+        softWrap: false,
+      ),
       trailing: animations(trailing),
       onPressed: onPressed,
     );
@@ -257,21 +260,19 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
     };
 
     Widget trailing = SizedBox(
+      width: 170,
       key: ValueKey("care_add_temptarget_$name"),
-      width: 220,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            "${e.description} ",
-            style: TextStyle(
-              color: onBackgroundColor(context).dim,
-              fontSize: 12,
-            ),
-          ),
-          callToAction(context, "Set")
-        ],
-      ),
+      child: callToAction(context, "Set"),
+    );
+
+    var dimStyle = TextStyle(
+      color: onBackgroundColor(context).dim,
+      fontSize: 10,
+    );
+
+    Widget? description = Text(
+      e.description,
+      style: dimStyle,
     );
 
     if (_editing) {
@@ -279,41 +280,52 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
 
       trailing = SizedBox(
           key: ValueKey("care_edit_temptarget_$name"),
-          width: 250,
+          width: 170,
           child: Row(
             children: [
-              const Text("Target "),
-              PlusMinusText(
-                getStr: (double val) => UISettings().unit.str(val),
-                fromStr: (String str) => UISettings().unit.fromStr(str),
-                getValue: () => e.getLow(),
-                setValue: (double val) => e.setLow(val),
-                dependencies: const [],
-              ),
-              const Text("-"),
-              PlusMinusText(
-                getStr: (double val) => UISettings().unit.str(val),
-                fromStr: (String str) => UISettings().unit.fromStr(str),
-                getValue: () => e.getHigh(),
-                setValue: (double val) => e.setHigh(val),
-                dependencies: const [],
-              ),
+              Column(children: [
+                Text("Target ", style: dimStyle),
+                Row(children: [
+                  PlusMinusText(
+                    getStr: (double val) => UISettings().unit.str(val),
+                    fromStr: (String str) => UISettings().unit.fromStr(str),
+                    getValue: () => e.getLow(),
+                    setValue: (double val) => e.setLow(val),
+                    dependencies: const [],
+                  ),
+                  Text("-", style: dimStyle),
+                  PlusMinusText(
+                    getStr: (double val) => UISettings().unit.str(val),
+                    fromStr: (String str) => UISettings().unit.fromStr(str),
+                    getValue: () => e.getHigh(),
+                    setValue: (double val) => e.setHigh(val),
+                    dependencies: const [],
+                  ),
+                ]),
+              ]),
               const Spacer(),
-              const Text("Time "),
-              PlusMinusText(
-                getStr: (double val) => val.toInt().toString(),
-                fromStr: (String str) => double.tryParse(str),
-                getValue: () => e.getDuration().toDouble(),
-                setValue: (double val) => e.setDuration(val.toInt()),
-                dependencies: const [],
+              Column(
+                children: [
+                  Text("Time ", style: dimStyle),
+                  PlusMinusText(
+                    getStr: (double val) => val.toInt().toString(),
+                    fromStr: (String str) => double.tryParse(str),
+                    getValue: () => e.getDuration().toDouble(),
+                    setValue: (double val) => e.setDuration(val.toInt()),
+                    dependencies: const [],
+                  ),
+                ],
               ),
             ],
           ));
     }
 
     return SettingsTile(
-      title: Text(name),
+      title: Text(
+        name,
+      ),
       descriptionInlineIos: true,
+      description: description,
       trailing: animations(trailing),
       onPressed: onPressed,
     );
@@ -326,11 +338,11 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
       duration: const Duration(milliseconds: 200),
       child: child,
       transitionBuilder: (child, animation, secondaryAnimation) {
-        var offset = const Offset(0, -1.5);
+        var offset = const Offset(1.5, 0);
         var soffset = const Offset(1.5, 0);
         if (_editing) {
           offset = const Offset(1.5, 0);
-          soffset = const Offset(0, -1.5);
+          soffset = const Offset(1.5, 0);
         }
         var slideAnimation = animation.drive(
           Tween<Offset>(

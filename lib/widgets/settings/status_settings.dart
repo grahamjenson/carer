@@ -58,7 +58,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
       },
       descriptionInlineIos: true,
       title: Text(status.title),
-      description: SmartText(texts: ["${status.description}\n", status.status], styles: [descriptionStyle, statusStyle]),
+      description: Flexible(child: SmartText(texts: ["${status.description}\n", status.status], styles: [descriptionStyle, statusStyle])),
       leading: Icon(status.icon, color: iconColor),
     );
   }

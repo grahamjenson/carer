@@ -41,7 +41,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
             SettingsTile.switchTile(
               title: const Text('Keep Screen Active'),
               descriptionInlineIos: true,
-              description: keepScreenActiveDescript,
+              description: Flexible(child: keepScreenActiveDescript),
               initialValue: UISettings().screenActive,
               onToggle: (value) async {
                 if (value) {

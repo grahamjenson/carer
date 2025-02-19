@@ -67,8 +67,11 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     return SettingsTile.switchTile(
       title: const Text("Flash on Alarm"),
       descriptionInlineIos: true,
-      description: const Text(
-        "Flashs the screen white when an alarming",
+      description: const Flexible(
+        child: Text(
+          "Flashs the screen white when an alarming",
+          softWrap: true,
+        ),
       ),
       initialValue: AlarmAlertSettings().enableFlashOnAlarm,
       onToggle: (bool value) {
@@ -81,8 +84,10 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     return SettingsTile.switchTile(
       title: const Text("Notifications"),
       descriptionInlineIos: true,
-      description: const Text(
-        "Notifications every 15 mintues if alarming (DANGER unreliable)",
+      description: const Flexible(
+        child: Text(
+          "Notifications every 15 mintues if alarming (DANGER unreliable)",
+        ),
       ),
       initialValue: AlarmAlertSettings().enableNotifications,
       onToggle: (bool value) {

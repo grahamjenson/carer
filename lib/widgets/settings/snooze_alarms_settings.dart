@@ -33,8 +33,10 @@ class SnoozeAlarmsSettings extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile.switchTile(
       title: const Text("Stop Snoozing When In Range"),
       descriptionInlineIos: true,
-      description: const Text(
-        "Stop Snoozing after 20 minutes in range",
+      description: const Flexible(
+        child: Text(
+          "Stop Snoozing after 20 minutes in range",
+        ),
       ),
       initialValue: AlarmAlertSettings().enableWakeUpInRange,
       onToggle: (bool value) {
@@ -47,8 +49,10 @@ class SnoozeAlarmsSettings extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile.switchTile(
       title: const Text("Stop Snoozing With Urgent Alarm"),
       descriptionInlineIos: true,
-      description: const Text(
-        "Stop Snoozing for Urgent Alarms\nUrgent High, Urgent Low and No Data\nSnoozing an Urgent Alarm will snooze",
+      description: const Flexible(
+        child: Text(
+          "Stop Snoozing for Urgent Alarms\nUrgent High, Urgent Low and No Data\nSnoozing an Urgent Alarm will snooze",
+        ),
       ),
       initialValue: AlarmAlertSettings().enableWakeUpWhenUrgent,
       onToggle: (bool value) {
