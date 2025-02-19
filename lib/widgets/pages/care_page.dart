@@ -6,13 +6,10 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
-import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
-import 'package:carer/widgets/settings/shared/settings_slider.dart';
-import 'package:carer/widgets/settings/shared/target_range_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +25,7 @@ class CarbsSettingsModel {
 
   CarbsSettingsModel(this.getCarbs, this.setCarbs);
 
-  String get description => "Add ${getCarbs()}g Carb";
+  String get description => "${getCarbs()}g Carb";
 }
 
 class TempTargetSettingsModel {
@@ -118,11 +115,11 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
   Widget build(BuildContext context) {
     var sections = SettingsList(sections: [
       SettingsSection(
-        title: const Text('Carbs'),
+        title: const Text('Add Carbs'),
         tiles: allCarbs.map((e) => carbsActionTile(context, e)).toList(),
       ),
       SettingsSection(
-        title: const Text('Temp Targets'),
+        title: const Text('Set Temp Target'),
         tiles: allTempTargets.map((e) => tempTargetSections(context, e)).toList(),
       )
     ]);
@@ -153,8 +150,11 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
 
     return SizedBox(
       width: 100,
-      child: IconButton(
-        icon: actionText,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor(context).dim,
+        ),
+        child: actionText,
         onPressed: () {
           setState(() {
             _editing = !_editing;
@@ -197,7 +197,7 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
       }
     };
 
-    Widget trailing = SizedBox(key: ValueKey("care_add_carbs_$carbs"), width: 60, child: plusIcon(context));
+    Widget trailing = SizedBox(key: ValueKey("care_add_carbs_$carbs"), width: 60, child: callToAction(context, "Add"));
     if (_editing) {
       trailing = SizedBox(
         key: ValueKey("care_edit_carbs_$carbs"),
@@ -229,46 +229,6 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
   // TempTargets
   ////
 
-  List<SettingsSection> getTempTargetEdit(TempTargetSettingsModel e) {
-    return [
-      SettingsSection(
-        title: Text(e.name),
-        tiles: [
-          SettingsTile(
-            title: Text(e.name),
-            description: Text(e.description),
-            descriptionInlineIos: true,
-          ),
-          SettingsTile(
-            title: TargetRangeSlider(
-              title: "Range",
-              getLow: () => e.getLow(),
-              getHigh: () => e.getHigh(),
-              setLow: (double val) => e.setLow(val),
-              setHigh: (double val) => e.setHigh(val),
-              getStr: (double val) => UISettings().unit.str(val),
-              fromStr: (String str) => UISettings().unit.fromStr(str),
-              minRange: 72,
-              maxRange: 180,
-              dependencies: const [],
-            ),
-          ),
-          SettingsTile(
-            title: SettingsSlider(
-              title: "Duration",
-              getValue: () => e.getDuration().toDouble(),
-              setValue: (double val) => e.setDuration(val.toInt()),
-              minRange: 1,
-              maxRange: 120,
-              divisions: 24,
-              dependencies: const [],
-            ),
-          ),
-        ],
-      )
-    ];
-  }
-
   SettingsTile tempTargetSections(BuildContext context, TempTargetSettingsModel e) {
     var name = e.name;
     var bottom = e.getLow();
@@ -286,7 +246,7 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
             ToastService().showSuccess("Temp Target ${e.description}");
             UpdateService().nsTreatmentUpdater.addExternalReason("Added Temp Target");
           } else {
-            ToastService().showError("Failed to set TempTarget");
+            ToastService().showError("Failed to set Temp Target");
           }
         });
 
@@ -298,10 +258,19 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
 
     Widget trailing = SizedBox(
       key: ValueKey("care_add_temptarget_$name"),
-      width: 250,
+      width: 220,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [Text("${e.description} "), plusIcon(context)],
+        children: [
+          Text(
+            "${e.description} ",
+            style: TextStyle(
+              color: onBackgroundColor(context).dim,
+              fontSize: 12,
+            ),
+          ),
+          callToAction(context, "Set")
+        ],
       ),
     );
 
@@ -389,18 +358,24 @@ class _CarePageState extends State<CarePage> with ThemeMixin {
     );
   }
 
-  Widget plusIcon(BuildContext context) {
+  Widget callToAction(BuildContext context, String action) {
     return Align(
-        alignment: Alignment.centerRight,
-        child: Container(
-          decoration: BoxDecoration(
-            color: onBackgroundColor(context),
-            borderRadius: BorderRadius.circular(5),
+      alignment: Alignment.centerRight,
+      child: Container(
+        height: 30,
+        width: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: backgroundColor(context),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: InkWell(
+            onTap: null,
+            child: Text(action, style: TextStyle(color: accentColor(context), fontSize: 16)),
           ),
-          child: Icon(
-            CarerIcons.CARE_ADD,
-            color: backgroundColorShade(context),
-          ),
-        ));
+        ),
+      ),
+    );
   }
 }
