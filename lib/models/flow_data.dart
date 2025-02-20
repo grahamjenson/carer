@@ -47,6 +47,7 @@ class FlowData {
   }
 
   // Getters
+  // minDateTime is used to invalidate the agreement if the terms change
   static DateTime minDateTime = DateTime(2024);
 
   DateTime? get agreedPrivacyPolicy {

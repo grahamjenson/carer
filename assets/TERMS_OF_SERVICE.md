@@ -1,6 +1,4 @@
 # CARER TERMS OF SERVICE
-Last Updated 29th November 2024
-
 We are T1DNZ ('Company', 'Owner', 'we', 'us', or 'our').
 
 We operate the mobile application Carer (the 'App'), as well as any other related products and services that refer or link to these legal terms (the 'Legal Terms') (collectively, the 'Services'). We refer to you, and any other person who you use the app on behalf of, as a "User".
@@ -10,8 +8,6 @@ You can contact us by email at **tos@t1d.nz**
 These Legal Terms constitute a legally binding agreement made between you, whether personally or on behalf of an entity ('you'), and T1DNZ, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.
 
 Supplemental terms and conditions or documents that may be posted on the Services from time to time are hereby expressly incorporated herein by reference. We reserve the right, in our sole discretion, to make changes or modifications to these Legal Terms from time to time. We will alert you about any changes by updating the 'Last updated' date of these Legal Terms, and you waive any right to receive specific notice of each such change. It is your responsibility to periodically review these Legal Terms to stay informed of updates. You will be subject to, and will be deemed to have been made aware of and to have accepted, the changes in any revised Legal Terms by your continued use of the Services after the date such revised Legal Terms are posted.
-
-The Services are intended for users who are at least 18 years old. Persons under the age of 18 are not permitted to use or register for the Services.
 
 ## 1. IT IS NOT A MEDICAL OR HEALCARE SERVICE
 
@@ -108,3 +104,7 @@ The Services are intended for users who are at least 18 years old. Persons under
 
 In order to resolve a complaint regarding the Services or to receive further information regarding use of the Services, please contact us at:
 T1DNZ **tos@t1d.nz**
+
+
+## Version
+Last Changed - 2025-20-2
