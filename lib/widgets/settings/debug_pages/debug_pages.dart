@@ -91,8 +91,8 @@ class DebugSettingsPage extends StatelessWidget {
           title: const Text("Reset Onboarding Data"),
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
-            FlowData().agreedPrivacyPolicy = null;
-            FlowData().agreedTermsOfService = null;
+            FlowData().agreedTermsOfServicePrivacy = null;
+
             GoRouter.of(context).refresh();
           },
         ),
@@ -101,6 +101,7 @@ class DebugSettingsPage extends StatelessWidget {
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             SecureSettings().debugDeleteNSValues();
+            GoRouter.of(context).refresh();
           },
         ),
       ],

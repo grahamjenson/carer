@@ -15,22 +15,14 @@ class DocumentsSettingsWidget extends AbstractSettingsSection {
       title: const Text('Documents'),
       tiles: [
         SettingsTile.navigation(
-          title: const Text("Terms of Service"),
+          title: const Text("Terms of Service & Privacy Policy"),
           descriptionInlineIos: true,
-          description: Text("Agreed on ${_formatDate(FlowData().agreedTermsOfService)}"),
+          description: Text("Agreed on ${_formatDate(FlowData().agreedTermsOfServicePrivacy)}"),
           leading: const Icon(CarerIcons.SETTINGS_TERMS_OF_SERVICE),
           onPressed: (BuildContext context) async {
             await showDocument(context, "Terms of Service", StringAssets().termsOfService);
           },
         ),
-        SettingsTile.navigation(
-            title: const Text("Privacy Policy"),
-            leading: const Icon(CarerIcons.SETTINGS_PRIVACY_POLICY),
-            descriptionInlineIos: true,
-            description: Text("Agreed on ${_formatDate(FlowData().agreedPrivacyPolicy)}"),
-            onPressed: (context) async {
-              await showDocument(context, "Privacy Policy", StringAssets().privacyPolicy);
-            }),
       ],
     );
   }

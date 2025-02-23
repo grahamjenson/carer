@@ -94,8 +94,8 @@ class SecureSettings {
   }
 
   debugDeleteNSValues() {
-    nightscoutURL = null;
-    nightscoutToken = null;
+    _signals[_SSNames.nightscoutToken]!.value = null;
+    _signals[_SSNames.nightscoutUrl]!.value = null;
     store.delete(key: _SSNames.nightscoutUrl.name);
     store.delete(key: _SSNames.nightscoutToken.name);
   }

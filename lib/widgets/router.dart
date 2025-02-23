@@ -5,7 +5,9 @@
 //   initialRoute = const IntroductionPage();
 // }
 
+import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/app_lifecycle_service.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/alarms/flashing_widget.dart';
@@ -15,7 +17,8 @@ import 'package:carer/widgets/pages/alarm_settings_page.dart';
 import 'package:carer/widgets/pages/care_page.dart';
 import 'package:carer/widgets/pages/display_page.dart';
 import 'package:carer/widgets/pages/events_page.dart';
-import 'package:carer/widgets/pages/introduction_page.dart';
+import 'package:carer/widgets/pages/intro/agreements_page.dart';
+import 'package:carer/widgets/pages/intro/ns_url_page.dart';
 import 'package:carer/widgets/pages/settingspage.dart';
 import 'package:carer/widgets/settings/alarms_pages/battery_alarm_page.dart';
 import 'package:carer/widgets/settings/alarms_pages/fast_fall_alarm_page.dart';
@@ -203,12 +206,34 @@ GoRouter getRouter() {
     navigatorKey: rootNavigatorKey,
     initialLocation: "/display",
     redirect: (BuildContext context, GoRouterState state) {
-      if (IntroductionPage.needsOnboarding()) {
-        return '/intro';
+      if (FlowData().agreedTermsOfServicePrivacy == null) {
+        return '/agreements';
+      }
+
+      if (!SecureSettings().nightscoutURLAndTokenSet()) {
+        return '/ns_setup';
       }
       return null;
     },
     routes: <RouteBase>[
+      ShellRoute(
+        pageBuilder: (BuildContext context, GoRouterState state, Widget child) {
+          return CustomTransitionPage(
+            child: child,
+            transitionsBuilder: (context, animation, secondaryAnimation, child) => Scaffold(body: child),
+          );
+        },
+        routes: [
+          GoRoute(
+            path: '/agreements',
+            builder: (context, state) => const AgreementsPage(),
+          ),
+          GoRoute(
+            path: '/ns_setup',
+            builder: (context, state) => const NSSetupPage(),
+          ),
+        ],
+      ),
       ShellRoute(
         navigatorKey: shellNavigatorKey,
         pageBuilder: (BuildContext context, GoRouterState state, Widget child) {
@@ -230,7 +255,7 @@ GoRouter getRouter() {
           //final extra = state.extra; - might need this at some point
 
           return CustomTransitionPage(
-              child: child,
+              child: childStack,
               transitionDuration: const Duration(milliseconds: transitionTime),
               reverseTransitionDuration: const Duration(milliseconds: transitionTime),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -255,7 +280,7 @@ GoRouter getRouter() {
                   opacity: fadeAnimation,
                   child: FadeTransition(
                     opacity: secondaryFadeAnimation,
-                    child: childStack,
+                    child: child,
                   ),
                 );
               });
@@ -340,12 +365,6 @@ GoRouter getRouter() {
             ],
           ),
         ],
-      ),
-      GoRoute(
-        path: '/intro',
-        builder: (BuildContext context, GoRouterState state) {
-          return const IntroductionPage();
-        },
       ),
       GoRoute(
         path: '/snooze',
