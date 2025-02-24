@@ -100,25 +100,25 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos
 
 SPEC CHECKSUMS:
-  audioplayers_darwin: dcad41de4fbd0099cb3749f7ab3b0cb8f70b810c
-  battery_plus: 922e3d9686072259c8fbce6c4238561f769990ae
-  cupertino_http: 947a233f40cfea55167a49f2facc18434ea117ba
-  desktop_window: fb7c4f12c1129f947ac482296b6f14059d57a3c3
-  flutter_local_notifications: 7062189aabf7f50938a7b8b6614ffa97656eb0bf
-  flutter_secure_storage_macos: c2754d3483d20bb207bb9e5a14f1b8e771abcdb9
-  flutter_volume_controller: 25d09126b0d695560f11c80b1311d5063fed882f
+  audioplayers_darwin: 761f2948df701d05b5db603220c384fb55720012
+  battery_plus: 2d51ddb1dfb011e28b0d78918ff9ab1659f30d80
+  cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
+  desktop_window: de6acd6053564bdccd9f4b9473d25bf4f2ad9bdf
+  flutter_local_notifications: 13862b132e32eb858dea558a86d45d08daeacfe7
+  flutter_secure_storage_macos: 7f45e30f838cf2659862a4e4e3ee1c347c2b3b54
+  flutter_volume_controller: ae08bf0838e4901f299781c3ab5056dfab0c2f74
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  objective_c: e5f8194456e8fc943e034d1af00510a1bc29c067
-  package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  screen_brightness_macos: 2d6d3af2165592d9a55ffcd95b7550970e41ebda
+  objective_c: ec13431e45ba099cb734eb2829a5c1cd37986cba
+  package_info_plus: f0052d280d17aa382b932f399edf32507174e870
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  screen_brightness_macos: 2a3ee243f8051c340381e8e51bcedced8360f421
   Sentry: 1fe34e9c2cbba1e347623610d26db121dcb569f1
-  sentry_flutter: a39c2a2d67d5e5b9cb0b94a4985c76dd5b3fc737
-  share_plus: 36537c04ce0c3e3f5bd297ce4318b6d5ee5fd6cf
-  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
-  wakelock_plus: 4783562c9a43d209c458cb9b30692134af456269
+  sentry_flutter: e24b397f9a61fa5bbefd8279c3b2242ca86faa90
+  share_plus: 11c7b7fa7020465584eca3ff6392c5bc1e399d6e
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
+  wakelock_plus: 21ddc249ac4b8d018838dbdabd65c5976c308497
 
 PODFILE CHECKSUM: 9ebaf0ce3d369aaa26a9ea0e159195ed94724cf3
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

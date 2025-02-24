@@ -1,4 +1,4 @@
-# Carer Privacy Policy 
+# PRIVACY POLICY
 In order to receive information about your Personal Data, the purposes and the parties the Data is shared with, contact the Owner.
 
 Owner contact email: **privacy@t1d.nz**
@@ -9,7 +9,7 @@ The owner does not provide a list of Data types or Data collected. Personal Data
 
 Any use of tracking tools by this Application or by the owners of third-party services used by this Application serves the purpose of providing the Service required by the User, in addition to any other purposes described in the present document.
 
-Users are responsible for any third-party Personal Data obtained, published or shared through this Application and confirm that they have the third party's consent to provide the Data to the Owner.
+Users are responsible for any third-party Personal Data obtained through this Application and confirm that they have the third party's consent to provide the Data to the Owner.
 
 ## Methods of Processing
 
@@ -31,7 +31,7 @@ The Owner may process Personal Data relating to Users if one of the following ap
 
 The Data is processed at the Owner's operating offices and in any other places where the parties involved in the processing are located.
 
-Depending on the User's location, data transfers may involve transferring the User's Data to a country other than their own. If any such transfer takes place, Users can find out more by checking the relevant sections of this document.
+Depending on the User's location, data transfers may involve transferring the User's Data to a country other than their own.
 
 ## Retention Time
 
@@ -40,7 +40,7 @@ Personal Data shall be processed and stored for as long as required by the purpo
 Therefore:
 
 1. Personal Data collected for purposes related to the performance of a contract between the Owner and the User shall be retained until such contract has been fully performed.
-2. Personal Data collected for the purposes of the Owner’s legitimate interests shall be retained as long as needed to fulfill such purposes. Users may find specific information regarding the legitimate interests pursued by the Owner within the relevant sections of this document.
+2. Personal Data collected for the purposes of the Owner’s legitimate interests shall be retained as long as needed to fulfill such purposes.
 
 The Owner may be allowed to retain Personal Data for a longer period whenever the User has given consent to such processing, as long as such consent is not withdrawn. Furthermore, the Owner may be obliged to retain Personal Data for a longer period whenever required to do so for the performance of a legal obligation or upon order of an authority.
 
@@ -86,5 +86,7 @@ The Owner reserves the right to make changes to this privacy policy at any time 
 
 Should the changes affect processing activities performed on the basis of the User’s consent, the Owner shall collect new consent from the User, where required.
 
+Owner contact email: **privacy@t1d.nz**
+
 ## Version
-Last Changed - 2025-20-2
+Last Changed - 2025-24-2
