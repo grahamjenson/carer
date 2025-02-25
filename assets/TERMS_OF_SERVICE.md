@@ -36,13 +36,13 @@ Supplemental terms and conditions or documents that may be posted on the Service
 
 4.1 We are not responsible for third-party matters. Without limiting the provisions of this Agreement or expanding the scope of our responsibilities, is not responsible for outages or defects in power, telecommunications, computers, Smart Devices, third party software and any other event outside of our  direct control.
 
-4.2 In no event will we or our directors, employees, or agents be liable to you or any third party for any direct, indirect, consequential, exemplary, incidental, special, or punitive damages, including lost profit, lost revenue, loss of data, or other damages arising from your use of the Services, even if we have been advised of the possibility of such damages.
+4.2 In no event will T1DNZ be liable to you or any third party for any direct, indirect, consequential, exemplary, incidental, special, or punitive damages, including lost profit, lost revenue, loss of data, or other damages arising from your use of the Services, even if we have been advised of the possibility of such damages.
 
 ## 5. TERM AND TERMINATION
 
 5.1 These Legal Terms shall remain in full force and effect while you use the Services. Without limiting any other provision of these legal terms, we reserve the right to, in our sole discretion and without notice or liability, deny access to and use of the Services (including blocking certain ip addresses), to any person for any reason or for no reason, including without limitation for breach of any representation, warranty, or covenant contained in these legal terms or of any applicable law or regulation. We may terminate your use or participation in the Services or delete any content or information that you posted at any time, without warning, in our sole discretion.
 
-5.2 If we terminate or suspend your account for any reason, you are prohibited from registering and creating a new account under your name, a fake or borrowed name, or the name of any third party, even if you may be acting on behalf of the third party. In addition to terminating or suspending your account, we reserve the right to take appropriate legal action, including without limitation pursuing civil, criminal, and injunctive redress.
+5.2 If we terminate or suspend your account for any reason, you are prohibited from registering and creating a new account, even if you may be acting on behalf of the third party. In addition to terminating or suspending your account, we reserve the right to take appropriate legal action, including without limitation pursuing civil, criminal, and injunctive redress.
 
 
 ## 6. MODIFICATIONS AND INTERRUPTIONS
@@ -107,4 +107,4 @@ T1DNZ **tos@t1d.nz**
 
 
 ## Version
-Last Changed - 2025-20-2
+Last Changed - 2025-25-2

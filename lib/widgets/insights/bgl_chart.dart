@@ -365,7 +365,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   SideTitles bottomTitleWidgets(BuildContext context) {
     bool showTime = false;
     int showTimeHours = 1;
-    if (chartHoursAgo >= 6) {
+    if (chartHoursAgo >= 3) {
       showTime = true;
 
       if (_chartMinsAgo.value > 1000) {
