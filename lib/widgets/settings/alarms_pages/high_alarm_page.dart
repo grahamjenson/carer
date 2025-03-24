@@ -62,7 +62,7 @@ class HighAlarmSettingsPage extends StatelessWidget {
       title: const Text("Smart Snooze"),
       descriptionInlineIos: true,
       description: const Text(
-        "Snooze Alarm when predicticed to be in range in 10 minutes",
+        "Snooze if in range in 10 minutes",
       ),
       initialValue: AlarmSettings().smartSnoozeHigh,
       onToggle: (bool value) {

@@ -39,3 +39,8 @@ For the alarms to work the app has to be active. So you can enable a screen lock
 Have a look at www.nightscout.info for more information about how to setup your own Nightscout backend.
 
 #wearenotwaiting
+
+Your values at a glance
+Access to your nightscout site
+Night mode, extra readability
+Configurable alarms
