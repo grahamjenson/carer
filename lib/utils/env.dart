@@ -10,4 +10,6 @@ abstract class Env {
   static bool profileOn = isDev;
 
   static bool catchErrors = isTest;
+
+  static String version = '0.0.1';
 }

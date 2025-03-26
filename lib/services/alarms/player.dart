@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
@@ -186,14 +187,24 @@ class VolumeProgressionController {
   }
 
   Future<void> saveOriginalVolume() async {
-    _originalVolume = await FlutterVolumeController.getVolume();
-    alog("VolumeProgressionController STORE VOLUME = $_originalVolume");
+    var (oV, err) = await go(FlutterVolumeController.getVolume());
+    if (oV != null) {
+      _originalVolume = oV;
+      alog("VolumeProgressionController STORE VOLUME = $_originalVolume");
+    } else {
+      _originalVolume = null;
+      alog("VolumeProgressionController ERROR SAVING VOLUME = $err");
+    }
   }
 
   Future<void> resetOriginalVolume() async {
     if (_originalVolume != null) {
-      alog("VolumeProgressionController RESET VOLUME? = $_originalVolume");
-      await FlutterVolumeController.setVolume(_originalVolume!);
+      var (_, err) = await go(FlutterVolumeController.setVolume(_originalVolume!));
+      if (err != null) {
+        alog("VolumeProgressionController ERROR SETTING VOLUME = $err");
+      } else {
+        alog("VolumeProgressionController RESET VOLUME? = $_originalVolume");
+      }
     }
     _originalVolume = null;
   }

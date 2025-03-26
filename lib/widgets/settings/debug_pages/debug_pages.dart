@@ -1,51 +1,16 @@
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
 import 'package:carer/models/flow_data.dart';
 import 'package:carer/services/background_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/secure_settings.dart';
+import 'package:carer/services/share_file_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
-import 'package:carer/services/update_service.dart';
-import 'package:carer/sql/carer_db.dart';
-import 'package:carer/sql/key_value_store.dart';
-import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/logs.dart';
-import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-
-Future<void> zipAndShare(List<String> filePaths, String zipFileName) async {
-  // Create a zip file from the list of files
-  var encoder = ZipFileEncoder();
-  String tempDir = (await getTemporaryDirectory()).path;
-  String zipFilePath = '$tempDir/$zipFileName.zip';
-  encoder.create(zipFilePath);
-  for (String path in filePaths) {
-    encoder.addFile(File(path));
-  }
-  encoder.close();
-
-  alog("Zip File location $zipFilePath");
-
-  // Share the zip file
-  final result = await Share.shareXFiles([XFile(zipFilePath)]);
-  if (result.status == ShareResultStatus.success) {
-    alog('Files shared successfully');
-  }
-}
-
-Future<String> writeFile(String contents, String name) async {
-  final directory = await getTemporaryDirectory(); // Use getApplicationDocumentsDirectory() for persistent storage
-  final logFile = File('${directory.path}/$name');
-  await logFile.writeAsString(contents, mode: FileMode.append);
-  return logFile.path;
-}
 
 class DebugSettingsPage extends StatelessWidget {
   const DebugSettingsPage({super.key});
@@ -161,20 +126,8 @@ class DebugSettingsPage extends StatelessWidget {
           title: const Text("Share Debug Files"),
           descriptionInlineIos: true,
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
-          onPressed: (context) async {
-            List<String> paths = [];
-
-            // Add main DB and KV DB
-            paths.add(await CarerDB.getPath());
-            paths.add(await KeyValueStore.getPath());
-            paths.add(await LogDB.getPath());
-
-            // Add the last raw value from all updaters
-            for (var updater in UpdateService().updaters) {
-              paths.add(await writeFile(updater.raw, "${updater.runtimeType.toString()}.json"));
-            }
-
-            zipAndShare(paths, "carer_debug_${clock.now().millisecondsSinceEpoch}");
+          onPressed: (BuildContext context) async {
+            ShareFileService().shareFiles();
           },
         ),
       ],

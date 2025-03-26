@@ -57,7 +57,8 @@ class CarerIcons {
   static const IconData SETTINGS_TERMS_OF_SERVICE = UniconsLine.document_info;
   static const IconData SETTINGS_PRIVACY_POLICY = UniconsLine.document_info;
   static const IconData SETTINGS_ABOUT = UniconsLine.info_circle;
-  static const IconData SETTINGS_DEBUG = UniconsLine.bug;
+  static const IconData SETTINGS_CONTACT = UniconsLine.envelope;
+  static const IconData SETTINGS_DEBUG = UniconsLine.share;
   static const IconData SETTINGS_PLUS = UniconsLine.plus;
   static const IconData SETTINGS_MINUS = UniconsLine.minus;
   static const IconData SETTINGS_VOLUME_DOWN = UniconsLine.volume_down;
