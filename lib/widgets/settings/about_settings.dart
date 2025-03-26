@@ -52,7 +52,7 @@ class AboutSettingsWidget extends AbstractSettingsSection {
           },
         ),
         SettingsTile.navigation(
-          title: const Text("Share Files"),
+          title: const Text("Share All Data"),
           description: const Text("Send to contact@t1d.nz"),
           descriptionInlineIos: true,
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
