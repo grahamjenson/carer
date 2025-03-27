@@ -17,7 +17,7 @@ class BrightnessAlert {
       started = true;
       alog("BRIGHTNESS: SET 1.0");
 
-      await ScreenBrightness().setScreenBrightness(1.0);
+      await ScreenBrightness().setApplicationScreenBrightness(1.0);
     } catch (e) {
       throw 'BRIGHTNESS Alarm: Failed to set brightness';
     }
@@ -28,7 +28,7 @@ class BrightnessAlert {
       started = false;
       alog("BRIGHTNESS: RESET");
 
-      ScreenBrightness().resetScreenBrightness();
+      ScreenBrightness().resetApplicationScreenBrightness();
     }
   }
 }

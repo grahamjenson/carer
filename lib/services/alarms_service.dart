@@ -68,6 +68,7 @@ class AlarmsService {
     // When there is an alaerting alarm we can fix this.
     aeffect(
       () async {
+        // is Checking alarms is a simple lock to stop multiple calls
         if (isCheckingAlarms) {
           return false;
         }

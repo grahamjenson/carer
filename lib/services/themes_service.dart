@@ -1,4 +1,5 @@
 import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/timer_service.dart';
@@ -87,15 +88,22 @@ class ThemeService {
 
   ThemeData get theme => themeSignal.value;
   static ThemeData selectTheme() {
+    // If alarming then normal theme
     if (AlarmsService().alertingAlarms.value.isNotEmpty) {
       return normalTheme;
     }
 
-    if (TimeSettings().isNight() && UISettings().enableDim) {
-      return dimTheme;
-    } else {
+    // If the App has just been opened then normal theme
+    if (AppLifecycleService().stateRecentlyChanged) {
       return normalTheme;
     }
+
+    // If night and UI settings then dim theme
+    if (TimeSettings().isNight() && UISettings().enableDim) {
+      return dimTheme;
+    }
+
+    return normalTheme;
   }
 }
 
