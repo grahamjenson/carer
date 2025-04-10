@@ -10,6 +10,7 @@ import 'package:carer/services/alarms/player.dart';
 import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/settings/time_settings.dart';
 import 'package:carer/services/timer_service.dart';
@@ -141,15 +142,24 @@ class AlarmsService {
   }
 
   (AlarmSet, AlarmSet) calculateAlarms() {
+    var nightscoutNotConnected = !SecureSettings().nightscoutURLAndTokenSet();
+
+    // If the app has only recently been resumed we give it time to warm up
+
+    var recentlyOpened = AppLifecycleService().wasResumed10SecondsAgo;
+
+    // Dont even Calculate alarms if Nightscout is not connected
+    if (nightscoutNotConnected || recentlyOpened) {
+      return (AlarmSet({}), AlarmSet({}));
+    }
+
     Set<AlarmType> newPendingAlarms = {};
     Set<AlarmType> newActiveAlarms = {};
 
     var notSnoozing = AlarmAlertSettings().snoozeDuration == null;
     var allAlarmsEnabled = !AlarmSettings().disableAlarms;
 
-    // If the app has only recently been resumed or a screen changed, we wipe all the active alarms
-    // because we want to give the app some time ot "warm up" and if the user is doing something give them time to finish
-    var notRecentChange = !(AppLifecycleService().wasResumed10SecondsAgo || AppLifecycleService().wasRecentlyScreenChanged);
+    var notRencentScreenChange = !AppLifecycleService().wasRecentlyScreenChanged;
 
     for (var alarm in AlarmType.values) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
@@ -166,8 +176,8 @@ class AlarmsService {
       // 3. Alarm is Active
       // 4. App is Not snoozing
       // 5. Alarm is not smart snoozing
-      // 6. App has not recently changed screens or resumed
-      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRecentChange;
+      // 6. App has not recently changed screen
+      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRencentScreenChange;
 
       if (addToActive) {
         newActiveAlarms.add(alarm);
