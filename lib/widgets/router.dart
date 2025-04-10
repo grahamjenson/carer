@@ -14,6 +14,7 @@ import 'package:carer/widgets/alarms/flashing_widget.dart';
 import 'package:carer/widgets/alarms/snoozetime_page.dart';
 import 'package:carer/widgets/bar/bar_bottom.dart';
 import 'package:carer/widgets/pages/alarm_settings_page.dart';
+import 'package:carer/widgets/pages/care_edit_page.dart';
 import 'package:carer/widgets/pages/care_page.dart';
 import 'package:carer/widgets/pages/display_page.dart';
 import 'package:carer/widgets/pages/events_page.dart';
@@ -297,6 +298,12 @@ GoRouter getRouter() {
           GoRoute(
             path: '/care',
             pageBuilder: pageBuilderBuilder(const CarePage()),
+            routes: <RouteBase>[
+              GoRoute(
+                path: '/edit',
+                pageBuilder: pageBuilderBuilder(const CareEditPage()),
+              ),
+            ],
           ),
           GoRoute(
             path: '/alarms',
