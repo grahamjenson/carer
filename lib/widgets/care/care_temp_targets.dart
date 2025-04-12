@@ -3,20 +3,22 @@ import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
+import 'package:carer/widgets/care/care_model.dart';
 import 'package:carer/widgets/common/dialogs.dart';
+import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-typedef OnPressedFunction = void Function();
 
 typedef Setter = void Function(int);
 typedef Getter = int Function();
 typedef GetD = double Function();
 typedef SetD = void Function(double);
 
-class TempTargetSettingsModel {
+class TempTargetSettingsModel extends CareModel {
   final String name;
   final Setter setDuration;
   final Getter getDuration;
@@ -28,21 +30,69 @@ class TempTargetSettingsModel {
 
   TempTargetSettingsModel(this.name, this.getDuration, this.setDuration, this.getLow, this.setLow, this.getHigh, this.setHigh, this.isCancel);
 
+  @override
+  Icon get icon => Icon(
+        CarerIcons.CARE_TEMP_TARGET,
+        color: highlightColor,
+        size: 40,
+      );
+
+  @override
+  SmartText get smartText {
+    if (isCancel) {
+      return SmartText(
+        textAlign: TextAlign.center,
+        texts: const [
+          "Cancel Target",
+        ],
+        styles: [
+          largeStyle,
+        ],
+      );
+    }
+
+    return SmartText(textAlign: TextAlign.right, texts: [
+      "$name\n",
+      getRangeString(),
+      " for ",
+      "${getDuration()}",
+      "mins",
+    ], styles: [
+      largeStyle,
+      subLargeStyle,
+      subSmallStyle,
+      subLargeStyle,
+      subSmallStyle,
+    ]);
+  }
+
+  @override
+  Color get highlightColor => ColorSchemes.accentColor;
+
+  @override
   String get description {
     if (isCancel) {
       return "Cancel Temp Target";
     }
-    var bot = getLow();
-    var top = getHigh();
+
     int duration = getDuration();
-    Unit unit = UISettings().unit;
-    String description = "${unit.str(bot)}-${unit.strWithUnit(top)}\nfor $duration mins";
-    if (unit.str(bot) == unit.str(top)) {
-      description = "${unit.strWithUnit(bot)}\nfor $duration mins";
-    }
-    return description;
+
+    return "${getRangeString()}\nfor $duration mins";
   }
 
+  String getRangeString() {
+    var bot = getLow();
+    var top = getHigh();
+
+    Unit unit = UISettings().unit;
+    String rangeString = "${unit.str(bot)}-${unit.strWithUnit(top)}";
+    if (unit.str(bot) == unit.str(top)) {
+      rangeString = unit.strWithUnit(bot);
+    }
+    return rangeString;
+  }
+
+  @override
   OnPressedFunction generateOnPressedFunction(BuildContext context) {
     var bottom = getLow();
     var top = getHigh();

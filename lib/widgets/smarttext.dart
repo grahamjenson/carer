@@ -14,6 +14,7 @@ class SmartText extends StatelessWidget {
       spans.add(TextSpan(text: texts[i], style: styles[i]));
     }
     return RichText(
+      textAlign: textAlign,
       text: TextSpan(children: spans, style: DefaultTextStyle.of(context).style),
     );
   }

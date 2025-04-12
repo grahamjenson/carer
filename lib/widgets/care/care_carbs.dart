@@ -1,9 +1,13 @@
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/secure_settings.dart';
+import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
+import 'package:carer/widgets/care/care_model.dart';
 import 'package:carer/widgets/common/dialogs.dart';
+import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,14 +16,35 @@ typedef OnPressedFunction = void Function();
 typedef Setter = void Function(int);
 typedef Getter = int Function();
 
-class CarbsSettingsModel {
+class CarbsSettingsModel extends CareModel {
   final Getter getCarbs;
   final Setter setCarbs;
 
   CarbsSettingsModel(this.getCarbs, this.setCarbs);
 
+  @override
   String get description => "${getCarbs()}g Carb";
 
+  @override
+  Icon get icon => Icon(CarerIcons.CARE_CARBS, color: highlightColor, size: 40);
+
+  @override
+  SmartText get smartText => SmartText(texts: [
+        "Add ",
+        "${getCarbs()}",
+        "g ",
+        "carbs"
+      ], styles: [
+        smallStyle,
+        largeStyle,
+        smallStyle,
+        smallStyle,
+      ]);
+
+  @override
+  Color get highlightColor => ColorSchemes.primaryColor;
+
+  @override
   OnPressedFunction generateOnPressedFunction(BuildContext context) {
     var carbs = getCarbs();
 

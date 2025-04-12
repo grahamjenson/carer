@@ -4,6 +4,7 @@ import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/care/care_carbs.dart';
+import 'package:carer/widgets/care/care_model.dart';
 import 'package:carer/widgets/care/care_temp_targets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -82,69 +83,50 @@ class CarePage extends StatelessWidget with ThemeMixin {
 
   List<Widget> carbButtons(BuildContext context) {
     return allCarbs.map((e) {
-      return carbsActionTile(context, e);
+      return treatmentActionButton(context, e);
     }).toList();
   }
 
   List<Widget> tempTargetButtons(BuildContext context) {
     return allTempTargets.map((e) {
-      return tempTargetActionTile(context, e);
+      return treatmentActionButton(context, e);
     }).toList();
   }
 
-  Widget carbsActionTile(BuildContext context, CarbsSettingsModel e) {
-    var buttonStyle = ElevatedButton.styleFrom(
-      textStyle: const TextStyle(fontSize: 20, color: ColorSchemes.primaryColor),
+  ButtonStyle buttonStyle(CareModel cm) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: ColorSchemes.backgroundColor.dim,
+      textStyle: TextStyle(fontSize: 20, color: cm.highlightColor),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8), // Square shape
-        side: const BorderSide(
-          color: ColorSchemes.primaryColor,
+        side: BorderSide(
+          color: cm.highlightColor,
           width: 2,
         ), // Border color and width
       ),
-
       padding: const EdgeInsets.all(5), // Remove default padding
-    );
-
-    Widget ret = ElevatedButton(
-      style: buttonStyle,
-      onPressed: e.generateOnPressedFunction(context),
-      child: Text("Add ${e.description}", style: const TextStyle(color: ColorSchemes.primaryColor)),
-    );
-
-    return Container(
-      margin: const EdgeInsets.all(5),
-      child: ret,
     );
   }
 
-  Widget tempTargetActionTile(BuildContext context, TempTargetSettingsModel e) {
-    var buttonStyle = ElevatedButton.styleFrom(
-      textStyle: const TextStyle(fontSize: 15, color: ColorSchemes.accentColor),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8), // Square shape
-        side: const BorderSide(
-          color: ColorSchemes.accentColor,
-          width: 2,
-        ), // Border color and width
-      ),
-
-      padding: const EdgeInsets.all(5), // Remove default padding
-    );
-
-    var description = "Set Target\n${e.description}";
-    if (e.isCancel) {
-      description = e.description;
-    }
-    Widget ret = ElevatedButton(
-      style: buttonStyle,
-      onPressed: e.generateOnPressedFunction(context),
-      child: Text(description, style: const TextStyle(color: ColorSchemes.accentColor)),
-    );
-
+  Widget treatmentActionButton(BuildContext context, CareModel cm) {
     return Container(
       margin: const EdgeInsets.all(5),
-      child: ret,
+      child: ElevatedButton(
+        style: buttonStyle(cm),
+        onPressed: cm.generateOnPressedFunction(context),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0), // spacing from top-left
+                child: cm.icon,
+              ),
+            ),
+            Center(child: cm.smartText),
+          ],
+        ),
+      ),
     );
   }
 }

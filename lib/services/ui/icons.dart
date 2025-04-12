@@ -14,6 +14,10 @@ class CarerIcons {
   static const IconData BAR_INFO = CupertinoIcons.info;
   static const IconData BAR_SNOOZE = CupertinoIcons.moon_zzz;
 
+  // CARE
+  static const IconData CARE_CARBS = UniconsLine.restaurant;
+  static const IconData CARE_TEMP_TARGET = UniconsLine.focus_target;
+
   // INFO
   static const IconData INFO_INSULIN_ON_BOARD = UniconsLine.syringe;
   static const IconData INFO_CARBS_ON_BOARD = UniconsLine.restaurant;

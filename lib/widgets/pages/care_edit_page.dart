@@ -19,7 +19,7 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       ),
       SettingsSection(
         title: const Text('Edit Temp Target'),
-        tiles: allTempTargets.map((e) => tempTargetEdit(context, e)).toList(),
+        tiles: allTempTargets.where((e) => !e.isCancel).map((e) => tempTargetEdit(context, e)).toList(),
       )
     ]);
     return Scaffold(
