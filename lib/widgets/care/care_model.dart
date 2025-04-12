@@ -10,19 +10,19 @@ abstract class CareModel {
   Color get highlightColor;
 
   TextStyle get smallStyle {
-    return TextStyle(fontSize: 18, color: highlightColor);
+    return TextStyle(fontSize: 16, color: highlightColor);
   }
 
   TextStyle get largeStyle {
-    return TextStyle(fontSize: 26, color: highlightColor, fontWeight: FontWeight.bold);
+    return TextStyle(fontSize: 22, color: highlightColor, fontWeight: FontWeight.bold);
   }
 
   TextStyle get subSmallStyle {
-    return TextStyle(fontSize: 15, color: highlightColor, fontWeight: FontWeight.bold);
+    return TextStyle(fontSize: 10, color: highlightColor, fontWeight: FontWeight.bold);
   }
 
   TextStyle get subLargeStyle {
-    return TextStyle(fontSize: 20, color: highlightColor, fontWeight: FontWeight.bold);
+    return TextStyle(fontSize: 14, color: highlightColor, fontWeight: FontWeight.bold);
   }
 
   OnPressedFunction generateOnPressedFunction(BuildContext context);

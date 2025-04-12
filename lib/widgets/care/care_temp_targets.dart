@@ -33,15 +33,15 @@ class TempTargetSettingsModel extends CareModel {
   @override
   Icon get icon => Icon(
         CarerIcons.CARE_TEMP_TARGET,
-        color: highlightColor,
-        size: 40,
+        color: highlightColor.dim,
+        size: 30,
       );
 
   @override
   SmartText get smartText {
     if (isCancel) {
       return SmartText(
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.right,
         texts: const [
           "Cancel Target",
         ],
@@ -51,15 +51,44 @@ class TempTargetSettingsModel extends CareModel {
       );
     }
 
+    var bot = getLow();
+    var top = getHigh();
+
+    Unit unit = UISettings().unit;
+
+    if (unit.str(bot) == unit.str(top)) {
+      return SmartText(textAlign: TextAlign.right, texts: [
+        "$name\n",
+        unit.str(bot),
+        unit.name,
+        " for ",
+        "${getDuration()}",
+        "mins",
+      ], styles: [
+        largeStyle,
+        subLargeStyle,
+        subSmallStyle,
+        subSmallStyle,
+        subLargeStyle,
+        subSmallStyle,
+      ]);
+    }
+
     return SmartText(textAlign: TextAlign.right, texts: [
       "$name\n",
-      getRangeString(),
+      unit.str(bot),
+      "-",
+      unit.str(top),
+      unit.name,
       " for ",
       "${getDuration()}",
       "mins",
     ], styles: [
       largeStyle,
       subLargeStyle,
+      subSmallStyle,
+      subLargeStyle,
+      subSmallStyle,
       subSmallStyle,
       subLargeStyle,
       subSmallStyle,

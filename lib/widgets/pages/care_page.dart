@@ -27,10 +27,10 @@ class CarePage extends StatelessWidget with ThemeMixin {
         final rows = (itemCount / columns).ceil();
         // get Width of the screen
         final screenWidth = MediaQuery.of(context).size.width - 20;
-        final screenHeight = MediaQuery.of(context).size.height - 130;
-        double ratio = 2;
+        final screenHeight = MediaQuery.of(context).size.height - 150;
+        double ratio = 1.5;
         if (UISettings().orientation == Orientation.landscape) {
-          ratio = 1;
+          ratio = 1.5;
         }
         var itemsWidth = max(min((screenWidth) / columns, screenHeight / rows), 100) * ratio;
         var itemsHeight = itemsWidth / ratio;
@@ -49,7 +49,7 @@ class CarePage extends StatelessWidget with ThemeMixin {
               margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
               child: GridView.count(
                 crossAxisCount: columns,
-                physics: const NeverScrollableScrollPhysics(),
+                //physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 childAspectRatio: ratio,
                 children: children,
@@ -119,11 +119,15 @@ class CarePage extends StatelessWidget with ThemeMixin {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.all(8.0), // spacing from top-left
+                padding: const EdgeInsets.only(top: 3), // spacing from top-left
                 child: cm.icon,
               ),
             ),
-            Center(child: cm.smartText),
+            Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(bottom: 0, left: 30),
+              child: cm.smartText,
+            ),
           ],
         ),
       ),

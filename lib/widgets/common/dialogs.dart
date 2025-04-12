@@ -6,7 +6,7 @@ class Dialogs {
   static Future<bool?> areYouSureDialog(BuildContext context, String title, String content, String confirmText) {
     TextStyle style = const TextStyle(
       color: ColorSchemes.primaryColor, // static so not dim at night
-      fontSize: 25,
+      fontSize: 20,
     );
 
     TextStyle cancelStyle = const TextStyle(

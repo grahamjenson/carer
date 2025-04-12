@@ -26,10 +26,10 @@ class CarbsSettingsModel extends CareModel {
   String get description => "${getCarbs()}g Carb";
 
   @override
-  Icon get icon => Icon(CarerIcons.CARE_CARBS, color: highlightColor, size: 40);
+  Icon get icon => Icon(CarerIcons.CARE_CARBS, color: highlightColor.dim, size: 30);
 
   @override
-  SmartText get smartText => SmartText(texts: [
+  SmartText get smartText => SmartText(textAlign: TextAlign.right, texts: [
         "Add ",
         "${getCarbs()}",
         "g ",
