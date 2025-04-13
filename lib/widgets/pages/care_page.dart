@@ -16,44 +16,50 @@ class CarePage extends StatelessWidget with ThemeMixin {
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var children = carbButtons(context) + tempTargetButtons(context);
-        var itemCount = children.length;
-
-        var columns = 2;
-        if (UISettings().orientation == Orientation.landscape) {
-          columns = 4;
-        }
-
-        final rows = (itemCount / columns).ceil();
-        // get Width of the screen
-        final screenWidth = MediaQuery.of(context).size.width - 20;
-        final screenHeight = MediaQuery.of(context).size.height - 150;
-        double ratio = 1.5;
-        if (UISettings().orientation == Orientation.landscape) {
-          ratio = 1.5;
-        }
-        var itemsWidth = max(min((screenWidth) / columns, screenHeight / rows), 100) * ratio;
-        var itemsHeight = itemsWidth / ratio;
-
         return Scaffold(
           backgroundColor: backgroundColor(context),
           appBar: AppBar(
             title: const Text('Care'),
             actions: [getEditButton(context)],
           ),
-          body: Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              height: (rows * itemsHeight).toDouble(),
-              width: (columns * itemsWidth).toDouble(),
-              margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-              child: GridView.count(
-                crossAxisCount: columns,
-                //physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                childAspectRatio: ratio,
-                children: children,
-              ),
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                var children = carbButtons(context) + tempTargetButtons(context);
+                var itemCount = children.length;
+
+                final screenWidth = constraints.maxWidth;
+                final screenHeight = constraints.maxHeight;
+
+                var columns = 1;
+                if (UISettings().orientation == Orientation.landscape) {
+                  columns = 4;
+                }
+
+                final rows = (itemCount / columns).ceil();
+
+                var itemsHeight = max(screenHeight / rows, 35);
+
+                var itemsWidth = max(screenWidth / columns, 100);
+
+                var ratio = itemsWidth / itemsHeight;
+
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    height: (rows * itemsHeight).toDouble(),
+                    width: (columns * itemsWidth).toDouble(),
+                    margin: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                    child: GridView.count(
+                      crossAxisCount: columns,
+                      //physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      childAspectRatio: ratio,
+                      children: children,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
@@ -110,7 +116,7 @@ class CarePage extends StatelessWidget with ThemeMixin {
 
   Widget treatmentActionButton(BuildContext context, CareModel cm) {
     return Container(
-      margin: const EdgeInsets.all(5),
+      margin: const EdgeInsets.all(3),
       child: ElevatedButton(
         style: buttonStyle(cm),
         onPressed: cm.generateOnPressedFunction(context),
