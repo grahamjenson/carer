@@ -94,7 +94,7 @@ class ThemeService {
     }
 
     // If the App has just been opened then normal theme
-    if (AppLifecycleService().stateRecentlyChanged) {
+    if (AppLifecycleService().stateChanged2SecondsAgo) {
       return normalTheme;
     }
 

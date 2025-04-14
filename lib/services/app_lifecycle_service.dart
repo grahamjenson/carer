@@ -28,13 +28,11 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
 
   bool get wasResumed10SecondsAgo => clock.now().difference(lastResumed.value).inSeconds < 9;
 
-  bool get wasRecentlyScreenChanged => clock.now().difference(lastChangeScreen.value).inSeconds < 5;
+  bool get wasScreenChanged5SecondsAgo => clock.now().difference(lastChangeScreen.value).inSeconds < 5;
 
   bool get stateResumed => lastState.value == AppLifecycleState.resumed;
-  bool get stateRecentlyChanged {
-    var diff = clock.now().difference(lastState.lastSet).inSeconds.abs();
-    return diff < 10;
-  }
+  bool get stateChanged10SecondsAgo => clock.now().difference(lastState.lastSet).inSeconds.abs() < 10;
+  bool get stateChanged2SecondsAgo => clock.now().difference(lastState.lastSet).inMilliseconds.abs() < 2000;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

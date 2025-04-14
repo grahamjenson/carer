@@ -38,8 +38,8 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     StatusSettings statusSettings = StatusSettings();
     Color? iconColor;
 
-    var descriptionStyle = labelMedium(context).copyWith(color: onBackgroundColor(context));
-    var statusStyle = labelSmall(context).copyWith(color: onBackgroundColor(context).dim);
+    var descriptionStyle = labelMedium(context).copyWith(color: ColorSchemes.textColor);
+    var statusStyle = labelSmall(context).copyWith(color: ColorSchemes.textColor.dim);
 
     var (texts, styles) = stat.status(context, statusStyle, statusStyle);
     return SettingsTile.switchTile(

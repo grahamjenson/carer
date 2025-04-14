@@ -10,8 +10,6 @@ enum Unit {
         return true;
       case Unit.mg:
         return false;
-      default:
-        return true;
     }
   }
 
@@ -21,8 +19,6 @@ enum Unit {
         return 'mmol/L';
       case Unit.mg:
         return 'mg/dl';
-      default:
-        return "mmol/L";
     }
   }
 

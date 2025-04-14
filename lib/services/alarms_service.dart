@@ -146,7 +146,7 @@ class AlarmsService {
 
     // If the app has only recently been resumed we give it time to warm up
 
-    var recentlyOpened = AppLifecycleService().wasResumed10SecondsAgo;
+    var recentlyOpened = AppLifecycleService().wasResumed2SecondsAgo;
 
     // Dont even Calculate alarms if Nightscout is not connected
     if (nightscoutNotConnected || recentlyOpened) {
@@ -159,7 +159,7 @@ class AlarmsService {
     var notSnoozing = AlarmAlertSettings().snoozeDuration == null;
     var allAlarmsEnabled = !AlarmSettings().disableAlarms;
 
-    var notRencentScreenChange = !AppLifecycleService().wasRecentlyScreenChanged;
+    var notRecentlyScreenChange = !AppLifecycleService().wasScreenChanged5SecondsAgo;
 
     for (var alarm in AlarmType.values) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
@@ -177,7 +177,7 @@ class AlarmsService {
       // 4. App is Not snoozing
       // 5. Alarm is not smart snoozing
       // 6. App has not recently changed screen
-      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRencentScreenChange;
+      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRecentlyScreenChange;
 
       if (addToActive) {
         newActiveAlarms.add(alarm);

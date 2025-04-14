@@ -43,10 +43,10 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   SettingsTile statusTile(BuildContext context, Status status) {
     Color? iconColor;
     if (status.triggered()) {
-      iconColor = primaryColor(context);
+      iconColor = ColorSchemes.primaryColor;
     }
-    var descriptionStyle = labelMedium(context).copyWith(color: onBackgroundColor(context));
-    var statusStyle = labelSmall(context).copyWith(color: onBackgroundColor(context).dim);
+    var descriptionStyle = labelMedium(context).copyWith(color: ColorSchemes.textColor);
+    var statusStyle = labelSmall(context).copyWith(color: ColorSchemes.textColor.dim);
     return SettingsTile.switchTile(
       initialValue: StatusSettings().statusEnabledContains(status.name),
       onToggle: (bool value) {
@@ -95,7 +95,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile(
       title: Text(
         title,
-        style: labelMedium(context).copyWith(color: onBackgroundColor(context)),
+        style: labelMedium(context).copyWith(color: ColorSchemes.textColor),
         textAlign: TextAlign.end,
       ),
       trailing: Row(children: [

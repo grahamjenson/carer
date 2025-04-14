@@ -83,18 +83,18 @@ class _SettingsPageState extends State<SettingsPage> with ThemeMixin {
                   });
                 }
               },
-              children: <SettingPageTabs, Widget>{
+              children: const <SettingPageTabs, Widget>{
                 SettingPageTabs.misc: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Settings', style: TextStyle(color: onBackgroundColor(context))),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Settings', style: TextStyle(color: ColorSchemes.textColor)),
                 ),
                 SettingPageTabs.info: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Info Bar', style: TextStyle(color: onBackgroundColor(context))),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Info Bar', style: TextStyle(color: ColorSchemes.textColor)),
                 ),
                 SettingPageTabs.status: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Status Bar', style: TextStyle(color: onBackgroundColor(context))),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Status Bar', style: TextStyle(color: ColorSchemes.textColor)),
                 ),
               },
             ),

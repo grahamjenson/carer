@@ -71,7 +71,7 @@ class NSClient {
   Client get http {
     // return normal client if in foreground
     // Give the state a little wiggle room since it might have just changed and we still want the default
-    if (AppLifecycleService().stateResumed || AppLifecycleService().stateRecentlyChanged) {
+    if (AppLifecycleService().stateResumed || AppLifecycleService().stateChanged10SecondsAgo) {
       return _flutterClient;
     }
 
