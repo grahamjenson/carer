@@ -14,6 +14,7 @@ abstract class _InfoMethods with ThemeMixin {
   const _InfoMethods();
   IconData get icon;
   String get title;
+  String get tooltip => title;
   String get description;
   bool get highlight => false;
   Unit get unit => UISettings().unit;
@@ -35,6 +36,7 @@ enum Info {
 
   IconData get icon => _methods.icon;
   String get title => _methods.title;
+  String get tooltip => _methods.tooltip;
   String get description => _methods.description;
   bool get highlight => _methods.highlight;
   bool get enabled => StatusSettings().infoEnabledContains(name);
@@ -47,6 +49,17 @@ class _IOB extends _InfoMethods {
   const _IOB();
 
   double get value => PropertiesData().iob;
+
+  @override
+  String get tooltip {
+    var tt = "IOB";
+    var iob = PropertiesData().iob;
+    var bolusIOB = PropertiesData().treatmentiob;
+    var basalIOB = PropertiesData().basaliob;
+
+    tt += "${toMax2dp(iob)}u\nBasal ${toMax2dp(basalIOB)}u + Bolus ${toMax2dp(bolusIOB)}u";
+    return tt;
+  }
 
   @override
   String get title => "IOB";
@@ -105,6 +118,20 @@ class _Basal extends _InfoMethods {
   }
 
   @override
+  String get tooltip {
+    var tt = "Basal";
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return tt;
+    }
+    tt += "\n${toMax2dp(valueAtTime.basal)} u/h";
+    if (valueAtTime.isTempBasal) {
+      tt += " ${Dates.dateAgoShort(valueAtTime.tempBasalRemaining)}";
+    }
+    return tt;
+  }
+
+  @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
     var valueAtTime = ValueAtTime.last();
     if (valueAtTime == null) {
@@ -127,6 +154,28 @@ class _Target extends _InfoMethods {
 
   @override
   String get title => "Target";
+
+  @override
+  String get tooltip {
+    var tt = "Target";
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return tt;
+    }
+
+    String lowStr = unit.str(valueAtTime.lowTarget);
+    String highStr = unit.str(valueAtTime.highTarget);
+    if (highStr == lowStr) {
+      tt += "\n$lowStr ${unit.name}";
+    } else {
+      tt += "\n$lowStr-$highStr ${unit.name}";
+    }
+    if (valueAtTime.isTempTarget) {
+      tt += " ${Dates.dateAgoShort(valueAtTime.tempTargetRemaining)}";
+    }
+
+    return tt;
+  }
 
   @override
   String get description => "Current Target Range";
@@ -154,6 +203,11 @@ class _Target extends _InfoMethods {
 
     List<String> texts = ["$lowStr-$highStr", unit.name];
     List<TextStyle> styles = [style, small];
+
+    if (highStr == lowStr) {
+      texts = [lowStr, unit.name];
+    }
+
     if (valueAtTime.isTempTarget) {
       texts.add(" ${Dates.dateAgoShort(valueAtTime.tempTargetRemaining)}");
       styles.add(small.copyWith(color: primaryColor(context)));
@@ -181,6 +235,20 @@ class _CurrentProfile extends _InfoMethods {
       return false;
     }
     return valueAtTime.isTempProfile;
+  }
+
+  @override
+  String get tooltip {
+    var tt = "Profile";
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return tt;
+    }
+    tt += "\n${valueAtTime.profileName} ${valueAtTime.profilePercent}%";
+    if (valueAtTime.isTempProfile) {
+      tt += " ${Dates.dateAgoShort(valueAtTime.tempProfileRemaining)}";
+    }
+    return tt;
   }
 
   @override

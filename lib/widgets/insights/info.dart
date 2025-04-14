@@ -86,7 +86,7 @@ class InfoWidget extends StatelessWidget with ThemeMixin {
 
     var (texts, styles) = stat.status(context, row, small);
     Widget statIcon = Tooltip(
-      message: stat.title,
+      message: stat.tooltip,
       triggerMode: TooltipTriggerMode.tap,
       child: Icon(stat.icon, size: 20, color: stat.highlight ? primaryColor(context) : accentColor(context)),
     );
