@@ -61,10 +61,10 @@ class TempTargetSettingsModel extends CareModel {
         "mins",
       ], styles: [
         largeStyle,
-        subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
+        subLargeStyle,
         subSmallStyle,
         subSmallStyle,
-        subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
+        subLargeStyle,
         subSmallStyle,
       ]);
     }
@@ -80,12 +80,12 @@ class TempTargetSettingsModel extends CareModel {
       "mins",
     ], styles: [
       largeStyle,
-      subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
+      subLargeStyle,
       subSmallStyle,
-      subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
+      subLargeStyle,
       subSmallStyle,
       subSmallStyle,
-      subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
+      subLargeStyle,
       subSmallStyle,
     ]);
   }

@@ -36,8 +36,8 @@ class CarbsSettingsModel extends CareModel {
         "carbs"
       ], styles: [
         smallStyle,
-        largeStyle.copyWith(color: highlightColor),
-        smallStyle.copyWith(color: highlightColor),
+        largeStyle.copyWith(fontSize: 18),
+        smallStyle,
         smallStyle,
       ]);
 
