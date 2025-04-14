@@ -6,12 +6,12 @@ class Dialogs {
   static Future<bool?> areYouSureDialog(BuildContext context, String title, String content, String confirmText) {
     TextStyle style = const TextStyle(
       color: ColorSchemes.primaryColor, // static so not dim at night
-      fontSize: 20,
+      fontSize: 18,
     );
 
     TextStyle cancelStyle = const TextStyle(
       color: ColorSchemes.primaryColor, // static so not dim at night
-      fontSize: 20,
+      fontSize: 18,
     );
 
     Widget cancelButton = TextButton(
