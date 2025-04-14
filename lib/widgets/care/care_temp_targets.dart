@@ -31,17 +31,12 @@ class TempTargetSettingsModel extends CareModel {
   TempTargetSettingsModel(this.name, this.getDuration, this.setDuration, this.getLow, this.setLow, this.getHigh, this.setHigh, this.isCancel);
 
   @override
-  Icon get icon => Icon(
-        CarerIcons.CARE_TEMP_TARGET,
-        color: highlightColor.dim,
-        size: 30,
-      );
+  IconData get icon => CarerIcons.CARE_TEMP_TARGET;
 
   @override
   SmartText get smartText {
     if (isCancel) {
       return SmartText(
-        textAlign: TextAlign.right,
         texts: const [
           "Cancel Target",
         ],
@@ -57,7 +52,7 @@ class TempTargetSettingsModel extends CareModel {
     Unit unit = UISettings().unit;
 
     if (unit.str(bot) == unit.str(top)) {
-      return SmartText(textAlign: TextAlign.right, texts: [
+      return SmartText(texts: [
         "$name\n",
         unit.str(bot),
         unit.name,
@@ -66,18 +61,18 @@ class TempTargetSettingsModel extends CareModel {
         "mins",
       ], styles: [
         largeStyle,
-        subLargeStyle,
+        subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
         subSmallStyle,
         subSmallStyle,
-        subLargeStyle,
+        subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
         subSmallStyle,
       ]);
     }
 
-    return SmartText(textAlign: TextAlign.right, texts: [
+    return SmartText(texts: [
       "$name\n",
       unit.str(bot),
-      "-",
+      " - ",
       unit.str(top),
       unit.name,
       " for ",
@@ -85,12 +80,12 @@ class TempTargetSettingsModel extends CareModel {
       "mins",
     ], styles: [
       largeStyle,
-      subLargeStyle,
+      subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
       subSmallStyle,
-      subLargeStyle,
+      subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
       subSmallStyle,
       subSmallStyle,
-      subLargeStyle,
+      subLargeStyle.copyWith(color: ColorSchemes.primaryColor),
       subSmallStyle,
     ]);
   }

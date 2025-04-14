@@ -26,18 +26,18 @@ class CarbsSettingsModel extends CareModel {
   String get description => "${getCarbs()}g Carb";
 
   @override
-  Icon get icon => Icon(CarerIcons.CARE_CARBS, color: highlightColor.dim, size: 30);
+  IconData get icon => CarerIcons.CARE_CARBS;
 
   @override
-  SmartText get smartText => SmartText(textAlign: TextAlign.right, texts: [
+  SmartText get smartText => SmartText(texts: [
         "Add ",
         "${getCarbs()}",
         "g ",
         "carbs"
       ], styles: [
         smallStyle,
-        largeStyle,
-        smallStyle,
+        largeStyle.copyWith(color: highlightColor),
+        smallStyle.copyWith(color: highlightColor),
         smallStyle,
       ]);
 

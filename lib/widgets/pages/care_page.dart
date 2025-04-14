@@ -38,7 +38,7 @@ class CarePage extends StatelessWidget with ThemeMixin {
 
                 final rows = (itemCount / columns).ceil();
 
-                var itemsHeight = max(screenHeight / rows, 35);
+                var itemsHeight = min(max(screenHeight / rows, 50), 100);
 
                 var itemsWidth = max(screenWidth / columns, 100);
 
@@ -104,9 +104,9 @@ class CarePage extends StatelessWidget with ThemeMixin {
       backgroundColor: ColorSchemes.backgroundColor.dim,
       textStyle: TextStyle(fontSize: 20, color: cm.highlightColor),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8), // Square shape
+        borderRadius: BorderRadius.circular(20), // Square shape
         side: BorderSide(
-          color: cm.highlightColor,
+          color: ColorSchemes.backgroundColor.bright.bright,
           width: 2,
         ), // Border color and width
       ),
@@ -120,19 +120,19 @@ class CarePage extends StatelessWidget with ThemeMixin {
       child: ElevatedButton(
         style: buttonStyle(cm),
         onPressed: cm.generateOnPressedFunction(context),
-        child: Stack(
+        child: Row(
           children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 3), // spacing from top-left
-                child: cm.icon,
-              ),
-            ),
             Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(bottom: 0, left: 30),
-              child: cm.smartText,
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.all(5),
+              child: Icon(cm.icon, size: 30, color: cm.highlightColor),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(left: 5),
+                alignment: Alignment.centerLeft,
+                child: cm.smartText,
+              ),
             ),
           ],
         ),
