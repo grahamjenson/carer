@@ -25,11 +25,11 @@ PODS:
     - FlutterMacOS
   - screen_brightness_ios (0.1.0):
     - Flutter
-  - Sentry/HybridSDK (8.35.1)
+  - Sentry/HybridSDK (8.46.0)
   - sentry_flutter (8.8.0):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.35.1)
+    - Sentry/HybridSDK (= 8.46.0)
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
