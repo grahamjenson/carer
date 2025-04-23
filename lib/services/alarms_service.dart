@@ -160,6 +160,7 @@ class AlarmsService {
     var allAlarmsEnabled = !AlarmSettings().disableAlarms;
 
     var notRecentlyScreenChange = !AppLifecycleService().wasScreenChanged5SecondsAgo;
+    var appInForeground = AppLifecycleService().stateResumed;
 
     for (var alarm in AlarmType.values) {
       var (triggered, active, smartSnooze) = alarm.alarmStatus();
@@ -177,7 +178,8 @@ class AlarmsService {
       // 4. App is Not snoozing
       // 5. Alarm is not smart snoozing
       // 6. App has not recently changed screen
-      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRecentlyScreenChange;
+      // 7. App is in to foreground
+      var addToActive = allAlarmsEnabled && triggered && active && notSnoozing && notSmartSnoozing && notRecentlyScreenChange && appInForeground;
 
       if (addToActive) {
         newActiveAlarms.add(alarm);

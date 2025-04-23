@@ -39,7 +39,6 @@ class AppLifecycleService extends State<MyApp> with WidgetsBindingObserver {
     // Put into a microtask to avoid any issues with the lifecycle state
     Future.microtask(() {
       // WARNING: this works differently on all platforms, so anything complicated should be platform specific
-
       lastState.value = state;
       switch (state) {
         case AppLifecycleState.inactive:
