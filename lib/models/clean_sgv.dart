@@ -169,6 +169,17 @@ class CleanSGV extends ASGV with DateMixin {
 
   static ASignal<CleanSGV?> lastSGV = ASignal(null, debugLabel: 'CleanSGVlastSGV');
 
+  static int missingFromLast3Hours() {
+    var totalInLastThreeHours = last3Hours.value.length;
+    var maxInLastThreeHours = 36 - 1;
+    var missing = maxInLastThreeHours - totalInLastThreeHours;
+    if (missing < 0) {
+      missing = 0;
+    }
+
+    return missing;
+  }
+
   static Future<void> setupSQLSignals() async {
     await signalAssign(last2Days, () async {
       List<SGV> rawSGVs = SGV.last2Days.value;

@@ -50,6 +50,12 @@ class NSEntriesUpdater extends Updater {
 
     // Get the last amount of readings with a few extra for certainty
     var gteCreatedAt = super.lastSuccessfulUpdate.subtract(const Duration(minutes: 10));
+
+    // Look back further if there are recent missing values
+    if (CleanSGV.missingFromLast3Hours() > 10) {
+      gteCreatedAt = gteCreatedAt.subtract(const Duration(hours: 3));
+    }
+
     var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, gteCreatedAt));
     if (err != null || entries == null) {
       return false;
