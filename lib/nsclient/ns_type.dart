@@ -6,7 +6,8 @@ abstract class NSType {
   static DateTime getBestGuessDate(json) {
     DateTime? createdAtMaybe;
     if (json["date"] != null) {
-      createdAtMaybe = DateTime.fromMillisecondsSinceEpoch(json['date']);
+      // date can be a double.
+      createdAtMaybe = DateTime.fromMillisecondsSinceEpoch(json['date'].toInt());
     }
 
     if (json["created_at"] != null && createdAtMaybe == null) {

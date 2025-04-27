@@ -73,10 +73,11 @@ class NSProfile {
       return null;
     }
     Map<String, dynamic> profileValues = profileStore[profileName];
+
     return NSProfile.fromJson(
       profileName,
       id!,
-      DateTime.fromMillisecondsSinceEpoch(json['date'] ?? 0),
+      NSType.getBestGuessDate(json),
       profileValues,
       raw: jsonString,
     );

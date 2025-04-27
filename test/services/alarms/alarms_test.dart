@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:carer/models/details/alarms/alarms.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,6 +36,8 @@ void main() async {
     int INRANGE = 80;
 
     setUp(() {
+      SecureSettings().setNSValuesFromURL("https://test.com?token=1232432434");
+
       // Turn on all alarms
       AlarmSettings().urgentLowAlarm = true;
       AlarmSettings().lowAlarm = true;

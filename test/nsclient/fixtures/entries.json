@@ -34,5 +34,19 @@
     "srvModified": 1705525702859,
     "srvCreated": 1705525702859,
     "subject": "phone"
+  },
+  {
+    "_id": "B4274B2D-2B01-4989-B853-E56601706FD0",
+    "direction": "Flat",
+    "filtered": 103,
+    "date": 1745689080000.0002,
+    "unfiltered": 103,
+    "type": "sgv",
+    "sgv": 103,
+    "dateString": "2025-04-26T17:38:00.000Z",
+    "glucose": 103,
+    "utcOffset": 0,
+    "sysTime": "2025-04-26T17:38:00.000Z",
+    "device": "unknown"
   }
 ]

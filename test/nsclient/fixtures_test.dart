@@ -53,7 +53,7 @@ void main() {
       NSTreatments.fromJson,
       test: (NSTreatments treatments) {
         expect(treatments.length, 11);
-        expect(treatments[0], isA<NSTreatmentInsulin>());
+        expect(treatments[0], isA<NSTreatmentTempBasal>());
       },
     ),
 
@@ -63,8 +63,8 @@ void main() {
 
     // Entries
     FixtureTest<NSEntries>('entries', NSEntries.fromJson, test: (NSEntries entries) {
-      expect(entries.length, 3);
-      expect(entries[0].sgv, 152);
+      expect(entries.length, 4);
+      expect(entries[0].sgv, 103);
     }),
 
     FixtureTest<NSEntries>('entries_bad', NSEntries.fromJson, test: (NSEntries entries) {
