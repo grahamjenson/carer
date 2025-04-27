@@ -20,6 +20,7 @@ class DisplayPage extends StatelessWidget with ThemeMixin {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
+          backgroundColor: backgroundColor(context),
           appBar: const BarTop(),
           body: RefreshIndicator(
             onRefresh: () async {
@@ -51,23 +52,27 @@ class DisplayPage extends StatelessWidget with ThemeMixin {
 
   Widget getLayout(BuildContext context, Orientation orientation) {
     if (orientation == Orientation.landscape) {
-      return landscapeLayout();
+      return landscapeLayout(context);
     } else {
-      return portraitLayout();
+      return portraitLayout(context);
     }
   }
 
-  Widget landscapeLayout() {
+  Widget landscapeLayout(BuildContext context) {
     return Row(
       children: [
         const Flexible(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Expanded(flex: 6, child: BGL()),
+              Flexible(flex: 4, child: BGL()),
               AlarmWidget(flex: 2),
             ],
           ),
+        ),
+        VerticalDivider(
+          color: outlineColor(context),
+          width: 1,
         ),
         Flexible(
           child: Column(
@@ -90,12 +95,13 @@ class DisplayPage extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Widget portraitLayout() {
+  Widget portraitLayout(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Expanded(flex: 4, child: BGL()),
         const AlarmWidget(flex: 2),
+        Divider(color: outlineColor(context)),
         const Flexible(flex: 4, child: BGLChart()),
         Flexible(
           flex: 2,

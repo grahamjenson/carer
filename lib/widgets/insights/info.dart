@@ -31,8 +31,8 @@ class InfoWidget extends StatelessWidget with ThemeMixin {
               alignment: Alignment.center,
               child: DataTable(
                   border: TableBorder(
-                    verticalInside: BorderSide(color: outlineColor(context)),
-                    horizontalInside: const BorderSide(color: Color.fromARGB(0, 0, 0, 0), width: 0.0),
+                    verticalInside: const BorderSide(color: Colors.transparent, width: 0),
+                    horizontalInside: BorderSide(color: outlineColor(context), width: 1),
                   ),
                   columnSpacing: 10,
                   dividerThickness: 0.01,

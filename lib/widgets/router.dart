@@ -242,10 +242,6 @@ GoRouter getRouter() {
             Scaffold(
               backgroundColor: themeMixin.backgroundColor(context),
               body: SafeArea(
-                left: false,
-                right: false,
-                bottom: false,
-                minimum: const EdgeInsets.all(0),
                 child: child,
               ),
               bottomNavigationBar: const BarBottom(),

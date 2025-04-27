@@ -33,8 +33,8 @@ class Treatments extends StatelessWidget with ThemeMixin {
                 alignment: Alignment.center,
                 child: DataTable(
                     border: TableBorder(
-                      verticalInside: BorderSide(color: outlineColor(context), width: 0.5),
-                      horizontalInside: BorderSide(color: outlineColor(context), width: 0.2),
+                      verticalInside: BorderSide(color: outlineColor(context), width: 2),
+                      horizontalInside: BorderSide(color: outlineColor(context), width: 1),
                     ),
                     columnSpacing: columnSpacing,
                     dividerThickness: dividerThickness,

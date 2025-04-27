@@ -139,7 +139,7 @@ class TimeValue {
     if (jsonValue is num) {
       value = jsonValue.toDouble();
     }
-    print("TimeValue: $timeOfDay $value ${jsonValue.runtimeType}");
+
     return TimeValue(
       time: timeOfDay,
       value: value,

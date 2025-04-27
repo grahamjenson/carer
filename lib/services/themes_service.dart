@@ -12,7 +12,7 @@ class ColorSchemes {
   // Created and exported from https://www.realtimecolors.com/?colors=efeeec-080705-FFCD36-ffb600-3accf8&fonts=Inter-Inter
   // Trying to use the themes from Diabetes awareness month nz logo
   static const textColor = Color(0xFFefeeec);
-  static const backgroundColor = Color(0xFF323231);
+  static const backgroundColor = Color(0xFF202020);
   static const primaryColor = Colors.amber;
   static const primaryFgColor = Color(0xFF080705);
   static const secondaryColor = Colors.amberAccent;
@@ -161,7 +161,7 @@ mixin ThemeMixin {
   }
 
   Color outlineColor(BuildContext context) {
-    return backgroundColor(context).bright;
+    return backgroundColor(context).bright.bright;
   }
 
   ////
