@@ -131,9 +131,18 @@ class TimeValue {
     final dateTime = DateTime.parse("1970-01-01T${json['time']}");
     final timeOfDay = TimeOfDay.fromDateTime(dateTime);
 
+    var jsonValue = json['value'];
+    double value = 0;
+    if (jsonValue is String) {
+      value = double.tryParse(jsonValue) ?? 0;
+    }
+    if (jsonValue is num) {
+      value = jsonValue.toDouble();
+    }
+    print("TimeValue: $timeOfDay $value ${jsonValue.runtimeType}");
     return TimeValue(
       time: timeOfDay,
-      value: json['value'].toDouble(),
+      value: value,
     );
   }
 }
