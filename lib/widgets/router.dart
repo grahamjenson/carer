@@ -240,6 +240,10 @@ GoRouter getRouter() {
         pageBuilder: (BuildContext context, GoRouterState state, Widget child) {
           var childStack = Stack(children: [
             Scaffold(
+              appBar: AppBar(
+                backgroundColor: themeMixin.backgroundColorShade(context),
+                toolbarHeight: 0,
+              ),
               backgroundColor: themeMixin.backgroundColor(context),
               body: SafeArea(
                 child: child,

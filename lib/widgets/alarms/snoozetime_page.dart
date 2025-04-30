@@ -96,10 +96,13 @@ class _SnoozeTimePageState extends State<SnoozeTimePage> with ThemeMixin {
                       ),
                     ),
                   ];
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: children,
+              return Container(
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children,
+                ),
               );
             },
             debugLabel: "SnoozePage",
