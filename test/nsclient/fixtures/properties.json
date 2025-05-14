@@ -31,7 +31,7 @@
         "previous": {
             "mean": 240,
             "last": 240,
-            "mills": 1722553570000,
+            "mills": 1722553570000.1,
             "sgvs": [
                 {
                     "_id": "66ac14e65de9b876d91df528",
@@ -112,13 +112,13 @@
             "last": 221,
             "mills": 1722552970000,
             "index": 3,
-            "fromMills": 1722552820000,
-            "toMills": 1722553120000,
+            "fromMills": 1722552820000.1,
+            "toMills": 1722553120000.1,
             "sgvs": [
                 {
                     "_id": "66ac128e5de9b86a211df51e",
                     "mgdl": 221,
-                    "mills": 1722552970000,
+                    "mills": 1722552970000.1,
                     "device": "AAPS-Dexcom",
                     "direction": "SingleUp",
                     "unfiltered": 0,

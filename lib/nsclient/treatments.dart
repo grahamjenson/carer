@@ -21,7 +21,7 @@ class NSRawTreatment {
   String? subject;
   double? insulin;
 
-  int? duration;
+  double? duration;
   int? durationInMilliseconds;
   double? absolute;
   double? rate;
@@ -82,7 +82,7 @@ class NSRawTreatment {
       date: guessDate,
       type: json['type'],
       eventType: json['eventType'] ?? "",
-      utcOffset: json['utcOffset'],
+      utcOffset: NSType.getInt(json['utcOffset']),
       isReadOnly: json['isReadOnly'],
       isValid: json['isValid'],
       createdAt: guessDate,
@@ -93,16 +93,16 @@ class NSRawTreatment {
       insulin: NSType.getDouble(json['insulin']),
       absolute: NSType.getDouble(json['absolute']),
       rate: NSType.getDouble(json['rate']),
-      duration: json['duration'],
-      durationInMilliseconds: json['durationInMilliseconds'],
+      duration: NSType.getDouble(json['duration']),
+      durationInMilliseconds: NSType.getInt(json['durationInMilliseconds']),
       targetBottom: NSType.getDouble(json['targetBottom']),
       targetTop: NSType.getDouble(json['targetTop']),
       reason: json['reason'],
-      originalDuration: json['originalDuration'],
+      originalDuration: NSType.getInt(json['originalDuration']),
       originalProfileName: json['originalProfileName'],
       profile: json['profile'],
-      percentage: json['percentage'],
-      originalPercentage: json['originalPercentage'],
+      percentage: NSType.getInt(json['percentage']),
+      originalPercentage: NSType.getInt(json['originalPercentage']),
       profileJson: json['profileJson'],
       rawJson: json,
     );
@@ -116,8 +116,19 @@ class NSRawTreatment {
     return true;
   }
 
+  int guessDurationInMilliseconds() {
+    if (durationInMilliseconds != null) {
+      return durationInMilliseconds!;
+    }
+    if (duration != null) {
+      return (duration! * 60 * 1000).round();
+    }
+    return 0;
+  }
+
   List<NSTreatment> toTreatments() {
     List<NSTreatment> treatments = [];
+
     switch (eventType) {
       case "Temp Basal":
         if (absolute != null || rate != null) {
@@ -126,19 +137,14 @@ class NSRawTreatment {
             id: id,
             absolute: r,
             date: date,
-            durationInMilliseconds: durationInMilliseconds ?? 0,
+            durationInMilliseconds: guessDurationInMilliseconds(),
           ));
         }
         break;
       case "Temporary Target":
         if (targetBottom != null && targetTop != null) {
           treatments.add(NSTemporaryTarget(
-            id: id,
-            targetBottom: targetBottom!,
-            targetTop: targetTop!,
-            date: date,
-            durationInMilliseconds: durationInMilliseconds ?? 0,
-          ));
+              id: id, targetBottom: targetBottom!, targetTop: targetTop!, date: date, durationInMilliseconds: guessDurationInMilliseconds()));
         }
         break;
       case "Meal Bolus" || "Correction Bolus":

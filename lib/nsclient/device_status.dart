@@ -3,6 +3,8 @@
 
 import 'dart:convert';
 
+import 'package:carer/nsclient/ns_type.dart';
+
 class NSDeviceStatus {
   final double? reservoir;
   final bool? isCharging;
@@ -29,7 +31,7 @@ class NSDeviceStatus {
     double? battery;
 
     if (json["pump"] != null && json["pump"] is Map<String, dynamic> && json["pump"]["reservoir"] != null && json["pump"]["reservoir"] is num) {
-      reservoir = json["pump"]["reservoir"].toDouble();
+      reservoir = NSType.getDouble(json["pump"]["reservoir"]);
     }
 
     if (json["isCharging"] is bool) {
@@ -37,7 +39,14 @@ class NSDeviceStatus {
     }
 
     if (json["uploaderBattery"] is num) {
-      battery = json["uploaderBattery"].toDouble();
+      battery = NSType.getDouble(json["uploaderBattery"]);
+    }
+
+    if (json["uploader"] != null &&
+        json["uploader"] is Map<String, dynamic> &&
+        json["uploader"]["battery"] != null &&
+        json["uploader"]["battery"] is num) {
+      battery = NSType.getDouble(json["uploader"]["battery"]);
     }
 
     return NSDeviceStatus(

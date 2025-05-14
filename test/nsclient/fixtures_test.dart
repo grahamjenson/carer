@@ -52,8 +52,19 @@ void main() {
       'treatments',
       NSTreatments.fromJson,
       test: (NSTreatments treatments) {
-        expect(treatments.length, 11);
-        expect(treatments[0], isA<NSTreatmentTempBasal>());
+        expect(treatments.length, 14);
+        expect(treatments[0], isA<NSTreatmentInsulin>());
+        var t0 = treatments[0] as NSTreatmentInsulin;
+        expect(t0.insulin, 0.05);
+
+        expect(treatments[1], isA<NSTemporaryTarget>());
+        var t1 = treatments[1] as NSTemporaryTarget;
+        expect(t1.durationInMilliseconds, 21600000);
+
+        expect(treatments[11], isA<NSTreatmentTempBasal>());
+        var t11 = treatments[11] as NSTreatmentTempBasal;
+        expect(t11.absolute, 1.55);
+        expect(t11.durationInMilliseconds, (4.1 * 60 * 1000).round());
       },
     ),
 
@@ -93,6 +104,10 @@ void main() {
       expect(profile.targetHigh.values.first.value, 7 * MGtoMMOL);
     }),
 
+    FixtureTest<NSProfile>('current_profile_loop', profileParserNoNull, test: (NSProfile profile) {
+      expect(profile.name, "loopProfile");
+    }),
+
     FixtureTest<NSProfile>('current_profile_bad', profileParserNoNull, test: (NSProfile profile) {
       expect(profile.name, "empty");
     }),
@@ -108,6 +123,10 @@ void main() {
       expect(properties.cob, equals(9.39056953071084));
       expect(properties.cannulaChangeTime, equals(1722497000000));
       expect(properties.sensorChangeTime, equals(1722498000000));
+    }),
+
+    FixtureTest<NSProperties>('properties_loop', NSProperties.fromJson, test: (NSProperties properties) {
+      expect(properties, isNotNull);
     }),
 
     FixtureTest<NSProperties>('properties_bad', NSProperties.fromJson, test: (NSProperties properties) {
@@ -129,6 +148,12 @@ void main() {
       expect(status.isCharging, false);
       expect(status.reservoir, 36.0);
     }),
+
+    FixtureTest<NSDeviceStatus>('devicestatus_loop', NSDeviceStatus.fromDeviceJson, test: (NSDeviceStatus status) {
+      expect(status, isNotNull);
+      expect(status.battery, equals(80.0));
+    }),
+
     FixtureTest<NSDeviceStatus>('devicestatus_bad', NSDeviceStatus.fromDeviceJson, test: (NSDeviceStatus status) {
       expect(status, isNotNull);
       expect(status.battery, isNull);
