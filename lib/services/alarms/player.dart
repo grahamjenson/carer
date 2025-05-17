@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/utils/futures.dart';
@@ -174,8 +176,9 @@ class VolumeProgressionController {
       if (player.state != PlayerState.playing) {
         break;
       }
+      double percievedVolume = pow(volume, 2).toDouble();
 
-      await player.setVolume(volume);
+      await player.setVolume(percievedVolume);
     }
 
     loopingMap[player] = false;

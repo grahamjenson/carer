@@ -234,7 +234,7 @@ class _TestAlarm extends AlarmMethods {
   String shortSummary() => "TEST ALARM";
 
   @override
-  String statment() => "TEST: Turn Off In Alarms";
+  String statment() => "Test Alarm";
 
   @override
   bool trigger() => AlarmAlertSettings().testAlarm;

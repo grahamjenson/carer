@@ -201,20 +201,20 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         borderRadius: BorderRadius.circular(10),
         borderWidth: 4,
         isSelected: [
-          20 == AlarmAlertSettings().volumeProgressionSeconds,
+          30 == AlarmAlertSettings().volumeProgressionSeconds,
           60 == AlarmAlertSettings().volumeProgressionSeconds,
           120 == AlarmAlertSettings().volumeProgressionSeconds,
         ],
         onPressed: (int index) {
           var value = -1;
           switch (index) {
-            case 1:
-              value = 20;
+            case 0:
+              value = 30;
               break;
-            case 2:
+            case 1:
               value = 60;
               break;
-            case 3:
+            case 2:
               value = 120;
               break;
           }
@@ -225,7 +225,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         },
         children: const [
           ToggleButton(
-            text: "20s",
+            text: "30s",
             height: _size,
             width: _size,
           ),
