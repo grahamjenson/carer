@@ -67,4 +67,5 @@ class CarerIcons {
   static const IconData SETTINGS_MINUS = UniconsLine.minus;
   static const IconData SETTINGS_VOLUME_DOWN = UniconsLine.volume_down;
   static const IconData SETTINGS_VOLUME_UP = UniconsLine.volume_up;
+  static const IconData SETTINGS_RANGE_ICON = UniconsLine.slider_h_range;
 }

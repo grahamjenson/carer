@@ -283,23 +283,18 @@ class AlarmAlertSettings {
     return true;
   }
 
-  String snoozeString() {
+  String snoozeDurationInMinutes() {
     if (!isSnoozing()) {
       return "";
     }
     var duration = AlarmAlertSettings().snoozeDuration!;
     var minutes = duration.inMinutes;
-    var hours = duration.inHours;
-
-    if (hours > 0) {
-      return "${hours}h";
-    }
 
     if (minutes > 0) {
-      return "${minutes}m";
+      return "$minutes";
     }
 
-    return "<1m";
+    return "<1";
   }
 }
 

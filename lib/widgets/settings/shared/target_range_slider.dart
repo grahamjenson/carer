@@ -1,4 +1,5 @@
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
 import 'package:flutter/material.dart';
@@ -55,22 +56,7 @@ class TargetRangeSlider extends StatelessWidget with ThemeMixin {
             dependencies: dependencies,
             signed: signed,
           ),
-          Expanded(
-              flex: 5,
-              child: Container(
-                  alignment: Alignment.center,
-                  height: 20,
-                  child: RangeSlider(
-                    values: RangeValues(low, high),
-                    activeColor: ColorSchemes.primaryColor, // static so not dim at night
-                    divisions: 230,
-                    min: minRange,
-                    max: maxRange,
-                    onChanged: (RangeValues vals) {
-                      setLow(vals.start.toDouble());
-                      setHigh(vals.end.toDouble());
-                    },
-                  ))),
+          Icon(CarerIcons.SETTINGS_RANGE_ICON, size: 20, color: Theme.of(context).colorScheme.primary),
           PlusMinusText(
             getStr: getStr ?? (double val) => val.toString(),
             fromStr: fromStr ?? (String str) => double.tryParse(str),
