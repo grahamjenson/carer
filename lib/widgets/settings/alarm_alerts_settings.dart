@@ -86,7 +86,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       descriptionInlineIos: true,
       description: const Flexible(
         child: Text(
-          "Notifications every 15 mintues if alarming (DANGER unreliable)",
+          "Notifications every 15 minutes if alarming (DANGER unreliable)",
         ),
       ),
       initialValue: AlarmAlertSettings().enableNotifications,
@@ -100,9 +100,10 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     return SettingsTile.switchTile(
       title: const Text("Audio Alarms"),
       descriptionInlineIos: true,
-      description: const Text(
+      description: const Flexible(
+          child: Text(
         "Play audio alert when an alarming",
-      ),
+      )),
       initialValue: AlarmAlertSettings().enableAudioAlarm,
       onToggle: (bool enable) async {
         if (enable) {
@@ -281,17 +282,17 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
           ToggleButton(
             text: "NightGuard",
             height: _size,
-            width: _size * 1.5,
+            width: _size * 1.2,
           ),
           ToggleButton(
             text: "Lets Go",
             height: _size,
-            width: _size * 1.5,
+            width: _size,
           ),
           ToggleButton(
             text: "Hybridas",
             height: _size,
-            width: _size * 1.5,
+            width: _size,
           ),
         ],
       ),

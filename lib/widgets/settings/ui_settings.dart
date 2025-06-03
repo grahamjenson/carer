@@ -103,7 +103,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
         title: const Text(
           "Override Night",
         ),
-        trailing: Text(
+        description: Text(
           description,
         ),
         descriptionInlineIos: true,

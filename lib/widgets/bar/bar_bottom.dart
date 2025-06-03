@@ -103,7 +103,7 @@ class _NavigationButtonState extends State<NavigationButton> with ThemeMixin {
           const SizedBox(height: 4.0),
           Text(
             widget.label,
-            style: TextStyle(color: color, fontSize: 10),
+            style: TextStyle(color: color, fontSize: 8),
             softWrap: false,
           ),
         ];
