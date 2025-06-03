@@ -50,6 +50,8 @@ class LogDB {
       },
     );
 
+    await DB.setPragma("logs", db);
+
     return db;
   }
 

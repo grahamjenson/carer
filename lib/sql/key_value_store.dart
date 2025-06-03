@@ -47,6 +47,8 @@ class KeyValueStore {
       },
     );
 
+    await DB.setPragma("kv", db);
+
     return db;
   }
 

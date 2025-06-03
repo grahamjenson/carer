@@ -67,23 +67,7 @@ class CarerDB {
       },
     );
 
-    // Try WAL
-    var walStr = 'PRAGMA journal_mode=WAL';
-    var busyStr = 'PRAGMA busy_timeout = 2000';
-    try {
-      await db.execute(walStr);
-      await db.execute(busyStr);
-    } catch (_) {
-      alog("database execute pragma failed");
-    }
-    try {
-      await db.rawQuery(walStr);
-      await db.rawQuery(busyStr);
-    } catch (_) {
-      alog("database rawQuery pragma failed");
-    }
-
-    alog("WAL MODE ENABLED? ${await db.rawQuery('PRAGMA journal_mode')}");
+    await DB.setPragma("carer", db);
 
     return db;
   }
