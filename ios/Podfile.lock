@@ -1,7 +1,7 @@
 PODS:
   - audioplayers_darwin (0.0.1):
     - Flutter
-  - background_fetch (1.3.7):
+  - background_fetch (1.3.8):
     - Flutter
   - battery_plus (1.0.0):
     - Flutter
@@ -114,7 +114,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
-  background_fetch: 94b36ee293e82972852dba8ede1fbcd3bd3d9d57
+  background_fetch: 851122c99dc3f25a011a6aebec5379ccdf4ab5eb
   battery_plus: 8df26ad5ade26110b2d22a4d1f582b5926983023
   cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
@@ -125,7 +125,7 @@ SPEC CHECKSUMS:
   objective_c: 89e720c30d716b036faf9c9684022048eee1eee2
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
-  screen_brightness_ios: 28c5fbdb40634de44f86025d84470158ad4df48c
+  screen_brightness_ios: 9953fd7da5bd480f1a93990daeec2eb42d4f3b52
   Sentry: da60d980b197a46db0b35ea12cb8f39af48d8854
   sentry_flutter: 27892878729f42701297c628eb90e7c6529f3684
   share_plus: 011d6fb4f9d2576b83179a3a5c5e323202cdabcf
@@ -133,7 +133,7 @@ SPEC CHECKSUMS:
   sound_mode: 53bd43e2fb1f640571ea74931ca5efdea5ddfc97
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
-  wakelock_plus: 04623e3f525556020ebd4034310f20fe7fda8b49
+  wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
 
 PODFILE CHECKSUM: cc90aa543993b9e6651fc1a46a23df9ca3d654a0
 
