@@ -26,12 +26,10 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
   late AnimationController _controller;
   late final Animation<double> _curvedAnimation;
 
-  bool isSnoozing = false;
   @override
   void initState() {
     super.initState();
 
-    isSnoozing = AlarmAlertSettings().snoozeDuration != null;
     _controller = AnimationController(
       vsync: this,
       duration: holdDuration,
@@ -48,6 +46,8 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
       reverseCurve: Curves.easeOut,
     );
   }
+
+  bool get isSnoozing => AlarmAlertSettings().snoozeDuration != null;
 
   void _startHold() {
     if (isSnoozing) {
