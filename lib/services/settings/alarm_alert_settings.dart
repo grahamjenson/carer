@@ -37,6 +37,7 @@ enum SnoozeReason {
   wakeUpWhenInRange,
   wakeUpWhenUrgent,
   noButtonPressed,
+  appBarButtonPressed,
   unknown,
 }
 

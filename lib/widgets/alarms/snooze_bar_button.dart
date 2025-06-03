@@ -50,10 +50,6 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
   bool get isSnoozing => AlarmAlertSettings().snoozeDuration != null;
 
   void _startHold() {
-    if (isSnoozing) {
-      GoRouter.of(context).go("/snooze");
-      return; // Do not allow holding if already snoozing
-    }
     _controller.forward(from: max(0.1, _curvedAnimation.value));
   }
 
@@ -84,29 +80,33 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
+              var colors = [
+                primaryColor(context).withAlpha(255),
+                primaryColor(context).withAlpha(255),
+                accentColor(context).withAlpha(255),
+                accentColor(context).withAlpha(255),
+              ];
+
+              var buttonSnooze = "Hold to Snooze";
+
+              if (isSnoozing) {
+                colors = colors.reversed.toList();
+
+                buttonSnooze = "Snooze";
+              }
+
               BoxDecoration buttonDecoration = BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [
-                    primaryColor(context).withAlpha(255),
-                    primaryColor(context).withAlpha(255),
-                    accentColor(context).withAlpha(255),
-                    accentColor(context).withAlpha(255),
-                  ],
+                  colors: colors,
                   stops: [
                     0, _curvedAnimation.value, _curvedAnimation.value, 1.0, // The fade to transparent starts at 90% of the width
                   ],
                 ),
               );
               Size size = const Size(180, 100);
-              if (isSnoozing) {
-                buttonDecoration = BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  color: primaryColor(context),
-                );
-              }
 
               ButtonStyle buttonStyle = ElevatedButton.styleFrom(
                 minimumSize: size,
@@ -120,10 +120,6 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
                 ),
               );
 
-              var buttonSnooze = "Hold to Snooze";
-              if (isSnoozing) {
-                buttonSnooze = "Snooze";
-              }
               Widget snoozeIcon = Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -145,7 +141,7 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
                 style: buttonStyle,
                 onPressed: () {
                   if (isSnoozing) {
-                    GoRouter.of(context).go("/snooze");
+                    AlarmAlertSettings().setSnoozeDurationSeconds(null, SnoozeReason.appBarButtonPressed);
                   } else {
                     _controller.reverse(from: max(0.4, _curvedAnimation.value));
                   }
@@ -178,7 +174,7 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
 
   Widget snoozeStrings(BuildContext context) {
     return Container(
-      width: 80,
+      width: 75,
       height: 40,
       alignment: Alignment.center,
       child: SmartText(texts: [
@@ -187,12 +183,12 @@ class _SnoozeBarButtonState extends State<SnoozeBarButton> with SingleTickerProv
       ], styles: [
         labelLarge(context).copyWith(
           height: 0.6,
-          fontSize: 40,
+          fontSize: 36,
           color: Colors.black,
         ),
         labelSmall(context).copyWith(
           height: 0.6,
-          fontSize: 20,
+          fontSize: 18,
           color: Colors.black,
         ),
       ]),
