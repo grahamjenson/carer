@@ -17,7 +17,7 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        var fixedWidth = 100.0;
+        var fixedWidth = 96.0;
         List<Widget> tiles = [
           SizedBox(
             width: fixedWidth,
@@ -35,7 +35,7 @@ class BarTop extends StatelessWidget with ThemeMixin implements PreferredSizeWid
 
         return BottomAppBar(
           color: backgroundColorShade(context),
-          padding: const EdgeInsets.only(left: 8, right: 8),
+          padding: const EdgeInsets.only(left: 5, right: 5),
           height: 40,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

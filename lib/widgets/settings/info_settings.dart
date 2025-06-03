@@ -53,7 +53,7 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
       },
       descriptionInlineIos: true,
       title: Text(stat.title),
-      description: SmartText(texts: ["${stat.description}\n"] + texts, styles: [descriptionStyle] + styles),
+      description: Flexible(child: SmartText(texts: ["${stat.description}\n"] + texts, styles: [descriptionStyle] + styles)),
       leading: Icon(stat.icon, color: iconColor),
     );
   }
