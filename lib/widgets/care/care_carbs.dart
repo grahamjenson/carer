@@ -26,7 +26,6 @@ class CarbsSettingsModel extends CareModel {
   int getCarbs() => carbsSignal.value;
 
   void setCarbs(int d) {
-    print("Setting carbs to $d for ${carbsSignal.debugLabel}");
     if (d < MIN_CARBS) {
       d = MIN_CARBS;
     }
