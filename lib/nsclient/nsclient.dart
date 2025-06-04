@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -26,7 +27,7 @@ String toNSDateString(DateTime dt) {
   return "$year-$month-${day}T$hour:$minute";
 }
 
-Uri testEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/summary.json?token=$token');
+Uri testEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/authorization/request/token=$token');
 
 Uri entryEndpoint(nsURL, token, DateTime gteCreatedAt) =>
     Uri.parse('$nsURL/api/v1/entries.json?token=$token&find[date][\$gte]=${gteCreatedAt.millisecondsSinceEpoch}&count=1000');
@@ -101,13 +102,17 @@ class NSClient {
     }
 
     var ep = testEndpoint(nsURL, token);
-    final (response, err) = await go(http.get(ep));
+    final (response, err) = await go(http.get(ep).timeout(const Duration(seconds: 3)));
     if (err != null || response == null) {
+      if (err is TimeoutException) {
+        return "Timeout: Could not connect to NightScout in 3 seconds";
+      }
       return "Error: $err";
     }
     if (response.statusCode != 200) {
       return "Bad Response: ${response.body}";
     }
+
     return null;
   }
 

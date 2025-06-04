@@ -1,6 +1,7 @@
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
@@ -17,22 +18,44 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
 
   String nightscoutMessage = "";
   bool nightscoutValid = false;
+  TextStyle activeBtnTextStyle = const TextStyle(fontSize: 30, color: ColorSchemes.primaryColor);
+  TextStyle nullBtnTextStyle = TextStyle(fontSize: 30, color: ColorSchemes.primaryColor.dim.dim);
+
+  ButtonStyle activeBtnStyle = ButtonStyle(
+    backgroundColor: WidgetStateProperty.all<Color>(ColorSchemes.accentColor.dim.dim.dim),
+    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(20)),
+    textStyle: WidgetStateProperty.all<TextStyle>(
+      const TextStyle(fontSize: 30, color: ColorSchemes.primaryColor),
+    ),
+    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+    side: WidgetStateProperty.all<BorderSide>(
+      BorderSide(color: ColorSchemes.accentColor.dim.dim, width: 1), // Change border color here
+    ),
+  );
+
+  ButtonStyle nullBtnStyle = ButtonStyle(
+    backgroundColor: WidgetStateProperty.all<Color>(ColorSchemes.accentColor.dim.dim.dim),
+    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(20)),
+    textStyle: WidgetStateProperty.all<TextStyle>(
+      TextStyle(fontSize: 30, color: ColorSchemes.primaryColor.dim.dim),
+    ),
+    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+    side: WidgetStateProperty.all<BorderSide>(
+      BorderSide(color: ColorSchemes.accentColor.dim.dim, width: 1), // Change border color here
+    ),
+  );
 
   @override
   void initState() {
     super.initState();
-    _nsTextController.addListener(() async {
-      var (url, token) = SecureSettings().nightscoutURLAndTokenFromString(_nsTextController.text);
-
-      var errMsg = await NSClient().testNSUrlAndToken(url, token);
-      if (errMsg != null) {
-        setState(() => nightscoutMessage = errMsg);
-        setState(() => nightscoutValid = false);
-      } else {
-        setState(() => nightscoutMessage = "");
-        setState(() => nightscoutValid = true);
-      }
-    });
   }
 
   @override
@@ -43,30 +66,34 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    ButtonStyle btnStyle = ButtonStyle(
-      backgroundColor: WidgetStateProperty.all<Color>(accentColor(context).dim.dim.dim),
-      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(20)),
-      textStyle: WidgetStateProperty.all<TextStyle>(
-        const TextStyle(
-          fontSize: 30,
-        ),
-      ),
-      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-      ),
-      side: WidgetStateProperty.all<BorderSide>(
-        BorderSide(color: accentColor(context).dim.dim, width: 1), // Change border color here
-      ),
-    );
+    onTestPressed() async {
+      var (url, token) = SecureSettings().nightscoutURLAndTokenFromString(_nsTextController.text);
 
-    VoidCallback? onPressed;
-    if (nightscoutValid) {
-      onPressed = () {
+      var (bigErr, errMsg) = await go(NSClient().testNSUrlAndToken(url, token));
+      if (bigErr != null) {
+        errMsg = bigErr.toString();
+      }
+
+      if (errMsg != null) {
+        setState(() => nightscoutMessage = "$errMsg");
+        setState(() => nightscoutValid = false);
+      } else {
         SecureSettings().setNSValuesFromURL(_nsTextController.text);
+        setState(() => nightscoutMessage = "");
+        setState(() => nightscoutValid = true);
+      }
+    }
+
+    VoidCallback? nextPressed;
+    var nextBtnStyle = nullBtnStyle;
+    var nextBtnTextStyle = nullBtnTextStyle;
+
+    if (nightscoutValid) {
+      nextPressed = () {
         GoRouter.of(context).go('/display');
       };
+      nextBtnStyle = activeBtnStyle;
+      nextBtnTextStyle = activeBtnTextStyle;
     }
 
     String errMessageString = "";
@@ -96,17 +123,21 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
             thickness: 10,
             color: Colors.blue.dim,
           ),
-          ElevatedButton(
-            style: btnStyle,
-            onPressed: onPressed,
-            child: const Text("Next"),
-          ),
-          ElevatedButton(
-            style: btnStyle,
-            onPressed: onPressed = () {
-              GoRouter.of(context).go('/display');
-            },
-            child: const Text("Skip"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: activeBtnStyle,
+                onPressed: onTestPressed,
+                child: Text("Save", style: activeBtnTextStyle),
+              ),
+              ElevatedButton(
+                style: nextBtnStyle,
+                onPressed: nextPressed,
+                child: Text("Next", style: nextBtnTextStyle),
+              ),
+            ],
           ),
         ],
       ),
