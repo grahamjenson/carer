@@ -5,6 +5,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/services/update_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/care/care_model.dart';
 import 'package:carer/widgets/common/dialogs.dart';
 import 'package:carer/widgets/smarttext.dart';
@@ -17,10 +18,25 @@ typedef Setter = void Function(int);
 typedef Getter = int Function();
 
 class CarbsSettingsModel extends CareModel {
-  final Getter getCarbs;
-  final Setter setCarbs;
+  int MIN_CARBS = 1;
+  int MAX_CARBS = 50;
 
-  CarbsSettingsModel(this.getCarbs, this.setCarbs);
+  ASignal<int> carbsSignal;
+
+  int getCarbs() => carbsSignal.value;
+
+  void setCarbs(int d) {
+    print("Setting carbs to $d for ${carbsSignal.debugLabel}");
+    if (d < MIN_CARBS) {
+      d = MIN_CARBS;
+    }
+    if (d > MAX_CARBS) {
+      d = MAX_CARBS;
+    }
+    carbsSignal.value = d;
+  }
+
+  CarbsSettingsModel(this.carbsSignal);
 
   @override
   String get description => "${getCarbs()}g Carb";
@@ -70,20 +86,8 @@ class CarbsSettingsModel extends CareModel {
 }
 
 List<CarbsSettingsModel> allCarbs = [
-  CarbsSettingsModel(
-    () => CareSettings().carbs1Value,
-    (int d) => CareSettings().carbs1Value = d.toInt(),
-  ),
-  CarbsSettingsModel(
-    () => CareSettings().carbs2Value,
-    (int d) => CareSettings().carbs2Value = d.toInt(),
-  ),
-  CarbsSettingsModel(
-    () => CareSettings().carbs3Value,
-    (int d) => CareSettings().carbs3Value = d.toInt(),
-  ),
-  CarbsSettingsModel(
-    () => CareSettings().carbs4Value,
-    (int d) => CareSettings().carbs4Value = d.toInt(),
-  ),
+  CarbsSettingsModel(CareSettings().carbs1Signal),
+  CarbsSettingsModel(CareSettings().carbs2Signal),
+  CarbsSettingsModel(CareSettings().carbs3Signal),
+  CarbsSettingsModel(CareSettings().carbs4Signal),
 ];

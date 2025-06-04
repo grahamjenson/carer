@@ -29,11 +29,18 @@ class PlusMinusText extends StatefulWidget with ThemeMixin {
 
 class _PlusMinusTextState extends State<PlusMinusText> {
   final TextEditingController _controller = TextEditingController();
+  final focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _controller.text = widget.getStr(widget.getValue());
+
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        setValue();
+      }
+    });
   }
 
   @override
@@ -48,40 +55,44 @@ class _PlusMinusTextState extends State<PlusMinusText> {
       // https://medium.com/@gabrieloranekwu/number-input-on-flutter-textfields-the-right-way-06441f7b5550
       _controller.text = widget.getStr(widget.getValue());
 
-      var regex = widget.signed ? r'[-+]?[0-9.]?' : r'[0-9.]?';
       return Container(
         alignment: Alignment.center,
         width: 50,
         height: 30,
-        child: TextField(
-          controller: _controller,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(regex)),
-            SinglePeriodEnforcer(),
-          ],
-          style: const TextStyle(
-            fontSize: 12,
-            height: 0.8,
-            color: ColorSchemes.primaryColor,
-          ),
-          keyboardType: TextInputType.numberWithOptions(decimal: true, signed: widget.signed),
-          textAlign: TextAlign.center,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(0),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0),
-            ),
-          ),
-          onEditingComplete: () => setValue(),
-          onTapOutside: (event) => setValue(),
-          onTap: () => _controller.selection = TextSelection(baseOffset: 0, extentOffset: _controller.value.text.length),
-        ),
+        child: getTextField(),
       );
     }, debugLabel: "PlusMinusText", dependencies: widget.dependencies);
   }
 
+  TextField getTextField() {
+    var regex = widget.signed ? r'[-+]?[0-9.]?' : r'[0-9.]?';
+    var tf = TextField(
+      controller: _controller,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(regex)),
+        SinglePeriodEnforcer(),
+      ],
+      style: const TextStyle(
+        fontSize: 12,
+        height: 0.8,
+        color: ColorSchemes.primaryColor,
+      ),
+      keyboardType: TextInputType.numberWithOptions(decimal: true, signed: widget.signed),
+      textAlign: TextAlign.center,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.all(0),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
+      ),
+      focusNode: focusNode,
+      onTap: () => _controller.selection = TextSelection(baseOffset: 0, extentOffset: _controller.value.text.length),
+    );
+
+    return tf;
+  }
+
   setValue() {
-    FocusScope.of(context).unfocus();
     double? value = widget.fromStr(_controller.text);
     if (value != null) {
       widget.setValue(value);

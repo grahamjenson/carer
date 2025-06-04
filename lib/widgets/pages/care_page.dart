@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -65,7 +66,7 @@ class CarePage extends StatelessWidget with ThemeMixin {
         );
       },
       debugLabel: "CarePage",
-      dependencies: [UISettings().orientationSignal],
+      dependencies: [UISettings().orientationSignal] + CareSettings().allSignals(),
     );
   }
 

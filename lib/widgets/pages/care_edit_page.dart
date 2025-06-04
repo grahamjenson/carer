@@ -1,5 +1,7 @@
+import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/care/care_carbs.dart';
 import 'package:carer/widgets/care/care_temp_targets.dart';
 import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
@@ -12,22 +14,28 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    var sections = SettingsList(sections: [
-      SettingsSection(
-        title: const Text('Edit Carbs Settings'),
-        tiles: allCarbs.map((e) => carbsEdit(context, e)).toList(),
-      ),
-      SettingsSection(
-        title: const Text('Edit Temp Target'),
-        tiles: allTempTargets.where((e) => !e.isCancel).map((e) => tempTargetEdit(context, e)).toList(),
-      )
-    ]);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Care'),
-        actions: [getDoneButton(context)],
-      ),
-      body: sections,
+    return AWatch(
+      (context) {
+        var sections = SettingsList(sections: [
+          SettingsSection(
+            title: const Text('Edit Carbs Settings'),
+            tiles: allCarbs.map((e) => carbsEdit(context, e)).toList(),
+          ),
+          SettingsSection(
+            title: const Text('Edit Temp Target'),
+            tiles: allTempTargets.where((e) => !e.isCancel).map((e) => tempTargetEdit(context, e)).toList(),
+          )
+        ]);
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Care'),
+            actions: [getDoneButton(context)],
+          ),
+          body: sections,
+        );
+      },
+      debugLabel: "CareEditPage",
+      dependencies: [UISettings().unitSignal, UISettings().orientationSignal] + CareSettings().allSignals(),
     );
   }
 
@@ -63,7 +71,6 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
     );
 
     Widget trailing = SizedBox(
-        key: ValueKey("care_edit_temptarget_$name"),
         width: 170,
         child: Row(
           children: [
@@ -114,10 +121,7 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
   }
 
   SettingsTile carbsEdit(BuildContext context, CarbsSettingsModel e) {
-    var carbs = e.getCarbs();
-
     Widget trailing = SizedBox(
-      key: ValueKey("care_edit_carbs_$carbs"),
       width: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -127,7 +131,7 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
             fromStr: (String str) => double.tryParse(str),
             getValue: () => e.getCarbs().toDouble(),
             setValue: (double val) => e.setCarbs(val.toInt()),
-            dependencies: const [],
+            dependencies: [e.carbsSignal],
           ),
         ],
       ),

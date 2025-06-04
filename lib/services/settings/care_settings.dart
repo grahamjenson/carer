@@ -50,51 +50,22 @@ class CareSettings {
     return _signals.values.toList();
   }
 
-  int MIN_CARBS = 1;
-  int MAX_CARBS = 50;
-  int get carbs1Value => _signals[_CSNames.carbs1Value]!.value;
-  set carbs1Value(int value) {
-    if (value < MIN_CARBS) {
-      value = MIN_CARBS;
-    }
-    if (value > MAX_CARBS) {
-      value = MAX_CARBS;
-    }
-    _signals[_CSNames.carbs1Value]!.value = value;
-  }
+  ASignal<int> get carbs1Signal => _signals[_CSNames.carbs1Value] as ASignal<int>;
+  ASignal<int> get carbs2Signal => _signals[_CSNames.carbs2Value] as ASignal<int>;
+  ASignal<int> get carbs3Signal => _signals[_CSNames.carbs3Value] as ASignal<int>;
+  ASignal<int> get carbs4Signal => _signals[_CSNames.carbs4Value] as ASignal<int>;
 
-  int get carbs2Value => _signals[_CSNames.carbs2Value]!.value;
-  set carbs2Value(int value) {
-    if (value < MIN_CARBS) {
-      value = MIN_CARBS;
-    }
-    if (value > MAX_CARBS) {
-      value = MAX_CARBS;
-    }
-    _signals[_CSNames.carbs2Value]!.value = value;
-  }
+  ASignal<double> get tempTargetHypoBottomSignal => _signals[_CSNames.tempTargetHypoBottom] as ASignal<double>;
+  ASignal<double> get tempTargetHypoTopSignal => _signals[_CSNames.tempTargetHypoTop] as ASignal<double>;
+  ASignal<int> get tempTargetHypoDurationSignal => _signals[_CSNames.tempTargetHypoDuration] as ASignal<int>;
 
-  int get carbs3Value => _signals[_CSNames.carbs3Value]!.value;
-  set carbs3Value(int value) {
-    if (value < MIN_CARBS) {
-      value = MIN_CARBS;
-    }
-    if (value > MAX_CARBS) {
-      value = MAX_CARBS;
-    }
-    _signals[_CSNames.carbs3Value]!.value = value;
-  }
+  ASignal<double> get tempTargetActivityBottomSignal => _signals[_CSNames.tempTargetActivityBottom] as ASignal<double>;
+  ASignal<double> get tempTargetActivityTopSignal => _signals[_CSNames.tempTargetActivityTop] as ASignal<double>;
+  ASignal<int> get tempTargetActivityDurationSignal => _signals[_CSNames.tempTargetActivityDuration] as ASignal<int>;
 
-  int get carbs4Value => _signals[_CSNames.carbs4Value]!.value;
-  set carbs4Value(int value) {
-    if (value < MIN_CARBS) {
-      value = MIN_CARBS;
-    }
-    if (value > MAX_CARBS) {
-      value = MAX_CARBS;
-    }
-    _signals[_CSNames.carbs4Value]!.value = value;
-  }
+  ASignal<double> get tempTargetEatingBottomSignal => _signals[_CSNames.tempTargetEatingBottom] as ASignal<double>;
+  ASignal<double> get tempTargetEatingTopSignal => _signals[_CSNames.tempTargetEatingTop] as ASignal<double>;
+  ASignal<int> get tempTargetEatingDurationSignal => _signals[_CSNames.tempTargetEatingDuration] as ASignal<int>;
 
   double get tempTargetHypoBottom => _signals[_CSNames.tempTargetHypoBottom]!.value;
   set tempTargetHypoBottom(double value) {
@@ -194,10 +165,10 @@ class CareSettings {
   }
 
   setupDBPropagation(KeyValueStore prefs) {
-    carbs1Value = prefs.getInt(_CSNames.carbs1Value.name) ?? 1;
-    carbs2Value = prefs.getInt(_CSNames.carbs2Value.name) ?? 5;
-    carbs3Value = prefs.getInt(_CSNames.carbs3Value.name) ?? 10;
-    carbs4Value = prefs.getInt(_CSNames.carbs4Value.name) ?? 15;
+    carbs1Signal.value = prefs.getInt(_CSNames.carbs1Value.name) ?? 1;
+    carbs2Signal.value = prefs.getInt(_CSNames.carbs2Value.name) ?? 5;
+    carbs3Signal.value = prefs.getInt(_CSNames.carbs3Value.name) ?? 10;
+    carbs4Signal.value = prefs.getInt(_CSNames.carbs4Value.name) ?? 15;
 
     tempTargetHypoBottom = prefs.getDouble(_CSNames.tempTargetHypoBottom.name) ?? 144;
     tempTargetHypoTop = prefs.getDouble(_CSNames.tempTargetHypoTop.name) ?? 144;
@@ -211,10 +182,10 @@ class CareSettings {
     tempTargetEatingTop = prefs.getDouble(_CSNames.tempTargetEatingTop.name) ?? 90.0;
     tempTargetEatingDuration = prefs.getInt(_CSNames.tempTargetEatingDuration.name) ?? 30;
 
-    aeffect(() => prefs.setInt(_CSNames.carbs1Value.name, carbs1Value), debugLabel: 'writecarbs1Value');
-    aeffect(() => prefs.setInt(_CSNames.carbs2Value.name, carbs2Value), debugLabel: 'writecarbs2Value');
-    aeffect(() => prefs.setInt(_CSNames.carbs3Value.name, carbs3Value), debugLabel: 'writecarbs3Value');
-    aeffect(() => prefs.setInt(_CSNames.carbs4Value.name, carbs4Value), debugLabel: 'writecarbs4Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs1Value.name, carbs1Signal.value), debugLabel: 'writecarbs1Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs2Value.name, carbs2Signal.value), debugLabel: 'writecarbs2Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs3Value.name, carbs3Signal.value), debugLabel: 'writecarbs3Value');
+    aeffect(() => prefs.setInt(_CSNames.carbs4Value.name, carbs4Signal.value), debugLabel: 'writecarbs4Value');
 
     aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoBottom.name, tempTargetHypoBottom), debugLabel: 'writetempTargetHypoBottom');
     aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoTop.name, tempTargetHypoTop), debugLabel: 'writetempTargetHypoTop');
