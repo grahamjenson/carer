@@ -78,7 +78,6 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
         setState(() => nightscoutMessage = "$errMsg");
         setState(() => nightscoutValid = false);
       } else {
-        SecureSettings().setNSValuesFromURL(_nsTextController.text);
         setState(() => nightscoutMessage = "");
         setState(() => nightscoutValid = true);
       }
@@ -90,6 +89,7 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
 
     if (nightscoutValid) {
       nextPressed = () {
+        SecureSettings().setNSValuesFromURL(_nsTextController.text);
         GoRouter.of(context).go('/display');
       };
       nextBtnStyle = activeBtnStyle;
@@ -130,12 +130,12 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
               ElevatedButton(
                 style: activeBtnStyle,
                 onPressed: onTestPressed,
-                child: Text("Save", style: activeBtnTextStyle),
+                child: Text("Test", style: activeBtnTextStyle),
               ),
               ElevatedButton(
                 style: nextBtnStyle,
                 onPressed: nextPressed,
-                child: Text("Next", style: nextBtnTextStyle),
+                child: Text("Save & Next", style: nextBtnTextStyle),
               ),
             ],
           ),

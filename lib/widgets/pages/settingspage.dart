@@ -27,10 +27,10 @@ class _SettingsPageState extends State<SettingsPage> with ThemeMixin {
     var miscPage = SettingsList(
       key: const ValueKey("SettingsPageMisc"),
       sections: [
-        ServicesSettingsWidget(),
         const UISettingsWidget(),
-        const DebugSettingsWidget(),
+        ServicesSettingsWidget(),
         const AboutSettingsWidget(),
+        const DebugSettingsWidget(),
       ],
     );
 
