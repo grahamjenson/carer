@@ -87,6 +87,7 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
     var nextBtnStyle = nullBtnStyle;
     var nextBtnTextStyle = nullBtnTextStyle;
 
+    String errMessageString = "";
     if (nightscoutValid) {
       nextPressed = () {
         SecureSettings().setNSValuesFromURL(_nsTextController.text);
@@ -94,9 +95,9 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
       };
       nextBtnStyle = activeBtnStyle;
       nextBtnTextStyle = activeBtnTextStyle;
+      errMessageString = "Good to go!";
     }
 
-    String errMessageString = "";
     if (nightscoutMessage.isNotEmpty) {
       errMessageString = "\n\n **Error**: $nightscoutMessage";
     }
@@ -112,26 +113,32 @@ class _NSSetupPageState extends State<NSSetupPage> with ThemeMixin {
             autofocus: true,
             controller: _nsTextController,
           ),
+          const Divider(
+            height: 10,
+            thickness: 10,
+            color: Colors.transparent,
+          ),
+          ElevatedButton(
+            style: activeBtnStyle,
+            onPressed: onTestPressed,
+            child: Text("Test", style: activeBtnTextStyle),
+          ),
+          MarkdownBody(data: errMessageString),
           Divider(
             height: 40,
             thickness: 10,
             color: Colors.blue.dim,
           ),
-          MarkdownBody(data: "**URL**: $nsURL \n\n **TOKEN**: $token$errMessageString"),
-          Divider(
-            height: 40,
+          MarkdownBody(data: "**URL**: $nsURL \n\n **TOKEN**: $token"),
+          const Divider(
+            height: 10,
             thickness: 10,
-            color: Colors.blue.dim,
+            color: Colors.transparent,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ElevatedButton(
-                style: activeBtnStyle,
-                onPressed: onTestPressed,
-                child: Text("Test", style: activeBtnTextStyle),
-              ),
               ElevatedButton(
                 style: nextBtnStyle,
                 onPressed: nextPressed,
