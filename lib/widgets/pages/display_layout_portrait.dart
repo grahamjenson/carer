@@ -18,7 +18,7 @@ class DisplayLayoutPortrait extends StatefulWidget {
 class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with SingleTickerProviderStateMixin, ThemeMixin {
   late AnimationController _controller;
   late final Animation<double> _curvedAnimation;
-  late final Animation<double> _animation;
+  late final Animation<double> _shrinkAnimation;
 
   @override
   void initState() {
@@ -26,21 +26,25 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
     );
+
+    if (UISettings().focusBGL) {
+      _controller.value = 1.0;
+    } else {
+      _controller.value = 0.0;
+    }
 
     _curvedAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.linear,
     );
 
-    _animation = Tween<double>(begin: 4, end: 10).animate(_curvedAnimation);
+    _shrinkAnimation = Tween<double>(begin: 8, end: 0).animate(_curvedAnimation);
   }
 
   @override
   void dispose() {
-    print("aaa REMOVING PPPPPPP A LISTENER!!!");
-
     _controller.dispose();
     super.dispose();
   }
@@ -50,35 +54,39 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
     return AWatch(
       (context) {
         if (UISettings().focusBGL) {
-          _controller.forward(from: 0.0);
+          _controller.forward();
         } else {
-          _controller.reverse(from: 1.0);
+          _controller.reverse();
         }
 
         return AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
-              int flex = _animation.value.toInt();
-              print("aaa BGL Flex: $flex  ");
+              var restFlex = _shrinkAnimation.value.toInt();
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(flex: flex, child: const BGL()),
-                  const AlarmWidget(flex: 2),
-                  Divider(color: outlineColor(context)),
-                  const Flexible(flex: 4, child: BGLChart()),
-                  Flexible(
-                    flex: 2,
-                    child: Row(
-                      children: [
-                        Flexible(child: Treatments()),
-                        Flexible(child: InfoWidget()),
-                      ],
+              List<Widget> children = [
+                const Expanded(flex: 16, child: BGL()),
+                const AlarmWidget(flex: 8),
+              ];
+
+              if (restFlex > 0) {
+                children.addAll(
+                  [
+                    Divider(color: outlineColor(context)),
+                    Flexible(flex: restFlex * 2, child: const BGLChart()),
+                    Flexible(
+                      flex: restFlex,
+                      child: Row(
+                        children: [
+                          Flexible(child: Treatments()),
+                          Flexible(child: InfoWidget()),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              );
+                  ],
+                );
+              }
+              return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children);
             });
       },
       debugLabel: "DisplayLayoutPortrait",

@@ -18,7 +18,7 @@ class DisplayLayoutLandscape extends StatefulWidget {
 class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with SingleTickerProviderStateMixin, ThemeMixin {
   late AnimationController _controller;
   late final Animation<double> _curvedAnimation;
-  late final Animation<double> _animation;
+  late final Animation<double> _shrinkAnimation;
 
   @override
   void initState() {
@@ -26,21 +26,25 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
     );
+
+    if (UISettings().focusBGL) {
+      _controller.value = 1.0;
+    } else {
+      _controller.value = 0.0;
+    }
 
     _curvedAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.linear,
     );
 
-    _animation = Tween<double>(begin: 4, end: 10).animate(_curvedAnimation);
+    _shrinkAnimation = Tween<double>(begin: 10, end: 0).animate(_curvedAnimation);
   }
 
   @override
   void dispose() {
-    print("aaa REMOVING PPPPPPP A LISTENER!!!");
-
     _controller.dispose();
     super.dispose();
   }
@@ -50,51 +54,60 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
     return AWatch(
       (context) {
         if (UISettings().focusBGL) {
-          _controller.forward(from: 0.0);
+          _controller.forward();
         } else {
-          _controller.reverse(from: 1.0);
+          _controller.reverse();
         }
 
         return AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
-              int flex = _animation.value.toInt();
-              print("aaa BGL Flex: $flex  ");
+              var bglFlex = 10;
+              var restFlex = _shrinkAnimation.value.toInt();
 
+              List<Widget> children = [
+                Flexible(
+                  flex: bglFlex,
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Flexible(flex: 4, child: BGL()),
+                      AlarmWidget(flex: 2),
+                    ],
+                  ),
+                ),
+              ];
+
+              if (restFlex > 0) {
+                children.addAll(
+                  [
+                    VerticalDivider(
+                      color: outlineColor(context),
+                      width: 1,
+                    ),
+                    Flexible(
+                      flex: restFlex,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Flexible(flex: 3, child: BGLChart()),
+                          Flexible(
+                            flex: 2,
+                            child: Row(
+                              children: [
+                                Flexible(child: Treatments()),
+                                Flexible(child: InfoWidget()),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
               return Row(
-                children: [
-                  Flexible(
-                    flex: flex,
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Flexible(flex: 4, child: BGL()),
-                        AlarmWidget(flex: 2),
-                      ],
-                    ),
-                  ),
-                  VerticalDivider(
-                    color: outlineColor(context),
-                    width: 1,
-                  ),
-                  Flexible(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Flexible(flex: 3, child: BGLChart()),
-                        Flexible(
-                          flex: 2,
-                          child: Row(
-                            children: [
-                              Flexible(child: Treatments()),
-                              Flexible(child: InfoWidget()),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+                children: children,
               );
             });
       },

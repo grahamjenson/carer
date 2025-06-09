@@ -36,41 +36,12 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       var (lowTargets, highTargets) = targetSpots(targets);
       var (carbSpots, bolusSpots) = treatmentsSpots(lastTreatments);
 
-      var buttonTextStyle = labelLarge(context).copyWith(color: onBackgroundColor(context));
       return Window(
         child: Column(children: [
           Flexible(
-              flex: 15,
-              child: ToggleButtons(
-                  selectedColor: accentColor(context),
-                  constraints: const BoxConstraints(maxHeight: 20, minWidth: 53, minHeight: 20),
-                  isSelected: [
-                    chartHoursAgo == 2,
-                    chartHoursAgo == 4,
-                    chartHoursAgo == 6,
-                    chartHoursAgo == 12,
-                    chartHoursAgo == 24,
-                  ],
-                  onPressed: (int index) {
-                    if (index == 0) {
-                      chartHoursAgo = 2;
-                    } else if (index == 1) {
-                      chartHoursAgo = 4;
-                    } else if (index == 2) {
-                      chartHoursAgo = 6;
-                    } else if (index == 3) {
-                      chartHoursAgo = 12;
-                    } else if (index == 4) {
-                      chartHoursAgo = 24;
-                    }
-                  },
-                  children: [
-                    Text("2h", style: buttonTextStyle),
-                    Text("4h", style: buttonTextStyle),
-                    Text("6h", style: buttonTextStyle),
-                    Text("12h", style: buttonTextStyle),
-                    Text("24h", style: buttonTextStyle),
-                  ])),
+            flex: 15,
+            child: getToggleButtonsForChartTime(context),
+          ),
           Flexible(
             flex: 90,
             child: LineChart(
@@ -91,6 +62,34 @@ class BGLChart extends StatelessWidget with ThemeMixin {
         ]),
       );
     }, debugLabel: "BGLChart");
+  }
+
+  Widget getToggleButtonsForChartTime(BuildContext context) {
+    var buttonTextStyle = labelLarge(context).copyWith(color: onBackgroundColor(context));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [2, 4, 6, 12, 24].map((value) {
+        final bool isSelected = chartHoursAgo == value;
+        return Flexible(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              backgroundColor: isSelected ? primaryColor(context).dim.dim : backgroundColor(context),
+              textStyle: buttonTextStyle,
+              side: BorderSide(color: backgroundColor(context).bright.bright, width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+            onPressed: () {
+              chartHoursAgo = value;
+            },
+            child: Text("${value}h", style: buttonTextStyle),
+          ),
+        );
+      }).toList(),
+    );
   }
 
   LineChartData buildlineChartData(
