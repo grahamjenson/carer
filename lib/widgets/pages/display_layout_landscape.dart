@@ -26,7 +26,7 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
     );
 
     if (UISettings().focusBGL) {
@@ -37,7 +37,8 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
 
     _curvedAnimation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.linear,
+      curve: Curves.easeInOutCubic,
+      reverseCurve: Curves.easeInOutCubic.flipped,
     );
 
     _shrinkAnimation = Tween<double>(begin: 10, end: 0).animate(_curvedAnimation);
