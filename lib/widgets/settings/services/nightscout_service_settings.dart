@@ -23,11 +23,6 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
   @override
   void initState() {
     super.initState();
-    if (SecureSettings().nightscoutURLWithToken != null) {
-      _nsTextController.text = SecureSettings().nightscoutURLWithToken!;
-    } else {
-      _nsTextController.text = "";
-    }
   }
 
   @override
@@ -75,11 +70,25 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                 SettingsTile(
                   title: Expanded(
                       child: TextField(
-                    decoration: const InputDecoration(hintText: "NightScout URL with Token"),
+                    decoration: InputDecoration(
+                      hintText: "https://example.com?token=your_token",
+                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+                      filled: true,
+                      fillColor: Colors.black,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide: const BorderSide(color: ColorSchemes.accentColor, width: 1.5),
+                      ),
+                    ),
                     autofocus: true,
                     controller: _nsTextController,
                   )),
-                  description: const Flexible(child: Text("e.g. https://example.com?token=your_token")),
+                  description: const Flexible(child: Text("Set NightScout URL with Token")),
                   descriptionInlineIos: true,
                 ),
                 SettingsTile(

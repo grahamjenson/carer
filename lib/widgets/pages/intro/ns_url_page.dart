@@ -51,6 +51,11 @@ class NSSetupPage extends StatelessWidget with ThemeMixin {
                 onPressed: nextPressed,
                 child: const Text("Next"),
               ),
+              const Divider(
+                height: 10,
+                thickness: 10,
+                color: Colors.transparent,
+              ),
             ],
           ),
         );
