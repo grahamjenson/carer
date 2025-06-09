@@ -65,6 +65,16 @@ class SecureSettings {
     return (nightscoutURL ?? "", nightscoutToken ?? "");
   }
 
+  String? get nightscoutURLWithToken {
+    if (nightscoutURL == null || nightscoutURL!.isEmpty) {
+      return null;
+    }
+    if (nightscoutToken == null || nightscoutToken!.isEmpty) {
+      return null;
+    }
+    return "$nightscoutURL?token=$nightscoutToken";
+  }
+
   bool nightscoutURLAndTokenSet() {
     return nightscoutURL != null && nightscoutToken != null && nightscoutURL!.isNotEmpty && nightscoutToken!.isNotEmpty;
   }
