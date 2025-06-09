@@ -1,4 +1,5 @@
 import 'package:carer/models/clean_sgv.dart';
+import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
@@ -111,13 +112,16 @@ class BGL extends StatelessWidget with ThemeMixin {
           ),
         ];
 
-        return Window(
-          child: FittedBox(
-            alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
-            child: SizedBox(
-              width: 15,
-              height: 10,
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: children),
+        return GestureDetector(
+          onLongPress: () => UISettings().toggleFocusBGL(),
+          child: Window(
+            child: FittedBox(
+              alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
+              child: SizedBox(
+                width: 15,
+                height: 10,
+                child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: children),
+              ),
             ),
           ),
         );

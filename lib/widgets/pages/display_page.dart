@@ -4,12 +4,9 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
-import 'package:carer/widgets/alarms/alarm_widget.dart';
 import 'package:carer/widgets/bar/bar_top.dart';
-import 'package:carer/widgets/bgl/bgl.dart';
-import 'package:carer/widgets/insights/bgl_chart.dart';
-import 'package:carer/widgets/insights/info.dart';
-import 'package:carer/widgets/insights/treatments.dart';
+import 'package:carer/widgets/pages/display_layout_landscape.dart';
+import 'package:carer/widgets/pages/display_layout_portrait.dart';
 import 'package:flutter/material.dart';
 
 class DisplayPage extends StatelessWidget with ThemeMixin {
@@ -37,7 +34,10 @@ class DisplayPage extends StatelessWidget with ThemeMixin {
                 constraints: BoxConstraints(minHeight: constraints.maxHeight - 40, maxHeight: constraints.maxHeight - 40),
                 child: AWatch(
                   (context) {
-                    return getLayout(context, UISettings().orientation);
+                    if (UISettings().orientation == Orientation.landscape) {
+                      return const DisplayLayoutLandscape();
+                    }
+                    return const DisplayLayoutPortrait();
                   },
                   dependencies: [AlarmSettings().disableAlarmsSignal, UISettings().orientationSignal],
                   debugLabel: "HomeLayout",
@@ -47,72 +47,6 @@ class DisplayPage extends StatelessWidget with ThemeMixin {
           ),
         );
       },
-    );
-  }
-
-  Widget getLayout(BuildContext context, Orientation orientation) {
-    if (orientation == Orientation.landscape) {
-      return landscapeLayout(context);
-    } else {
-      return portraitLayout(context);
-    }
-  }
-
-  Widget landscapeLayout(BuildContext context) {
-    return Row(
-      children: [
-        const Flexible(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Flexible(flex: 4, child: BGL()),
-              AlarmWidget(flex: 2),
-            ],
-          ),
-        ),
-        VerticalDivider(
-          color: outlineColor(context),
-          width: 1,
-        ),
-        Flexible(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Flexible(flex: 3, child: BGLChart()),
-              Flexible(
-                flex: 2,
-                child: Row(
-                  children: [
-                    Flexible(child: Treatments()),
-                    Flexible(child: InfoWidget()),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget portraitLayout(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Expanded(flex: 4, child: BGL()),
-        const AlarmWidget(flex: 2),
-        Divider(color: outlineColor(context)),
-        const Flexible(flex: 4, child: BGLChart()),
-        Flexible(
-          flex: 2,
-          child: Row(
-            children: [
-              Flexible(child: Treatments()),
-              Flexible(child: InfoWidget()),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

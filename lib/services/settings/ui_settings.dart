@@ -11,6 +11,7 @@ enum _UINames {
 
   // Ephemeril
   orientation,
+  focusBGL,
 }
 
 class UISettings {
@@ -22,6 +23,7 @@ class UISettings {
     _UINames.unit: ASignal<Unit>(Unit.mg, debugLabel: 'unit'),
     _UINames.enableDim: ASignal<bool>(false, debugLabel: 'enableDim'),
     _UINames.orientation: ASignal<Orientation>(Orientation.portrait, debugLabel: 'orientation'),
+    _UINames.focusBGL: ASignal<bool>(false, debugLabel: 'focusBGL'),
   };
 
   UISettings._();
@@ -42,6 +44,14 @@ class UISettings {
   ASignal get orientationSignal => _signals[_UINames.orientation]!;
   Orientation get orientation => _signals[_UINames.orientation]!.value as Orientation;
   set orientation(Orientation value) => _signals[_UINames.orientation]!.value = value;
+
+  /// If true, the BGL will be displayed in a total.
+  ASignal<bool> get focusBGLSignal => _signals[_UINames.focusBGL]! as ASignal<bool>;
+  bool get focusBGL => _signals[_UINames.focusBGL]!.value as bool;
+  set focusBGL(bool value) => _signals[_UINames.focusBGL]!.value = value;
+  void toggleFocusBGL() {
+    focusBGL = !focusBGL;
+  }
 
   setupDBPropagation(KeyValueStore prefs) {
     // Assign the values from the DB
