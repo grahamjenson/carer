@@ -1,12 +1,12 @@
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/alarms/alarm_widget.dart';
-import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
+import 'package:carer/widgets/insights/bgl_column.dart';
 import 'package:carer/widgets/insights/info.dart';
 import 'package:carer/widgets/insights/treatments.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class DisplayLayoutLandscape extends StatefulWidget {
   const DisplayLayoutLandscape({super.key});
@@ -63,19 +63,12 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
         return AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
-              var bglFlex = 10;
               var restFlex = _shrinkAnimation.value.toInt();
 
               List<Widget> children = [
                 Flexible(
-                  flex: bglFlex,
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Flexible(flex: 4, child: BGL()),
-                      AlarmWidget(flex: 2),
-                    ],
-                  ),
+                  flex: 10,
+                  child: BGLColumn(),
                 ),
               ];
 
@@ -114,6 +107,31 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
       },
       debugLabel: "DisplayLayoutLandscape",
       dependencies: [UISettings().focusBGLSignal],
+    );
+  }
+
+  Widget getShrinkButton(BuildContext context) {
+    if (!UISettings().focusBGL) {
+      return const SizedBox();
+    }
+    return Flexible(
+      flex: 4,
+      child: IconButton(
+        padding: const EdgeInsets.all(10),
+        constraints: const BoxConstraints(),
+        iconSize: 24,
+        onPressed: () => UISettings().focusBGL = false,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor(context).bright.bright,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(3)),
+          ),
+        ),
+        icon: Icon(
+          UniconsLine.compress_alt,
+          color: onBackgroundColor(context).dim,
+        ),
+      ),
     );
   }
 }

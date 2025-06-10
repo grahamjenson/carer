@@ -1,9 +1,8 @@
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/alarms/alarm_widget.dart';
-import 'package:carer/widgets/bgl/bgl.dart';
 import 'package:carer/widgets/insights/bgl_chart.dart';
+import 'package:carer/widgets/insights/bgl_column.dart';
 import 'package:carer/widgets/insights/info.dart';
 import 'package:carer/widgets/insights/treatments.dart';
 import 'package:flutter/material.dart';
@@ -66,8 +65,10 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
               var restFlex = _shrinkAnimation.value.toInt();
 
               List<Widget> children = [
-                const Expanded(flex: 16, child: BGL()),
-                const AlarmWidget(flex: 8),
+                Flexible(
+                  flex: 24,
+                  child: BGLColumn(),
+                )
               ];
 
               if (restFlex > 0) {
@@ -87,7 +88,13 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
                   ],
                 );
               }
-              return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children);
+
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: children,
+              );
             });
       },
       debugLabel: "DisplayLayoutPortrait",

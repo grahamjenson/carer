@@ -14,15 +14,15 @@ class BGL extends StatelessWidget with ThemeMixin {
   const BGL({super.key});
 
   TextStyle goodStyle(BuildContext context) {
-    return displayLarge(context).merge(shadows()).copyWith(color: onBackgroundColor(context));
+    return displayLarge(context).merge(shadows()).copyWith(color: onBackgroundColor(context), fontSize: 100);
   }
 
   TextStyle badStyle(BuildContext context) {
-    return displayLarge(context).merge(shadows(width: 1.5)).copyWith(color: primaryColor(context));
+    return displayLarge(context).merge(shadows(width: 1.5)).copyWith(color: primaryColor(context), fontSize: 100);
   }
 
   TextStyle veryBadStyle(BuildContext context) {
-    return displayLarge(context).merge(shadows(width: 2)).copyWith(color: badColor(context));
+    return displayLarge(context).merge(shadows(width: 2)).copyWith(color: badColor(context), fontSize: 100);
   }
 
   Color? ageColor(BuildContext context) {
@@ -119,17 +119,12 @@ class BGL extends StatelessWidget with ThemeMixin {
             child: FittedBox(
               alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
               child: SizedBox(
-                width: 15,
-                height: 10,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: children,
-                    ),
-                  ],
+                width: 150,
+                height: 100,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: children,
                 ),
               ),
             ),
