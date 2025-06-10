@@ -67,6 +67,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
   TextField getTextField() {
     var regex = widget.signed ? r'[-+]?[0-9.]?' : r'[0-9.]?';
     var tf = TextField(
+      autofocus: true,
       controller: _controller,
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(regex)),
@@ -86,6 +87,7 @@ class _PlusMinusTextState extends State<PlusMinusText> {
         ),
       ),
       focusNode: focusNode,
+      onTapOutside: (_) => focusNode.unfocus(),
       onTap: () => _controller.selection = TextSelection(baseOffset: 0, extentOffset: _controller.value.text.length),
     );
 

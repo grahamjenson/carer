@@ -68,8 +68,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
               title: const Text("NightScout Service Settings"),
               tiles: [
                 SettingsTile(
-                  title: Expanded(
-                      child: TextField(
+                  title: TextField(
                     decoration: InputDecoration(
                       hintText: "https://example.com?token=your_token",
                       hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -87,7 +86,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                     ),
                     autofocus: true,
                     controller: _nsTextController,
-                  )),
+                  ),
                   description: const Flexible(child: Text("Set NightScout URL with Token")),
                   descriptionInlineIos: true,
                 ),
