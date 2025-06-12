@@ -25,7 +25,7 @@ void main() async {
       );
       expect(await SQLToProfile().save(p), true);
 
-      var p1 = await Profile.profile();
+      var p1 = await Profile.fetchCurrentProfile(now);
       expect(p1, isNotNull);
     });
   });

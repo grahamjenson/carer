@@ -41,46 +41,56 @@ class NSProfile {
   List<int> expandedTargetLow() => targetLow.expand().map((e) => e.round()).toList();
   List<int> expandedTargetHigh() => targetHigh.expand().map((e) => e.round()).toList();
 
-  static NSProfile? fromCurrentJson(String jsonString) {
+  static List<NSProfile> fromCurrentJson(String jsonString) {
     var (json, err) = tryDecodeJson(jsonString);
     if (err != null) {
       alog("NSError: Failed to decode profile json: $err $jsonString");
       Errors.captureError(err, StackTrace.current);
-      return null;
+      return [];
     }
     // Return unless json is a Map<String, dynamic>
 
     if (json is! Map<String, dynamic>) {
       alog("NSError: Failed to decode profile json:  NOT A MAP $jsonString");
-      return null;
+      return [];
     }
 
-    var store = json["store"];
-    if (store is! Map<String, dynamic>) {
+    var untypedStore = json["store"];
+    if (untypedStore is! Map<String, dynamic>) {
       alog("NSError: Failed to decode profile json: store key not found $jsonString");
-      return null;
+      return [];
     }
+
+    Map<String, dynamic> store = untypedStore;
 
     var id = json["_id"];
     if (id == null) {
       alog("NSError: Failed to decode profile json: id key not found $jsonString");
-      return null;
+      return [];
     }
-    Map<String, dynamic> profileStore = store;
-    var profileName = profileStore.keys.firstOrNull;
-    if (profileName == null) {
-      alog("NSError: Failed to decode profile json: profile name not found $jsonString");
-      return null;
-    }
-    Map<String, dynamic> profileValues = profileStore[profileName];
 
-    return NSProfile.fromJson(
-      profileName,
-      id!,
-      NSType.getBestGuessDate(json),
-      profileValues,
-      raw: jsonString,
-    );
+    String defaultProfile = json['defaultProfile'].toString();
+    if (defaultProfile.isEmpty) {
+      alog("NSError: Failed to decode profile json: defaultProfile is empty $jsonString");
+      return [];
+    }
+
+    List<NSProfile> profileValues = [];
+    store.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        //TODO check ID use
+        var profile = NSProfile.fromJson(key, "${id}_$key", NSType.getBestGuessDate(json), value, raw: jsonString);
+        if (key == defaultProfile) {
+          profileValues.insert(0, profile); // Put the default profile at the start
+        } else {
+          profileValues.add(profile);
+        }
+      } else {
+        alog("NSError: Failed to decode profile json: store value for key $key is not a Map $jsonString");
+      }
+    });
+
+    return profileValues;
   }
 
   factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json, {String raw = ""}) {

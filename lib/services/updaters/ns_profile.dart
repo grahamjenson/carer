@@ -27,15 +27,24 @@ class NSProfileUpdater extends Updater {
     var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
     // Get the last amount of readings with a few extra for certainty
-    var (profile, err) = await go(NSClient().getCurrentProfile(nsURL, nsToken));
-    if (err != null || profile == null) {
+    // TODO return default profile, other profiles and raw seperately
+    var (profiles, err) = await go(NSClient().getCurrentProfiles(nsURL, nsToken));
+    if (err != null || profiles == null || profiles.isEmpty) {
+      alog("NSProfileUpdater: Failed to retrieve profiles: $err");
       return false;
     }
+    var currentProfile = profiles.first;
+    for (var profile in profiles) {
+      if (profile.date.isAfter(currentProfile.date)) {
+        currentProfile = profile;
+      }
+    }
+    raw = currentProfile.raw ?? "";
 
-    raw = profile.raw ?? "";
-
+    // TODO save all profiles in a way which records them as the most recent current profiles
+    // TODO save non default profiles in a way which records them as not the defatul profile to use
     NSProfileToProfileExtras extras = const NSProfileToProfileExtras("CurrentProfile", 100, 0);
-    Profile profileModel = const NSProfileToProfile().aToB((profile, extras));
+    Profile profileModel = const NSProfileToProfile().aToB((currentProfile, extras));
 
     // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await SQLToProfile().save(profileModel);

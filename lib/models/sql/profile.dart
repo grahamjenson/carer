@@ -60,8 +60,11 @@ class Profile extends DateRangeDBModel {
     }
   }
 
-  static Future<Profile?> atTime(DateTime date) async {
+  static Future<Profile?> fetchCurrentProfile(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
+    // TODO this needs to consider temporary profiles might be written before updates and such
+    // That is, this should only ever return 2 values, a Current Profile and an override but may return more
+    // If there is an override return the most recent timestamp, otherwise return current profile
     return (await SQLToProfile().query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
   }
 
@@ -71,16 +74,12 @@ class Profile extends DateRangeDBModel {
     });
   }
 
-  static Future<Profile?> profile() async {
-    return SQLToProfile().query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
-  }
-
   static ASignal<Profile?> currentProfile = ASignal<Profile?>(null, debugLabel: 'currentProfile');
 
   static Future<void> setupSQLSignals() async {
     await signalAssign(
       currentProfile,
-      () => atTime(clock.now()),
+      () => fetchCurrentProfile(clock.now()),
       debugLabel: 'fetchCurrentProfile',
       dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
     );

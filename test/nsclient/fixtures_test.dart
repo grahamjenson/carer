@@ -6,7 +6,6 @@ import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:clock/clock.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -38,12 +37,11 @@ class FixtureTest<T> {
 }
 
 void main() {
-  profileParserNoNull(String str) {
-    var eprofile = NSProfile.fromJson("empty", "", clock.now(), {});
+  List<NSProfile> profileParserNoNull(String str) {
     try {
-      return NSProfile.fromCurrentJson(str) ?? eprofile;
+      return NSProfile.fromCurrentJson(str) ?? [];
     } catch (e) {}
-    return eprofile;
+    return [];
   }
 
   List<FixtureTest> tests = [
@@ -83,11 +81,16 @@ void main() {
     }),
 
     // Current Profile
-    FixtureTest<NSProfile>('current_profile', profileParserNoNull, test: (NSProfile profile) {
+    FixtureTest<List<NSProfile>>('current_profile', profileParserNoNull, test: (List<NSProfile> profiles) {
+      expect(profiles, isNotNull);
+      expect(profiles.length, 2);
+
+      var profile = profiles[0];
+
       expect(profile.name, "currentProfileName");
       expect(profile.dia, 6);
 
-      expect(profile.id, "668fbca35de9b880531dad48");
+      expect(profile.id, "668fbca35de9b880531dad48_currentProfileName");
       expect(profile.carbratio.values.length, 6);
       expect(profile.carbratio.values.first.value, 20);
 
@@ -104,12 +107,16 @@ void main() {
       expect(profile.targetHigh.values.first.value, 7 * MGtoMMOL);
     }),
 
-    FixtureTest<NSProfile>('current_profile_loop', profileParserNoNull, test: (NSProfile profile) {
+    FixtureTest<List<NSProfile>>('current_profile_loop', profileParserNoNull, test: (List<NSProfile> profiles) {
+      expect(profiles, isNotNull);
+      expect(profiles.length, 1);
+      var profile = profiles[0];
       expect(profile.name, "loopProfile");
     }),
 
-    FixtureTest<NSProfile>('current_profile_bad', profileParserNoNull, test: (NSProfile profile) {
-      expect(profile.name, "empty");
+    FixtureTest<List<NSProfile>>('current_profile_bad', profileParserNoNull, test: (List<NSProfile> profiles) {
+      expect(profiles, isNotNull);
+      expect(profiles.length, 0);
     }),
 
     // Properties
