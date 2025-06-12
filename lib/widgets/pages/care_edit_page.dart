@@ -193,15 +193,28 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       ),
     );
 
+    var initSelect = e.getName();
+    var remoteNames = ["Profilewqeasfasf", "Profile2"];
+
+    var remoteContainsSelection = false;
+    if (remoteNames.contains(initSelect)) {
+      remoteContainsSelection = true;
+    }
+
+    var selectionItems = [const DropdownMenuEntry(value: "", label: "NONE")];
+    selectionItems.addAll(remoteNames.map((name) {
+      return DropdownMenuEntry(value: name, label: name);
+    }).toList());
+
+    if (!remoteContainsSelection) {
+      selectionItems.add(DropdownMenuEntry(value: initSelect, label: initSelect, enabled: false));
+    }
+
     return SettingsTile(
       title: DropdownMenu(
         width: 145,
-        dropdownMenuEntries: const [
-          DropdownMenuEntry(value: "", label: "NONE"),
-          DropdownMenuEntry(value: "Profile1", label: "Profile1"),
-          DropdownMenuEntry(value: "Profile2", label: "Profile2"),
-        ],
-        initialSelection: e.getName(),
+        dropdownMenuEntries: selectionItems,
+        initialSelection: initSelect,
         onSelected: (value) {
           if (value != null) {
             e.setName(value);
