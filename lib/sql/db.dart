@@ -11,7 +11,7 @@ class DB {
       return inMemoryDatabasePath;
     }
     final path = join(databasePath, "$name.db");
-    print("DB: Using database path: $path");
+    print("DBPath: Using database path: $path");
     return path;
   }
 
