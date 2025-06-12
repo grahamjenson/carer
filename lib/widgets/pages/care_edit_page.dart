@@ -3,6 +3,7 @@ import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/care/care_carbs.dart';
+import 'package:carer/widgets/care/care_profiles.dart';
 import 'package:carer/widgets/care/care_temp_targets.dart';
 import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,10 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
           SettingsSection(
             title: const Text('Edit Temp Target'),
             tiles: allTempTargets.where((e) => !e.isCancel).map((e) => tempTargetEdit(context, e)).toList(),
+          ),
+          SettingsSection(
+            title: const Text('Edit Profile Switches'),
+            tiles: allProfileSwitches.map((e) => profileEdit(context, e)).toList(),
           )
         ]);
         return Scaffold(
@@ -142,6 +147,69 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
         e.description,
         softWrap: false,
       ),
+      trailing: trailing,
+    );
+  }
+
+  SettingsTile profileEdit(BuildContext context, ProfileSettingsModel e) {
+    var dimStyle = TextStyle(
+      color: onBackgroundColor(context).dim,
+      fontSize: 10,
+    );
+
+    Widget? description = Text(
+      e.description,
+      style: dimStyle,
+    );
+
+    Widget trailing = SizedBox(
+      width: 100,
+      child: Row(
+        children: [
+          Column(children: [
+            Text("Percent ", style: dimStyle),
+            PlusMinusText(
+              getStr: (double val) => "${val.toInt()}",
+              fromStr: (String str) => double.tryParse(str),
+              getValue: () => e.getPercent().toDouble(),
+              setValue: (double val) => e.setPercent(val.toInt()),
+              dependencies: [e.percentSignal],
+            ),
+          ]),
+          const Spacer(),
+          Column(
+            children: [
+              Text("Time ", style: dimStyle),
+              PlusMinusText(
+                getStr: (double val) => "${val.toInt()}",
+                fromStr: (String str) => double.tryParse(str),
+                getValue: () => e.getDuration().toDouble(),
+                setValue: (double val) => e.setDuration(val.toInt()),
+                dependencies: [e.durationSignal],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    return SettingsTile(
+      title: DropdownMenu(
+        width: 145,
+        dropdownMenuEntries: const [
+          DropdownMenuEntry(value: "", label: "NONE"),
+          DropdownMenuEntry(value: "Profile1", label: "Profile1"),
+          DropdownMenuEntry(value: "Profile2", label: "Profile2"),
+        ],
+        initialSelection: e.getName(),
+        onSelected: (value) {
+          if (value != null) {
+            e.setName(value);
+          }
+        },
+      ),
+      descriptionInlineIos: true,
+      description: description,
       trailing: trailing,
     );
   }
