@@ -112,7 +112,7 @@ class ProfileSettingsModel extends CareModel {
         var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
         NSClient().switchProfile(nsURL, nsToken, name, duration, percent).then((value) {
           if (value) {
-            ToastService().showSuccess("Profile Switch $description");
+            ToastService().showSuccess("Profile Switch $name", description: description);
             UpdateService().nsProfileUpdater.addExternalReason("Added Profile Switch");
           } else {
             ToastService().showError("Failed to set Profile Switch");

@@ -213,6 +213,21 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
     return SettingsTile(
       title: DropdownMenu(
         width: 145,
+        menuStyle: const MenuStyle(
+          padding: WidgetStatePropertyAll(EdgeInsets.zero),
+          visualDensity: VisualDensity(horizontal: -4, vertical: -4),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          constraints: BoxConstraints.tight(const Size.fromHeight(30)),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 14,
+        ),
         dropdownMenuEntries: selectionItems,
         initialSelection: initSelect,
         onSelected: (value) {
