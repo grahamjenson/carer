@@ -2,6 +2,7 @@ import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:carer/nsclient/nsclient.dart';
+import 'package:carer/nsclient/shared.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
@@ -35,7 +36,7 @@ class NSProfileUpdater extends Updater {
       return false;
     }
 
-    var (currentProfile, profiles, rawr) = profileProfiles;
+    var (currentProfile, otherProfiles, rawr) = profileProfiles;
     raw = rawr;
     if (currentProfile == null) {
       alog("NSProfileUpdater: Failed to retrieve current profile");
@@ -43,12 +44,30 @@ class NSProfileUpdater extends Updater {
     }
 
     // Assigning Duration as 100 years in seconds
-    NSProfileToProfileExtras extras = const NSProfileToProfileExtras(NSProfileSource.currentDefault, 100, 0);
+    NSProfileToProfileExtras extras = const NSProfileToProfileExtras(NSProfileSource.defaultStoreProfile, 100, 0);
     Profile profileModel = const NSProfileToProfile().aToB((currentProfile, extras));
 
     // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await SQLToProfile().save(profileModel);
-    alog("Saved Current Profile $saved");
+    if (saved) {
+      alog("NSProfileUpdater: Saved Current Default Profile ${profileModel.name} with ID ${profileModel.eid}");
+    } else {
+      alog("NSProfileUpdater: Failed to save Current Default Profile ${profileModel.name} with ID ${profileModel.eid}");
+    }
+
+    for (NSProfile p in otherProfiles) {
+      // Convert each profile to a Profile model
+      var extras = const NSProfileToProfileExtras(NSProfileSource.storeProfile, 100, 0);
+      var profile = const NSProfileToProfile().aToB((p, extras));
+
+      // Save each profile
+      var saved = await SQLToProfile().save(profile);
+      if (saved) {
+        alog("NSProfileUpdater: Saved Current Default Profile ${profile.name} with ID ${profile.eid}");
+      } else {
+        alog("NSProfileUpdater: Failed to save Current Default Profile ${profile.name} with ID ${profile.eid}");
+      }
+    }
 
     return true;
   }

@@ -1,12 +1,13 @@
+import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/db_model.dart';
-import 'package:carer/services/timer_service.dart';
-import 'package:carer/utils/futures.dart';
-import 'package:clock/clock.dart';
 
 class Profile extends DateRangeDBModel {
   final int dia;
   final String name;
+
+  // Stores the id of the store that the profile was pulled from
+  final String? storeid;
   final String units;
   final String timezone;
 
@@ -24,6 +25,7 @@ class Profile extends DateRangeDBModel {
     super.id,
     required this.name,
     required super.eid,
+    this.storeid,
     // Date Range
     required super.startDate,
     required super.duration,
@@ -61,43 +63,39 @@ class Profile extends DateRangeDBModel {
   }
 
   // TODO test the shit out of this
-  static Future<Profile?> fetchProfileAt(DateTime date) async {
-    var ms = date.millisecondsSinceEpoch;
-    // 1. See if there is an override Profile
-    // 2. See if the default current profile is available
-
-    // 1
-    var overridingProfile = (await SQLToProfile().query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
-    if (overridingProfile != null) {
-      // If there is an overriding profile, return it
-      return overridingProfile;
-    }
-
-    // 2
-    // Duration 0 means indefinite, so we can just check for start <= ms
-    var currentProfile = (await SQLToProfile().query(conditions: {
-      "start <= ?": ms,
-      "duration = ?": 0,
-    }, limit: 1, orderBy: "start ASC"))
-        .firstOrNull;
-
-    return currentProfile;
+  static Future<List<Profile>> fetchDefaultStoreProfilesAfter(DateTime date) async {
+    // TODO, I want to make sure that we get all those after the date, plus one before because that is the default
+    return (await SQLToProfile().query(
+      conditions: {
+        "source IS ?": NSProfileSource.defaultStoreProfile.name,
+      },
+    ));
   }
 
-  static ASignal<Profile?> currentProfile = ASignal<Profile?>(null, debugLabel: 'currentProfile');
-
-  static Future<void> setupSQLSignals() async {
-    await signalAssign(
-      currentProfile,
-      () => fetchProfileAt(clock.now()),
-      debugLabel: 'fetchProfileAt',
-      dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
-    );
+  static Future<List<Profile>> fetchProfileSwitchesAfter(DateTime date) async {
+    return (await SQLToProfile().query(
+      conditions: {
+        "end >= ?": date.millisecondsSinceEpoch,
+      },
+    ));
   }
 
   @override
   String toString() {
     return "Profile($eid, $startDate, $duration, $name, $percent%)";
+  }
+
+  @override
+  bool isAtTime(DateTime date) {
+    if (date.isBefore(startDate)) {
+      return false;
+    }
+    if (duration == 0) {
+      // Indefinite profile, so it is always valid after startDate
+      return true;
+    }
+
+    return date.isBefore(endDate);
   }
 }
 

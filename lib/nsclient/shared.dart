@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 class NSProfile {
   final String id;
+  final String? storeid;
   final String name;
   final int dia;
   final TimeValues carbratio;
@@ -20,6 +21,7 @@ class NSProfile {
 
   const NSProfile({
     required this.id,
+    this.storeid,
     required this.name,
     required this.date,
     required this.dia,
@@ -78,7 +80,7 @@ class NSProfile {
     store.forEach((key, value) {
       if (value is Map<String, dynamic>) {
         //TODO check ID use
-        var profile = NSProfile.fromJson(key, "${id}_$key", NSType.getBestGuessDate(json), value);
+        var profile = NSProfile.fromJson(key, "${id}_$key", "$id", NSType.getBestGuessDate(json), value);
         if (key == defaultProfile) {
           currentProfile = profile;
         } else {
@@ -92,7 +94,7 @@ class NSProfile {
     return (currentProfile, otherProfiles);
   }
 
-  factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json) {
+  factory NSProfile.fromJson(String name, String id, String? storeid, DateTime date, Map<String, dynamic> json) {
     String units = json['units'] ?? "mg/dL";
 
     var targetLow = TimeValues.fromJson(json['target_low']);
@@ -112,6 +114,7 @@ class NSProfile {
 
     return NSProfile(
       id: id,
+      storeid: storeid,
       name: name,
       date: date,
       dia: NSType.getInt(json['dia'], defaultValue: 5)!,

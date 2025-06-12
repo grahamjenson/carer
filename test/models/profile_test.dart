@@ -1,3 +1,4 @@
+import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,7 +13,7 @@ void main() async {
         eid: "EID",
         dia: 5,
         timezone: "asad",
-        source: "Test",
+        source: NSProfileSource.defaultStoreProfile.name,
         percent: 100,
         duration: 10,
         units: "mmol",
@@ -25,7 +26,7 @@ void main() async {
       );
       expect(await SQLToProfile().save(p), true);
 
-      var p1 = await Profile.fetchProfileAt(now);
+      var p1 = await Profile.fetchDefaultStoreProfilesAfter(now);
       expect(p1, isNotNull);
     });
   });

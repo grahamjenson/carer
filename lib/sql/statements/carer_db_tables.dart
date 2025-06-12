@@ -139,6 +139,7 @@ const profileTable = DBTable(profileTableName, '''
     CREATE TABLE profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       eid TEXT,
+      storeid TEXT,
       name TEXT,
       
       -- Date stuff

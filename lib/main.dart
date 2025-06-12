@@ -4,7 +4,6 @@ import 'package:carer/mappers/sql/events.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/flow_data.dart';
 import 'package:carer/models/properties_data.dart';
-import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/models/valueAtTime.dart';
@@ -131,7 +130,6 @@ void runCarer() async {
   ////
 
   await CleanSGV.setupSQLSignals();
-  await Profile.setupSQLSignals();
   await Treatment.setupSQLSignals();
   await ValueAtTime.setupSQLSignals();
   await SGV.setupSQLSignals();

@@ -21,6 +21,7 @@ class SQLToProfile extends SQLMapper<Profile> {
 
     return Profile(
       id: row["id"] as int?,
+      storeid: row["storeid"] as String?,
       name: row["name"] as String,
       eid: row["eid"] as String,
       startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
@@ -51,6 +52,11 @@ class SQLToProfile extends SQLMapper<Profile> {
       "source": model.source,
       "percent": model.percent,
     };
+
+    if (model.storeid != null) {
+      map["storeid"] = model.storeid!;
+    }
+
     model.carbratio.asMap().forEach((index, value) {
       map[crKeys[index]] = value;
     });

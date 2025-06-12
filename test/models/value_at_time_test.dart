@@ -15,7 +15,7 @@ void main() async {
         name: "Default",
         eid: "AProfile",
         dia: 5,
-        source: NSProfileSource.currentDefault.name,
+        source: NSProfileSource.defaultStoreProfile.name,
         percent: 100,
         duration: 0,
         timezone: "asad",
