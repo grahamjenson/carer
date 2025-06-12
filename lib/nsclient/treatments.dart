@@ -173,7 +173,7 @@ class NSRawTreatment {
           treatments.add(NSProfileSwitch(
             durationInMilliseconds: originalDuration!,
             percentage: percentage!,
-            source: "ProfileSwitch",
+            source: NSProfileSwitchSource.profileSwitch,
             profile: profileModel,
           ));
         }
@@ -186,7 +186,7 @@ class NSRawTreatment {
           treatments.add(NSProfileSwitch(
             durationInMilliseconds: originalDuration!,
             percentage: originalPercentage!,
-            source: "Note",
+            source: NSProfileSwitchSource.note,
             profile: profileModel,
           ));
         }
@@ -309,10 +309,12 @@ class NSTemporaryTarget extends NSTreatment {
 //   "insulin": null
 // },
 
+enum NSProfileSwitchSource { profileSwitch, note }
+
 class NSProfileSwitch extends NSTreatment {
   int durationInMilliseconds;
   int percentage;
-  String source;
+  NSProfileSwitchSource source;
 
   NSProfile profile;
 

@@ -60,18 +60,28 @@ class Profile extends DateRangeDBModel {
     }
   }
 
-  static Future<Profile?> fetchCurrentProfile(DateTime date) async {
+  // TODO test the shit out of this
+  static Future<Profile?> fetchProfileAt(DateTime date) async {
     var ms = date.millisecondsSinceEpoch;
-    // TODO this needs to consider temporary profiles might be written before updates and such
-    // That is, this should only ever return 2 values, a Current Profile and an override but may return more
-    // If there is an override return the most recent timestamp, otherwise return current profile
-    return (await SQLToProfile().query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
-  }
+    // 1. See if there is an override Profile
+    // 2. See if the default current profile is available
 
-  static Future<List<Profile>> after(DateTime date) async {
-    return SQLToProfile().query(conditions: {
-      "end >= ?": date.millisecondsSinceEpoch,
-    });
+    // 1
+    var overridingProfile = (await SQLToProfile().query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
+    if (overridingProfile != null) {
+      // If there is an overriding profile, return it
+      return overridingProfile;
+    }
+
+    // 2
+    // Duration 0 means indefinite, so we can just check for start <= ms
+    var currentProfile = (await SQLToProfile().query(conditions: {
+      "start <= ?": ms,
+      "duration = ?": 0,
+    }, limit: 1, orderBy: "start ASC"))
+        .firstOrNull;
+
+    return currentProfile;
   }
 
   static ASignal<Profile?> currentProfile = ASignal<Profile?>(null, debugLabel: 'currentProfile');
@@ -79,8 +89,8 @@ class Profile extends DateRangeDBModel {
   static Future<void> setupSQLSignals() async {
     await signalAssign(
       currentProfile,
-      () => fetchCurrentProfile(clock.now()),
-      debugLabel: 'fetchCurrentProfile',
+      () => fetchProfileAt(clock.now()),
+      debugLabel: 'fetchProfileAt',
       dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
     );
   }

@@ -28,27 +28,27 @@ class NSProfileUpdater extends Updater {
 
     // Get the last amount of readings with a few extra for certainty
     // TODO return default profile, other profiles and raw seperately
-    var (profiles, err) = await go(NSClient().getCurrentProfiles(nsURL, nsToken));
-    if (err != null || profiles == null || profiles.isEmpty) {
+    var (profileProfiles, err) = await go(NSClient().getCurrentProfiles(nsURL, nsToken));
+
+    if (err != null || profileProfiles == null) {
       alog("NSProfileUpdater: Failed to retrieve profiles: $err");
       return false;
     }
-    var currentProfile = profiles.first;
-    for (var profile in profiles) {
-      if (profile.date.isAfter(currentProfile.date)) {
-        currentProfile = profile;
-      }
-    }
-    raw = currentProfile.raw ?? "";
 
-    // TODO save all profiles in a way which records them as the most recent current profiles
-    // TODO save non default profiles in a way which records them as not the defatul profile to use
-    NSProfileToProfileExtras extras = const NSProfileToProfileExtras("CurrentProfile", 100, 0);
+    var (currentProfile, profiles, rawr) = profileProfiles;
+    raw = rawr;
+    if (currentProfile == null) {
+      alog("NSProfileUpdater: Failed to retrieve current profile");
+      return false;
+    }
+
+    // Assigning Duration as 100 years in seconds
+    NSProfileToProfileExtras extras = const NSProfileToProfileExtras(NSProfileSource.currentDefault, 100, 0);
     Profile profileModel = const NSProfileToProfile().aToB((currentProfile, extras));
 
     // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await SQLToProfile().save(profileModel);
-    alog("Updated Profile $saved");
+    alog("Saved Current Profile $saved");
 
     return true;
   }

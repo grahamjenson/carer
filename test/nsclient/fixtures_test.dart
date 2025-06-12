@@ -37,11 +37,11 @@ class FixtureTest<T> {
 }
 
 void main() {
-  List<NSProfile> profileParserNoNull(String str) {
+  (NSProfile?, List<NSProfile>) profileParserNoNull(String str) {
     try {
-      return NSProfile.fromCurrentJson(str) ?? [];
+      return NSProfile.fromCurrentJson(str);
     } catch (e) {}
-    return [];
+    return (null, <NSProfile>[]);
   }
 
   List<FixtureTest> tests = [
@@ -81,11 +81,13 @@ void main() {
     }),
 
     // Current Profile
-    FixtureTest<List<NSProfile>>('current_profile', profileParserNoNull, test: (List<NSProfile> profiles) {
+    FixtureTest<(NSProfile?, List<NSProfile>)>('current_profile', profileParserNoNull, test: ((NSProfile?, List<NSProfile>) profileProfiles) {
+      var (profile, profiles) = profileProfiles;
+      if (profile == null) {
+        fail("Profile should not be null");
+      }
       expect(profiles, isNotNull);
-      expect(profiles.length, 2);
-
-      var profile = profiles[0];
+      expect(profiles.length, 1);
 
       expect(profile.name, "currentProfileName");
       expect(profile.dia, 6);
@@ -107,15 +109,20 @@ void main() {
       expect(profile.targetHigh.values.first.value, 7 * MGtoMMOL);
     }),
 
-    FixtureTest<List<NSProfile>>('current_profile_loop', profileParserNoNull, test: (List<NSProfile> profiles) {
-      expect(profiles, isNotNull);
-      expect(profiles.length, 1);
-      var profile = profiles[0];
+    FixtureTest<(NSProfile?, List<NSProfile>)>('current_profile_loop', profileParserNoNull, test: ((NSProfile?, List<NSProfile>) profileProfiles) {
+      var (profile, profiles) = profileProfiles;
+      if (profile == null) {
+        fail("Profile should not be null");
+      }
+
+      expect(profiles.length, 0);
+
       expect(profile.name, "loopProfile");
     }),
 
-    FixtureTest<List<NSProfile>>('current_profile_bad', profileParserNoNull, test: (List<NSProfile> profiles) {
-      expect(profiles, isNotNull);
+    FixtureTest<(NSProfile?, List<NSProfile>)>('current_profile_bad', profileParserNoNull, test: ((NSProfile?, List<NSProfile>) profileProfiles) {
+      var (profile, profiles) = profileProfiles;
+      expect(profile, isNull);
       expect(profiles.length, 0);
     }),
 

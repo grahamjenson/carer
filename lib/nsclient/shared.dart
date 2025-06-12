@@ -18,10 +18,7 @@ class NSProfile {
 
   final DateTime date;
 
-  final String? raw;
-
   const NSProfile({
-    this.raw,
     required this.id,
     required this.name,
     required this.date,
@@ -41,24 +38,24 @@ class NSProfile {
   List<int> expandedTargetLow() => targetLow.expand().map((e) => e.round()).toList();
   List<int> expandedTargetHigh() => targetHigh.expand().map((e) => e.round()).toList();
 
-  static List<NSProfile> fromCurrentJson(String jsonString) {
+  static (NSProfile?, List<NSProfile>) fromCurrentJson(String jsonString) {
     var (json, err) = tryDecodeJson(jsonString);
     if (err != null) {
       alog("NSError: Failed to decode profile json: $err $jsonString");
       Errors.captureError(err, StackTrace.current);
-      return [];
+      return (null, <NSProfile>[]);
     }
     // Return unless json is a Map<String, dynamic>
 
     if (json is! Map<String, dynamic>) {
       alog("NSError: Failed to decode profile json:  NOT A MAP $jsonString");
-      return [];
+      return (null, <NSProfile>[]);
     }
 
     var untypedStore = json["store"];
     if (untypedStore is! Map<String, dynamic>) {
       alog("NSError: Failed to decode profile json: store key not found $jsonString");
-      return [];
+      return (null, <NSProfile>[]);
     }
 
     Map<String, dynamic> store = untypedStore;
@@ -66,34 +63,36 @@ class NSProfile {
     var id = json["_id"];
     if (id == null) {
       alog("NSError: Failed to decode profile json: id key not found $jsonString");
-      return [];
+      return (null, <NSProfile>[]);
     }
 
     String defaultProfile = json['defaultProfile'].toString();
     if (defaultProfile.isEmpty) {
       alog("NSError: Failed to decode profile json: defaultProfile is empty $jsonString");
-      return [];
+      return (null, <NSProfile>[]);
     }
 
-    List<NSProfile> profileValues = [];
+    NSProfile? currentProfile;
+    List<NSProfile> otherProfiles = [];
+
     store.forEach((key, value) {
       if (value is Map<String, dynamic>) {
         //TODO check ID use
-        var profile = NSProfile.fromJson(key, "${id}_$key", NSType.getBestGuessDate(json), value, raw: jsonString);
+        var profile = NSProfile.fromJson(key, "${id}_$key", NSType.getBestGuessDate(json), value);
         if (key == defaultProfile) {
-          profileValues.insert(0, profile); // Put the default profile at the start
+          currentProfile = profile;
         } else {
-          profileValues.add(profile);
+          otherProfiles.add(profile);
         }
       } else {
         alog("NSError: Failed to decode profile json: store value for key $key is not a Map $jsonString");
       }
     });
 
-    return profileValues;
+    return (currentProfile, otherProfiles);
   }
 
-  factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json, {String raw = ""}) {
+  factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json) {
     String units = json['units'] ?? "mg/dL";
 
     var targetLow = TimeValues.fromJson(json['target_low']);
@@ -112,7 +111,6 @@ class NSProfile {
     }
 
     return NSProfile(
-      raw: raw,
       id: id,
       name: name,
       date: date,

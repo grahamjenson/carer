@@ -297,18 +297,20 @@ class NSClient {
     return NSTreatments.fromJson(response!.body);
   }
 
-  Future<List<NSProfile>> getCurrentProfiles(String nsURL, String token) async {
+  Future<(NSProfile?, List<NSProfile>, String)> getCurrentProfiles(String nsURL, String token) async {
     if (nsURL == "" || token == "") {
       alog("getCurrentProfiles No NS URL");
-      return [];
+      return (null, <NSProfile>[], "");
     }
     var ep = currentProfile(nsURL, token);
     final (response, err) = await go(http.get(ep));
     if (_handleResponseError("currentProfile", ep, response, err)) {
-      return [];
+      return (null, <NSProfile>[], "");
     }
 
-    return NSProfile.fromCurrentJson(response!.body);
+    var (currentP, otherProfiles) = NSProfile.fromCurrentJson(response!.body);
+
+    return (currentP, otherProfiles, response.body);
   }
 
   Future<NSProperties?> getProperties(String nsURL, String token) async {

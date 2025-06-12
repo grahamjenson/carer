@@ -1,3 +1,4 @@
+import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/models/sql/profile.dart';
@@ -14,7 +15,7 @@ void main() async {
         name: "Default",
         eid: "AProfile",
         dia: 5,
-        source: "Test",
+        source: NSProfileSource.currentDefault.name,
         percent: 100,
         duration: 0,
         timezone: "asad",

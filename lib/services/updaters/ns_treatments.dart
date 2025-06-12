@@ -14,6 +14,7 @@ import 'package:carer/models/sql/profile.dart';
 import 'package:carer/models/sql/tempbasal.dart';
 import 'package:carer/models/sql/temptarget.dart';
 import 'package:carer/nsclient/nsclient.dart';
+import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
@@ -68,8 +69,11 @@ class NSTreatmentsUpdater extends Updater {
     // get the profileswitches
     List<Profile> profileSwitches = [];
     for (var profileSwitch in treatments.profileSwitchs) {
-      NSProfileToProfileExtras extras =
-          NSProfileToProfileExtras(profileSwitch.source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000);
+      var source = NSProfileSource.profileSwitch;
+      if (profileSwitch.source == NSProfileSwitchSource.note) {
+        source = NSProfileSource.note;
+      }
+      NSProfileToProfileExtras extras = NSProfileToProfileExtras(source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000);
       Profile profileModel = const NSProfileToProfile().aToB((profileSwitch.profile, extras));
 
       profileSwitches.add(profileModel);

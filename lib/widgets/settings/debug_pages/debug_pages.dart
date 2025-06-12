@@ -69,6 +69,13 @@ class DebugSettingsPage extends StatelessWidget {
             GoRouter.of(context).refresh();
           },
         ),
+        SettingsTile(
+          title: const Text("Delete Database Data on restart"),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
+          onPressed: (context) async {
+            ToastService().showError("NOT YET IMPLEMENTED");
+          },
+        ),
       ],
     );
   }
