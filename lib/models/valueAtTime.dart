@@ -66,7 +66,8 @@ class ValueAtTime with DateMixin {
     // make date rounded to nearest minute
     fon(DateRangeDBModel element) => element.isAtTime(date);
 
-    Profile? profile = profiles.firstWhereOrNull((e) => e.startDate.isAfter(date));
+    Profile? profile = profiles.firstWhereOrNull((e) => date.isAfter(e.startDate));
+
     Profile? profileSwitch = profileSwitches.firstWhereOrNull(fon);
     if (profileSwitch != null) {
       // if there is a profile switch, use that instead of the current profile
