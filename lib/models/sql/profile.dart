@@ -63,7 +63,7 @@ class Profile extends DateRangeDBModel {
   }
 
   // TODO test the shit out of this
-  static Future<List<Profile>> fetchDefaultStoreProfilesAfter(DateTime date) async {
+  static Future<List<Profile>> fetchAllDefaultStoreProfiles(DateTime date) async {
     // TODO, I want to make sure that we get all those after the date, plus one before because that is the default
     return (await SQLToProfile().query(
       conditions: {

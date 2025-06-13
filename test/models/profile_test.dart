@@ -26,7 +26,7 @@ void main() async {
       );
       expect(await SQLToProfile().save(p), true);
 
-      var p1 = await Profile.fetchDefaultStoreProfilesAfter(now);
+      var p1 = await Profile.fetchAllDefaultStoreProfiles(now);
       expect(p1, isNotNull);
     });
   });
