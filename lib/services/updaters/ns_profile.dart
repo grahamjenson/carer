@@ -28,7 +28,6 @@ class NSProfileUpdater extends Updater {
     var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
     // Get the last amount of readings with a few extra for certainty
-    // TODO return default profile, other profiles and raw seperately
     var (profileProfiles, err) = await go(NSClient().getCurrentProfiles(nsURL, nsToken));
 
     if (err != null || profileProfiles == null) {
