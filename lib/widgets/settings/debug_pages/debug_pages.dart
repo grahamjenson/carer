@@ -7,6 +7,7 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/share_file_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
+import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -70,10 +71,15 @@ class DebugSettingsPage extends StatelessWidget {
           },
         ),
         SettingsTile(
-          title: const Text("Delete Database Data on restart"),
+          title: const Text("Reset and Delete Database Data"),
+          description: const Text("This deletes all NS Data but leaves settings like alarms and Nightscout URL"),
+          descriptionInlineIos: true,
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
-            ToastService().showError("NOT YET IMPLEMENTED");
+            var db = await CarerDB.instance;
+            await CarerDB.dropAll(db.db);
+            await CarerDB.createAll(db.db);
+            ToastService().showSuccess("Reset All Data");
           },
         ),
       ],

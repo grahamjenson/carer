@@ -22,6 +22,7 @@ class DisplayPage extends StatelessWidget with ThemeMixin {
           body: RefreshIndicator(
             onRefresh: () async {
               alog("Forcing Update");
+
               UpdateService().forceUpdateAll();
               // just to see something is happening
               await Future.delayed(const Duration(seconds: 1));

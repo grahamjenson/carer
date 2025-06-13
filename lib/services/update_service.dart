@@ -4,6 +4,7 @@ import 'package:carer/services/updaters/ns_profile.dart';
 import 'package:carer/services/updaters/ns_properties.dart';
 import 'package:carer/services/updaters/ns_treatments.dart';
 import 'package:carer/services/updaters/updater.dart';
+import 'package:clock/clock.dart';
 
 class UpdateService {
   // is a singleton
@@ -40,6 +41,8 @@ class UpdateService {
 
   bool forceUpdateAll() {
     for (var element in updaters) {
+      // Force pulling in more info
+      element.lastSuccessfulUpdate = clock.daysAgo(1);
       element.forceUpdate();
     }
     return true;
