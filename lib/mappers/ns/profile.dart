@@ -2,11 +2,16 @@ import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/sql/profile.dart';
 import 'package:carer/nsclient/shared.dart';
 
+enum NSProfileSource {
+  defaultStoreProfile,
+  storeProfile,
+  profileSwitch,
+}
+
 class NSProfileToProfileExtras {
-  final String source;
+  final NSProfileSource source;
   final int percent;
   final int duration;
-
   const NSProfileToProfileExtras(this.source, this.percent, this.duration);
 }
 
@@ -19,9 +24,10 @@ class NSProfileToProfile extends DataMapper<(NSProfile, NSProfileToProfileExtras
     return Profile(
       name: profile.name,
       eid: profile.id,
+      storeid: profile.storeid,
       startDate: profile.date,
       duration: extras.duration,
-      source: extras.source,
+      source: extras.source.name,
       percent: extras.percent,
       dia: profile.dia,
       units: profile.units,

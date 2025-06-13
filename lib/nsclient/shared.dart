@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 class NSProfile {
   final String id;
+  final String? storeid;
   final String name;
   final int dia;
   final TimeValues carbratio;
@@ -18,11 +19,9 @@ class NSProfile {
 
   final DateTime date;
 
-  final String? raw;
-
   const NSProfile({
-    this.raw,
     required this.id,
+    this.storeid,
     required this.name,
     required this.date,
     required this.dia,
@@ -41,49 +40,61 @@ class NSProfile {
   List<int> expandedTargetLow() => targetLow.expand().map((e) => e.round()).toList();
   List<int> expandedTargetHigh() => targetHigh.expand().map((e) => e.round()).toList();
 
-  static NSProfile? fromCurrentJson(String jsonString) {
+  static (NSProfile?, List<NSProfile>) fromCurrentJson(String jsonString) {
     var (json, err) = tryDecodeJson(jsonString);
     if (err != null) {
       alog("NSError: Failed to decode profile json: $err $jsonString");
       Errors.captureError(err, StackTrace.current);
-      return null;
+      return (null, <NSProfile>[]);
     }
     // Return unless json is a Map<String, dynamic>
 
     if (json is! Map<String, dynamic>) {
       alog("NSError: Failed to decode profile json:  NOT A MAP $jsonString");
-      return null;
+      return (null, <NSProfile>[]);
     }
 
-    var store = json["store"];
-    if (store is! Map<String, dynamic>) {
+    var untypedStore = json["store"];
+    if (untypedStore is! Map<String, dynamic>) {
       alog("NSError: Failed to decode profile json: store key not found $jsonString");
-      return null;
+      return (null, <NSProfile>[]);
     }
+
+    Map<String, dynamic> store = untypedStore;
 
     var id = json["_id"];
     if (id == null) {
       alog("NSError: Failed to decode profile json: id key not found $jsonString");
-      return null;
+      return (null, <NSProfile>[]);
     }
-    Map<String, dynamic> profileStore = store;
-    var profileName = profileStore.keys.firstOrNull;
-    if (profileName == null) {
-      alog("NSError: Failed to decode profile json: profile name not found $jsonString");
-      return null;
-    }
-    Map<String, dynamic> profileValues = profileStore[profileName];
 
-    return NSProfile.fromJson(
-      profileName,
-      id!,
-      NSType.getBestGuessDate(json),
-      profileValues,
-      raw: jsonString,
-    );
+    String defaultProfile = json['defaultProfile'].toString();
+    if (defaultProfile.isEmpty) {
+      alog("NSError: Failed to decode profile json: defaultProfile is empty $jsonString");
+      return (null, <NSProfile>[]);
+    }
+
+    NSProfile? currentProfile;
+    List<NSProfile> otherProfiles = [];
+
+    store.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        //TODO check ID use
+        var profile = NSProfile.fromJson(key, "${id}_$key", "$id", NSType.getBestGuessDate(json), value);
+        if (key == defaultProfile) {
+          currentProfile = profile;
+        } else {
+          otherProfiles.add(profile);
+        }
+      } else {
+        alog("NSError: Failed to decode profile json: store value for key $key is not a Map $jsonString");
+      }
+    });
+
+    return (currentProfile, otherProfiles);
   }
 
-  factory NSProfile.fromJson(String name, String id, DateTime date, Map<String, dynamic> json, {String raw = ""}) {
+  factory NSProfile.fromJson(String name, String id, String? storeid, DateTime date, Map<String, dynamic> json) {
     String units = json['units'] ?? "mg/dL";
 
     var targetLow = TimeValues.fromJson(json['target_low']);
@@ -102,8 +113,8 @@ class NSProfile {
     }
 
     return NSProfile(
-      raw: raw,
       id: id,
+      storeid: storeid,
       name: name,
       date: date,
       dia: NSType.getInt(json['dia'], defaultValue: 5)!,

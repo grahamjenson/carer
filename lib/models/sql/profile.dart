@@ -1,12 +1,13 @@
+import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/db_model.dart';
-import 'package:carer/services/timer_service.dart';
-import 'package:carer/utils/futures.dart';
-import 'package:clock/clock.dart';
 
 class Profile extends DateRangeDBModel {
   final int dia;
   final String name;
+
+  // Stores the id of the store that the profile was pulled from
+  final String? storeid;
   final String units;
   final String timezone;
 
@@ -24,6 +25,7 @@ class Profile extends DateRangeDBModel {
     super.id,
     required this.name,
     required super.eid,
+    this.storeid,
     // Date Range
     required super.startDate,
     required super.duration,
@@ -60,35 +62,38 @@ class Profile extends DateRangeDBModel {
     }
   }
 
-  static Future<Profile?> atTime(DateTime date) async {
-    var ms = date.millisecondsSinceEpoch;
-    return (await SQLToProfile().query(conditions: {"start <= ?": ms, "end >= ?": ms}, limit: 1)).firstOrNull;
+  static Future<List<Profile>> fetchAllDefaultStoreProfiles() async {
+    return (await SQLToProfile().query(
+      conditions: {
+        "source IS ?": NSProfileSource.defaultStoreProfile.name,
+      },
+    ));
   }
 
-  static Future<List<Profile>> after(DateTime date) async {
-    return SQLToProfile().query(conditions: {
-      "end >= ?": date.millisecondsSinceEpoch,
-    });
-  }
-
-  static Future<Profile?> profile() async {
-    return SQLToProfile().query(limit: 1, name: "lastProfile").then((value) => value.firstOrNull);
-  }
-
-  static ASignal<Profile?> currentProfile = ASignal<Profile?>(null, debugLabel: 'currentProfile');
-
-  static Future<void> setupSQLSignals() async {
-    await signalAssign(
-      currentProfile,
-      () => atTime(clock.now()),
-      debugLabel: 'fetchCurrentProfile',
-      dependencies: [SQLToProfile().writeSignal, TimerService().fifteenSecondSignal],
-    );
+  static Future<List<Profile>> fetchProfileSwitchesAfter(DateTime date) async {
+    return (await SQLToProfile().query(
+      conditions: {
+        "end >= ?": date.millisecondsSinceEpoch,
+      },
+    ));
   }
 
   @override
   String toString() {
     return "Profile($eid, $startDate, $duration, $name, $percent%)";
+  }
+
+  @override
+  bool isAtTime(DateTime date) {
+    if (date.isBefore(startDate)) {
+      return false;
+    }
+    if (duration == 0) {
+      // Indefinite profile, so it is always valid after startDate
+      return true;
+    }
+
+    return date.isBefore(endDate);
   }
 }
 

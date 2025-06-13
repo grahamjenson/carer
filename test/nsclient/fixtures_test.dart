@@ -6,7 +6,6 @@ import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:clock/clock.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -38,12 +37,11 @@ class FixtureTest<T> {
 }
 
 void main() {
-  profileParserNoNull(String str) {
-    var eprofile = NSProfile.fromJson("empty", "", clock.now(), {});
+  (NSProfile?, List<NSProfile>) profileParserNoNull(String str) {
     try {
-      return NSProfile.fromCurrentJson(str) ?? eprofile;
+      return NSProfile.fromCurrentJson(str);
     } catch (e) {}
-    return eprofile;
+    return (null, <NSProfile>[]);
   }
 
   List<FixtureTest> tests = [
@@ -52,7 +50,7 @@ void main() {
       'treatments',
       NSTreatments.fromJson,
       test: (NSTreatments treatments) {
-        expect(treatments.length, 14);
+        expect(treatments.length, 13);
         expect(treatments[0], isA<NSTreatmentInsulin>());
         var t0 = treatments[0] as NSTreatmentInsulin;
         expect(t0.insulin, 0.05);
@@ -61,8 +59,8 @@ void main() {
         var t1 = treatments[1] as NSTemporaryTarget;
         expect(t1.durationInMilliseconds, 21600000);
 
-        expect(treatments[11], isA<NSTreatmentTempBasal>());
-        var t11 = treatments[11] as NSTreatmentTempBasal;
+        expect(treatments[10], isA<NSTreatmentTempBasal>());
+        var t11 = treatments[10] as NSTreatmentTempBasal;
         expect(t11.absolute, 1.55);
         expect(t11.durationInMilliseconds, (4.1 * 60 * 1000).round());
       },
@@ -83,11 +81,18 @@ void main() {
     }),
 
     // Current Profile
-    FixtureTest<NSProfile>('current_profile', profileParserNoNull, test: (NSProfile profile) {
+    FixtureTest<(NSProfile?, List<NSProfile>)>('current_profile', profileParserNoNull, test: ((NSProfile?, List<NSProfile>) profileProfiles) {
+      var (profile, profiles) = profileProfiles;
+      if (profile == null) {
+        fail("Profile should not be null");
+      }
+      expect(profiles, isNotNull);
+      expect(profiles.length, 1);
+
       expect(profile.name, "currentProfileName");
       expect(profile.dia, 6);
 
-      expect(profile.id, "668fbca35de9b880531dad48");
+      expect(profile.id, "668fbca35de9b880531dad48_currentProfileName");
       expect(profile.carbratio.values.length, 6);
       expect(profile.carbratio.values.first.value, 20);
 
@@ -104,12 +109,21 @@ void main() {
       expect(profile.targetHigh.values.first.value, 7 * MGtoMMOL);
     }),
 
-    FixtureTest<NSProfile>('current_profile_loop', profileParserNoNull, test: (NSProfile profile) {
+    FixtureTest<(NSProfile?, List<NSProfile>)>('current_profile_loop', profileParserNoNull, test: ((NSProfile?, List<NSProfile>) profileProfiles) {
+      var (profile, profiles) = profileProfiles;
+      if (profile == null) {
+        fail("Profile should not be null");
+      }
+
+      expect(profiles.length, 0);
+
       expect(profile.name, "loopProfile");
     }),
 
-    FixtureTest<NSProfile>('current_profile_bad', profileParserNoNull, test: (NSProfile profile) {
-      expect(profile.name, "empty");
+    FixtureTest<(NSProfile?, List<NSProfile>)>('current_profile_bad', profileParserNoNull, test: ((NSProfile?, List<NSProfile>) profileProfiles) {
+      var (profile, profiles) = profileProfiles;
+      expect(profile, isNull);
+      expect(profiles.length, 0);
     }),
 
     // Properties

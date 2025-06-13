@@ -168,29 +168,18 @@ class NSRawTreatment {
       case "Profile Switch":
         if (originalDuration != null && originalProfileName != null && percentage != null && profileJson != null) {
           var profileVariables = json.decode(profileJson!);
-          var profileModel = NSProfile.fromJson(originalProfileName!, id, date, profileVariables);
+          var profileModel = NSProfile.fromJson(originalProfileName!, id, null, date, profileVariables);
 
           treatments.add(NSProfileSwitch(
             durationInMilliseconds: originalDuration!,
             percentage: percentage!,
-            source: "ProfileSwitch",
             profile: profileModel,
           ));
         }
         break;
       case "Note":
-        if (originalDuration != null && originalProfileName != null && originalPercentage != null && profileJson != null) {
-          var profileVariables = json.decode(profileJson!);
-          var profileModel = NSProfile.fromJson(originalProfileName!, id, date, profileVariables);
-          // If the Note has these fields it is actually a profile switch BACK to the original profile
-          treatments.add(NSProfileSwitch(
-            durationInMilliseconds: originalDuration!,
-            percentage: originalPercentage!,
-            source: "Note",
-            profile: profileModel,
-          ));
-        }
-
+        if (originalDuration != null && originalProfileName != null && originalPercentage != null && profileJson != null) {}
+        // This is reserved for possibly saving the profile switch from a note
         break;
     }
 
@@ -312,14 +301,12 @@ class NSTemporaryTarget extends NSTreatment {
 class NSProfileSwitch extends NSTreatment {
   int durationInMilliseconds;
   int percentage;
-  String source;
 
   NSProfile profile;
 
   NSProfileSwitch({
     required this.durationInMilliseconds,
     required this.percentage,
-    required this.source,
     required this.profile,
   });
 

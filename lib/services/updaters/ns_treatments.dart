@@ -68,8 +68,8 @@ class NSTreatmentsUpdater extends Updater {
     // get the profileswitches
     List<Profile> profileSwitches = [];
     for (var profileSwitch in treatments.profileSwitchs) {
-      NSProfileToProfileExtras extras =
-          NSProfileToProfileExtras(profileSwitch.source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000);
+      var source = NSProfileSource.profileSwitch;
+      NSProfileToProfileExtras extras = NSProfileToProfileExtras(source, profileSwitch.percentage, profileSwitch.durationInMilliseconds ~/ 1000);
       Profile profileModel = const NSProfileToProfile().aToB((profileSwitch.profile, extras));
 
       profileSwitches.add(profileModel);

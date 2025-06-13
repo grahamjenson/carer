@@ -59,13 +59,21 @@ class ValueAtTime with DateMixin {
     return "ValueAtTime($date, $lowTarget, $highTarget, $basal, $isf, $cr, $profileName, $profilePercent, $isTempBasal, $isTempTarget, $isTempProfile)";
   }
 
-  static ValueAtTime createValueAtTime(List<Profile> profiles, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {
+  static ValueAtTime createValueAtTime(
+      List<Profile> profiles, List<Profile> profileSwitches, List<TempTarget> tempTargets, List<TempBasal> tempBasals, DateTime date) {
     int hourOfDay = date.hour;
 
     // make date rounded to nearest minute
     fon(DateRangeDBModel element) => element.isAtTime(date);
 
-    Profile? profile = profiles.firstWhereOrNull(fon);
+    Profile? profile = profiles.firstWhereOrNull((e) => date.isAfter(e.startDate));
+
+    Profile? profileSwitch = profileSwitches.firstWhereOrNull(fon);
+    if (profileSwitch != null) {
+      // if there is a profile switch, use that instead of the current profile
+      profile = profileSwitch;
+    }
+
     TempBasal? tempBasal = tempBasals.firstWhereOrNull(fon);
     TempTarget? tempTarget = tempTargets.firstWhereOrNull(fon);
 
@@ -138,7 +146,10 @@ class ValueAtTime with DateMixin {
 
     var start = now.subtract(Duration(hours: hoursAgo));
 
-    var profiles = await Profile.after(start);
+    var profiles = await Profile.fetchAllDefaultStoreProfiles();
+    var profileSwitches = await Profile.fetchProfileSwitchesAfter(start);
+
+    // add the profile switches to the profiles
     var tempTargets = await TempTarget.after(start);
     var tempBasals = await TempBasal.after(start);
 
@@ -146,7 +157,7 @@ class ValueAtTime with DateMixin {
     List<ValueAtTime> vats = [];
     for (var i = 0; i < hoursAgo * 60; i++) {
       var d = now.subtract(Duration(minutes: i));
-      vats.add(createValueAtTime(profiles, tempTargets, tempBasals, d));
+      vats.add(createValueAtTime(profiles, profileSwitches, tempTargets, tempBasals, d));
     }
 
     return vats;
