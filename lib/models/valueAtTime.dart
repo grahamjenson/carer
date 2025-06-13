@@ -146,7 +146,7 @@ class ValueAtTime with DateMixin {
 
     var start = now.subtract(Duration(hours: hoursAgo));
 
-    var profiles = await Profile.fetchAllDefaultStoreProfiles(start);
+    var profiles = await Profile.fetchAllDefaultStoreProfiles();
     var profileSwitches = await Profile.fetchProfileSwitchesAfter(start);
 
     // add the profile switches to the profiles
