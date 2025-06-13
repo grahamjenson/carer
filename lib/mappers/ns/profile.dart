@@ -5,7 +5,6 @@ import 'package:carer/nsclient/shared.dart';
 enum NSProfileSource {
   defaultStoreProfile,
   storeProfile,
-  note,
   profileSwitch,
 }
 
