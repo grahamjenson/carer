@@ -1,6 +1,7 @@
 import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/db_model.dart';
+import 'package:collection/collection.dart';
 
 class Profile extends DateRangeDBModel {
   final int dia;
@@ -73,9 +74,22 @@ class Profile extends DateRangeDBModel {
   static Future<List<Profile>> fetchProfileSwitchesAfter(DateTime date) async {
     return (await SQLToProfile().query(
       conditions: {
+        "source IS ?": NSProfileSource.profileSwitch.name,
         "end >= ?": date.millisecondsSinceEpoch,
       },
     ));
+  }
+
+  static Profile? selectProfileAtTime(DateTime date, List<Profile> profiles, List<Profile> profileSwitches) {
+    Profile? profile = profiles.firstWhereOrNull((e) => date.isAfter(e.startDate));
+
+    Profile? profileSwitch = profileSwitches.firstWhereOrNull((Profile element) => element.isAtTime(date));
+    if (profileSwitch != null) {
+      // if there is a profile switch, use that instead of the current profile
+      profile = profileSwitch;
+    }
+
+    return profile;
   }
 
   @override
