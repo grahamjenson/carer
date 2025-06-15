@@ -129,7 +129,7 @@ class TempTargetSettingsModel extends CareModel {
         var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
         NSClient().addTempTarget(nsURL, nsToken, bottom.toInt(), top.toInt(), duration, name).then((value) {
           if (value) {
-            ToastService().showSuccess("Temp Target $description");
+            ToastService().showSuccess("Temp Target $name", description: description);
             UpdateService().nsTreatmentUpdater.addExternalReason("Added Temp Target");
           } else {
             ToastService().showError("Failed to set Temp Target");

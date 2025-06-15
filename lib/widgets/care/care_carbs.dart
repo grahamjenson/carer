@@ -12,11 +12,6 @@ import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-typedef OnPressedFunction = void Function();
-
-typedef Setter = void Function(int);
-typedef Getter = int Function();
-
 class CarbsSettingsModel extends CareModel {
   int MIN_CARBS = 1;
   int MAX_CARBS = 50;
