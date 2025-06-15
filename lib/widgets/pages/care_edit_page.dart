@@ -1,3 +1,4 @@
+import 'package:carer/models/sql/profile.dart';
 import 'package:carer/services/settings/care_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -70,10 +71,11 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       fontSize: 10,
     );
 
-    Widget? description = Text(
+    Widget? description = Flexible(
+        child: Text(
       e.description,
       style: dimStyle,
-    );
+    ));
 
     Widget trailing = SizedBox(
         width: 170,
@@ -157,10 +159,11 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       fontSize: 10,
     );
 
-    Widget? description = Text(
+    Widget? description = Flexible(
+        child: Text(
       e.description,
       style: dimStyle,
-    );
+    ));
 
     Widget trailing = SizedBox(
       width: 100,
@@ -194,7 +197,8 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
     );
 
     var initSelect = e.getName();
-    var remoteNames = ["Profilewqeasfasf", "Profile2"];
+
+    var remoteNames = Profile.currentProfileNames.value;
 
     var remoteContainsSelection = false;
     if (remoteNames.contains(initSelect)) {
@@ -212,7 +216,7 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
 
     return SettingsTile(
       title: DropdownMenu(
-        width: 145,
+        width: 300,
         menuStyle: const MenuStyle(
           padding: WidgetStatePropertyAll(EdgeInsets.zero),
           visualDensity: VisualDensity(horizontal: -4, vertical: -4),
