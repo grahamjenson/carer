@@ -4,6 +4,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -58,7 +59,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
       },
       descriptionInlineIos: true,
       title: Text(status.title),
-      description: Flexible(child: SmartText(texts: ["${status.description}\n", status.status], styles: [descriptionStyle, statusStyle])),
+      description: TextWrap(child: SmartText(texts: ["${status.description}\n", status.status], styles: [descriptionStyle, statusStyle])),
       leading: Icon(status.icon, color: iconColor),
     );
   }

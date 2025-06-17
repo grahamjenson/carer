@@ -2,6 +2,7 @@ import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
@@ -33,7 +34,7 @@ class SnoozeAlarmsSettings extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile.switchTile(
       title: const Text("Stop Snoozing When In Range"),
       descriptionInlineIos: true,
-      description: const Flexible(
+      description: const TextWrap(
         child: Text(
           "Stop Snoozing after 20 minutes in range",
         ),
@@ -49,7 +50,7 @@ class SnoozeAlarmsSettings extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile.switchTile(
       title: const Text("Stop Snoozing With Urgent Alarm"),
       descriptionInlineIos: true,
-      description: const Flexible(
+      description: const TextWrap(
         child: Text(
           "Stop Snoozing for Urgent Alarms\nUrgent High, Urgent Low and No Data\nSnoozing an Urgent Alarm will snooze",
         ),

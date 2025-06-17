@@ -4,6 +4,7 @@ import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/target_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:go_router/go_router.dart';
@@ -48,7 +49,7 @@ class AlarmsSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return SettingsTile.navigation(
       title: Text(alarmType.title),
       leading: Icon(alarmType.icon, color: iconColor),
-      description: Flexible(child: Text(alarmType.description)),
+      description: TextWrap(child: Text(alarmType.description)),
       descriptionInlineIos: true,
       onPressed: (context) => GoRouter.of(context).go(page),
     );

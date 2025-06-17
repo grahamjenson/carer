@@ -3,6 +3,7 @@ import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -53,7 +54,7 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
       },
       descriptionInlineIos: true,
       title: Text(stat.title),
-      description: Flexible(child: SmartText(texts: ["${stat.description}\n"] + texts, styles: [descriptionStyle] + styles)),
+      description: TextWrap(child: SmartText(texts: ["${stat.description}\n"] + texts, styles: [descriptionStyle] + styles)),
       leading: Icon(stat.icon, color: iconColor),
     );
   }

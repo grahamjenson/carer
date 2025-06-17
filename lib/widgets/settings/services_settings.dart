@@ -22,7 +22,7 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
         );
       },
       debugLabel: "NightScoutSettingsWidget",
-      dependencies: [NSClient().lastFetched, NSClient().totalErrors],
+      dependencies: [NSClient.lastFetched, NSClient.totalErrors],
     );
   }
 
@@ -30,9 +30,9 @@ class ServicesSettingsWidget extends AbstractSettingsSection {
     var description = "Not Set";
 
     if (SecureSettings().nightscoutURLAndTokenSet()) {
-      var lastFetched = NSClient().lastFetched.value;
-      var lastError = NSClient().totalErrors.lastSet;
-      var totalErrors = NSClient().totalErrors.value;
+      var lastFetched = NSClient.lastFetched.value;
+      var lastError = NSClient.totalErrors.lastSet;
+      var totalErrors = NSClient.totalErrors.value;
 
       var times = [];
       if (lastFetched != null) {

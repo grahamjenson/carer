@@ -7,6 +7,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -67,12 +68,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     return SettingsTile.switchTile(
       title: const Text("Flash on Alarm"),
       descriptionInlineIos: true,
-      description: const Flexible(
-        child: Text(
-          "Flashs the screen white when an alarming",
-          softWrap: true,
-        ),
-      ),
+      description: const TextWrap(child: Text("Flashes the screen white when an alarming")),
       initialValue: AlarmAlertSettings().enableFlashOnAlarm,
       onToggle: (bool value) {
         AlarmAlertSettings().enableFlashOnAlarm = value;
@@ -84,11 +80,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     return SettingsTile.switchTile(
       title: const Text("Notifications"),
       descriptionInlineIos: true,
-      description: const Flexible(
-        child: Text(
-          "Notifications every 15 minutes if alarming (DANGER unreliable)",
-        ),
-      ),
+      description: const TextWrap(child: Text("Notifications every 15 minutes if alarming (DANGER unreliable)")),
       initialValue: AlarmAlertSettings().enableNotifications,
       onToggle: (bool value) {
         AlarmAlertSettings().enableNotifications = value;
@@ -100,10 +92,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     return SettingsTile.switchTile(
       title: const Text("Audio Alarms"),
       descriptionInlineIos: true,
-      description: const Flexible(
-          child: Text(
-        "Play audio alert when an alarming",
-      )),
+      description: const TextWrap(child: Text("Play audio alert when an alarming")),
       initialValue: AlarmAlertSettings().enableAudioAlarm,
       onToggle: (bool enable) async {
         if (enable) {

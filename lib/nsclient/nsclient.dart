@@ -57,8 +57,8 @@ class NSClient {
   factory NSClient() => _singleton;
   NSClient._internal();
 
-  ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
-  ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
+  static ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
+  static ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
 
   String? jwtURL;
   String? jwtToken;

@@ -3,6 +3,7 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -46,7 +47,6 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
 
     onTestAndSavePressed() async {
       var (url, token) = SecureSettings().nightscoutURLAndTokenFromString(_nsTextController.text);
-
       var (bigErr, errMsg) = await go(NSClient().testNSUrlAndToken(url, token));
       if (bigErr != null) {
         errMsg = bigErr.toString();
@@ -87,7 +87,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                     autofocus: true,
                     controller: _nsTextController,
                   ),
-                  description: const Flexible(child: Text("Set NightScout URL with Token")),
+                  description: const TextWrap(child: Text("Set NightScout URL with Token")),
                   descriptionInlineIos: true,
                 ),
                 SettingsTile(
@@ -101,7 +101,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                 ),
                 SettingsTile(
                   title: const Text("Nightscout Base URL"),
-                  description: Flexible(child: Text(SecureSettings().nightscoutURL ?? "NONE")),
+                  description: TextWrap(child: Text(SecureSettings().nightscoutURL ?? "NONE")),
                   descriptionInlineIos: true,
                   leading: const Icon(Icons.link),
                   trailing: const Icon(Icons.copy_outlined),
@@ -118,7 +118,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                 ),
                 SettingsTile(
                   title: const Text("Nightscout TOKEN"),
-                  description: Flexible(child: Text(SecureSettings().nightscoutToken ?? "NONE")),
+                  description: TextWrap(child: Text(SecureSettings().nightscoutToken ?? "NONE")),
                   descriptionInlineIos: true,
                   leading: const Icon(Icons.security),
                   trailing: const Icon(Icons.copy_outlined),
@@ -135,7 +135,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                 ),
                 SettingsTile(
                   title: const Text("Nightscout Full URL"),
-                  description: Flexible(child: Text(SecureSettings().nightscoutURLWithToken ?? "NONE")),
+                  description: TextWrap(child: Text(SecureSettings().nightscoutURLWithToken ?? "NONE")),
                   descriptionInlineIos: true,
                   leading: const Icon(Icons.link),
                   trailing: const Icon(Icons.copy_outlined),
