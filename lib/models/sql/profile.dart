@@ -111,6 +111,7 @@ class Profile extends DateRangeDBModel {
     return date.isBefore(endDate);
   }
 
+  // Stores the current profiles in the profile store.
   static ASignal<List<String>> currentProfileNames = ASignal([], debugLabel: 'CurrentProfileNames');
 }
 

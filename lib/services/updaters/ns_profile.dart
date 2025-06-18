@@ -71,6 +71,8 @@ class NSProfileUpdater extends Updater {
       }
     }
 
+    // This is a bit of a hack, but it saves an annoying query later.
+    // Like pulling the most recent default profile, then the store id, then all store profiles, then their names
     Profile.currentProfileNames.value = names;
     return true;
   }
