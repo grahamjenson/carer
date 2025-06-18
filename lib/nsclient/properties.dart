@@ -60,16 +60,25 @@ class NSProperties {
   static NSProperties fromJson(String jsonString) {
     try {
       var json = jsonDecode(jsonString);
+      if (json is! Map<String, dynamic>) {
+        throw const FormatException("Invalid JSON format");
+      }
+
+      for (var key in json.keys) {
+        if (json[key] is Map && json[key].isEmpty) {
+          json[key] = null; // Convert empty maps to null
+        }
+      }
 
       return NSProperties(
-        battery: json["upbat"]?["min"]?["battery"]?.toInt(),
-        batteryDisplay: json["upbat"]?["min"]?["display"]?.toString(),
-        iob: json["iob"]?["iob"]?.toDouble(),
-        basaliob: json["iob"]?["basaliob"]?.toDouble(),
-        treatmentIob: json["iob"]?["treatmentIob"]?.toDouble(),
-        cob: json["cob"]?["cob"]?.toDouble(),
-        sensorChangeTime: json["sage"]?["Sensor Change"]?["treatmentDate"]?.toInt(),
-        cannulaChangeTime: json["cage"]?["treatmentDate"]?.toInt(),
+        battery: getBattery(json),
+        batteryDisplay: getBatteryDisplay(json),
+        iob: getIOB(json),
+        basaliob: getBasalIOB(json),
+        treatmentIob: getTreatmentIOB(json),
+        cob: getCOB(json),
+        sensorChangeTime: getSensorChangeTime(json),
+        cannulaChangeTime: getCannulaChangeTime(json),
         raw: jsonString,
       );
     } catch (e, stackTrace) {
@@ -86,5 +95,108 @@ class NSProperties {
         raw: jsonString,
       );
     }
+  }
+
+  static int? getBattery(Map<String, dynamic> json) {
+    try {
+      if (json['upbat'] is Map && json['upbat']['min'] is Map && json['upbat']['min']['battery'] is num) {
+        return (json['upbat']['min']['battery'] as num).toInt();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static String? getBatteryDisplay(Map<String, dynamic> json) {
+    try {
+      if (json['upbat'] is Map && json['upbat']['min'] is Map && json['upbat']['min']['display'] is String) {
+        return json['upbat']['min']['display'] as String;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static double? getIOB(Map<String, dynamic> json) {
+    try {
+      if (json["openaps"] is Map && json["openaps"]["lastIOB"] is Map && json["openaps"]["lastIOB"]["iob"] is num) {
+        return (json["openaps"]["lastIOB"]["iob"] as num).toDouble();
+      }
+
+      if (json["openaps"] is Map && json["openaps"]["lastSuggested"] is Map && json["openaps"]["lastSuggested"]["IOB"] is num) {
+        return (json["openaps"]["lastSuggested"]["IOB"] as num).toDouble();
+      }
+
+      if (json["iob"] is Map && json["iob"]["iob"] is num) {
+        return (json["iob"]["iob"] as num).toDouble();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static double? getTreatmentIOB(Map<String, dynamic> json) {
+    try {
+      if (json["iob"] is Map && json["iob"]["treatmentIob"] is num) {
+        return (json["iob"]["treatmentIob"] as num).toDouble();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static double? getBasalIOB(Map<String, dynamic> json) {
+    try {
+      if (json["openaps"] is Map && json["openaps"]["lastIOB"] is Map && json["openaps"]["lastIOB"]["basaliob"] is num) {
+        return (json["openaps"]["lastIOB"]["basaliob"] as num).toDouble();
+      }
+
+      if (json["iob"] is Map && json["iob"]["basaliob"] is num) {
+        return (json["iob"]["basaliob"] as num).toDouble();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static double? getCOB(Map<String, dynamic> json) {
+    try {
+      if (json["openaps"] is Map && json["openaps"]["lastSuggested"] is Map && json["openaps"]["lastSuggested"]["COB"] is num) {
+        return (json["openaps"]["lastSuggested"]["COB"] as num).toDouble();
+      }
+      if (json["cob"] is Map && json["cob"]["cob"] is num) {
+        return (json["cob"]["cob"] as num).toDouble();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static int? getCannulaChangeTime(Map<String, dynamic> json) {
+    try {
+      if (json["cage"] is Map && json["cage"]["treatmentDate"] is num) {
+        return (json["cage"]["treatmentDate"] as num).toInt();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  static int? getSensorChangeTime(Map<String, dynamic> json) {
+    try {
+      if (json["sage"] is Map && json["sage"]["Sensor Change"] is Map && json["sage"]["Sensor Change"]["treatmentDate"] is num) {
+        return (json["sage"]["Sensor Change"]["treatmentDate"] as num).toInt();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }
