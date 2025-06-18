@@ -278,7 +278,6 @@ class NSClient {
   }
 
   Future<bool> switchProfile(String nsURL, String token, String profileName, int duration, int percent) async {
-    return true; // Debug TODO
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
       return false;
@@ -296,11 +295,11 @@ class NSClient {
 
     Map<String, dynamic> bodyMap = {
       "eventType": "Profile Switch",
-      "profileName": profileName,
-      "percent": percent,
+      "profile": profileName,
+      "percentage": percent,
+      "timeshift": 0,
       "date": dateInMilliseconds,
       "mills": dateInMilliseconds, // NightGuard requires this ¯\_(ツ)_/¯
-      "isValid": true,
       "app": "carer",
     };
 

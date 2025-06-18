@@ -71,11 +71,10 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       fontSize: 10,
     );
 
-    Widget? description = Flexible(
-        child: Text(
+    Widget? description = Text(
       e.description,
       style: dimStyle,
-    ));
+    );
 
     Widget trailing = SizedBox(
         width: 170,
@@ -159,11 +158,10 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       fontSize: 10,
     );
 
-    Widget? description = Flexible(
-        child: Text(
+    Widget? description = Text(
       e.description,
       style: dimStyle,
-    ));
+    );
 
     Widget trailing = SizedBox(
       width: 100,
