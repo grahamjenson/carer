@@ -277,6 +277,52 @@ class NSClient {
     return true;
   }
 
+  Future<bool> switchProfile(String nsURL, String token, String profileName, int duration, int percent) async {
+    if (nsURL == "" || token == "") {
+      alog("No NS URL or token");
+      return false;
+    }
+
+    var jwtSuccess = await refreshJWT(nsURL, token);
+    if (!jwtSuccess) {
+      return false;
+    }
+
+    var ep = v3TreatmentsEndpoint(nsURL, token);
+
+    var date = clock.now();
+    var dateInMilliseconds = date.millisecondsSinceEpoch;
+
+    Map<String, dynamic> bodyMap = {
+      "eventType": "Profile Switch",
+      "profile": profileName,
+      "percentage": percent,
+      "timeshift": 0,
+      "date": dateInMilliseconds,
+      "mills": dateInMilliseconds, // NightGuard requires this ¯\_(ツ)_/¯
+      "app": "carer",
+    };
+
+    if (duration != 0) {
+      bodyMap["duration"] = duration; // In minutes
+      bodyMap["durationInMilliseconds"] = duration * 60 * 1000; // ms
+    }
+
+    final (response, err) = await go(http.post(ep,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Accept": " application/json",
+          "Authorization": "bearer $jwt",
+        },
+        body: jsonEncode(bodyMap)));
+
+    if (_handleResponseError("switchProfile", ep, response, err)) {
+      return false;
+    }
+
+    return true;
+  }
+
   ///
   // API  V1 CALLS
   ///

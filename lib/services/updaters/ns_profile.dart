@@ -46,6 +46,8 @@ class NSProfileUpdater extends Updater {
     NSProfileToProfileExtras extras = const NSProfileToProfileExtras(NSProfileSource.defaultStoreProfile, 100, 0);
     Profile profileModel = const NSProfileToProfile().aToB((currentProfile, extras));
 
+    List<String> names = [profileModel.name];
+
     // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await SQLToProfile().save(profileModel);
     if (saved) {
@@ -55,6 +57,7 @@ class NSProfileUpdater extends Updater {
     }
 
     for (NSProfile p in otherProfiles) {
+      names.add(p.name);
       // Convert each profile to a Profile model
       var extras = const NSProfileToProfileExtras(NSProfileSource.storeProfile, 100, 0);
       var profile = const NSProfileToProfile().aToB((p, extras));
@@ -68,6 +71,9 @@ class NSProfileUpdater extends Updater {
       }
     }
 
+    // This is a bit of a hack, but it saves an annoying query later.
+    // Like pulling the most recent default profile, then the store id, then all store profiles, then their names
+    Profile.currentProfileNames.value = names;
     return true;
   }
 }

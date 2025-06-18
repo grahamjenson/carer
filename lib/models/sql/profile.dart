@@ -1,6 +1,7 @@
 import 'package:carer/mappers/ns/profile.dart';
 import 'package:carer/mappers/sql/profile.dart';
 import 'package:carer/models/sql/db_model.dart';
+import 'package:carer/utils/futures.dart';
 import 'package:collection/collection.dart';
 
 class Profile extends DateRangeDBModel {
@@ -109,6 +110,9 @@ class Profile extends DateRangeDBModel {
 
     return date.isBefore(endDate);
   }
+
+  // Stores the current profiles in the profile store.
+  static ASignal<List<String>> currentProfileNames = ASignal([], debugLabel: 'CurrentProfileNames');
 }
 
 const crKeys = [

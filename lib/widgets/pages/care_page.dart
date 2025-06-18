@@ -6,6 +6,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/care/care_carbs.dart';
 import 'package:carer/widgets/care/care_model.dart';
+import 'package:carer/widgets/care/care_profiles.dart';
 import 'package:carer/widgets/care/care_temp_targets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +27,7 @@ class CarePage extends StatelessWidget with ThemeMixin {
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                var children = carbButtons(context) + tempTargetButtons(context);
+                var children = carbButtons(context) + tempTargetButtons(context) + profileSwitchButtons(context);
                 var itemCount = children.length;
 
                 final screenWidth = constraints.maxWidth;
@@ -96,6 +97,12 @@ class CarePage extends StatelessWidget with ThemeMixin {
 
   List<Widget> tempTargetButtons(BuildContext context) {
     return allTempTargets.map((e) {
+      return treatmentActionButton(context, e);
+    }).toList();
+  }
+
+  List<Widget> profileSwitchButtons(BuildContext context) {
+    return allProfileSwitches.where((e) => e.getName().isNotEmpty).map((e) {
       return treatmentActionButton(context, e);
     }).toList();
   }

@@ -17,6 +17,7 @@ class CarerIcons {
   // CARE
   static const IconData CARE_CARBS = UniconsLine.restaurant;
   static const IconData CARE_TEMP_TARGET = UniconsLine.focus_target;
+  static const IconData CARE_PROFILE = UniconsLine.user;
 
   // INFO
   static const IconData INFO_INSULIN_ON_BOARD = UniconsLine.syringe;
