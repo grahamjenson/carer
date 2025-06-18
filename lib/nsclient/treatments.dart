@@ -178,8 +178,17 @@ class NSRawTreatment {
         }
         break;
       case "Note":
-        if (originalDuration != null && originalProfileName != null && originalPercentage != null && profileJson != null) {}
-        // This is reserved for possibly saving the profile switch from a note
+        // After changing a profile in Carer, AAPS puts a full Note with calculated profileJSON which is useful to use here
+        if (originalDuration != null && originalProfileName != null && originalPercentage != null && profileJson != null) {
+          var profileVariables = json.decode(profileJson!);
+          var profileModel = NSProfile.fromJson(originalProfileName!, id, null, date, profileVariables);
+          // If the Note has these fields it is actually a profile switch BACK to the original profile
+          treatments.add(NSProfileSwitch(
+            durationInMilliseconds: originalDuration!,
+            percentage: originalPercentage!,
+            profile: profileModel,
+          ));
+        }
         break;
     }
 
