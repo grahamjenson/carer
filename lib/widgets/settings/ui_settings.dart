@@ -5,6 +5,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/dates.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:carer/widgets/settings/togglebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -41,7 +42,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
             SettingsTile.switchTile(
               title: const Text('Keep Screen Active'),
               descriptionInlineIos: true,
-              description: Flexible(child: keepScreenActiveDescript),
+              description: TextWrap(child: keepScreenActiveDescript),
               initialValue: UISettings().screenActive,
               onToggle: (value) async {
                 if (value) {

@@ -103,10 +103,12 @@ class AlarmPlayer implements IAlarmPlayer {
   }
 
   Future<void> playerPlay(AudioPlayer player, double? volume) {
-    return player.play(
-      AssetSource(alarmFile),
-      volume: volume,
-    );
+    return player.play(AssetSource(alarmFile), volume: volume).catchError((err) {
+      // Swallow the error here
+      print("Error playing alarm: $err");
+      alog("Error playing alarm: $err");
+      return;
+    });
   }
 
   Future<void> playAlarmWithoutOverrideWithoutProgression(AudioPlayer player) async {

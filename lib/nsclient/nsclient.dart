@@ -66,8 +66,20 @@ class NSClient {
   DateTime? jwtExpire;
 
   final Client _flutterClient = ASentryHttpClient(client: Client());
-  final Client _cupertinoClient =
-      ASentryHttpClient(client: CupertinoClient.fromSessionConfiguration(URLSessionConfiguration.ephemeralSessionConfiguration()));
+  Client? _realCupertinoClient;
+  Client get _cupertinoClient {
+    if (!(Platform.isIOS || Platform.isMacOS)) {
+      return _flutterClient; // If not on iOS or macOS, return the flutter client
+    }
+
+    if (_realCupertinoClient != null) {
+      return _realCupertinoClient!;
+    }
+    // Create a new cupertino client with an ephemeral session configuration
+    _realCupertinoClient =
+        ASentryHttpClient(client: CupertinoClient.fromSessionConfiguration(URLSessionConfiguration.ephemeralSessionConfiguration()));
+    return _realCupertinoClient!;
+  }
 
   Client get http {
     // return normal client if in foreground
