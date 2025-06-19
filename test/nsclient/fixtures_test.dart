@@ -141,6 +141,14 @@ void main() {
 
     FixtureTest<NSProperties>('properties_loop', NSProperties.fromJson, test: (NSProperties properties) {
       expect(properties, isNotNull);
+      expect(properties.battery, equals(80));
+      expect(properties.batteryDisplay, equals("80%"));
+      expect(properties.iob, equals(1.087));
+      expect(properties.basaliob, isNull);
+      expect(properties.treatmentIob, 3.658);
+      expect(properties.cob, equals(5.0947962907626785));
+      expect(properties.cannulaChangeTime, isNull);
+      expect(properties.sensorChangeTime, isNull);
     }),
 
     FixtureTest<NSProperties>('properties_bad', NSProperties.fromJson, test: (NSProperties properties) {
@@ -153,6 +161,18 @@ void main() {
       expect(properties.cob, isNull);
       expect(properties.cannulaChangeTime, isNull);
       expect(properties.sensorChangeTime, isNull);
+    }),
+
+    FixtureTest<NSProperties>('properties01', NSProperties.fromJson, test: (NSProperties properties) {
+      expect(properties, isNotNull);
+      expect(properties.battery, 100);
+      expect(properties.batteryDisplay, "100%");
+      expect(properties.iob, 0.555);
+      expect(properties.basaliob, 0.07);
+      expect(properties.treatmentIob, null);
+      expect(properties.cob, 3.666666666666666);
+      expect(properties.cannulaChangeTime, isNull);
+      expect(properties.sensorChangeTime, 1750244579000);
     }),
 
     // device status

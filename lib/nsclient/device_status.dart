@@ -26,28 +26,11 @@ class NSDeviceStatus {
   }
 
   factory NSDeviceStatus.fromJson(Map<String, dynamic> json) {
-    double? reservoir;
-    bool? isCharging;
-    double? battery;
+    double? reservoir = NSType.getDoubleFromJson(json, ["pump", "reservoir"]);
+    bool? isCharging = NSType.getBoolFromJson(json, ["isCharging"]);
 
-    if (json["pump"] != null && json["pump"] is Map<String, dynamic> && json["pump"]["reservoir"] != null && json["pump"]["reservoir"] is num) {
-      reservoir = NSType.getDouble(json["pump"]["reservoir"]);
-    }
-
-    if (json["isCharging"] is bool) {
-      isCharging = json["isCharging"];
-    }
-
-    if (json["uploaderBattery"] is num) {
-      battery = NSType.getDouble(json["uploaderBattery"]);
-    }
-
-    if (json["uploader"] != null &&
-        json["uploader"] is Map<String, dynamic> &&
-        json["uploader"]["battery"] != null &&
-        json["uploader"]["battery"] is num) {
-      battery = NSType.getDouble(json["uploader"]["battery"]);
-    }
+    double? battery = NSType.getDoubleFromJson(json, ["uploader", "battery"]);
+    battery ??= NSType.getDoubleFromJson(json, ["uploaderBattery"]);
 
     return NSDeviceStatus(
       reservoir: reservoir,

@@ -14,6 +14,7 @@ var files = {
 
   // Properties
   "properties": 'test/nsclient/fixtures/properties.json',
+  "properties01": 'test/nsclient/fixtures/properties01.json',
   "properties_loop": 'test/nsclient/fixtures/properties_loop.json',
   "properties_bad": 'test/nsclient/fixtures/properties_bad.json',
 
