@@ -39,10 +39,23 @@ class PropertiesData {
   };
   // Getters
 
+  List<ASignal> allSignals() {
+    return [
+      ..._doubleSignals.values,
+      ..._boolSignals.values,
+      ..._intSignals.values,
+      ..._dateTimeSignals.values,
+    ];
+  }
+
   // Double methods
   double? get iob => _doubleSignals[PropertiesDataName.iob]!.value;
   set iob(double? value) {
     _doubleSignals[PropertiesDataName.iob]!.value = value;
+  }
+
+  int get iobMinsOld {
+    return _doubleSignals[PropertiesDataName.iob]!.lastSetAgo.inMinutes;
   }
 
   double? get basaliob => _doubleSignals[PropertiesDataName.basaliob]!.value;
@@ -58,6 +71,10 @@ class PropertiesData {
   double? get cob => _doubleSignals[PropertiesDataName.cob]!.value;
   set cob(double? value) {
     _doubleSignals[PropertiesDataName.cob]!.value = value;
+  }
+
+  int get cobMinsOld {
+    return _doubleSignals[PropertiesDataName.cob]!.lastSetAgo.inMinutes;
   }
 
   double? get reservoir => _doubleSignals[PropertiesDataName.reservoir]!.value;

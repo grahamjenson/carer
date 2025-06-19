@@ -53,6 +53,9 @@ class _IOB extends _InfoMethods {
   @override
   String get tooltip {
     var tt = "IOB";
+    if (PropertiesData().iobMinsOld >= 1) {
+      tt += " (${PropertiesData().iobMinsOld}m)";
+    }
     double? iob = PropertiesData().iob;
     double? bolusIOB = PropertiesData().treatmentiob;
     double? basalIOB = PropertiesData().basaliob;
@@ -96,6 +99,15 @@ class _COB extends _InfoMethods {
 
   @override
   String get title => "COB";
+
+  @override
+  String get tooltip {
+    var tt = "COB";
+    if (PropertiesData().cobMinsOld >= 1) {
+      tt += " (${PropertiesData().cobMinsOld}m)";
+    }
+    return tt;
+  }
 
   @override
   String get description => "Carbs on board";

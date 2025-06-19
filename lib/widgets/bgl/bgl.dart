@@ -145,7 +145,7 @@ class BGL extends StatelessWidget with ThemeMixin {
     }
 
     var smallTS = baseStyle.copyWith(fontSize: baseStyle.fontSize! * 0.8);
-    var countdownFont = smallTS.copyWith(fontFeatures: [const FontFeature.superscripts()]);
+    var countdownFont = smallTS.copyWith(fontSize: baseStyle.fontSize! * 0.5);
 
     Widget text;
     if (sgv.age.inMinutes == 0) {

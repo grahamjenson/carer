@@ -1,6 +1,8 @@
 import 'package:carer/models/details/info/info_service.dart';
+import 'package:carer/models/properties_data.dart';
 import 'package:carer/services/settings/status_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
@@ -50,7 +52,7 @@ class InfoWidget extends StatelessWidget with ThemeMixin {
         );
       },
       debugLabel: "Stats",
-      dependencies: StatusSettings().allSignals() + [],
+      dependencies: [TimerService().fifteenSecondSignal] + StatusSettings().allSignals() + PropertiesData().allSignals(),
     );
   }
 
