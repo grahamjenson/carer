@@ -32,10 +32,10 @@ class NSDeviceStatusUpdater extends Updater {
     raw = ds.raw;
 
     if (ds.battery != null) {
-      PropertiesData().battery = ds.battery!.toDouble();
+      PropertiesData().t1dPhoneBattery = ds.battery!.toInt();
     }
     if (ds.isCharging != null) {
-      PropertiesData().isCharging = ds.isCharging!;
+      PropertiesData().t1dPhoneCharging = ds.isCharging!;
     }
     if (ds.reservoir != null) {
       PropertiesData().reservoir = ds.reservoir!.toDouble();

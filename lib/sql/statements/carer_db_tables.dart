@@ -1,5 +1,3 @@
-import 'package:carer/sql/statements/kv.dart';
-
 class DBTable {
   final String name;
   final String create;
@@ -7,7 +5,6 @@ class DBTable {
 }
 
 const dbTables = [
-  kvTable,
   sgvTable,
   bolusTable,
   carbsTable,
@@ -16,9 +13,6 @@ const dbTables = [
   profileTable,
   eventsTable,
 ];
-
-// Used for key values like iob...
-const kvTable = DBTable(KVTables.kvTableName, KVTables.kvTable);
 
 const String sgvsTableName = 'sgvs';
 const sgvTable = DBTable(sgvsTableName, '''

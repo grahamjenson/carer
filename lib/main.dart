@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:carer/mappers/sql/events.dart';
 import 'package:carer/models/clean_sgv.dart';
 import 'package:carer/models/flow_data.dart';
-import 'package:carer/models/properties_data.dart';
 import 'package:carer/models/sql/sgv.dart';
 import 'package:carer/models/treatment_group.dart';
 import 'package:carer/models/valueAtTime.dart';
@@ -100,9 +99,6 @@ void runCarer() async {
 
   // Load the settings from Shared Preferences before starting
   await Settings().setupDBPropagation();
-
-  // Setup the StateData DB stuff
-  await PropertiesData().setupDBPropagation();
 
   await FlowData().setupDBPropagation();
 

@@ -50,7 +50,7 @@ void main() {
       'treatments',
       NSTreatments.fromJson,
       test: (NSTreatments treatments) {
-        expect(treatments.length, 13);
+        expect(treatments.length, 14);
         expect(treatments[0], isA<NSTreatmentInsulin>());
         var t0 = treatments[0] as NSTreatmentInsulin;
         expect(t0.insulin, 0.05);
@@ -59,8 +59,8 @@ void main() {
         var t1 = treatments[1] as NSTemporaryTarget;
         expect(t1.durationInMilliseconds, 21600000);
 
-        expect(treatments[10], isA<NSTreatmentTempBasal>());
-        var t11 = treatments[10] as NSTreatmentTempBasal;
+        expect(treatments[11], isA<NSTreatmentTempBasal>());
+        var t11 = treatments[11] as NSTreatmentTempBasal;
         expect(t11.absolute, 1.55);
         expect(t11.durationInMilliseconds, (4.1 * 60 * 1000).round());
       },

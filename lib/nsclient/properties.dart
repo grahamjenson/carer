@@ -70,6 +70,9 @@ class NSProperties {
         }
       }
 
+      // TODO: Test the shit out of this
+      // TODO: make the json search much nicer and also allow more complexity
+
       return NSProperties(
         battery: getBattery(json),
         batteryDisplay: getBatteryDisplay(json),
@@ -166,6 +169,7 @@ class NSProperties {
 
   static double? getCOB(Map<String, dynamic> json) {
     try {
+      //TODO is last suggested within the last 15 minutes use this data
       if (json["openaps"] is Map && json["openaps"]["lastSuggested"] is Map && json["openaps"]["lastSuggested"]["COB"] is num) {
         return (json["openaps"]["lastSuggested"]["COB"] as num).toDouble();
       }

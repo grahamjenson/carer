@@ -130,18 +130,26 @@ class _CannulaChange extends _StatusMethods {
 
   @override
   String get status {
-    var hours = hoursLeft;
+    var cage = PropertiesData().cage;
+    if (cage == null) {
+      return "Cannula Change Unknown";
+    }
+    var hours = hoursLeft(cage);
     var hoursStr = "in ${hours}h";
     if (hours < 1) {
       hoursStr = "NOW";
     }
-    var (daysOld, hoursOld) = daysHoursOld;
+    var (daysOld, hoursOld) = daysHoursOld(cage);
     return "Cannula (${daysOld}d${hoursOld}h) change $hoursStr";
   }
 
   @override
   String get reason {
-    var hours = hoursLeft;
+    var cage = PropertiesData().cage;
+    if (cage == null) {
+      return "Cannula Change Unknown";
+    }
+    var hours = hoursLeft(cage);
     var hoursStr = "in ${hours}h";
     if (hours < 1) {
       hoursStr = "NOW";
@@ -149,22 +157,24 @@ class _CannulaChange extends _StatusMethods {
     return "Cannula Change $hoursStr";
   }
 
-  int get hoursLeft {
-    var cage = PropertiesData().cage;
+  int hoursLeft(DateTime cage) {
     var cageExpiry = cage.add(StatusSettings().cannulaDuration);
     var hours = cageExpiry.difference(clock.now()).inHours;
     return hours;
   }
 
-  (int, int) get daysHoursOld {
-    var cage = PropertiesData().cage;
+  (int, int) daysHoursOld(DateTime cage) {
     var diff = clock.now().difference(cage);
     return (diff.inDays, diff.inHours % 24);
   }
 
   @override
   bool triggered() {
-    return hoursLeft < 24;
+    var cage = PropertiesData().cage;
+    if (cage == null) {
+      return true;
+    }
+    return hoursLeft(cage) < 24;
   }
 }
 
@@ -182,18 +192,26 @@ class _SensorChange extends _StatusMethods {
 
   @override
   String get status {
-    var hours = hoursLeft;
+    var sage = PropertiesData().sage;
+    if (sage == null) {
+      return "Sensor Change Unknown";
+    }
+    var hours = hoursLeft(sage);
     var hoursStr = "in ${hours}h";
     if (hours < 1) {
       hoursStr = "NOW";
     }
-    var (daysOld, hoursOld) = daysHoursOld;
+    var (daysOld, hoursOld) = daysHoursOld(sage);
     return "Sensor (${daysOld}d${hoursOld}h old) Change $hoursStr";
   }
 
   @override
   String get reason {
-    var hours = hoursLeft;
+    var sage = PropertiesData().sage;
+    if (sage == null) {
+      return "Sensor Change Unknown";
+    }
+    var hours = hoursLeft(sage);
     var hoursStr = "in ${hours}h";
     if (hours < 1) {
       hoursStr = "NOW";
@@ -201,22 +219,25 @@ class _SensorChange extends _StatusMethods {
     return "Sensor Change $hoursStr";
   }
 
-  int get hoursLeft {
-    var sage = PropertiesData().sage;
+  int hoursLeft(DateTime sage) {
     var sageExpiry = sage.add(StatusSettings().sensorDuration);
     var hours = sageExpiry.difference(clock.now()).inHours;
     return hours;
   }
 
-  (int, int) get daysHoursOld {
-    var sage = PropertiesData().sage;
+  (int, int) daysHoursOld(DateTime sage) {
     var diff = clock.now().difference(sage);
     return (diff.inDays, diff.inHours % 24);
   }
 
   @override
   bool triggered() {
-    return hoursLeft < 24;
+    var sage = PropertiesData().sage;
+    if (sage == null) {
+      return true;
+    }
+
+    return hoursLeft(sage) < 24;
   }
 }
 
@@ -237,9 +258,8 @@ class _NotCharging extends _StatusMethods {
     List<String> tooltip = [];
 
     var thisChargingStr = PlatformInfoService().thisPhoneIsCharging() ? "Charging" : "Not Charging";
-    var t1dPhoneChargingStr = PropertiesData().t1dPhoneIsCharging() ? "Charging" : "Not Charging";
 
-    tooltip.add("T1D Phone Battery(${PropertiesData().battery.toInt()}%) $t1dPhoneChargingStr");
+    tooltip.add("T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr}) ${PropertiesData().t1dPhoneChargingStr}");
     tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%) $thisChargingStr");
     return tooltip.join("\n");
   }
@@ -247,15 +267,15 @@ class _NotCharging extends _StatusMethods {
   @override
   String get reason {
     var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
-    var t1dPhonesCharging = PropertiesData().t1dPhoneIsCharging();
+    var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
 
     List<String> tooltip = [];
 
     if (!thisPhonesCharging) {
       tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%) Not Charging");
     }
-    if (!t1dPhonesCharging) {
-      tooltip.add("T1D Phone Battery(${PropertiesData().battery.toInt()}%) Not Charging");
+    if (t1dPhonesCharging == null || !t1dPhonesCharging) {
+      tooltip.add("T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr}) Not Charging");
     }
     return tooltip.join("\n");
   }
@@ -263,9 +283,10 @@ class _NotCharging extends _StatusMethods {
   @override
   bool triggered() {
     var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
-    var t1dPhonesCharging = PropertiesData().t1dPhoneIsCharging();
 
-    return !thisPhonesCharging || !t1dPhonesCharging;
+    var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
+
+    return !thisPhonesCharging || (t1dPhonesCharging == null || !t1dPhonesCharging);
   }
 }
 
@@ -285,7 +306,7 @@ class _PowerLow extends _StatusMethods {
   String get status {
     List<String> tooltip = [];
 
-    tooltip.add("T1D Phone Battery(${PropertiesData().battery.toInt()}%)");
+    tooltip.add("T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr})");
     tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%)");
     return tooltip.join("\n");
   }
@@ -300,8 +321,8 @@ class _PowerLow extends _StatusMethods {
     }
 
     if (t1dPhoneLowPower()) {
-      var t1dPhonesBatteryLevel = PropertiesData().t1dPhonesBatteryLevel();
-      tooltip.add("T1D Phones Battery < 30%($t1dPhonesBatteryLevel%)");
+      var t1dPhonesBatteryLevel = PropertiesData().t1dPhonesBatteryStr;
+      tooltip.add("T1D Phones Battery < 30%($t1dPhonesBatteryLevel)");
     }
 
     return tooltip.join("\n");
@@ -314,8 +335,11 @@ class _PowerLow extends _StatusMethods {
   }
 
   bool t1dPhoneLowPower() {
-    var t1dPhonesCharging = PropertiesData().t1dPhoneIsCharging();
-    var t1dPhonesBatteryLevel = PropertiesData().t1dPhonesBatteryLevel();
+    var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
+    var t1dPhonesBatteryLevel = PropertiesData().t1dPhoneBattery;
+    if (t1dPhonesCharging == null || t1dPhonesBatteryLevel == null) {
+      return true;
+    }
     return !t1dPhonesCharging && t1dPhonesBatteryLevel < 30;
   }
 
@@ -373,12 +397,18 @@ class _LowReservoir extends _StatusMethods {
   @override
   String get reason {
     var reservoir = PropertiesData().reservoir;
+    if (reservoir == null) {
+      return "Reservoir Unknown";
+    }
     return "Reservoir has ${reservoir.toInt()}u remaining";
   }
 
   @override
   bool triggered() {
     var reservoir = PropertiesData().reservoir;
+    if (reservoir == null) {
+      return true;
+    }
     return reservoir < 20;
   }
 }

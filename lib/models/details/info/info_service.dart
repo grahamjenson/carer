@@ -48,16 +48,25 @@ enum Info {
 class _IOB extends _InfoMethods {
   const _IOB();
 
-  double get value => PropertiesData().iob;
+  double? get value => PropertiesData().iob;
 
   @override
   String get tooltip {
     var tt = "IOB";
-    var iob = PropertiesData().iob;
-    var bolusIOB = PropertiesData().treatmentiob;
-    var basalIOB = PropertiesData().basaliob;
-
-    tt += "${toMax2dp(iob)}u\nBasal ${toMax2dp(basalIOB)}u + Bolus ${toMax2dp(bolusIOB)}u";
+    double? iob = PropertiesData().iob;
+    double? bolusIOB = PropertiesData().treatmentiob;
+    double? basalIOB = PropertiesData().basaliob;
+    if (iob != null) {
+      tt += "\n${toMax2dp(iob)}u";
+    } else {
+      return "$tt ?";
+    }
+    if (bolusIOB != null) {
+      tt += "\nBolus ${toMax2dp(bolusIOB)}u";
+    }
+    if (basalIOB != null) {
+      tt += "\nBasal ${toMax2dp(basalIOB)}u";
+    }
     return tt;
   }
 
@@ -72,14 +81,18 @@ class _IOB extends _InfoMethods {
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return (["${toMax2dp(value)}", "u"], [style, small]);
+    if (value == null) {
+      return (["?"], [style]);
+    }
+
+    return (["${toMax2dp(value!)}", "u"], [style, small]);
   }
 }
 
 class _COB extends _InfoMethods {
   const _COB();
 
-  double get value => PropertiesData().cob;
+  double? get value => PropertiesData().cob;
 
   @override
   String get title => "COB";
@@ -92,7 +105,10 @@ class _COB extends _InfoMethods {
 
   @override
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return (["${value.round()}", "g"], [style, small]);
+    if (value == null) {
+      return (["?"], [style]);
+    }
+    return (["${value!.round()}", "g"], [style, small]);
   }
 }
 

@@ -51,7 +51,6 @@ class AlarmSet extends Iterable<AlarmType> {
   }
 }
 
-// TODO this is a step towards having all alarms as static
 enum AlarmType {
   urgentLow(_UrgentLowAlarm()),
   low(_LowAlarm()),
@@ -670,8 +669,8 @@ class _LowBatteryAlarm extends AlarmMethods {
       ..addAll({
         "thisCharging": PlatformInfoService().thisPhoneIsCharging(),
         "thisBattery": PlatformInfoService().thisPhonesBatteryLevel(),
-        "t1dCharging": PropertiesData().t1dPhoneIsCharging(),
-        "t1dBattery": PropertiesData().t1dPhonesBatteryLevel(),
+        "t1dCharging": PropertiesData().t1dPhoneCharging,
+        "t1dBattery": PropertiesData().t1dPhoneBattery,
       });
   }
 
@@ -700,7 +699,7 @@ class _LowBatteryAlarm extends AlarmMethods {
       statusStr.add("Battery");
     }
     if (_t1DTrigger()) {
-      statusStr.add("T1D Battery(${PropertiesData().t1dPhonesBatteryLevel()}%)");
+      statusStr.add("T1D Battery(${PropertiesData().t1dPhonesBatteryStr})");
     }
 
     return "${statusStr.join(" and ")} < 10%";
@@ -734,7 +733,14 @@ class _LowBatteryAlarm extends AlarmMethods {
     if (!AlarmSettings().t1dBatteryAlarm) {
       return false;
     }
-    return PropertiesData().t1dPhonesBatteryLevel() < 10 && !PropertiesData().t1dPhoneIsCharging();
+
+    bool? isCharging = PropertiesData().t1dPhoneCharging;
+    int? batteryLevel = PropertiesData().t1dPhoneBattery;
+    if (isCharging == null || batteryLevel == null) {
+      // If we don't have the data, we can't trigger the alarm
+      return false;
+    }
+    return batteryLevel < 10 && !isCharging;
   }
 
   @override

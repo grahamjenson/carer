@@ -1,10 +1,8 @@
-import 'package:carer/sql/carer_db.dart';
-import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 
 enum PropertiesDataName {
-  battery,
-  isCharging,
+  t1dPhoneBattery,
+  t1dPhoneCharging,
   iob,
   basaliob,
   treatmentiob,
@@ -19,147 +17,92 @@ class PropertiesData {
   factory PropertiesData() => _singleton;
   PropertiesData._();
 
-  final Map<PropertiesDataName, ASignal> _signals = {
-    PropertiesDataName.battery: ASignal(100.0, debugLabel: "Battery"),
-    PropertiesDataName.isCharging: ASignal(true, debugLabel: "isCharging"),
-    PropertiesDataName.iob: ASignal(0.0, debugLabel: "IOB"),
-    PropertiesDataName.basaliob: ASignal(0.0, debugLabel: "BasalIOB"),
-    PropertiesDataName.treatmentiob: ASignal(0.0, debugLabel: "TreatmentiOB"),
-    PropertiesDataName.cob: ASignal(0.0, debugLabel: "COB"),
-    PropertiesDataName.cage: ASignal(0.0, debugLabel: "CannulaAge"),
-    PropertiesDataName.sage: ASignal(0.0, debugLabel: "SensorAge"),
-    PropertiesDataName.reservoir: ASignal(0.0, debugLabel: "Reservoir"),
+  final Map<PropertiesDataName, ASignal<double?>> _doubleSignals = {
+    PropertiesDataName.iob: ASignal<double?>(null, debugLabel: "IOB"),
+    PropertiesDataName.basaliob: ASignal<double?>(null, debugLabel: "BasalIOB"),
+    PropertiesDataName.treatmentiob: ASignal<double?>(null, debugLabel: "TreatmentiOB"),
+    PropertiesDataName.cob: ASignal<double?>(null, debugLabel: "COB"),
+    PropertiesDataName.reservoir: ASignal<double?>(null, debugLabel: "Reservoir"),
   };
 
-  // Constructor
-  Future<bool> setupDBPropagation() async {
-    final db = (await CarerDB.instance).db;
-    var kvdb = KeyValueStore(db);
-    await kvdb.internalPopulate();
+  final Map<PropertiesDataName, ASignal<bool?>> _boolSignals = {
+    PropertiesDataName.t1dPhoneCharging: ASignal<bool?>(null, debugLabel: "t1dPhoneCharging"),
+  };
 
-    battery = kvdb.getDouble(PropertiesDataName.battery.name, defaultValue: 100.0)!;
-    isCharging = kvdb.getBool(PropertiesDataName.isCharging.name, defaultValue: true)!;
-    iob = kvdb.getDouble(PropertiesDataName.iob.name, defaultValue: 0.0)!;
-    basaliob = kvdb.getDouble(PropertiesDataName.basaliob.name, defaultValue: 0.0)!;
-    treatmentiob = kvdb.getDouble(PropertiesDataName.treatmentiob.name, defaultValue: 0.0)!;
-    cob = kvdb.getDouble(PropertiesDataName.cob.name, defaultValue: 0.0)!;
-    cage = DateTime.fromMillisecondsSinceEpoch(kvdb.getDouble(PropertiesDataName.cage.name, defaultValue: 0.0)!.toInt());
-    sage = DateTime.fromMillisecondsSinceEpoch(kvdb.getDouble(PropertiesDataName.sage.name, defaultValue: 0.0)!.toInt());
-    reservoir = kvdb.getDouble(PropertiesDataName.reservoir.name, defaultValue: 0.0)!;
+  final Map<PropertiesDataName, ASignal<int?>> _intSignals = {
+    PropertiesDataName.t1dPhoneBattery: ASignal<int?>(null, debugLabel: "t1dPhoneBattery"),
+  };
 
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.battery.name, _signals[PropertiesDataName.battery]!.value);
-      },
-      debugLabel: "writeBattery",
-    );
-
-    aeffect(
-      () {
-        kvdb.setBool(PropertiesDataName.isCharging.name, _signals[PropertiesDataName.isCharging]!.value);
-      },
-      debugLabel: "writeisCharging",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.iob.name, _signals[PropertiesDataName.iob]!.value);
-      },
-      debugLabel: "writeIOB",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.basaliob.name, _signals[PropertiesDataName.basaliob]!.value);
-      },
-      debugLabel: "writeBasalIOB",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.treatmentiob.name, _signals[PropertiesDataName.treatmentiob]!.value);
-      },
-      debugLabel: "writeTreatmentiOB",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.cob.name, _signals[PropertiesDataName.cob]!.value);
-      },
-      debugLabel: "writeCOB",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.cage.name, _signals[PropertiesDataName.cage]!.value);
-      },
-      debugLabel: "writeCAGE",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.sage.name, _signals[PropertiesDataName.sage]!.value);
-      },
-      debugLabel: "writeSAGE",
-    );
-
-    aeffect(
-      () {
-        kvdb.setDouble(PropertiesDataName.reservoir.name, _signals[PropertiesDataName.reservoir]!.value);
-      },
-      debugLabel: "writeReservoir",
-    );
-
-    return true;
-  }
-
+  final Map<PropertiesDataName, ASignal<DateTime?>> _dateTimeSignals = {
+    PropertiesDataName.cage: ASignal<DateTime?>(null, debugLabel: "CannulaAge"),
+    PropertiesDataName.sage: ASignal<DateTime?>(null, debugLabel: "SensorAge"),
+  };
   // Getters
 
-  bool t1dPhoneIsCharging() => _signals[PropertiesDataName.isCharging]!.value;
-  int t1dPhonesBatteryLevel() => battery.toInt();
-
-  double get battery => _signals[PropertiesDataName.battery]!.value;
-  double get iob => _signals[PropertiesDataName.iob]!.value;
-  double get basaliob => _signals[PropertiesDataName.basaliob]!.value;
-  double get treatmentiob => _signals[PropertiesDataName.treatmentiob]!.value;
-  double get cob => _signals[PropertiesDataName.cob]!.value;
-  DateTime get cage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.cage]!.value.toInt());
-  DateTime get sage => DateTime.fromMillisecondsSinceEpoch(_signals[PropertiesDataName.sage]!.value.toInt());
-  double get reservoir => _signals[PropertiesDataName.reservoir]!.value;
-
-  set battery(double value) {
-    _signals[PropertiesDataName.battery]!.value = value;
+  // Double methods
+  double? get iob => _doubleSignals[PropertiesDataName.iob]!.value;
+  set iob(double? value) {
+    _doubleSignals[PropertiesDataName.iob]!.value = value;
   }
 
-  set isCharging(bool value) {
-    _signals[PropertiesDataName.isCharging]!.value = value;
+  double? get basaliob => _doubleSignals[PropertiesDataName.basaliob]!.value;
+  set basaliob(double? value) {
+    _doubleSignals[PropertiesDataName.basaliob]!.value = value;
   }
 
-  set iob(double value) {
-    _signals[PropertiesDataName.iob]!.value = value;
+  double? get treatmentiob => _doubleSignals[PropertiesDataName.treatmentiob]!.value;
+  set treatmentiob(double? value) {
+    _doubleSignals[PropertiesDataName.treatmentiob]!.value = value;
   }
 
-  set basaliob(double value) {
-    _signals[PropertiesDataName.basaliob]!.value = value;
+  double? get cob => _doubleSignals[PropertiesDataName.cob]!.value;
+  set cob(double? value) {
+    _doubleSignals[PropertiesDataName.cob]!.value = value;
   }
 
-  set treatmentiob(double value) {
-    _signals[PropertiesDataName.treatmentiob]!.value = value;
+  double? get reservoir => _doubleSignals[PropertiesDataName.reservoir]!.value;
+  set reservoir(double? value) {
+    _doubleSignals[PropertiesDataName.reservoir]!.value = value;
   }
 
-  set cob(double value) {
-    _signals[PropertiesDataName.cob]!.value = value;
+  // Int methods
+  int? get t1dPhoneBattery => _intSignals[PropertiesDataName.t1dPhoneBattery]!.value;
+  set t1dPhoneBattery(int? value) {
+    _intSignals[PropertiesDataName.t1dPhoneBattery]!.value = value;
   }
 
-  set cage(DateTime value) {
-    _signals[PropertiesDataName.cage]!.value = value.millisecondsSinceEpoch.toDouble();
+  // Bool methods
+  bool? get t1dPhoneCharging => _boolSignals[PropertiesDataName.t1dPhoneCharging]!.value;
+  set t1dPhoneCharging(bool? value) {
+    _boolSignals[PropertiesDataName.t1dPhoneCharging]!.value = value;
   }
 
-  set sage(DateTime value) {
-    _signals[PropertiesDataName.sage]!.value = value.millisecondsSinceEpoch.toDouble();
+  // DateTime methods
+  DateTime? get cage => _dateTimeSignals[PropertiesDataName.cage]!.value;
+  set cage(DateTime? value) {
+    _dateTimeSignals[PropertiesDataName.cage]!.value = value;
   }
 
-  set reservoir(double value) {
-    _signals[PropertiesDataName.reservoir]!.value = value;
+  DateTime? get sage => _dateTimeSignals[PropertiesDataName.sage]!.value;
+  set sage(DateTime? value) {
+    _dateTimeSignals[PropertiesDataName.sage]!.value = value;
+  }
+
+  // Vis methods
+
+  String get t1dPhoneChargingStr {
+    var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
+    if (t1dPhonesCharging == null) {
+      return "?";
+    }
+    return t1dPhonesCharging ? "Charging" : "Not Charging";
+  }
+
+  String get t1dPhonesBatteryStr {
+    int? t1dBattery = PropertiesData().t1dPhoneBattery;
+    if (t1dBattery == null) {
+      return "?";
+    }
+    return "$t1dBattery%";
   }
 }
