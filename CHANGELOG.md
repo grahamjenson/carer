@@ -1,7 +1,7 @@
-2,2,2,2,2,2 Fixed some Profile issues
+2,2,2,2,2,2 Fixed some Profile issues where it would find the wrong profile
             Added Profile Switch to Care Page
             Fixed COB and IOB numbers
-            Fixed a bunch of stuff to get android working
+            Fixed a bunch of stuff to get Android working
 
 
 1.1.1.1.1.1 Fixing snooze while asleep
