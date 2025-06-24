@@ -115,6 +115,12 @@ class BGL extends StatelessWidget with ThemeMixin {
         return GestureDetector(
           onLongPress: () => UISettings().toggleFocusBGL(),
           onDoubleTap: () => UISettings().toggleFocusBGL(),
+          onScaleEnd: (ScaleEndDetails scale) {
+            if (scale.pointerCount != 1) {
+              return;
+            }
+            UISettings().toggleFocusBGL();
+          },
           child: Window(
             child: FittedBox(
               alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
