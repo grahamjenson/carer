@@ -22,7 +22,6 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           infoTile(context, Info.target),
           infoTile(context, Info.currentProfile),
           infoTile(context, Info.todaysInRange),
-          infoTile(context, Info.yesterdayInRange),
         ];
 
         return SettingsSection(
@@ -44,12 +43,12 @@ class InfoSettingsWidget extends AbstractSettingsSection with ThemeMixin {
 
     var (texts, styles) = stat.status(context, statusStyle, statusStyle);
     return SettingsTile.switchTile(
-      initialValue: statusSettings.infoEnabledContains(stat.name),
+      initialValue: !statusSettings.infoDisabledContains(stat.name),
       onToggle: (bool value) {
-        if (value) {
-          statusSettings.infoEnabledAdd(stat.name);
+        if (!value) {
+          statusSettings.infoDisabledAdd(stat.name);
         } else {
-          statusSettings.infoEnabledRemove(stat.name);
+          statusSettings.infoDisabledRemove(stat.name);
         }
       },
       descriptionInlineIos: true,

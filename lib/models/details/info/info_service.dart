@@ -27,8 +27,7 @@ enum Info {
   basal(_Basal()),
   target(_Target()),
   currentProfile(_CurrentProfile()),
-  todaysInRange(_TodayInRange()),
-  yesterdayInRange(_YesterdayInRange());
+  todaysInRange(_TodayInRange());
 
   final _InfoMethods _methods;
 
@@ -39,7 +38,7 @@ enum Info {
   String get tooltip => _methods.tooltip;
   String get description => _methods.description;
   bool get highlight => _methods.highlight;
-  bool get enabled => StatusSettings().infoEnabledContains(name);
+  bool get enabled => !StatusSettings().infoDisabledContains(name);
 
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) =>
       _methods.status(context, style, small);
@@ -315,24 +314,11 @@ class _TodayInRange extends _InfoMethods {
   (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
     return ([(value.toStringAsFixed(0)), "%"], [style, small]);
   }
-}
-
-class _YesterdayInRange extends _InfoMethods {
-  const _YesterdayInRange();
-
-  double get value => SGV.yesterdaysPercentage.value ?? 0.0;
 
   @override
-  String get title => "YIR";
+  String get tooltip {
+    var yir = SGV.yesterdaysPercentage.value ?? 0.0;
 
-  @override
-  String get description => "Yesterday's Time in Range";
-
-  @override
-  IconData get icon => CarerIcons.INFO_YESTERDAY_IN_RANGE;
-
-  @override
-  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
-    return ([value.toStringAsFixed(0), "%"], [style, small]);
+    return "Today's TIR: ${value.toStringAsFixed(0)}%\nYesterday's TIR: ${yir.toStringAsFixed(0)}%";
   }
 }

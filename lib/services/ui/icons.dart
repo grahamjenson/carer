@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
 // THIS FILE EXISTS TO ENSURE CONSISTENCY ACROSS THE APP OF ICON USE
@@ -31,7 +32,8 @@ class CarerIcons {
   // STATUS
   static const IconData STATUS_CANNULA_CHANGE = UniconsLine.mobile_android;
   static const IconData STATUS_SENSOR_CHANGE = UniconsLine.processor;
-  static const IconData STATUS_NOT_CHARGING = UniconsLine.bolt_slash;
+  static const IconData STATUS_THIS_PHONE_NOT_CHARGING = UniconsLine.bolt;
+  static const IconData STATUS_T1D_PHONE_NOT_CHARGING = Icons.bolt_sharp;
   static const IconData STATUS_BATTERY_LOW = UniconsLine.battery_empty;
   static const IconData STATUS_SILENT_MODE = UniconsLine.bell_slash;
   static const IconData STATUS_LOW_RESERVOIR = UniconsLine.water_drop_slash;

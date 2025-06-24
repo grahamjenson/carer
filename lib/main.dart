@@ -17,7 +17,6 @@ import 'package:carer/services/settings/ui_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
-import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
@@ -83,13 +82,6 @@ void runCarer() async {
     // Key value store in another db
     var prefs = await KeyValueStore.instance;
     await prefs.internalPopulate();
-  });
-
-  await executeWithRetry(() async {
-    final db = (await CarerDB.instance).db;
-    // Key Value store inside the main DB
-    var kvdb = KeyValueStore(db);
-    await kvdb.internalPopulate();
   });
 
   await executeWithRetry(() async {

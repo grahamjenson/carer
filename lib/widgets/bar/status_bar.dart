@@ -16,7 +16,8 @@ class StatusesBar extends StatelessWidget with ThemeMixin {
         List<Widget?> rowsMaybe = [
           getStatusIcon(context, Status.cannulaChange),
           getStatusIcon(context, Status.sensorChange),
-          getStatusIcon(context, Status.notCharging),
+          getStatusIcon(context, Status.thisPhoneNotCharging),
+          getStatusIcon(context, Status.t1dPhoneNotCharging),
           getStatusIcon(context, Status.powerLow),
           getStatusIcon(context, Status.silentOn),
           getStatusIcon(context, Status.lowReservoir),

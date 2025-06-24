@@ -21,7 +21,8 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
           cannulaAge(context),
           statusTile(context, Status.sensorChange),
           sensorAge(context),
-          statusTile(context, Status.notCharging),
+          statusTile(context, Status.thisPhoneNotCharging),
+          statusTile(context, Status.t1dPhoneNotCharging),
           statusTile(context, Status.powerLow),
           statusTile(context, Status.silentOn),
           statusTile(context, Status.lowReservoir),
@@ -49,12 +50,12 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
     var descriptionStyle = labelMedium(context).copyWith(color: ColorSchemes.textColor);
     var statusStyle = labelSmall(context).copyWith(color: ColorSchemes.textColor.dim);
     return SettingsTile.switchTile(
-      initialValue: StatusSettings().statusEnabledContains(status.name),
+      initialValue: !StatusSettings().statusDisabledContains(status.name),
       onToggle: (bool value) {
-        if (value) {
-          StatusSettings().statusEnabledAdd(status.name);
+        if (!value) {
+          StatusSettings().statusDisabledAdd(status.name);
         } else {
-          StatusSettings().statusEnabledRemove(status.name);
+          StatusSettings().statusDisabledRemove(status.name);
         }
       },
       descriptionInlineIos: true,
@@ -65,7 +66,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   }
 
   SettingsTile? cannulaAge(BuildContext context) {
-    if (!StatusSettings().statusEnabledContains(Status.cannulaChange.name)) {
+    if (StatusSettings().statusDisabledContains(Status.cannulaChange.name)) {
       return null;
     }
 
@@ -79,7 +80,7 @@ class StatusSettingsWidget extends AbstractSettingsSection with ThemeMixin {
   }
 
   SettingsTile? sensorAge(BuildContext context) {
-    if (!StatusSettings().statusEnabledContains(Status.sensorChange.name)) {
+    if (StatusSettings().statusDisabledContains(Status.sensorChange.name)) {
       return null;
     }
 

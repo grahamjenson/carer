@@ -21,7 +21,8 @@ abstract class _StatusMethods {
 enum Status {
   cannulaChange(_CannulaChange()),
   sensorChange(_SensorChange()),
-  notCharging(_NotCharging()),
+  thisPhoneNotCharging(_ThisPhoneNotCharging()),
+  t1dPhoneNotCharging(_T1DPhoneNotCharging()),
   powerLow(_PowerLow()),
   silentOn(_SilentOn()),
   lowReservoir(_LowReservoir()),
@@ -40,7 +41,7 @@ enum Status {
   String get status => _methods.status;
   String get description => _methods.description;
   bool triggered() {
-    if (StatusSettings().statusEnabledContains(name)) {
+    if (!StatusSettings().statusDisabledContains(name)) {
       return _methods.triggered();
     }
     return false;
@@ -241,52 +242,75 @@ class _SensorChange extends _StatusMethods {
   }
 }
 
-class _NotCharging extends _StatusMethods {
-  const _NotCharging();
+class _ThisPhoneNotCharging extends _StatusMethods {
+  const _ThisPhoneNotCharging();
 
   @override
-  String get title => "Not Charging";
+  String get title => "This Phone Not Charging";
 
   @override
-  String get description => "Shows When Phone is not Charging";
+  String get description => "Shows When This Phone is not Charging";
 
   @override
-  IconData get icon => CarerIcons.STATUS_NOT_CHARGING;
+  IconData get icon => CarerIcons.STATUS_THIS_PHONE_NOT_CHARGING;
 
   @override
   String get status {
-    List<String> tooltip = [];
-
     var thisChargingStr = PlatformInfoService().thisPhoneIsCharging() ? "Charging" : "Not Charging";
 
-    tooltip.add("T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr}) ${PropertiesData().t1dPhoneChargingStr}");
-    tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%) $thisChargingStr");
-    return tooltip.join("\n");
+    return "Battery(${PlatformInfoService().batteryLevel.value}%) $thisChargingStr";
   }
 
   @override
   String get reason {
     var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
-    var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
-
-    List<String> tooltip = [];
 
     if (!thisPhonesCharging) {
-      tooltip.add("Battery(${PlatformInfoService().batteryLevel.value}%) Not Charging");
+      return "Battery(${PlatformInfoService().batteryLevel.value}%) Not Charging";
     }
-    if (t1dPhonesCharging == null || !t1dPhonesCharging) {
-      tooltip.add("T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr}) Not Charging");
-    }
-    return tooltip.join("\n");
+
+    return "";
   }
 
   @override
   bool triggered() {
     var thisPhonesCharging = PlatformInfoService().thisPhoneIsCharging();
 
+    return !thisPhonesCharging;
+  }
+}
+
+class _T1DPhoneNotCharging extends _StatusMethods {
+  const _T1DPhoneNotCharging();
+
+  @override
+  String get title => "T1D Phone Not Charging";
+
+  @override
+  String get description => "Shows When T1D Phone is not Charging";
+
+  @override
+  IconData get icon => CarerIcons.STATUS_T1D_PHONE_NOT_CHARGING;
+
+  @override
+  String get status {
+    return "T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr}) ${PropertiesData().t1dPhoneChargingStr}";
+  }
+
+  @override
+  String get reason {
+    var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
+    if (t1dPhonesCharging == null || !t1dPhonesCharging) {
+      return "T1D Phone Battery(${PropertiesData().t1dPhonesBatteryStr}) Not Charging";
+    }
+    return "";
+  }
+
+  @override
+  bool triggered() {
     var t1dPhonesCharging = PropertiesData().t1dPhoneCharging;
 
-    return !thisPhonesCharging || (t1dPhonesCharging == null || !t1dPhonesCharging);
+    return t1dPhonesCharging == null || !t1dPhonesCharging;
   }
 }
 

@@ -22,7 +22,6 @@ class InfoWidget extends StatelessWidget with ThemeMixin {
           infoRow(context, Info.target),
           infoRow(context, Info.currentProfile),
           infoRow(context, Info.todaysInRange),
-          infoRow(context, Info.yesterdayInRange),
         ];
 
         List<DataRow> filteredRows = rows.whereType<DataRow>().toList();

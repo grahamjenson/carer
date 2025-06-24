@@ -1,20 +1,12 @@
-import 'package:carer/models/details/info/info_service.dart';
-import 'package:carer/models/details/status/status_service.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 
 enum _StatusNames {
   cannulaDays,
   sensorDays,
-  infoEnabledSet,
-  statusEnabledSet,
+  infoDisabledSet,
+  statusDisabledSet,
 }
-
-final Set<String> defaultInfoSet = Info.values.map((e) => e.name).toSet();
-final Set<String> defaultStatusSet = Status.values.map((e) => e.name).toSet();
-
-final String defaultStatusString = Status.values.map((e) => e.name).join(',');
-final String defaultInfoString = Info.values.map((e) => e.name).join(',');
 
 class StatusSettings {
   static final StatusSettings _singleton = StatusSettings._();
@@ -23,10 +15,8 @@ class StatusSettings {
   final Map<_StatusNames, ASignal> _signals = {
     _StatusNames.cannulaDays: ASignal<int>(3, debugLabel: 'cannulaDays'),
     _StatusNames.sensorDays: ASignal<int>(10, debugLabel: 'sensorDays'),
-    _StatusNames.infoEnabledSet:
-        ASignal<Set<String>>(defaultInfoSet, debugLabel: 'infoEnabled'), // Comma Seperated List of INFO types that are enabled
-    _StatusNames.statusEnabledSet:
-        ASignal<Set<String>>(defaultStatusSet, debugLabel: 'statusEnabled'), // Comma Seperated List of INFO types that are enabled
+    _StatusNames.infoDisabledSet: ASignal<Set<String>>({}, debugLabel: 'infoDisabled'),
+    _StatusNames.statusDisabledSet: ASignal<Set<String>>({}, debugLabel: 'statusDisabled'),
   };
 
   StatusSettings._();
@@ -55,30 +45,30 @@ class StatusSettings {
 
   Duration get sensorDuration => Duration(days: sensorDays);
 
-  bool infoEnabledContains(String name) => _signals[_StatusNames.infoEnabledSet]!.value.contains(name);
-  void infoEnabledAdd(String name) {
-    var set = Set<String>.from(_signals[_StatusNames.infoEnabledSet]!.value);
+  bool infoDisabledContains(String name) => _signals[_StatusNames.infoDisabledSet]!.value.contains(name);
+  void infoDisabledAdd(String name) {
+    var set = Set<String>.from(_signals[_StatusNames.infoDisabledSet]!.value);
     set.add(name);
-    _signals[_StatusNames.infoEnabledSet]!.value = set;
+    _signals[_StatusNames.infoDisabledSet]!.value = set;
   }
 
-  void infoEnabledRemove(String name) {
-    var set = Set<String>.from(_signals[_StatusNames.infoEnabledSet]!.value);
+  void infoDisabledRemove(String name) {
+    var set = Set<String>.from(_signals[_StatusNames.infoDisabledSet]!.value);
     set.remove(name);
-    _signals[_StatusNames.infoEnabledSet]!.value = set;
+    _signals[_StatusNames.infoDisabledSet]!.value = set;
   }
 
-  bool statusEnabledContains(String name) => _signals[_StatusNames.statusEnabledSet]!.value.contains(name);
-  void statusEnabledAdd(String name) {
-    var set = Set<String>.from(_signals[_StatusNames.statusEnabledSet]!.value);
+  bool statusDisabledContains(String name) => _signals[_StatusNames.statusDisabledSet]!.value.contains(name);
+  void statusDisabledAdd(String name) {
+    var set = Set<String>.from(_signals[_StatusNames.statusDisabledSet]!.value);
     set.add(name);
-    _signals[_StatusNames.statusEnabledSet]!.value = set;
+    _signals[_StatusNames.statusDisabledSet]!.value = set;
   }
 
-  void statusEnabledRemove(String name) {
-    var set = Set<String>.from(_signals[_StatusNames.statusEnabledSet]!.value);
+  void statusDisabledRemove(String name) {
+    var set = Set<String>.from(_signals[_StatusNames.statusDisabledSet]!.value);
     set.remove(name);
-    _signals[_StatusNames.statusEnabledSet]!.value = set;
+    _signals[_StatusNames.statusDisabledSet]!.value = set;
   }
 
   setupDBPropagation(KeyValueStore prefs) {
@@ -87,20 +77,18 @@ class StatusSettings {
 
     sensorDays = prefs.getInt(_StatusNames.sensorDays.name, defaultValue: 10)!;
 
-    _signals[_StatusNames.infoEnabledSet]!.value =
-        prefs.getString(_StatusNames.infoEnabledSet.name, defaultValue: defaultInfoString)!.split(',').toSet();
+    _signals[_StatusNames.infoDisabledSet]!.value = prefs.getString(_StatusNames.infoDisabledSet.name, defaultValue: "")!.split(',').toSet();
 
-    _signals[_StatusNames.statusEnabledSet]!.value =
-        prefs.getString(_StatusNames.statusEnabledSet.name, defaultValue: defaultStatusString)!.split(',').toSet();
+    _signals[_StatusNames.statusDisabledSet]!.value = prefs.getString(_StatusNames.statusDisabledSet.name, defaultValue: "")!.split(',').toSet();
 
     aeffect(() => prefs.setInt(_StatusNames.cannulaDays.name, cannulaDays), debugLabel: 'writecannulaDays');
 
     aeffect(() => prefs.setInt(_StatusNames.sensorDays.name, sensorDays), debugLabel: 'writesensorDays');
 
-    aeffect(() => prefs.setString(_StatusNames.infoEnabledSet.name, _signals[_StatusNames.infoEnabledSet]!.value.join(',')),
-        debugLabel: 'writeinfoEnabled');
+    aeffect(() => prefs.setString(_StatusNames.infoDisabledSet.name, _signals[_StatusNames.infoDisabledSet]!.value.join(',')),
+        debugLabel: 'writeinfoDisabled');
 
-    aeffect(() => prefs.setString(_StatusNames.statusEnabledSet.name, _signals[_StatusNames.statusEnabledSet]!.value.join(',')),
-        debugLabel: 'writestatusEnabled');
+    aeffect(() => prefs.setString(_StatusNames.statusDisabledSet.name, _signals[_StatusNames.statusDisabledSet]!.value.join(',')),
+        debugLabel: 'writestatusDisabled');
   }
 }
