@@ -25,6 +25,7 @@ import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/router.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:toastification/toastification.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -93,6 +94,8 @@ void runCarer() async {
   await Settings().setupDBPropagation();
 
   await FlowData().setupDBPropagation();
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   // For some reason screens forget to stay awake
   aeffect(() {
