@@ -4,7 +4,6 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/math.dart';
-import 'package:carer/widgets/insights/window.dart';
 import 'package:carer/widgets/smarttext.dart';
 import 'package:flutter/material.dart';
 
@@ -121,17 +120,15 @@ class BGL extends StatelessWidget with ThemeMixin {
             }
             UISettings().toggleFocusBGL();
           },
-          child: Window(
-            child: FittedBox(
-              alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
-              child: SizedBox(
-                width: 150,
-                height: 100,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: children,
-                ),
+          child: FittedBox(
+            alignment: const Alignment(0.0, -0.5), // This is trying to make it look better
+            child: SizedBox(
+              width: 150,
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: children,
               ),
             ),
           ),

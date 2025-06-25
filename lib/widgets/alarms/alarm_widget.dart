@@ -3,7 +3,6 @@ import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/widgets/insights/window.dart';
 import 'package:flutter/material.dart';
 
 class AlarmWidget extends StatelessWidget with ThemeMixin {
@@ -54,10 +53,8 @@ class AlarmWidget extends StatelessWidget with ThemeMixin {
 
       return Expanded(
         flex: flex,
-        child: Window(
-          child: FittedBox(
-            child: fittedWidget,
-          ),
+        child: FittedBox(
+          child: fittedWidget,
         ),
       );
     }, debugLabel: "AlarmWidget", dependencies: [AlarmsService().pendingAlarms]);

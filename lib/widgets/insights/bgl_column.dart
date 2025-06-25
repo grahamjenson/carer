@@ -10,13 +10,23 @@ class BGLColumn extends StatelessWidget with ThemeMixin {
   @override
   Widget build(BuildContext context) {
     return const Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(flex: 20, child: BGL()),
-        AlarmWidget(flex: 8),
-        ShrinkButton(),
+        Expanded(
+          flex: 5,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Flexible(flex: 16, child: BGL()),
+              AlarmWidget(flex: 8),
+            ],
+          ),
+        ),
+        Flexible(child: ShrinkButton()),
       ],
     );
   }
