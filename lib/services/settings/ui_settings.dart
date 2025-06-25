@@ -1,4 +1,6 @@
 import 'package:carer/models/sql/constants.dart';
+import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/timer_service.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:flutter/material.dart';
@@ -70,5 +72,16 @@ class UISettings {
     aeffect(() {
       prefs.setBool(_UINames.enableDim.name, enableDim);
     }, debugLabel: "writeEnableDim");
+
+    // Turn off focus mode if alarms become active
+    aeffect(
+      () {
+        if (AlarmsService().alertingAlarms.value.isNotEmpty) {
+          focusBGL = false;
+        }
+      },
+      dependencies: [AlarmsService().alertingAlarms, TimerService().fiveSecondSignal],
+      debugLabel: "focusBGLOffOnAlarms",
+    );
   }
 }

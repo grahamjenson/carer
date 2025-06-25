@@ -20,10 +20,10 @@ class ShrinkButton extends StatelessWidget with ThemeMixin {
       if (AlarmAlertSettings().isSnoozing()) {
         snoozingWidget = Expanded(
           child: Text(
-            "Snoozing ${AlarmAlertSettings().snoozeDurationInMinutes()} min",
+            "Snoozed ${AlarmAlertSettings().snoozeDurationInMinutes()}m",
             style: TextStyle(
               color: primaryColor(context),
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),

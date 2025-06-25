@@ -1,4 +1,3 @@
-import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/settings/ui_settings.dart';
@@ -57,7 +56,7 @@ class _BarBottomState extends State<BarBottom> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return AWatch(
       (context) {
-        if (UISettings().focusBGL && AlarmsService().alertingAlarms.value.isEmpty) {
+        if (UISettings().focusBGL) {
           _controller.forward();
         } else {
           _controller.reverse();
