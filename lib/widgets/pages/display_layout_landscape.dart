@@ -6,7 +6,6 @@ import 'package:carer/widgets/insights/bgl_column.dart';
 import 'package:carer/widgets/insights/info.dart';
 import 'package:carer/widgets/insights/treatments.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
 class DisplayLayoutLandscape extends StatefulWidget {
   const DisplayLayoutLandscape({super.key});
@@ -19,6 +18,7 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
   late AnimationController _controller;
   late final Animation<double> _curvedAnimation;
   late final Animation<double> _shrinkAnimation;
+  final double MIN_FLEX = 3;
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
 
-    _shrinkAnimation = Tween<double>(begin: 10, end: 0).animate(_curvedAnimation);
+    _shrinkAnimation = Tween<double>(begin: 10, end: MIN_FLEX).animate(_curvedAnimation);
   }
 
   @override
@@ -72,7 +72,7 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
                 ),
               ];
 
-              if (restFlex > 0) {
+              if (restFlex > MIN_FLEX) {
                 children.addAll(
                   [
                     VerticalDivider(
@@ -107,31 +107,6 @@ class _DisplayLayoutLandscapeState extends State<DisplayLayoutLandscape> with Si
       },
       debugLabel: "DisplayLayoutLandscape",
       dependencies: [UISettings().focusBGLSignal],
-    );
-  }
-
-  Widget getShrinkButton(BuildContext context) {
-    if (!UISettings().focusBGL) {
-      return const SizedBox();
-    }
-    return Flexible(
-      flex: 4,
-      child: IconButton(
-        padding: const EdgeInsets.all(10),
-        constraints: const BoxConstraints(),
-        iconSize: 24,
-        onPressed: () => UISettings().focusBGL = false,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor(context).bright.bright,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(3)),
-          ),
-        ),
-        icon: Icon(
-          UniconsLine.compress_alt,
-          color: onBackgroundColor(context).dim,
-        ),
-      ),
     );
   }
 }

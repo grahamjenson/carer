@@ -15,7 +15,7 @@ class BGLColumn extends StatelessWidget with ThemeMixin {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          flex: 5,
+          flex: 10,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -26,7 +26,7 @@ class BGLColumn extends StatelessWidget with ThemeMixin {
             ],
           ),
         ),
-        Flexible(child: ShrinkButton()),
+        ShrinkButton(),
       ],
     );
   }

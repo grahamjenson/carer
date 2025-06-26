@@ -18,6 +18,7 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
   late AnimationController _controller;
   late final Animation<double> _curvedAnimation;
   late final Animation<double> _shrinkAnimation;
+  final double MIN_FLEX = 3;
 
   @override
   void initState() {
@@ -40,7 +41,7 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
 
-    _shrinkAnimation = Tween<double>(begin: 8, end: 0).animate(_curvedAnimation);
+    _shrinkAnimation = Tween<double>(begin: 8, end: MIN_FLEX).animate(_curvedAnimation);
   }
 
   @override
@@ -71,7 +72,7 @@ class _DisplayLayoutPortraitState extends State<DisplayLayoutPortrait> with Sing
                 )
               ];
 
-              if (restFlex > 0) {
+              if (restFlex > MIN_FLEX) {
                 children.addAll(
                   [
                     Divider(color: outlineColor(context)),
