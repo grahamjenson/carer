@@ -7,6 +7,7 @@ import 'package:carer/widgets/care/care_carbs.dart';
 import 'package:carer/widgets/care/care_profiles.dart';
 import 'package:carer/widgets/care/care_temp_targets.dart';
 import 'package:carer/widgets/settings/shared/plus_minus_text.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:go_router/go_router.dart';
@@ -163,22 +164,29 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
       style: dimStyle,
     );
 
-    Widget trailing = SizedBox(
+    Widget trailing = Container(
       width: 100,
+      alignment: Alignment.topCenter,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Column(children: [
-            Text("Percent ", style: dimStyle),
-            PlusMinusText(
-              getStr: (double val) => "${val.toInt()}",
-              fromStr: (String str) => double.tryParse(str),
-              getValue: () => e.getPercent().toDouble(),
-              setValue: (double val) => e.setPercent(val.toInt()),
-              dependencies: [e.percentSignal],
-            ),
-          ]),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Percent ", style: dimStyle),
+              PlusMinusText(
+                getStr: (double val) => "${val.toInt()}",
+                fromStr: (String str) => double.tryParse(str),
+                getValue: () => e.getPercent().toDouble(),
+                setValue: (double val) => e.setPercent(val.toInt()),
+                dependencies: [e.percentSignal],
+              ),
+            ],
+          ),
           const Spacer(),
           Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text("Time ", style: dimStyle),
               PlusMinusText(
@@ -213,33 +221,37 @@ class CareEditPage extends StatelessWidget with ThemeMixin {
     }
 
     return SettingsTile(
-      title: DropdownMenu(
-        width: 300,
-        menuStyle: const MenuStyle(
-          padding: WidgetStatePropertyAll(EdgeInsets.zero),
-          visualDensity: VisualDensity(horizontal: -4, vertical: -4),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-          constraints: BoxConstraints.tight(const Size.fromHeight(30)),
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
+      title: Container(
+        alignment: Alignment.topLeft,
+        padding: const EdgeInsets.only(top: 8, right: 8),
+        child: DropdownMenu(
+          width: 280,
+          menuStyle: const MenuStyle(
+            padding: WidgetStatePropertyAll(EdgeInsets.zero),
+            visualDensity: VisualDensity(horizontal: -4, vertical: -4),
           ),
+          inputDecorationTheme: InputDecorationTheme(
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+            constraints: BoxConstraints.tight(const Size.fromHeight(30)),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 14,
+          ),
+          dropdownMenuEntries: selectionItems,
+          initialSelection: initSelect,
+          onSelected: (value) {
+            if (value != null) {
+              e.setName(value);
+            }
+          },
         ),
-        textStyle: const TextStyle(
-          fontSize: 14,
-        ),
-        dropdownMenuEntries: selectionItems,
-        initialSelection: initSelect,
-        onSelected: (value) {
-          if (value != null) {
-            e.setName(value);
-          }
-        },
       ),
       descriptionInlineIos: true,
-      description: description,
+      description: TextWrap(child: description),
       trailing: trailing,
     );
   }

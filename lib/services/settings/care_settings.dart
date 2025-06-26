@@ -242,6 +242,18 @@ class CareSettings {
     tempTargetEatingTop = prefs.getDouble(_CSNames.tempTargetEatingTop.name) ?? 90.0;
     tempTargetEatingDuration = prefs.getInt(_CSNames.tempTargetEatingDuration.name) ?? 30;
 
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoBottom.name, tempTargetHypoBottom), debugLabel: 'writeTempTargetHypoBottom');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetHypoTop.name, tempTargetHypoTop), debugLabel: 'writeTempTargetHypoTop');
+    aeffect(() => prefs.setInt(_CSNames.tempTargetHypoDuration.name, tempTargetHypoDuration), debugLabel: 'writeTempTargetHypoDuration');
+
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetActivityBottom.name, tempTargetActivityBottom), debugLabel: 'writeTempTargetActivityBottom');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetActivityTop.name, tempTargetActivityTop), debugLabel: 'writeTempTargetActivityTop');
+    aeffect(() => prefs.setInt(_CSNames.tempTargetActivityDuration.name, tempTargetActivityDuration), debugLabel: 'writeTempTargetActivityDuration');
+
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetEatingBottom.name, tempTargetEatingBottom), debugLabel: 'writeTempTargetEatingBottom');
+    aeffect(() => prefs.setDouble(_CSNames.tempTargetEatingTop.name, tempTargetEatingTop), debugLabel: 'writeTempTargetEatingTop');
+    aeffect(() => prefs.setInt(_CSNames.tempTargetEatingDuration.name, tempTargetEatingDuration), debugLabel: 'writeTempTargetEatingDuration');
+
     // Profiles
     profile1NameSignal.value = prefs.getString(_CSNames.profile1Name.name) ?? "";
     profile1DurationSignal.value = prefs.getInt(_CSNames.profile1Duration.name) ?? 0;

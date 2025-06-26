@@ -96,7 +96,7 @@ class ProfileSettingsModel extends CareModel {
     if (duration == 0) {
       return "$name at $percent%";
     }
-    return "$name at $percent% for $duration mins";
+    return "$name at $percent%\nfor $duration mins";
   }
 
   @override
