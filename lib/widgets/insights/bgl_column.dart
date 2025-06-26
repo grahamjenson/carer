@@ -18,7 +18,7 @@ class BGLColumn extends StatelessWidget with ThemeMixin {
           flex: 10,
           child: Column(
             mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Flexible(flex: 16, child: BGL()),
