@@ -72,11 +72,12 @@ class Profile extends DateRangeDBModel {
     ));
   }
 
-  static Future<List<Profile>> fetchProfileSwitchesAfter(DateTime date) async {
+  // We cant put a time range on this because profile switches can have a duration of 0
+  // TODO this might get a little slow, especially if dyanmically profile switching causees a lot of profile switches
+  static Future<List<Profile>> fetchProfileSwitches() async {
     return (await SQLToProfile().query(
       conditions: {
         "source IS ?": NSProfileSource.profileSwitch.name,
-        "end >= ?": date.millisecondsSinceEpoch,
       },
     ));
   }
@@ -85,6 +86,7 @@ class Profile extends DateRangeDBModel {
     Profile? profile = profiles.firstWhereOrNull((e) => date.isAfter(e.startDate));
 
     Profile? profileSwitch = profileSwitches.firstWhereOrNull((Profile element) => element.isAtTime(date));
+
     if (profileSwitch != null) {
       // if there is a profile switch, use that instead of the current profile
       profile = profileSwitch;

@@ -355,6 +355,34 @@ class NSClient {
     return NSTreatments.fromJson(response!.body);
   }
 
+  Future<NSTreatments> getProfileSwitches(String nsURL, String token, int count) async {
+    if (nsURL == "" || token == "") {
+      alog("getProfileSwitches No NS URL or token");
+      return NSTreatments.empty();
+    }
+    var ep = treatmentsProfileSwitch(nsURL, token, count);
+    final (response, err) = await go(http.get(ep));
+    if (_handleResponseError("profileSwitches", ep, response, err)) {
+      return NSTreatments.empty();
+    }
+
+    return NSTreatments.fromJson(response!.body);
+  }
+
+  Future<NSTreatments> getNotes(String nsURL, String token, int count) async {
+    if (nsURL == "" || token == "") {
+      alog("getNotes No NS URL or token");
+      return NSTreatments.empty();
+    }
+    var ep = treatmentsNote(nsURL, token, count);
+    final (response, err) = await go(http.get(ep));
+    if (_handleResponseError("notes", ep, response, err)) {
+      return NSTreatments.empty();
+    }
+
+    return NSTreatments.fromJson(response!.body);
+  }
+
   Future<(NSProfile?, List<NSProfile>, String)> getCurrentProfiles(String nsURL, String token) async {
     if (nsURL == "" || token == "") {
       alog("getCurrentProfiles No NS URL");
@@ -404,11 +432,11 @@ class NSClient {
   }
 
   bool _handleResponseError(String route, Uri uri, Response? response, Object? err) {
-    alog("NSCLIENT: FETCHED $route ${uri.toString()}");
+    alog("NSCLIENT($route): FETCHED ${uri.toString()}");
 
     if (err != null || response == null) {
       incTotalErorrs();
-      alog("NSError: Unknown $route $err");
+      alog("NSCLIENT($route): NSError: Unknown $err");
       ToastService().showError("NSError", description: "$route: Unknown $err");
       return true;
     }
@@ -416,7 +444,7 @@ class NSClient {
     String body = response.body;
 
     if (response.statusCode == 500) {
-      alog("NSError: 500 Server error $body");
+      alog("NSCLIENT($route): NSError: 500 Server error $body");
       // Not our problem if the server is erroring Will log it though, just because we will see if easily
       return true;
     }
@@ -424,7 +452,7 @@ class NSClient {
     var (json, parseErr) = tryDecodeJson(response.body);
     if (parseErr != null) {
       incTotalErorrs();
-      alog("NSError: $route: Code ${response.statusCode} Bad JSON with Code $body");
+      alog("NSCLIENT($route): NSError: Code ${response.statusCode} Bad JSON with Code $body");
 
       ToastService().showError("NSError", description: "$route: Code ${response.statusCode} Bad JSON");
       return true;
@@ -432,7 +460,7 @@ class NSClient {
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       incTotalErorrs();
-      alog("NSError: NON 200 response code ${response.statusCode} $body");
+      alog("NSCLIENT($route) NSError: NON 200 response code ${response.statusCode} $body");
 
       if (json != null && json is Map) {
         if (json.containsKey("message") && json.containsKey("description")) {

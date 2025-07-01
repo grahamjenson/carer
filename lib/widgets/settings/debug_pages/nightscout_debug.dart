@@ -24,6 +24,7 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
             'Treatments': us.nsTreatmentUpdater,
             'Profile': us.nsProfileUpdater,
             'DeviceStatus': us.nsDeviceStatusUpdater,
+            'Bootstrap': us.nsBootstrap,
           };
 
           return ListView.builder(

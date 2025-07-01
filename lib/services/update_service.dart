@@ -1,3 +1,4 @@
+import 'package:carer/services/updaters/ns_bootstrap.dart';
 import 'package:carer/services/updaters/ns_device_status.dart';
 import 'package:carer/services/updaters/ns_entries.dart';
 import 'package:carer/services/updaters/ns_profile.dart';
@@ -11,6 +12,7 @@ class UpdateService {
   static final UpdateService _instance = UpdateService._();
   factory UpdateService() => _instance;
 
+  late NsBootstrap nsBootstrap;
   late NSPropertiesUpdater nsPropertiesUpdater;
   late NSEntriesUpdater nsEntriesUpdater;
   late NSTreatmentsUpdater nsTreatmentUpdater;
@@ -31,12 +33,14 @@ class UpdateService {
     nsTreatmentUpdater = NSTreatmentsUpdater();
     nsProfileUpdater = NSProfileUpdater();
     nsDeviceStatusUpdater = NSDeviceStatusUpdater();
+    nsBootstrap = NsBootstrap();
   }
 
   start() {
     for (var element in updaters) {
       element.start();
     }
+    nsBootstrap.bootstrap();
   }
 
   bool forceUpdateAll() {

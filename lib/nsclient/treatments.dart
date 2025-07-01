@@ -375,7 +375,7 @@ class NSTreatments {
     return treatments.whereType<NSTemporaryTarget>().toList();
   }
 
-  List<NSProfileSwitch> get profileSwitchs {
+  List<NSProfileSwitch> get profileSwitches {
     return treatments.whereType<NSProfileSwitch>().toList();
   }
 }

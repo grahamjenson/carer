@@ -130,6 +130,7 @@ class ValueAtTime with DateMixin {
     if (values.isEmpty) {
       return null;
     }
+
     return values.first;
   }
 
@@ -141,7 +142,7 @@ class ValueAtTime with DateMixin {
     var start = now.subtract(Duration(hours: hoursAgo));
 
     var profiles = await Profile.fetchAllDefaultStoreProfiles();
-    var profileSwitches = await Profile.fetchProfileSwitchesAfter(start);
+    var profileSwitches = await Profile.fetchProfileSwitches();
 
     // add the profile switches to the profiles
     var tempTargets = await TempTarget.after(start);
