@@ -1,5 +1,3 @@
-import 'package:carer/services/timer_service.dart';
-import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +13,19 @@ class _LogErrorPageState extends State<LogErrorPage> {
 
   _LogErrorPageState();
 
+  var filterString = "";
   String getFilteredLogLines() {
     String logString = ALogger().getPrettyLogs();
-    return logString.split('\n').where((line) => line.contains(controller.text)).join('\n');
+    return logString.split('\n').where((line) => line.contains(filterString)).join('\n');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // initialize the controller
+    controller.addListener(() {
+      setState(() => filterString = controller.text);
+    });
   }
 
   // on destroy dispose of the controller
@@ -46,20 +54,14 @@ class _LogErrorPageState extends State<LogErrorPage> {
               ),
             ),
             Expanded(
-              child: AWatch(
-                (_) {
-                  return SingleChildScrollView(
-                      child: SelectableText(
-                    getFilteredLogLines(),
-                    style: const TextStyle(
-                      fontSize: 8,
-                      fontFeatures: [FontFeature.tabularFigures()],
-                    ),
-                  ));
-                },
-                debugLabel: "LogErrorPage",
-                dependencies: [TimerService().secondSignal],
-              ),
+              child: SingleChildScrollView(
+                  child: SelectableText(
+                getFilteredLogLines(),
+                style: const TextStyle(
+                  fontSize: 8,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
+              )),
             )
           ],
         ),

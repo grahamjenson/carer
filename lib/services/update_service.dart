@@ -11,14 +11,14 @@ class UpdateService {
   static final UpdateService _instance = UpdateService._();
   factory UpdateService() => _instance;
 
-  late NSPropertiesUpdater nsSummaryUpdater;
+  late NSPropertiesUpdater nsPropertiesUpdater;
   late NSEntriesUpdater nsEntriesUpdater;
   late NSTreatmentsUpdater nsTreatmentUpdater;
   late NSProfileUpdater nsProfileUpdater;
   late NSDeviceStatusUpdater nsDeviceStatusUpdater;
 
   List<Updater> get updaters => [
-        nsSummaryUpdater,
+        nsPropertiesUpdater,
         nsEntriesUpdater,
         nsTreatmentUpdater,
         nsProfileUpdater,
@@ -26,7 +26,7 @@ class UpdateService {
       ];
 
   UpdateService._() {
-    nsSummaryUpdater = NSPropertiesUpdater();
+    nsPropertiesUpdater = NSPropertiesUpdater();
     nsEntriesUpdater = NSEntriesUpdater();
     nsTreatmentUpdater = NSTreatmentsUpdater();
     nsProfileUpdater = NSProfileUpdater();

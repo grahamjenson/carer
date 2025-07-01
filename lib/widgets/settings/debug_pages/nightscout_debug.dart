@@ -1,8 +1,9 @@
+import 'dart:convert';
+
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/services/updaters/updater.dart';
 import 'package:carer/utils/futures.dart';
-import 'package:carer/utils/strings.dart';
 import 'package:flutter/material.dart';
 
 class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
@@ -16,26 +17,22 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
       ),
       body: AWatch(
         (context) {
-          var us = UpdateService();
-          var nsSummaryUpdater = us.nsSummaryUpdater;
-          var nsEntriesUpdater = us.nsEntriesUpdater;
-          var nsTreatmentUpdater = us.nsTreatmentUpdater;
-          var nsProfileUpdater = us.nsProfileUpdater;
+          final us = UpdateService();
+          final updaters = {
+            'Properties': us.nsPropertiesUpdater,
+            'Entries': us.nsEntriesUpdater,
+            'Treatments': us.nsTreatmentUpdater,
+            'Profile': us.nsProfileUpdater,
+            'DeviceStatus': us.nsDeviceStatusUpdater,
+          };
 
-          var list = [
-            getUpdaterRow('Summary', nsSummaryUpdater),
-            getUpdaterRow('Entries', nsEntriesUpdater),
-            getUpdaterRow('Treatments', nsTreatmentUpdater),
-            getUpdaterRow('Profile', nsProfileUpdater),
-          ];
-          return Container(
-            margin: const EdgeInsets.all(12),
-            child: ListView.builder(
-              itemCount: list.length,
-              itemBuilder: (context, index) {
-                return list[index];
-              },
-            ),
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: updaters.length,
+            itemBuilder: (context, index) {
+              final entry = updaters.entries.elementAt(index);
+              return _buildUpdaterTile(entry.key, entry.value);
+            },
           );
         },
         debugLabel: "NightScoutServiceDebugPage",
@@ -43,33 +40,30 @@ class NightScoutServiceDebugPage extends StatelessWidget with ThemeMixin {
     );
   }
 
-  Row getUpdaterRow(String name, Updater updater) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$name: ${updater.successfulAge.inMinutes}'),
-        Text(prettyPrintJson(updater.raw)),
-      ],
+  Widget _buildUpdaterTile(String name, Updater updater) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: ExpansionTile(
+        title: Text('$name: ${updater.successfulAge.inMinutes} min ago'),
+        childrenPadding: const EdgeInsets.all(12),
+        children: [
+          SelectableText(
+            _prettyPrintJson(updater.raw),
+            style: const TextStyle(fontFamily: 'monospace'),
+          ),
+        ],
+      ),
     );
   }
 
-  String formatDate(DateTime? date) {
-    if (date == null) {
-      return '?';
-    }
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  String prettyPrintJson(String input) {
+  String _prettyPrintJson(String input) {
     try {
-      var object = decoder.convert(input);
-      var prettyString = encoder.convert(object);
-      var str = "";
-      prettyString.split('\n').forEach((element) => str += "$element\n");
-      return str;
-    } catch (e) {
-      return input;
+      final decoded = const JsonDecoder().convert(input);
+      final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
+      return pretty;
+    } catch (_) {
+      return input; // If not valid JSON, just return raw string
     }
   }
 }
