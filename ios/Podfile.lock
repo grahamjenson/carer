@@ -8,6 +8,8 @@ PODS:
   - cupertino_http (0.0.1):
     - Flutter
     - FlutterMacOS
+  - external_path (2.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
@@ -51,6 +53,7 @@ DEPENDENCIES:
   - background_fetch (from `.symlinks/plugins/background_fetch/ios`)
   - battery_plus (from `.symlinks/plugins/battery_plus/ios`)
   - cupertino_http (from `.symlinks/plugins/cupertino_http/darwin`)
+  - external_path (from `.symlinks/plugins/external_path/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
@@ -81,6 +84,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/battery_plus/ios"
   cupertino_http:
     :path: ".symlinks/plugins/cupertino_http/darwin"
+  external_path:
+    :path: ".symlinks/plugins/external_path/ios"
   Flutter:
     :path: Flutter
   flutter_local_notifications:
@@ -115,8 +120,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
   background_fetch: 851122c99dc3f25a011a6aebec5379ccdf4ab5eb
-  battery_plus: 8df26ad5ade26110b2d22a4d1f582b5926983023
+  battery_plus: b42253f6d2dde71712f8c36fef456d99121c5977
   cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
+  external_path: fd37c654b69a1336e33a2403f48383ae6100e443
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
   flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
@@ -128,7 +134,7 @@ SPEC CHECKSUMS:
   screen_brightness_ios: 9953fd7da5bd480f1a93990daeec2eb42d4f3b52
   Sentry: da60d980b197a46db0b35ea12cb8f39af48d8854
   sentry_flutter: 27892878729f42701297c628eb90e7c6529f3684
-  share_plus: 011d6fb4f9d2576b83179a3a5c5e323202cdabcf
+  share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sound_mode: 53bd43e2fb1f640571ea74931ca5efdea5ddfc97
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0

@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
+import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/sql/key_value_store.dart';
 import 'package:carer/sql/log_db.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:clock/clock.dart';
+import 'package:external_path/external_path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -20,7 +22,7 @@ class ShareFileService {
   Future<void> zipAndShare(List<String> filePaths, String zipFileName) async {
     // Create a zip file from the list of files
     var encoder = ZipFileEncoder();
-    String tempDir = (await getTemporaryDirectory()).path;
+    String tempDir = await getPath();
     String zipFilePath = '$tempDir/$zipFileName.zip';
     encoder.create(zipFilePath);
     for (String path in filePaths) {
@@ -31,10 +33,27 @@ class ShareFileService {
     alog("Zip File location $zipFilePath");
 
     // Share the zip file
-    final result = await Share.shareXFiles([XFile(zipFilePath)]);
-    if (result.status == ShareResultStatus.success) {
-      alog('Files shared successfully');
+    ShareParams params = ShareParams(
+      files: [XFile(zipFilePath, mimeType: 'application/zip')],
+    );
+
+    if (Platform.isAndroid) {
+      // On Android it doesnt work well, so we just save the file and give its location
+      alog('Sharing files on Android, saving to $zipFilePath');
+      ToastService().showSuccess("Files saved to Download Folder");
+    } else {
+      final result = await SharePlus.instance.share(params);
+      if (result.status == ShareResultStatus.success) {
+        alog('Files shared successfully');
+      }
     }
+  }
+
+  Future<String> getPath() async {
+    if (Platform.isAndroid) {
+      return ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOAD);
+    }
+    return (await getTemporaryDirectory()).path;
   }
 
   Future<String> writeFile(String contents, String name) async {
