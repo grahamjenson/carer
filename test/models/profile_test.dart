@@ -63,7 +63,7 @@ void main() async {
       var agesAgo = now.subtract(const Duration(days: 10));
 
       var profiles = await Profile.fetchAllDefaultStoreProfiles();
-      var profileSwitches = await Profile.fetchProfileSwitchesAfter(agesAgo);
+      var profileSwitches = await Profile.fetchProfileSwitches();
 
       var sp0 = Profile.selectProfileAtTime(now, profiles, profileSwitches);
       expect(sp0, isNull);
@@ -87,7 +87,7 @@ void main() async {
       expect(await SQLToProfile().save(np1), true);
 
       profiles = await Profile.fetchAllDefaultStoreProfiles();
-      profileSwitches = await Profile.fetchProfileSwitchesAfter(agesAgo);
+      profileSwitches = await Profile.fetchProfileSwitches();
 
       var sp1 = Profile.selectProfileAtTime(now, profiles, profileSwitches);
       expect(sp1, isNotNull);
@@ -115,7 +115,7 @@ void main() async {
       expect(await SQLToProfile().save(np2), true);
 
       profiles = await Profile.fetchAllDefaultStoreProfiles();
-      profileSwitches = await Profile.fetchProfileSwitchesAfter(agesAgo);
+      profileSwitches = await Profile.fetchProfileSwitches();
       print(
           "${profileSwitches[0].name} ${profileSwitches[0].duration}, startDate: ${profileSwitches[0].startDate}, endDate: ${profileSwitches[0].endDate} $now");
 
