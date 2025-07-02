@@ -106,7 +106,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audioplayers_darwin: 761f2948df701d05b5db603220c384fb55720012
-  battery_plus: 2d51ddb1dfb011e28b0d78918ff9ab1659f30d80
+  battery_plus: f51ad29136e025b714b96f7d096f44f604615da7
   cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
   desktop_window: de6acd6053564bdccd9f4b9473d25bf4f2ad9bdf
   flutter_local_notifications: 13862b132e32eb858dea558a86d45d08daeacfe7
@@ -119,7 +119,7 @@ SPEC CHECKSUMS:
   screen_brightness_macos: 2a3ee243f8051c340381e8e51bcedced8360f421
   Sentry: da60d980b197a46db0b35ea12cb8f39af48d8854
   sentry_flutter: 27892878729f42701297c628eb90e7c6529f3684
-  share_plus: 11c7b7fa7020465584eca3ff6392c5bc1e399d6e
+  share_plus: 510bf0af1a42cd602274b4629920c9649c52f4cc
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
