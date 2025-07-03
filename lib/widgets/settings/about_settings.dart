@@ -52,6 +52,20 @@ class AboutSettingsWidget extends AbstractSettingsSection {
           },
         ),
         SettingsTile.navigation(
+          title: const Text("Facebook"),
+          leading: const Icon(Icons.facebook),
+          onPressed: (context) async {
+            final Uri emailLaunchUri = Uri(
+              scheme: 'https',
+              host: 'www.facebook.com',
+              path: 'groups/1393405828463156',
+            );
+
+            // This is async but we just ignore return
+            launchUrl(emailLaunchUri);
+          },
+        ),
+        SettingsTile.navigation(
           title: const Text("Share All Data"),
           description: const Text("Send to contact@t1d.nz"),
           descriptionInlineIos: true,
