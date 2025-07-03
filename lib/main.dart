@@ -41,6 +41,8 @@ void main() async {
       // Setting to 1.0 will profile 100% of sampled transactions:
       options.profilesSampleRate = 1.0;
 
+      options.debug = Env.isDev;
+
       options.beforeBreadcrumb = (Breadcrumb? breadcrumb, Hint hint) {
         if (breadcrumb == null) {
           return null; // nothgin in nothign out

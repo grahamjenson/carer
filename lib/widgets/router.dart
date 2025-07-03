@@ -100,6 +100,7 @@ CustomTransitionPage getSimpleSlideTransitionPage(
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
+    name: state.name,
     transitionDuration: const Duration(milliseconds: transitionTime),
     reverseTransitionDuration: const Duration(milliseconds: transitionTime),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -124,6 +125,7 @@ CustomTransitionPage getPageSlideTransitionPage({required BuildContext context, 
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
+    name: state.name,
     transitionDuration: const Duration(milliseconds: transitionTime),
     reverseTransitionDuration: const Duration(milliseconds: transitionTime),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -195,15 +197,27 @@ pageBuilderBuilder(Widget widget) {
 }
 
 GoRouter? router;
+List<NavigatorObserver> observers() {
+  return [
+    NavigationChangeObserver(),
+    SentryNavigatorObserver(
+      routeNameExtractor: (RouteSettings? state) {
+        return state;
+      },
+    )
+  ];
+}
+
 GoRouter getRouter() {
   if (router != null) {
     return router!;
   }
+
   final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'main');
 
   router = GoRouter(
-    observers: [NavigationChangeObserver(), SentryNavigatorObserver()],
+    observers: observers(),
     navigatorKey: rootNavigatorKey,
     initialLocation: "/display",
     redirect: (BuildContext context, GoRouterState state) {
@@ -218,8 +232,10 @@ GoRouter getRouter() {
     },
     routes: <RouteBase>[
       ShellRoute(
+        observers: observers(),
         pageBuilder: (BuildContext context, GoRouterState state, Widget child) {
           return CustomTransitionPage(
+            name: state.name,
             child: child,
             transitionsBuilder: (context, animation, secondaryAnimation, child) => Scaffold(body: child),
           );
@@ -227,15 +243,18 @@ GoRouter getRouter() {
         routes: [
           GoRoute(
             path: '/agreements',
+            name: 'agreements',
             builder: (context, state) => const AgreementsPage(),
           ),
           GoRoute(
             path: '/ns_setup',
+            name: 'ns_setup',
             builder: (context, state) => const NSSetupPage(),
           ),
         ],
       ),
       ShellRoute(
+        observers: observers(),
         navigatorKey: shellNavigatorKey,
         pageBuilder: (BuildContext context, GoRouterState state, Widget child) {
           var childStack = Stack(children: [
@@ -257,6 +276,7 @@ GoRouter getRouter() {
 
           return CustomTransitionPage(
               child: childStack,
+              name: state.name,
               transitionDuration: const Duration(milliseconds: transitionTime),
               reverseTransitionDuration: const Duration(milliseconds: transitionTime),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -289,84 +309,103 @@ GoRouter getRouter() {
         routes: <RouteBase>[
           GoRoute(
             path: '/',
+            name: 'root',
             pageBuilder: pageBuilderBuilder(const DisplayPage()),
           ),
           GoRoute(
             path: '/display',
+            name: 'display',
             pageBuilder: pageBuilderBuilder(const DisplayPage()),
           ),
           GoRoute(
             path: '/care',
+            name: 'care',
             pageBuilder: pageBuilderBuilder(const CarePage()),
             routes: <RouteBase>[
               GoRoute(
                 path: '/edit',
+                name: 'care_edit',
                 pageBuilder: pageBuilderBuilder(const CareEditPage()),
               ),
             ],
           ),
           GoRoute(
             path: '/alarms',
+            name: 'alarms',
             pageBuilder: pageBuilderBuilder(const AlarmsSettingsPage()),
             routes: <RouteBase>[
               GoRoute(
                 path: '/urgent_low_alarm',
+                name: 'urgent_low_alarm',
                 pageBuilder: pageBuilderBuilder(const UrgentAlarmLowSettingsPage()),
               ),
               GoRoute(
                 path: '/low_alarm',
+                name: 'low_alarm',
                 pageBuilder: pageBuilderBuilder(const LowAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/high_alarm',
+                name: 'high_alarm',
                 pageBuilder: pageBuilderBuilder(const HighAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/urgent_high_alarm',
+                name: 'urgent_high_alarm',
                 pageBuilder: pageBuilderBuilder(const UrgentAlarmHighSettingsPage()),
               ),
               GoRoute(
                 path: '/fast_rise_alarm',
+                name: 'fast_rise_alarm',
                 pageBuilder: pageBuilderBuilder(const FastRiseAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/fast_drop_alarm',
+                name: 'fast_drop_alarm',
                 pageBuilder: pageBuilderBuilder(const FastFallAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/no_data_alarm',
+                name: 'no_data_alarm',
                 pageBuilder: pageBuilderBuilder(const NoDataAlarmSettingsPage()),
               ),
               GoRoute(
                 path: '/battery_alarm',
+                name: 'battery_alarm',
                 pageBuilder: pageBuilderBuilder(const BatteryAlarmSettingsPage()),
               ),
             ],
           ),
           GoRoute(
             path: '/settings',
+            name: 'settings',
             pageBuilder: pageBuilderBuilder(const SettingsPage()),
             routes: <RouteBase>[
               GoRoute(
                 path: '/nightscout',
-                pageBuilder: pageBuilderBuilder(NightscoutSettingsPage()),
+                name: 'nightscout',
+                pageBuilder: pageBuilderBuilder(const NightscoutSettingsPage()),
               ),
               GoRoute(
                 path: '/debug',
+                name: 'debug',
                 pageBuilder: pageBuilderBuilder(const DebugSettingsPage()),
                 routes: <RouteBase>[
                   GoRoute(
                     path: '/log_errors',
+                    name: 'log_errors',
                     pageBuilder: pageBuilderBuilder(const LogErrorPage()),
                   ),
                   GoRoute(
                     path: '/nightscout_debug',
+                    name: 'nightscout_debug',
                     pageBuilder: pageBuilderBuilder(const NightScoutServiceDebugPage()),
                   ),
                 ],
               ),
               GoRoute(
                 path: '/events',
+                name: 'events',
                 pageBuilder: pageBuilderBuilder(const EventsPage()),
               ),
             ],
@@ -375,6 +414,7 @@ GoRouter getRouter() {
       ),
       GoRoute(
         path: '/snooze',
+        name: 'snooze',
         pageBuilder: (BuildContext context, GoRouterState state) {
           return getSimpleSlideTransitionPage(
             context: context,
@@ -395,5 +435,8 @@ GoRouter getRouter() {
 }
 
 void updateCurrentPath() {
+  if (router == null) {
+    return;
+  }
   currentRoute.value = router!.state.uri.toString();
 }
