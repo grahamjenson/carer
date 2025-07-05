@@ -12,10 +12,6 @@ import 'package:clock/clock.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-ASignal<int> _chartMinsAgo = ASignal<int>(120, debugLabel: "BGLChartminsAgo");
-int get chartHoursAgo => _chartMinsAgo.value ~/ 60;
-set chartHoursAgo(int value) => _chartMinsAgo.value = value * 60;
-
 class BGLChart extends StatelessWidget with ThemeMixin {
   final basalMultiplier = 18 * 3;
 
@@ -23,45 +19,49 @@ class BGLChart extends StatelessWidget with ThemeMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AWatch((context) {
-      int minsAgo = _chartMinsAgo.value;
+    return AWatch(
+      (context) {
+        int minsAgo = UISettings().chartMinsAgoSignal.value;
 
-      List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<ASGV> sgvs = SGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
-      List<Treatment> lastTreatments = Treatment.last2days.value.where((e) => e.minsAgo < minsAgo).toList();
+        List<ValueAtTime> targets = ValueAtTime.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
+        List<ASGV> sgvs = SGV.last2Days.value.where((e) => e.minsAgo < minsAgo).toList();
+        List<Treatment> lastTreatments = Treatment.last2days.value.where((e) => e.minsAgo < minsAgo).toList();
 
-      // convert the last hours of summary sgvs into flspots
-      var bglSpotData = bglSpots(sgvs);
-      var (basalSpotData, maxBasal) = basalSpots(targets);
-      var (lowTargets, highTargets) = targetSpots(targets);
-      var (carbSpots, bolusSpots) = treatmentsSpots(lastTreatments);
+        // convert the last hours of summary sgvs into flspots
+        var bglSpotData = bglSpots(sgvs);
+        var (basalSpotData, maxBasal) = basalSpots(targets);
+        var (lowTargets, highTargets) = targetSpots(targets);
+        var (carbSpots, bolusSpots) = treatmentsSpots(lastTreatments);
 
-      return Window(
-        child: Column(children: [
-          Flexible(
-            flex: 15,
-            child: getToggleButtonsForChartTime(context),
-          ),
-          Flexible(
-            flex: 90,
-            child: LineChart(
-              buildlineChartData(
-                context,
-                minsAgo,
-                maxBasal,
-                bglSpotData,
-                basalSpotData,
-                lowTargets,
-                highTargets,
-                carbSpots,
-                bolusSpots,
-              ),
-              duration: Duration.zero,
+        return Window(
+          child: Column(children: [
+            Flexible(
+              flex: 15,
+              child: getToggleButtonsForChartTime(context),
             ),
-          ),
-        ]),
-      );
-    }, debugLabel: "BGLChart");
+            Flexible(
+              flex: 90,
+              child: LineChart(
+                buildlineChartData(
+                  context,
+                  minsAgo,
+                  maxBasal,
+                  bglSpotData,
+                  basalSpotData,
+                  lowTargets,
+                  highTargets,
+                  carbSpots,
+                  bolusSpots,
+                ),
+                duration: Duration.zero,
+              ),
+            ),
+          ]),
+        );
+      },
+      dependencies: [UISettings().chartMinsAgoSignal],
+      debugLabel: "BGLChart",
+    );
   }
 
   Widget getToggleButtonsForChartTime(BuildContext context) {
@@ -70,7 +70,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [2, 4, 6, 12, 24].map((value) {
-        final bool isSelected = chartHoursAgo == value;
+        final bool isSelected = UISettings().chartHoursAgo == value;
         return Flexible(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -83,7 +83,7 @@ class BGLChart extends StatelessWidget with ThemeMixin {
               ),
             ),
             onPressed: () {
-              chartHoursAgo = value;
+              UISettings().chartHoursAgo = value;
             },
             child: Text("${value}h", style: buttonTextStyle),
           ),
@@ -364,10 +364,10 @@ class BGLChart extends StatelessWidget with ThemeMixin {
   SideTitles bottomTitleWidgets(BuildContext context) {
     bool showTime = false;
     int showTimeHours = 1;
-    if (chartHoursAgo >= 3) {
+    if (UISettings().chartHoursAgo >= 3) {
       showTime = true;
 
-      if (_chartMinsAgo.value > 1000) {
+      if (UISettings().chartMinsAgoSignal.value > 1000) {
         showTimeHours = 2;
       }
     }

@@ -23,6 +23,7 @@ import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/router.dart';
+import 'package:clock/clock.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -145,7 +146,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with ThemeMixin {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeData>(
+    return ListenForInteraction(
+      child: ValueListenableBuilder<ThemeData>(
         valueListenable: ThemeService().themeNotifier,
         builder: (context, theme, _) {
           final landscape = MediaQuery.of(context).size.aspectRatio > 1.0;
@@ -163,6 +165,31 @@ class _MyAppState extends State<MyApp> with ThemeMixin {
               routerConfig: getRouter(),
             ),
           );
-        });
+        },
+      ),
+    );
+  }
+}
+
+class ListenForInteraction extends StatelessWidget {
+  final Widget child;
+
+  const ListenForInteraction({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyboardListener(
+      focusNode: FocusNode(),
+      onKeyEvent: (_) {
+        AppLifecycleService().lastInteraction.value = clock.now();
+      },
+      child: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) {
+          AppLifecycleService().lastInteraction.value = clock.now();
+        },
+        child: child,
+      ),
+    );
   }
 }
