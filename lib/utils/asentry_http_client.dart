@@ -25,7 +25,7 @@ class ASentryHttpClient extends BaseClient {
     // We don't want to include the breadcrumbs for the current request
     // when capturing it as a failed request.
     // However it still should be added for following events.
-    innerClient = ABreadcrumbClient(client: innerClient, hub: _hub);
+    innerClient = ABreadcrumbClient(innerClient, _hub);
 
     _client = innerClient;
   }
