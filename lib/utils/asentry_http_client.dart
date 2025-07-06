@@ -10,26 +10,16 @@ Uri replacementUriWithPath(String path) => Uri.parse("https://$replacementHost$p
 /// This is mostly copy pasted from the Sentry package because I dont want to write BaseURLs to Sentry
 /// NSURLS are private and there is no easy way to sanitize them out
 class ASentryHttpClient extends BaseClient {
-  static const defaultFailedRequestTargets = ['.*'];
-
   ASentryHttpClient({
     required Client client,
-    Hub? hub,
-    List<String> failedRequestTargets = defaultFailedRequestTargets,
-    bool? captureFailedRequests,
   }) {
-    _hub = hub ?? HubAdapter();
+    _hub = HubAdapter();
 
     var innerClient = client;
 
-    innerClient = AFailedRequestClient(
-      failedRequestTargets: failedRequestTargets,
-      hub: _hub,
-      client: innerClient,
-      captureFailedRequests: captureFailedRequests,
-    );
+    innerClient = AFailedRequestClient(innerClient, _hub);
 
-    innerClient = ATracingClient(client: innerClient, hub: _hub);
+    innerClient = ATracingClient(innerClient, _hub);
 
     // The ordering here matters.
     // We don't want to include the breadcrumbs for the current request
@@ -52,20 +42,12 @@ class ASentryHttpClient extends BaseClient {
 }
 
 class AFailedRequestClient extends BaseClient {
-  AFailedRequestClient({
-    this.failedRequestTargets = ASentryHttpClient.defaultFailedRequestTargets,
-    Client? client,
-    Hub? hub,
-    bool? captureFailedRequests,
-  })  : _hub = hub ?? HubAdapter(),
-        _client = client ?? Client(),
-        _captureFailedRequests = captureFailedRequests;
+  AFailedRequestClient(Client client, Hub hub)
+      : _client = client,
+        _hub = hub;
 
   final Client _client;
   final Hub _hub;
-  final bool? _captureFailedRequests;
-
-  final List<String> failedRequestTargets;
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
@@ -111,42 +93,38 @@ class AFailedRequestClient extends BaseClient {
     }
   }
 
+  /// Because we dont control the server there is a massive amount of noise in these errors to filter out.
+  List<String> get _ignoredExceptions => [
+        'The request timed out',
+        'The Internet connection appears to be offline',
+        'Bad file descriptor', // ref https://github.com/dart-lang/http/issues/197
+        'Software caused connection abort',
+        'Failed host lookup',
+        'Connection closed before full header was received',
+        'The network connection was lost',
+        'Connection reset by peer',
+        'Connection terminated during handshake',
+      ];
+
   Future<void> _captureEventIfNeeded(
       BaseRequest request, int? statusCode, Object? exception, StackTrace? stackTrace, StreamedResponse? response, Duration duration) async {
-    if (!(_captureFailedRequests ?? _hub.options.captureFailedRequests)) {
-      return;
-    }
-
-    // Only check `failedRequestStatusCodes` & `failedRequestTargets` if no exception was thrown.
     if (exception == null) {
-      // if (!failedRequestStatusCodes._containsStatusCode(statusCode)) {
-      //   return;
-      // }
-      // if (!containsTargetOrMatchesRegExp(failedRequestTargets, request.url.toString())) {
-      //   return;
-      // }
-      // Dont log if no exception
       return;
     }
 
     if (statusCode == 500) {
-      // TODO: improtve logic (native code actually throws exception on 500 so need this)
       // dont log on 500 because this is a server error and we dont control the error
       return;
     }
 
-    if (exception.toString().contains("The request timed out")) {
-      // We dont capture client timeout exceptions.
-      return;
-    }
-
-    if (exception.toString().contains("The Internet connection appears to be offline")) {
-      // We dont capture clients without internet
-      return;
+    for (final ignoredException in _ignoredExceptions) {
+      if (exception.toString().contains(ignoredException)) {
+        // We dont capture these exceptions.
+        return;
+      }
     }
 
     final reason = 'HTTP Client Error with status code: $statusCode';
-    exception ??= SentryHttpClientError(reason);
 
     await _captureEvent(
       exception: exception,
@@ -174,9 +152,7 @@ class AFailedRequestClient extends BaseClient {
       method: request.method,
       headers: null,
       uri: replacementUriWithPath(request.url.path),
-      data: null,
-      // ignore: deprecated_member_use_from_same_package
-      other: {
+      data: {
         'content_length': request.contentLength.toString(),
         'duration': requestDuration.toString(),
       },
@@ -230,9 +206,9 @@ class AFailedRequestClient extends BaseClient {
 /// which adds support to Sentry Performance feature.
 /// https://develop.sentry.dev/sdk/performance
 class ATracingClient extends BaseClient {
-  ATracingClient({Client? client, Hub? hub})
-      : _hub = hub ?? HubAdapter(),
-        _client = client ?? Client();
+  ATracingClient(Client client, Hub hub)
+      : _hub = hub,
+        _client = client;
 
   final Client _client;
   final Hub _hub;
@@ -305,9 +281,9 @@ class ATracingClient extends BaseClient {
 }
 
 class ABreadcrumbClient extends BaseClient {
-  ABreadcrumbClient({Client? client, Hub? hub})
-      : _hub = hub ?? HubAdapter(),
-        _client = client ?? Client();
+  ABreadcrumbClient(Client client, Hub hub)
+      : _hub = hub,
+        _client = client;
 
   final Client _client;
   final Hub _hub;
