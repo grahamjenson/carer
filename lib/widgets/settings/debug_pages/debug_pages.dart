@@ -111,6 +111,13 @@ class DebugSettingsPage extends StatelessWidget {
             NotificationService().showNotification("Alarm", "Text on the Notification");
           },
         ),
+        SettingsTile(
+          title: const Text("Test Background Run"),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
+          onPressed: (context) async {
+            BackgroundService().scheduleTask();
+          },
+        ),
       ],
     );
   }

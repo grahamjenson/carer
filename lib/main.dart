@@ -132,7 +132,8 @@ void runCarer() async {
   runApp(const MyApp());
 
   if (Platform.isIOS || Platform.isAndroid) {
-    BackgroundService();
+    await BackgroundService().setupBackgroundFetch();
+    BackgroundService().scheduleTask();
   }
 }
 

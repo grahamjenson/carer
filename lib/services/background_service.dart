@@ -12,29 +12,21 @@ class BackgroundService {
   static final BackgroundService _singleton = BackgroundService._();
   factory BackgroundService() => _singleton;
 
-  BackgroundService._() {
-    setupBackgroundFetch();
-  }
+  BackgroundService._();
 
   BackgroundFetchConfig config = BackgroundFetchConfig(
-      minimumFetchInterval: 15,
-      stopOnTerminate: false,
-      enableHeadless: true,
-      requiresBatteryNotLow: false,
-      requiresCharging: false,
-      requiresStorageNotLow: false,
-      requiresDeviceIdle: false,
-      requiredNetworkType: NetworkType.ANY);
+    minimumFetchInterval: 15,
+    stopOnTerminate: false,
+    startOnBoot: true,
+    enableHeadless: true,
+    requiresBatteryNotLow: false,
+    requiresCharging: false,
+    requiresStorageNotLow: false,
+    requiresDeviceIdle: false,
+    requiredNetworkType: NetworkType.ANY,
+  );
 
-  Future<bool> run() async {
-    doublelog("BackgroundFetch:  Scheduling task");
-    return await BackgroundFetch.scheduleTask(TaskConfig(
-      taskId: "com.transistorsoft.fetch",
-      delay: 5000,
-    ));
-  }
-
-  void setupBackgroundFetch() async {
+  Future<void> setupBackgroundFetch() async {
     int status = await BackgroundFetch.configure(config, onFetch, onTimeout);
     doublelog('BackgroundFetch: configure success: $status');
     // Andoird only
@@ -51,6 +43,7 @@ class BackgroundService {
       doublelog("BackgroundFetch: updateALL After sleep $x ${CleanSGV.lastSGV.value}");
 
       var (newTriggeredAlarms, _) = AlarmsService().calculateAlarms();
+      doublelog("BackgroundFetch: calculateAlarms: $newTriggeredAlarms");
       if (newTriggeredAlarms.isNotEmpty) {
         CleanSGV? sgv = CleanSGV.lastSGV.value;
 
@@ -82,8 +75,17 @@ class BackgroundService {
   }
 
   void onTimeout(String taskId) async {
+    doublelog("BackgroundFetch: onTimeout");
     // just log the timeout
     BackgroundFetch.finish(taskId);
+  }
+
+  void scheduleTask() {
+    doublelog("BackgroundFetch: Scheduling task");
+    BackgroundFetch.scheduleTask(TaskConfig(
+      taskId: "com.transistorsoft.fetch",
+      delay: 5000, // <-- milliseconds
+    ));
   }
 }
 

@@ -34,8 +34,8 @@ class AlarmsService {
     return _player!;
   }
 
-  ASignal<AlarmSet> pendingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "PendingAlarms");
-  ASignal<AlarmSet> alertingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "AlertingAlarms");
+  ASignal<AlarmSet> pendingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "PendingAlarmsSet");
+  ASignal<AlarmSet> alertingAlarms = ASignal<AlarmSet>(AlarmSet({}), debugLabel: "AlertingAlarmsSet");
 
   AlarmsService._() {
     List<Signal> allSettingsSignals = [];
@@ -51,7 +51,7 @@ class AlarmsService {
       AppLifecycleService().lastChangeScreen
     ];
 
-    List<Signal> checkAlarmsDependencies = allSettingsSignals + additionalDeps;
+    List<Signal> calculateAlarmsDependencies = allSettingsSignals + additionalDeps;
 
     // Calculate the alarms and then set Pending and Alerting Alarms values
     aeffect(() {
@@ -60,17 +60,23 @@ class AlarmsService {
         pendingAlarms.value = newPendingAlarms;
         alertingAlarms.value = newAlertingAlarms;
       } catch (err) {
-        alog("CheckAlarms: Error checking alarms: $err");
+        alog("CalculateAlarms: Error checking alarms: $err");
       }
       return true;
-    }, debugLabel: "CheckAlarms", dependencies: checkAlarmsDependencies);
+    }, debugLabel: "CalculateAlarms", dependencies: calculateAlarmsDependencies);
 
     // Alert when there are alarms to alert for.
     // When there is an alaerting alarm we can fix this.
     aeffect(
       () async {
+        if (!AppLifecycleService().stateResumed) {
+          alog("AlertingAlarms: skipping ${AppLifecycleService().lastState.value}");
+          return false;
+        }
+
         // is Checking alarms is a simple lock to stop multiple calls
         if (isCheckingAlarms) {
+          alog("AlertingAlarms: already running");
           return false;
         }
         isCheckingAlarms = true;
@@ -97,10 +103,10 @@ class AlarmsService {
         }
         return true;
       },
-      debugLabel: "AudioBrightnessAlarms",
+      debugLabel: "AlertingAlarmsCalculation",
       dependencies: [
         alertingAlarms,
-        TimerService().tenSecondSignal,
+        TimerService().secondSignal,
       ],
     );
 
@@ -306,14 +312,16 @@ class AlarmsService {
 
     if (!TimeSettings().isNight() || !AlarmAlertSettings().brightnessAdjustAtNight) {
       // Brightness only works at night
-      alog("Stopping Brightness: Setting is ${AlarmAlertSettings().brightnessAdjustAtNight} Night is ${TimeSettings().isNight()}");
-      BrightnessAlert().stop();
+      if (await BrightnessAlert().stop()) {
+        alog("Stopping Brightness: Setting is ${AlarmAlertSettings().brightnessAdjustAtNight} Night is ${TimeSettings().isNight()}");
+      }
       return false;
     }
 
     if (alarms.isEmpty) {
-      alog("Stopping Brightness Alarms");
-      BrightnessAlert().stop();
+      if (await BrightnessAlert().stop()) {
+        alog("Stopping Brightness Alarms");
+      }
       return false;
     }
 

@@ -367,6 +367,7 @@ class AHttpSanitizer {
     } else {
       try {
         final uri = Uri.parse(url);
+        uri.queryParameters["token"] = "censored"; // Censor token in query parameters
         return AUrlDetails(
             url: "https://$replacementHost${uri.path}",
             query: uri.query.isEmpty ? null : uri.query,

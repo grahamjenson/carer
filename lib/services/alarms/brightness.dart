@@ -23,12 +23,14 @@ class BrightnessAlert {
     }
   }
 
-  Future<void> stop() async {
+  Future<bool> stop() async {
     if (started) {
       started = false;
       alog("BRIGHTNESS: RESET");
 
       ScreenBrightness().resetApplicationScreenBrightness();
+      return true;
     }
+    return false;
   }
 }
