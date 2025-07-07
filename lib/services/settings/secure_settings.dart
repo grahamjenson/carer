@@ -14,6 +14,7 @@ class SecureSettings {
   };
 
   late FlutterSecureStorage store;
+  late FlutterSecureStorage oldStore;
 
   List<ASignal> allSignals() {
     return _signals.values.toList();
@@ -21,9 +22,52 @@ class SecureSettings {
 
   SecureSettings._() {
     store = const FlutterSecureStorage(
-        aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ));
+      aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
+      ),
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.first_unlock,
+      ),
+    );
+
+    oldStore = const FlutterSecureStorage(
+      aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
+      ),
+    );
+  }
+
+  // TODO delete before launch
+  Future<void> migrateOldStore() async {
+    // Check to see if keys are missing
+    var newMap = await store.readAll();
+
+    if (newMap.containsKey(_SSNames.nightscoutUrl.name) && newMap.containsKey(_SSNames.nightscoutToken.name)) {
+      // Already migrated
+      return;
+    }
+
+    var oldMap = await oldStore.readAll();
+    if (!oldMap.containsKey(_SSNames.nightscoutUrl.name) || !oldMap.containsKey(_SSNames.nightscoutToken.name)) {
+      // No old values to migrate
+      return;
+    }
+
+    var oldNightscoutURL = oldMap[_SSNames.nightscoutUrl.name];
+    var oldNightscoutToken = oldMap[_SSNames.nightscoutToken.name];
+    if (oldNightscoutURL == null || oldNightscoutToken == null) {
+      // No old values to migrate
+      return;
+    }
+
+    // save values to new store
+    await store.write(key: _SSNames.nightscoutUrl.name, value: oldNightscoutURL);
+    await store.write(key: _SSNames.nightscoutToken.name, value: oldNightscoutToken);
+  }
+
+  Future<Map<String, String>> readAll() async {
+    // This is called in main.dart
+    return store.readAll();
   }
 
   (String, String) nightscoutURLAndTokenFromString(String url) {
@@ -82,7 +126,7 @@ class SecureSettings {
   setupDBPropagation() async {
     // https://github.com/mogol/flutter_secure_storage/issues/709
     // read errors, read all doesn't
-    final allKeys = await store.readAll();
+    final allKeys = await readAll();
     nightscoutURL = allKeys[_SSNames.nightscoutUrl.name];
     nightscoutToken = allKeys[_SSNames.nightscoutToken.name];
 

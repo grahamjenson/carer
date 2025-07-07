@@ -88,10 +88,14 @@ void runCarer() async {
     await prefs.internalPopulate();
   });
 
-  await executeWithRetry(() async {
-    // Setup secure storage for settings
-    await SecureSettings().store.readAll();
-  });
+  await executeWithRetry(
+    () async {
+      // Setup secure storage for settings
+      await SecureSettings().readAll();
+      await SecureSettings().migrateOldStore();
+    },
+    maxRetries: 10,
+  );
 
   // Load the settings from Shared Preferences before starting
   await Settings().setupDBPropagation();
