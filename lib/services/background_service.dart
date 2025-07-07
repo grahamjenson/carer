@@ -26,11 +26,20 @@ class BackgroundService {
     requiredNetworkType: NetworkType.ANY,
   );
 
-  Future<void> setupBackgroundFetch() async {
+  Future<void> configure() async {
     int status = await BackgroundFetch.configure(config, onFetch, onTimeout);
     doublelog('BackgroundFetch: configure success: $status');
+  }
+
+  Future<void> start() async {
+    int status = await BackgroundFetch.start();
+    doublelog('BackgroundFetch: start success: $status');
+  }
+
+  Future<bool> registerHeadlessTask() async {
     // Andoird only
-    BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+    doublelog('BackgroundFetch: registerHeadlessTask');
+    return BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   }
 
   void onFetch(String taskId) async {

@@ -289,10 +289,12 @@ class AlarmsService {
 
   Future<bool> audioAlerts(AlarmSet alarms) async {
     if (alarms.isEmpty || !AlarmAlertSettings().enableAudioAlarm) {
-      alog("Stopping Audio Alarm: Setting is ${AlarmAlertSettings().enableAudioAlarm} Alarms are $alarms");
       var (playing, err) = await go(player.stopAlarm());
       if (playing == null || err != null) {
         alog("Error stopping alarm: $err");
+      }
+      if (playing == true) {
+        alog("Stopped Audio Alarm: Setting is ${AlarmAlertSettings().enableAudioAlarm} Alarms are $alarms");
       }
       return false;
     }

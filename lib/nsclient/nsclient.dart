@@ -1,20 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:carer/nsclient/device_status.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
-import 'package:carer/services/app_lifecycle_service.dart';
 import 'package:carer/services/toast_service.dart';
+import 'package:carer/utils/ahttp.dart';
 import 'package:carer/utils/asentry_http_client.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
 import 'package:clock/clock.dart';
-import 'package:cupertino_http/cupertino_http.dart';
 import 'package:http/http.dart';
 
 String toNSDateString(DateTime dt) {
@@ -55,7 +53,10 @@ Uri jwtEndpoint(nsURL, token) => Uri.parse('$nsURL/api/v2/authorization/request/
 class NSClient {
   static final NSClient _singleton = NSClient._internal();
   factory NSClient() => _singleton;
-  NSClient._internal();
+  NSClient._internal() {
+    // Initialize the client
+    http = ASentryHttpClient(client: Ahttp.getClient());
+  }
 
   static ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
   static ASignal<DateTime?> lastFetched = ASignal<DateTime?>(null, debugLabel: "NSClientLastCalled");
@@ -65,41 +66,7 @@ class NSClient {
   String? jwt;
   DateTime? jwtExpire;
 
-  final Client _flutterClient = ASentryHttpClient(client: Client());
-  Client? _realCupertinoClient;
-  Client get _cupertinoClient {
-    if (!(Platform.isIOS || Platform.isMacOS)) {
-      return _flutterClient; // If not on iOS or macOS, return the flutter client
-    }
-
-    if (_realCupertinoClient != null) {
-      return _realCupertinoClient!;
-    }
-    // Create a new cupertino client with an ephemeral session configuration
-    _realCupertinoClient =
-        ASentryHttpClient(client: CupertinoClient.fromSessionConfiguration(URLSessionConfiguration.ephemeralSessionConfiguration()));
-    return _realCupertinoClient!;
-  }
-
-  Client get http {
-    // return normal client if in foreground
-    // Give the state a little wiggle room since it might have just changed and we still want the default
-    if (AppLifecycleService().stateResumed || AppLifecycleService().stateChanged10SecondsAgo) {
-      return _flutterClient;
-    }
-
-    // App is in background
-
-    // the cupertino client throws errors on 500 spamming error logging, dont know how to fix
-    // But normal http client throws bad file descripor errors in background (or startup) https://github.com/dart-lang/http/issues/197
-    // So we just use the cupertino client on background fetches
-    // TODO: this is a bit of a hack
-    if (Platform.isIOS || Platform.isMacOS) {
-      return _cupertinoClient;
-    }
-
-    return _flutterClient;
-  }
+  late Client http;
 
   ///
   // Test API Call

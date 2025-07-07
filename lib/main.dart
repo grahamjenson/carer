@@ -18,6 +18,7 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/key_value_store.dart';
+import 'package:carer/utils/ahttp.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -42,8 +43,11 @@ void main() async {
       // Setting to 1.0 will profile 100% of sampled transactions:
       options.profilesSampleRate = 1.0;
 
+      options.httpClient = Ahttp.getClient();
+
       options.debug = Env.isDev;
 
+      // I don't want to know the URL of NSClients
       options.beforeBreadcrumb = (Breadcrumb? breadcrumb, Hint hint) {
         if (breadcrumb == null) {
           return null; // nothgin in nothign out
@@ -133,11 +137,15 @@ void runCarer() async {
   await SGV.setupSQLSignals();
   await SQLToEvents().setupSQLSignals();
 
+  if (Platform.isIOS || Platform.isAndroid) {
+    await BackgroundService().configure();
+    await BackgroundService().start();
+  }
+
   runApp(const MyApp());
 
-  if (Platform.isIOS || Platform.isAndroid) {
-    await BackgroundService().setupBackgroundFetch();
-    BackgroundService().scheduleTask();
+  if (Platform.isAndroid) {
+    await BackgroundService().registerHeadlessTask();
   }
 }
 
