@@ -87,7 +87,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                     autofocus: true,
                     controller: _nsTextController,
                   ),
-                  description: const TextWrap(child: Text("Set NightScout URL with Token")),
+                  description: const TextWrap(percent: 0.8, child: Text("Set NightScout URL with Token")),
                   descriptionInlineIos: true,
                 ),
                 SettingsTile(
