@@ -65,6 +65,7 @@ class AlarmPlayer implements IAlarmPlayer {
     await Future.delayed(const Duration(milliseconds: 300));
     if (player.state == PlayerState.playing) {
       await player.stop();
+      player.setVolume(1.0); // Reset volume to default
       alog("successfully stopped player");
       await VolumeProgressionController().resetOriginalVolume();
       return true;
