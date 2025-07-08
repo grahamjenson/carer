@@ -71,10 +71,12 @@ class NotificationService {
 
     var darwinSpecifics = DarwinNotificationDetails(
       sound: 'notif.aiff',
+      presentSound: true,
       presentAlert: true,
       presentBadge: true,
       presentBanner: true,
       subtitle: subtitle,
+      interruptionLevel: InterruptionLevel.critical,
     );
 
     NotificationDetails platformChannelSpecifics = NotificationDetails(
