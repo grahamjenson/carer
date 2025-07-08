@@ -18,7 +18,8 @@ import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/timer_service.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/sql/key_value_store.dart';
-import 'package:carer/utils/ahttp.dart';
+import 'package:carer/utils/asentry_http_client.dart';
+import 'package:carer/utils/carer_http.dart';
 import 'package:carer/utils/env.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
@@ -34,38 +35,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   await SentryFlutter.init(
-    (SentryFlutterOptions options) {
-      options.dsn = 'https://635c475aa48824327a23e3723e92a278@o4507178414243840.ingest.us.sentry.io/4507178416996352';
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-      // We recommend adjusting this value in production.
-      options.tracesSampleRate = 1.0;
-      // The sampling rate for profiling is relative to tracesSampleRate
-      // Setting to 1.0 will profile 100% of sampled transactions:
-      options.profilesSampleRate = 1.0;
-
-      options.httpClient = Ahttp.getClient();
-
-      options.debug = Env.isDev;
-
-      // I don't want to know the URL of NSClients
-      options.beforeBreadcrumb = (Breadcrumb? breadcrumb, Hint hint) {
-        if (breadcrumb == null) {
-          return null; // nothgin in nothign out
-        }
-
-        // This stops some leaks from sentry sending host and query params out!!!
-        if (breadcrumb.type == 'http' && breadcrumb.data != null) {
-          for (var key in breadcrumb.data!.keys.toList()) {
-            var val = breadcrumb.data![key];
-            if (val is String) {
-              breadcrumb.data![key] = ALogger().censorLogs(val);
-            }
-          }
-        }
-
-        return breadcrumb; // Keep the breadcrumb
-      };
-    },
+    sentryOptions,
     appRunner: () => runCarer(),
   );
 }
@@ -205,4 +175,48 @@ class ListenForInteraction extends StatelessWidget {
       ),
     );
   }
+}
+
+void sentryOptions(SentryFlutterOptions options) {
+  options.dsn = 'https://635c475aa48824327a23e3723e92a278@o4507178414243840.ingest.us.sentry.io/4507178416996352';
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  options.tracesSampleRate = 1.0;
+  // The sampling rate for profiling is relative to tracesSampleRate
+  // Setting to 1.0 will profile 100% of sampled transactions:
+  options.profilesSampleRate = 1.0;
+
+  options.httpClient = CarerHttp.getClient();
+
+  options.debug = Env.isDev;
+
+  options.beforeSend = (SentryEvent event, Hint hint) {
+    final exception = event.throwable;
+    for (var ig in ignoredExceptions) {
+      if (exception != null && exception.message.contains(ig)) {
+        return null; // Drop the event
+      }
+    }
+
+    return event;
+  };
+
+  // I don't want to know the URL of NSClients
+  options.beforeBreadcrumb = (Breadcrumb? breadcrumb, Hint hint) {
+    if (breadcrumb == null) {
+      return null; // nothgin in nothign out
+    }
+
+    // This stops some leaks from sentry sending host and query params out!!!
+    if (breadcrumb.type == 'http' && breadcrumb.data != null) {
+      for (var key in breadcrumb.data!.keys.toList()) {
+        var val = breadcrumb.data![key];
+        if (val is String) {
+          breadcrumb.data![key] = ALogger().censorLogs(val);
+        }
+      }
+    }
+
+    return breadcrumb; // Keep the breadcrumb
+  };
 }

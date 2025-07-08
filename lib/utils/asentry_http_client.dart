@@ -2,10 +2,23 @@ import 'package:carer/utils/logs.dart';
 import 'package:http/http.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+//
 const String replacementHost = "nsurl.com";
 final Uri replacementUri = Uri.parse("https://$replacementHost");
 
 Uri replacementUriWithPath(String path) => Uri.parse("https://$replacementHost$path");
+
+const List<String> ignoredExceptions = [
+  'The request timed out',
+  'The Internet connection appears to be offline',
+  'Bad file descriptor', // ref https://github.com/dart-lang/http/issues/197
+  'Software caused connection abort',
+  'Failed host lookup',
+  'Connection closed before full header was received',
+  'The network connection was lost',
+  'Connection reset by peer',
+  'Connection terminated during handshake',
+];
 
 /// This is mostly copy pasted from the Sentry package because I dont want to write BaseURLs to Sentry
 /// NSURLS are private and there is no easy way to sanitize them out
@@ -94,17 +107,6 @@ class AFailedRequestClient extends BaseClient {
   }
 
   /// Because we dont control the server there is a massive amount of noise in these errors to filter out.
-  List<String> get _ignoredExceptions => [
-        'The request timed out',
-        'The Internet connection appears to be offline',
-        'Bad file descriptor', // ref https://github.com/dart-lang/http/issues/197
-        'Software caused connection abort',
-        'Failed host lookup',
-        'Connection closed before full header was received',
-        'The network connection was lost',
-        'Connection reset by peer',
-        'Connection terminated during handshake',
-      ];
 
   Future<void> _captureEventIfNeeded(
       BaseRequest request, int? statusCode, Object? exception, StackTrace? stackTrace, StreamedResponse? response, Duration duration) async {
@@ -117,7 +119,7 @@ class AFailedRequestClient extends BaseClient {
       return;
     }
 
-    for (final ignoredException in _ignoredExceptions) {
+    for (final ignoredException in ignoredExceptions) {
       if (exception.toString().contains(ignoredException)) {
         // We dont capture these exceptions.
         return;

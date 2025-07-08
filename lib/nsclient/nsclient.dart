@@ -7,8 +7,8 @@ import 'package:carer/nsclient/properties.dart';
 import 'package:carer/nsclient/shared.dart';
 import 'package:carer/nsclient/treatments.dart';
 import 'package:carer/services/toast_service.dart';
-import 'package:carer/utils/ahttp.dart';
 import 'package:carer/utils/asentry_http_client.dart';
+import 'package:carer/utils/carer_http.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/utils/logs.dart';
 import 'package:carer/utils/strings.dart';
@@ -55,7 +55,7 @@ class NSClient {
   factory NSClient() => _singleton;
   NSClient._internal() {
     // Initialize the client
-    http = ASentryHttpClient(client: Ahttp.getClient());
+    http = ASentryHttpClient(client: CarerHttp.getClient());
   }
 
   static ASignal<int> totalErrors = ASignal<int>(0, debugLabel: "NSClientTotalErrors");
