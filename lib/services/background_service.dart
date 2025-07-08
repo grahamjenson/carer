@@ -56,22 +56,24 @@ class BackgroundService {
       if (newTriggeredAlarms.isNotEmpty) {
         CleanSGV? sgv = CleanSGV.lastSGV.value;
 
-        var svgstr = "unknwon sgv";
+        var svgstr = "Unknown";
         if (sgv != null) {
-          svgstr = "${sgv.sgvStr()}${sgv.rate5mWithSign()}, ${sgv.age.inMinutes}m ago";
+          svgstr = "${sgv.sgvStr()} ${sgv.rate5mWithSign()} ${sgv.age.inMinutes}m ago";
         }
 
         String alarms = "";
         for (var alarm in newTriggeredAlarms) {
           alarms += alarm.toString();
         }
+        String firstAlarm = newTriggeredAlarms.first.toString();
+
         if (AlarmSettings().disableAlarms) {
           doublelog("BackgroundFetch: Disabled Alarms $svgstr $alarms");
         } else if (!AlarmAlertSettings().enableNotifications) {
           doublelog("BackgroundFetch: Disabled Notifications $svgstr $alarms");
         } else {
           doublelog("BackgroundFetch: Notification $svgstr $alarms");
-          NotificationService().showNotification("Alarm", "$svgstr $alarms");
+          NotificationService().showNotification("Alarm $svgstr", firstAlarm, alarms);
         }
       }
       doublelog("BackgroundFetch: FINISHED ");

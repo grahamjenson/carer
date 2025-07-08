@@ -50,14 +50,17 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> showNotification(String title, String body) async {
+  Future<void> showNotification(String title, String subtitle, String? body) async {
     var allowed = await requestPermissions();
     if (allowed == null || allowed == false) {
       print("Notification permission not granted $allowed");
       return;
     }
-    print("Showing notification: $title, $body");
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+
+    print("Showing notification: $title, $subtitle, $body");
+
+    // TODO: Android Fix this
+    const androidSpecifics = AndroidNotificationDetails(
       'your channel id',
       'your channel name',
       channelDescription: 'your channel description',
@@ -65,11 +68,20 @@ class NotificationService {
       priority: Priority.high,
       ticker: 'ticker',
     );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: DarwinNotificationDetails(),
-      macOS: DarwinNotificationDetails(),
-      linux: LinuxNotificationDetails(),
+
+    var darwinSpecifics = DarwinNotificationDetails(
+      sound: 'notif.aiff',
+      presentAlert: true,
+      presentBadge: true,
+      presentBanner: true,
+      subtitle: subtitle,
+    );
+
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidSpecifics,
+      iOS: darwinSpecifics,
+      macOS: darwinSpecifics,
+      linux: const LinuxNotificationDetails(),
     );
     await flutterLocalNotificationsPlugin.show(
       0, // Notification ID

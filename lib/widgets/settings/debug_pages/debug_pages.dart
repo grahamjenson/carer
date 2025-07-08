@@ -9,6 +9,7 @@ import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/sql/carer_db.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:go_router/go_router.dart';
@@ -72,7 +73,7 @@ class DebugSettingsPage extends StatelessWidget {
         ),
         SettingsTile(
           title: const Text("Reset and Delete Database Data"),
-          description: const Text("This deletes all NS Data but leaves settings like alarms and Nightscout URL"),
+          description: const TextWrap(child: Text("This deletes all NS Data but leaves settings like alarms and Nightscout URL")),
           descriptionInlineIos: true,
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
@@ -108,14 +109,7 @@ class DebugSettingsPage extends StatelessWidget {
           title: const Text("Test Notification"),
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
-            NotificationService().showNotification("Alarm", "Text on the Notification");
-          },
-        ),
-        SettingsTile(
-          title: const Text("Test Background Run"),
-          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
-          onPressed: (context) async {
-            BackgroundService().scheduleTask();
+            NotificationService().showNotification("Alarm 3.2 -1 5m ago", "Predicted Low", "Low, Urgent Low, Predicted Low");
           },
         ),
       ],
@@ -156,16 +150,25 @@ class DebugSettingsPage extends StatelessWidget {
 
   SettingsSection getBackgroundDo() {
     return SettingsSection(
-      title: const Text('Background Do'),
+      title: const Text('Background'),
       tiles: [
         SettingsTile.navigation(
-          title: const Text("Background Do"),
+          title: const Text("Execute Background Task"),
           descriptionInlineIos: true,
           leading: const Icon(CarerIcons.SETTINGS_DEBUG),
           onPressed: (context) async {
             BackgroundService().onFetch("com.transistorsoft.fetch");
           },
-        )
+        ),
+        SettingsTile(
+          title: const Text("Schedule Background Task"),
+          descriptionInlineIos: true,
+          description: const TextWrap(child: Text("Background probably won't work in iOS")),
+          leading: const Icon(CarerIcons.SETTINGS_DEBUG),
+          onPressed: (context) async {
+            BackgroundService().scheduleTask();
+          },
+        ),
       ],
     );
   }
@@ -180,7 +183,7 @@ class DebugSettingsPage extends StatelessWidget {
           onPressed: (context) async {
             GoRouter.of(context).go("/settings/debug/nightscout_debug");
           },
-        )
+        ),
       ],
     );
   }
