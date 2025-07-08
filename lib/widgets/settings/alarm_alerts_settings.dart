@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
@@ -29,6 +30,7 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
         List<SettingsTile> tiles = [
           enableFlashOnAlarm(),
           enableNotifications(),
+          testNotification(context, width),
           brightnessAdjust(),
           enableAudioAlarms(context),
           volumeOverride(context),
@@ -85,6 +87,28 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       onToggle: (bool value) {
         AlarmAlertSettings().enableNotifications = value;
       },
+    );
+  }
+
+  SettingsTile? testNotification(BuildContext context, double width) {
+    if (!AlarmAlertSettings().enableNotifications) {
+      return null;
+    }
+    var bStyle = ButtonStyle(
+      backgroundColor: WidgetStateProperty.all(errorColor(context)),
+    );
+    var tStyle = TextStyle(color: onErrorColor(context));
+    var button = ElevatedButton(
+      onPressed: () async {
+        NotificationService().showNotification("Alarm 3.2 -1 5m ago", "Predicted Low", "Low, Urgent Low, Predicted Low");
+      },
+      style: bStyle,
+      child: Text("Test Notification", style: tStyle),
+    );
+
+    return SettingsTile(
+      title: const Text(""),
+      trailing: SizedBox(width: width - 100, child: Center(child: button)),
     );
   }
 
@@ -311,6 +335,9 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
       );
     }
 
-    return SettingsTile(title: const Text(""), trailing: SizedBox(width: width - 100, child: Center(child: button)));
+    return SettingsTile(
+      title: const Text(""),
+      trailing: SizedBox(width: width - 100, child: Center(child: button)),
+    );
   }
 }
