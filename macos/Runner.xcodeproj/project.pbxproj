@@ -29,6 +29,7 @@
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		4E2DED31FA3FB606B9FC52CA /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 729F537400501BCD1BF33D0D /* Pods_Runner.framework */; };
 		6281F8781A3637AB5CECABD8 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31F177FB1CB41E6EE40E6A37 /* Pods_RunnerTests.framework */; };
+		BF1562442E1E13DE006ED138 /* notif.aiff in Resources */ = {isa = PBXBuildFile; fileRef = BF1562432E1E13DE006ED138 /* notif.aiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 		756400ED0EE5716153CA7A3E /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		BF1562432E1E13DE006ED138 /* notif.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = notif.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +158,7 @@
 				33CC10F22044A3C60003C045 /* Assets.xcassets */,
 				33CC10F42044A3C60003C045 /* MainMenu.xib */,
 				33CC10F72044A3C60003C045 /* Info.plist */,
+				BF1562432E1E13DE006ED138 /* notif.aiff */,
 			);
 			name = Resources;
 			path = ..;
@@ -314,6 +317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
+				BF1562442E1E13DE006ED138 /* notif.aiff in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

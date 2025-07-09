@@ -85,7 +85,7 @@ class ProfileSettingsModel extends CareModel {
   }
 
   @override
-  Color get highlightColor => ColorSchemes.primaryColor.bright;
+  Color get highlightColor => ColorSchemes.secondaryColor;
 
   @override
   String get description {

@@ -15,23 +15,15 @@ class NotificationService {
 
   Future<void> _init() async {
     // Initialization settings for Android
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     // Initialization settings for iOS
-    final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-      notificationCategories: [
-        DarwinNotificationCategory(
-          'demoCategory',
-          actions: <DarwinNotificationAction>[
-            DarwinNotificationAction.plain('id_1', 'Action 1'),
-            DarwinNotificationAction.plain('id_2', 'Action 2', options: <DarwinNotificationActionOption>{DarwinNotificationActionOption.destructive}),
-            DarwinNotificationAction.plain('id_3', 'Action 3', options: <DarwinNotificationActionOption>{DarwinNotificationActionOption.foreground}),
-          ],
-        ),
-      ],
+    const DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
     );
 
     // Initialization settings for Linux
@@ -40,7 +32,7 @@ class NotificationService {
     );
 
     // Choose the right initialization settings based on the platform
-    final InitializationSettings initializationSettings = InitializationSettings(
+    const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
       macOS: initializationSettingsDarwin,
@@ -50,26 +42,35 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> showNotification(String title, String subtitle, String? body) async {
+  Future<bool> showNotification(String title, String subtitle, String? body) async {
     var allowed = await requestPermissions();
     if (allowed == null || allowed == false) {
       print("Notification permission not granted $allowed");
-      return;
+      return false;
     }
 
     print("Showing notification: $title, $subtitle, $body");
 
     // TODO: Android Fix this
     const androidSpecifics = AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
-      channelDescription: 'your channel description',
+      'nz.t1d.carer',
+      'Carer Notification',
+      channelDescription: 'Carer Alarm Notifications',
       importance: Importance.max,
       priority: Priority.high,
-      ticker: 'ticker',
     );
 
-    var darwinSpecifics = DarwinNotificationDetails(
+    var iosSpecifics = DarwinNotificationDetails(
+      sound: 'notif.aiff',
+      presentSound: true,
+      presentAlert: true,
+      presentBadge: true,
+      presentBanner: true,
+      subtitle: subtitle,
+      interruptionLevel: InterruptionLevel.critical,
+    );
+
+    var macosSpecifics = DarwinNotificationDetails(
       sound: 'notif.aiff',
       presentSound: true,
       presentAlert: true,
@@ -81,8 +82,8 @@ class NotificationService {
 
     NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidSpecifics,
-      iOS: darwinSpecifics,
-      macOS: darwinSpecifics,
+      iOS: iosSpecifics,
+      macOS: macosSpecifics,
       linux: const LinuxNotificationDetails(),
     );
     await flutterLocalNotificationsPlugin.show(
@@ -91,6 +92,7 @@ class NotificationService {
       body,
       platformChannelSpecifics,
     );
+    return true;
   }
 
   Future<bool?>? requestPermissions() {

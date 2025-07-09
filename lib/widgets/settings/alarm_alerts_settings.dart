@@ -5,6 +5,7 @@ import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/settings/alarm_settings.dart';
 import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/toast_service.dart';
 import 'package:carer/services/ui/icons.dart';
 import 'package:carer/utils/futures.dart';
 import 'package:carer/widgets/common/dialogs.dart';
@@ -100,7 +101,11 @@ class AlarmsAlertSettingsWidget extends AbstractSettingsSection with ThemeMixin 
     var tStyle = TextStyle(color: onErrorColor(context));
     var button = ElevatedButton(
       onPressed: () async {
-        NotificationService().showNotification("Alarm 3.2 -1 5m ago", "Predicted Low", "Low, Urgent Low, Predicted Low");
+        var allowed = await NotificationService().showNotification("Alarm 3.2 -1 5m ago", "Predicted Low", "Low, Urgent Low, Predicted Low");
+        if (!allowed) {
+          ToastService().showError("Notification Permission Denied", description: "Please enable notifications in settings to use this feature.");
+          return;
+        }
       },
       style: bStyle,
       child: Text("Test Notification", style: tStyle),

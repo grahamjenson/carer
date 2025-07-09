@@ -15,7 +15,7 @@ class ColorSchemes {
   static const backgroundColor = Color(0xFF202020);
   static const primaryColor = Colors.amber;
   static const primaryFgColor = Color(0xFF080705);
-  static const secondaryColor = Colors.amberAccent;
+  static const secondaryColor = Color.fromARGB(255, 47, 222, 222);
   static const secondaryFgColor = Color(0xFF080705);
   static const accentColor = Colors.lightBlueAccent;
   static const accentFgColor = Color(0xFF080705);
