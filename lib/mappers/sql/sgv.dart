@@ -10,7 +10,7 @@ class SQLToSGV extends SQLMapper<SGV> {
   SQLToSGV._();
 
   @override
-  String get tableName => sgvsTableName; //TODO
+  String get tableName => sgvsTableName;
 
   @override
   SGV aToB(SQLRow row) {

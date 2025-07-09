@@ -13,7 +13,6 @@ class TextWrap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: in some places this is too agressive a width
     var width = (MediaQuery.of(context).size.width * percent) - offset;
 
     return ConstrainedBox(

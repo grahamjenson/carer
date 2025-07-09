@@ -48,7 +48,6 @@ class NSProfileUpdater extends Updater {
 
     List<String> names = [profileModel.name];
 
-    // TODO: Should this be upsert, profiles immutable in nightscout?
     var saved = await SQLToProfile().save(profileModel);
     if (saved) {
       alog("NSProfileUpdater: Saved Current Default Profile ${profileModel.name} with ID ${profileModel.eid}");

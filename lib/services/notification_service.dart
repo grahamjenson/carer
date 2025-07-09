@@ -51,7 +51,6 @@ class NotificationService {
 
     print("Showing notification: $title, $subtitle, $body");
 
-    // TODO: Android Fix this
     const androidSpecifics = AndroidNotificationDetails(
       'nz.t1d.carer',
       'Carer Notification',

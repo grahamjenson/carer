@@ -442,7 +442,6 @@ class _HighAlarm extends AlarmMethods {
 
   @override
   bool smartSnooze() {
-    // TODO: make readings ahead adjustable
     CleanSGV? sgv = getPredictedValue(3);
     if (sgv == null) {
       return false;

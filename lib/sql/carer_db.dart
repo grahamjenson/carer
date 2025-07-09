@@ -47,7 +47,7 @@ class CarerDB {
     alog("Opening database at $path for version $version");
     var db = await openDatabase(
       path,
-      version: version, // TODO: replace this eventually with a version number
+      version: version,
       singleInstance: DB.singleInstance,
       onCreate: (db, version) async {
         alog("Creating database at version $version");

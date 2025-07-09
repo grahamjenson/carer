@@ -110,7 +110,7 @@ class CleanSGV extends ASGV with DateMixin {
   void setPredictions(List<CleanSGV?> predictions) {
     if (this.predictions != null) {
       // Do not update predictions,
-      // TODO, this is a hack to stop weird issues around the time of a new reading causing issues
+      // Predictions can change over time, but we really need to just have one set per SGV
       return;
     }
     this.predictions = predictions;
