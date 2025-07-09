@@ -61,7 +61,7 @@ enum AlarmType {
   noData(_NoDataAlarm()),
   lowBattery(_LowBatteryAlarm()),
   test(_TestAlarm()),
-  unknown(_Unkown());
+  unknown(_Unknown());
 
   final AlarmMethods _methods;
   const AlarmType(this._methods);
@@ -77,7 +77,7 @@ enum AlarmType {
   String get description => _methods.description;
   String get title => _methods.title;
   String shortSummary() => _methods.shortSummary();
-  String statment() => _methods.statment();
+  String statement() => _methods.statement();
 
   IconData get icon => _methods.icon();
 
@@ -149,7 +149,7 @@ abstract class AlarmMethods {
   String get description;
   String get title;
   String shortSummary();
-  String statment();
+  String statement();
   IconData icon();
 
   (bool, bool, bool) alarmStatus() {
@@ -192,8 +192,8 @@ abstract class AlarmMethods {
   }
 }
 
-class _Unkown extends AlarmMethods {
-  const _Unkown();
+class _Unknown extends AlarmMethods {
+  const _Unknown();
 
   @override
   String get title => "Unknown Alarm";
@@ -208,7 +208,7 @@ class _Unkown extends AlarmMethods {
   String shortSummary() => "Unknown Alarm";
 
   @override
-  String statment() => "Unknown Alarm";
+  String statement() => "Unknown Alarm";
 
   @override
   bool trigger() => false;
@@ -233,7 +233,7 @@ class _TestAlarm extends AlarmMethods {
   String shortSummary() => "TEST ALARM";
 
   @override
-  String statment() => "Test Alarm";
+  String statement() => "Test Alarm";
 
   @override
   bool trigger() => AlarmAlertSettings().testAlarm;
@@ -265,7 +265,7 @@ class _UrgentLowAlarm extends AlarmMethods {
   String shortSummary() => "Urgent Low <${unitStr(TargetSettings().lowUrgent)}";
 
   @override
-  String statment() => "Urgent Low";
+  String statement() => "Urgent Low";
 
   @override
   bool trigger() {
@@ -316,7 +316,7 @@ class _LowAlarm extends AlarmMethods {
   }
 
   @override
-  String statment() {
+  String statement() {
     if (_lowTrigger()) {
       return "Low";
     }
@@ -407,7 +407,7 @@ class _HighAlarm extends AlarmMethods {
   }
 
   @override
-  String statment() {
+  String statement() {
     if (smartSnooze()) {
       return "High (Smart Snooze)";
     }
@@ -475,7 +475,7 @@ class _UrgentHighAlarm extends AlarmMethods {
   String shortSummary() => "Urgent High >${unitStr(TargetSettings().highUrgent)}";
 
   @override
-  String statment() => "Urgent High";
+  String statement() => "Urgent High";
 
   @override
   bool trigger() {
@@ -510,7 +510,7 @@ class _FastRiseAlarm extends AlarmMethods {
   String shortSummary() => "Fast Rise <${unitStr(TargetSettings().fastRiseDelta)}";
 
   @override
-  String statment() => "Fast Rise";
+  String statement() => "Fast Rise";
 
   @override
   int get triggerWindow => AlarmSettings().fastRiseAlarmMinutes;
@@ -564,7 +564,7 @@ class _FastDropAlarm extends AlarmMethods {
   String shortSummary() => "Fast Drop <${unitStr(TargetSettings().fastDropDelta)}";
 
   @override
-  String statment() => "Fast Drop";
+  String statement() => "Fast Drop";
 
   @override
   int get triggerWindow => AlarmSettings().fastDropAlarmMinutes;
@@ -618,7 +618,7 @@ class _NoDataAlarm extends AlarmMethods {
   String shortSummary() => "No Data for ${ageInMinutes ?? "unknown"}m";
 
   @override
-  String statment() => "No Data";
+  String statement() => "No Data";
 
   @override
   int get triggerWindow => AlarmSettings().noDataAlarmMinutes;
@@ -706,7 +706,7 @@ class _LowBatteryAlarm extends AlarmMethods {
   }
 
   @override
-  String statment() {
+  String statement() {
     var statusStr = [];
     if (_carerTrigger()) {
       statusStr.add("Battery");

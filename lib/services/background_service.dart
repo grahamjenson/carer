@@ -1,10 +1,12 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:carer/models/clean_sgv.dart';
+import 'package:carer/models/sql/events/background_event.dart';
 import 'package:carer/services/alarms_service.dart';
 import 'package:carer/services/notification_service.dart';
 import 'package:carer/services/settings/alarm_alert_settings.dart';
 import 'package:carer/services/update_service.dart';
 import 'package:carer/utils/logs.dart';
+import 'package:clock/clock.dart';
 
 import 'settings/alarm_settings.dart';
 
@@ -43,44 +45,57 @@ class BackgroundService {
   }
 
   void onFetch(String taskId) async {
+    var start = clock.now();
+
+    CleanSGV? startSGV;
+    CleanSGV? endSGV;
+    String alarms = "";
     try {
-      doublelog("BackgroundFetch: Event received $taskId ${CleanSGV.lastSGV.value}");
+      start = clock.now();
+      startSGV = CleanSGV.lastSGV.value;
+
+      doublelog("BackgroundFetch: Event received $taskId startSGV: $startSGV");
       var x = await UpdateService().updateAll();
-      doublelog("BackgroundFetch: updateALL $x ${CleanSGV.lastSGV.value}");
+
       // Because their are asynchronous signals we need to wait a little bit for all values to propagate
       await Future.delayed(const Duration(milliseconds: 500));
-      doublelog("BackgroundFetch: updateALL After sleep $x ${CleanSGV.lastSGV.value}");
 
+      doublelog("BackgroundFetch: updateALL After sleep $x");
+      alarms = "";
+      endSGV = CleanSGV.lastSGV.value;
       var (newTriggeredAlarms, _) = AlarmsService().calculateAlarms();
       doublelog("BackgroundFetch: calculateAlarms: $newTriggeredAlarms");
+
       if (newTriggeredAlarms.isNotEmpty) {
-        CleanSGV? sgv = CleanSGV.lastSGV.value;
-
-        var svgstr = "Unknown";
-        if (sgv != null) {
-          svgstr = "${sgv.sgvStr()} ${sgv.rate5mWithSign()} ${sgv.age.inMinutes}m ago";
-        }
-
-        String alarms = "";
         for (var alarm in newTriggeredAlarms) {
           alarms += alarm.toString();
         }
         String firstAlarm = newTriggeredAlarms.first.toString();
 
         if (AlarmSettings().disableAlarms) {
-          doublelog("BackgroundFetch: Disabled Alarms $svgstr $alarms");
+          doublelog("BackgroundFetch: Disabled Alarms $endSGV $alarms");
         } else if (!AlarmAlertSettings().enableNotifications) {
-          doublelog("BackgroundFetch: Disabled Notifications $svgstr $alarms");
+          doublelog("BackgroundFetch: Disabled Notifications $endSGV $alarms");
         } else {
+          var svgstr = "Unknown";
+          if (endSGV != null) {
+            svgstr = "${endSGV.sgvStr()} ${endSGV.rate5mWithSign()} ${endSGV.age.inMinutes}m ago";
+          }
           doublelog("BackgroundFetch: Notification $svgstr $alarms");
           NotificationService().showNotification("Alarm $svgstr", firstAlarm, alarms);
         }
       }
-      doublelog("BackgroundFetch: FINISHED ");
     } catch (err, st) {
       doublelog("BackgroundFetch: onFetch error: $err, $st");
     } finally {
       BackgroundFetch.finish(taskId);
+      BackgroundEvent.saveBackgroundEvent(
+        start,
+        clock.now(),
+        startSGV,
+        endSGV,
+        alarms,
+      );
       doublelog("BackgroundFetch: EXITING");
     }
   }

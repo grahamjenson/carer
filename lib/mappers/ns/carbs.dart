@@ -2,8 +2,8 @@ import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/sql/carbs.dart';
 import 'package:carer/nsclient/treatments.dart';
 
-class NSCarbstoCarbs extends DataMapper<NSTreatmentCarbs, Carbs> {
-  const NSCarbstoCarbs();
+class NSCarbsToCarbs extends DataMapper<NSTreatmentCarbs, Carbs> {
+  const NSCarbsToCarbs();
 
   @override
   Carbs aToB(NSTreatmentCarbs model) {

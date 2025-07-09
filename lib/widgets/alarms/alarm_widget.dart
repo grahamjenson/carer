@@ -24,7 +24,7 @@ class AlarmWidget extends StatelessWidget with ThemeMixin {
       Widget fittedWidget =
           Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
         Icon(alarm.icon, color: alarmStyle.color, size: alarmStyle.fontSize! * 0.8),
-        Text(alarm.statment(), style: alarmStyle),
+        Text(alarm.statement(), style: alarmStyle),
       ]);
 
       if (alarm == AlarmType.test) {

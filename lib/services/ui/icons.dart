@@ -56,6 +56,7 @@ class CarerIcons {
   // EVENTS
   static const IconData EVENT_APP_RESUMED = CupertinoIcons.play;
   static const IconData EVENT_APP_PAUSED = CupertinoIcons.pause;
+  static const IconData EVENT_BACKGROUND = UniconsLine.history;
   static const IconData EVENT_SNOOZE = CupertinoIcons.zzz;
   static const IconData EVENT_BOLUS = UniconsLine.syringe;
   static const IconData EVENT_CARBS = UniconsLine.restaurant;

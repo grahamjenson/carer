@@ -2,6 +2,7 @@ import 'package:carer/mappers/sql/events.dart';
 import 'package:carer/models/model.dart';
 import 'package:carer/models/sql/events/alarm_event.dart';
 import 'package:carer/models/sql/events/app_state_change_event.dart';
+import 'package:carer/models/sql/events/background_event.dart';
 import 'package:carer/models/sql/events/event.dart';
 import 'package:carer/models/sql/events/snooze_events.dart';
 import 'package:carer/models/treatment_group.dart';
@@ -73,6 +74,17 @@ class EventsPage extends StatelessWidget with ThemeMixin {
           " ${formatDate(model.startDate)}     App ${model.stage.name}",
           model.stage == AppStateEventType.paused ? CarerIcons.EVENT_APP_PAUSED : CarerIcons.EVENT_APP_RESUMED,
           accentColor(context),
+          () {
+            showLogModelDialog(context, model);
+          },
+        );
+      }
+      if (model is BackgroundEvent) {
+        return eventHistoryRow(
+          context,
+          " ${formatDate(model.startDate)}     Background Event ${model.duration.inSeconds})",
+          CarerIcons.EVENT_BACKGROUND,
+          secondaryColor(context),
           () {
             showLogModelDialog(context, model);
           },

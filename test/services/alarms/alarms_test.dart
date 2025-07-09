@@ -190,7 +190,7 @@ void main() async {
           expect(alarm.description, isNotNull);
           expect(alarm.title, isNotNull);
           expect(alarm.shortSummary(), isNotNull);
-          expect(alarm.statment(), isNotNull);
+          expect(alarm.statement(), isNotNull);
           expect(alarm.details(), isNotNull);
           // This has tripped me up a few times accidentally adding objects to the map
           expect(jsonEncode(alarm.details()), isNotNull);
@@ -223,7 +223,7 @@ class TestAlarm extends AlarmMethods {
   String shortSummary() => "Test";
 
   @override
-  String statment() => "Test";
+  String statement() => "Test";
 
   @override
   bool trigger() => false;

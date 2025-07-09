@@ -56,7 +56,7 @@ class NSTreatmentsUpdater extends Updater {
     List<Bolus> boluses = const NSBolusToBolus().mapAToB(treatments.boluses);
     int bolusUpdates = await SQLToBolus().saveAll(boluses);
 
-    List<Carbs> carbs = const NSCarbstoCarbs().mapAToB(treatments.carbs);
+    List<Carbs> carbs = const NSCarbsToCarbs().mapAToB(treatments.carbs);
     int carbUpdates = await SQLToCarbs().saveAll(carbs);
 
     List<TempBasal> tempBasals = const NSTempBasalToTempBasal().mapAToB(treatments.tempBasals);

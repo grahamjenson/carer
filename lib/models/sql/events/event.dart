@@ -4,7 +4,8 @@ import 'package:clock/clock.dart';
 enum EventType {
   alarm,
   snooze,
-  appState;
+  appState,
+  background;
 
   static EventType fromName(String name) {
     for (var alarm in EventType.values) {

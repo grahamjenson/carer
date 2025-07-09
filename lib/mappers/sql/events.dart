@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:carer/mappers/mapper.dart';
 import 'package:carer/models/sql/events/alarm_event.dart';
 import 'package:carer/models/sql/events/app_state_change_event.dart';
+import 'package:carer/models/sql/events/background_event.dart';
 import 'package:carer/models/sql/events/event.dart';
 import 'package:carer/models/sql/events/snooze_events.dart';
 import 'package:carer/sql/sqlmodel.dart';
@@ -78,6 +79,13 @@ class SQLToEvents extends SQLMapper<EventModel> {
         );
       case EventType.appState:
         return AppStateEvent(
+          id: row["id"] as int?,
+          details: details,
+          startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
+          endDate: endDate,
+        );
+      case EventType.background:
+        return BackgroundEvent(
           id: row["id"] as int?,
           details: details,
           startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
