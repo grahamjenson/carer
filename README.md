@@ -80,3 +80,11 @@ To upload the symbols and such need `SENTRY_AUTH_TOKEN` in env and run `flutter 
 
 1. `flutter build ipa`
 2. 
+
+
+# TEST
+
+```
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage
+```
