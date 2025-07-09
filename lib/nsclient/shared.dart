@@ -79,7 +79,6 @@ class NSProfile {
 
     store.forEach((key, value) {
       if (value is Map<String, dynamic>) {
-        //TODO check ID use
         var profile = NSProfile.fromJson(key, "${id}_$key", "$id", NSType.getBestGuessDate(json), value);
         if (key == defaultProfile) {
           currentProfile = profile;
