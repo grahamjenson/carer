@@ -18,6 +18,7 @@ const List<String> ignoredExceptions = [
   'The network connection was lost',
   'Connection reset by peer',
   'Connection terminated during handshake',
+  'An SSL error has occurred and a secure connection to the server cannot be made',
 ];
 
 /// This is mostly copy pasted from the Sentry package because I dont want to write BaseURLs to Sentry
