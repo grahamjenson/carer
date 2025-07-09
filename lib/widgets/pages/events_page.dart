@@ -82,7 +82,7 @@ class EventsPage extends StatelessWidget with ThemeMixin {
       if (model is BackgroundEvent) {
         return eventHistoryRow(
           context,
-          " ${formatDate(model.startDate)}     Background Event ${model.duration.inSeconds})",
+          " ${formatDate(model.startDate)}     Background Event (took ${model.duration.inSeconds}s ${model.updatedSGV() ? "to update" : ""})",
           CarerIcons.EVENT_BACKGROUND,
           secondaryColor(context),
           () {

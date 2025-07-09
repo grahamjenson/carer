@@ -28,4 +28,10 @@ class BackgroundEvent extends EventModel {
     });
     SQLToEvents().save(BackgroundEvent(startDate: start, endDate: end, details: map));
   }
+
+  bool updatedSGV() {
+    String? sgv = details["startSGV"];
+    String? eSGV = details["endSGV"];
+    return sgv != null && eSGV != null && sgv != eSGV;
+  }
 }
