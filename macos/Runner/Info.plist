@@ -32,5 +32,7 @@
 	<array>
 		<string>mailto</string>
 	</array>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.medical</string>
 </dict>
 </plist>
