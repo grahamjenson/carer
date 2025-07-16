@@ -56,13 +56,13 @@ class NSEntry {
       isValid: json['isValid'],
       sgv: NSType.getInt(json['sgv'], defaultValue: 0)!,
       type: json['type'],
-      unfiltered: json['unfiltered'],
+      unfiltered: NSType.getInt(json['unfiltered']),
       units: json['units'],
-      utcOffset: json['utcOffset'],
+      utcOffset: NSType.getInt(json['utcOffset']),
       createdAt: guessDate,
       identifier: json['identifier'],
-      srvModified: json['srvModified'],
-      srvCreated: json['srvCreated'],
+      srvModified: NSType.getInt(json['srvModified']),
+      srvCreated: NSType.getInt(json['srvCreated']),
       subject: json['subject'],
     );
   }
