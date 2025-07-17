@@ -86,15 +86,15 @@ class _SettingsPageState extends State<SettingsPage> with ThemeMixin {
               children: const <SettingPageTabs, Widget>{
                 SettingPageTabs.misc: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Settings', style: TextStyle(color: ColorSchemes.textColor)),
+                  child: Text('General', style: TextStyle(color: ColorSchemes.textColor)),
                 ),
                 SettingPageTabs.info: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Info Bar', style: TextStyle(color: ColorSchemes.textColor)),
+                  child: Text('Info', style: TextStyle(color: ColorSchemes.textColor)),
                 ),
                 SettingPageTabs.status: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Status Bar', style: TextStyle(color: ColorSchemes.textColor)),
+                  child: Text('Status', style: TextStyle(color: ColorSchemes.textColor)),
                 ),
               },
             ),

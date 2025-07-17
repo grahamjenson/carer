@@ -20,7 +20,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
     return AWatch(
       (context) {
         var unit = UISettings().unit;
-        var keepScreenActiveDescript = const Text('Keep the awake.\nWhen screen is asleep alarms wont work!');
+        var keepScreenActiveDescript = const Text('Keep the screen awake.\nWhen screen is asleep alarms wont work!');
         if (!UISettings().screenActive) {
           keepScreenActiveDescript = const Text(
             'Alarms wont work when screen is asleep!',
@@ -42,7 +42,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
             SettingsTile.switchTile(
               title: const Text('Keep Screen Active'),
               descriptionInlineIos: true,
-              description: TextWrap(child: keepScreenActiveDescript),
+              description: TextWrap(percent: 0.7, child: keepScreenActiveDescript),
               initialValue: UISettings().screenActive,
               onToggle: (value) async {
                 if (value) {
@@ -59,7 +59,7 @@ class UISettingsWidget extends AbstractSettingsSection with ThemeMixin {
             ),
             SettingsTile.switchTile(
               title: const Text('Dim At Night'),
-              description: const Text('Dim screen Colors at night'),
+              description: const Text('Dim screen color at night'),
               descriptionInlineIos: true,
               initialValue: UISettings().enableDim,
               onToggle: (value) async {
