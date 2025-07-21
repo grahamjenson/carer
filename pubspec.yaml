@@ -122,8 +122,10 @@ flutter:
     - assets/alarm.mp3
     - assets/letsgo.mp3
     - assets/hybridas.mp3
+    - assets/nstoken.gif
     - assets/TERMS_OF_SERVICE.md
     - assets/PRIVACY_POLICY.md
+    - assets/NIGHTSCOUT_HELP.md
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

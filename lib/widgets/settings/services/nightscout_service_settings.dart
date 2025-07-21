@@ -3,9 +3,11 @@ import 'package:carer/services/settings/secure_settings.dart';
 import 'package:carer/services/themes_service.dart';
 import 'package:carer/services/toast_service.dart';
 import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/strings.dart';
 import 'package:carer/widgets/settings/shared/text_wrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
 class NightScoutServiceSettings extends StatefulWidget {
@@ -152,11 +154,38 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
                 ),
               ],
             ),
+            howToTokenURL(context),
           ],
         );
       },
       debugLabel: "NightscoutServiceSettings",
       dependencies: SecureSettings().allSignals(),
+    );
+  }
+
+  SettingsSection howToTokenURL(BuildContext context) {
+    return SettingsSection(
+      title: const Text("How to get Nightscout URL and TOKEN"),
+      tiles: [
+        SettingsTile(
+            title: Center(
+                child: Image.asset(
+          'assets/nstoken.gif',
+          width: 400,
+          height: 200,
+          fit: BoxFit.cover,
+        ))),
+        SettingsTile(
+          title: MarkdownBody(
+            data: StringAssets().nightScoutHelp,
+            styleSheet: MarkdownStyleSheet.fromTheme(
+              Theme.of(context).copyWith(
+                textTheme: Theme.of(context).textTheme.apply(fontSizeFactor: 0.8),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -14,6 +14,8 @@ const List<String> ignoredExceptions = [
   'Bad file descriptor', // ref https://github.com/dart-lang/http/issues/197
   'Software caused connection abort',
   'Failed host lookup',
+  'No route to host',
+  'Could not connect to the server.',
   'Connection closed before full header was received',
   'The network connection was lost',
   'Connection reset by peer',

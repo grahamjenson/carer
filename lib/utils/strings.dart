@@ -51,11 +51,14 @@ class StringAssets {
   void loadStrings() async {
     termsOfService = await rootBundle.loadString(termsOfServiceFile);
     privacyPolicy = await rootBundle.loadString(privacyPolicyFile);
+    nightScoutHelp = await rootBundle.loadString(nightScoutHelpFile);
   }
 
   static const String termsOfServiceFile = "assets/TERMS_OF_SERVICE.md";
   static const String privacyPolicyFile = "assets/PRIVACY_POLICY.md";
+  static const String nightScoutHelpFile = "assets/NIGHTSCOUT_HELP.md";
 
   String termsOfService = "";
   String privacyPolicy = "";
+  String nightScoutHelp = "";
 }
