@@ -1,0 +1,74 @@
+import 'package:carer/mappers/ns/profile.dart';
+import 'package:carer/mappers/sql/profile.dart';
+import 'package:carer/models/sql/profile.dart';
+import 'package:carer/nsclient/nsclient.dart';
+import 'package:carer/nsclient/shared.dart';
+import 'package:carer/services/collection_updaters/collection.dart';
+import 'package:carer/services/settings/secure_settings.dart';
+import 'package:carer/utils/futures.dart';
+import 'package:carer/utils/logs.dart';
+
+class NSProfileUpdater extends NSCollection {
+  @override
+  String getCollectionName() {
+    return "profile";
+  }
+
+  @override
+  Future<bool> bootstrap() async {
+    return update(0);
+  }
+
+  @override
+  Future<bool> update(int lastModified) async {
+    var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
+
+    // Get the last amount of readings with a few extra for certainty
+    var (profileProfiles, err) = await go(NSClient().getCurrentProfiles(nsURL, nsToken));
+
+    if (err != null || profileProfiles == null) {
+      alog("NSProfileUpdater: Failed to retrieve profiles: $err");
+      return false;
+    }
+
+    var (currentProfile, otherProfiles, rawr) = profileProfiles;
+    raw.add(rawr);
+    if (currentProfile == null) {
+      alog("NSProfileUpdater: Failed to retrieve current profile");
+      return false;
+    }
+
+    // Assigning Duration as 100 years in seconds
+    NSProfileToProfileExtras extras = const NSProfileToProfileExtras(NSProfileSource.defaultStoreProfile, 100, 0);
+    Profile profileModel = const NSProfileToProfile().aToB((currentProfile, extras));
+
+    List<String> names = [profileModel.name];
+
+    var saved = await SQLToProfile().save(profileModel);
+    if (saved) {
+      alog("NSProfileUpdater: Saved Current Default Profile ${profileModel.name} with ID ${profileModel.eid}");
+    } else {
+      alog("NSProfileUpdater: Failed to save Current Default Profile ${profileModel.name} with ID ${profileModel.eid}");
+    }
+
+    for (NSProfile p in otherProfiles) {
+      names.add(p.name);
+      // Convert each profile to a Profile model
+      var extras = const NSProfileToProfileExtras(NSProfileSource.storeProfile, 100, 0);
+      var profile = const NSProfileToProfile().aToB((p, extras));
+
+      // Save each profile
+      var saved = await SQLToProfile().save(profile);
+      if (saved) {
+        alog("NSProfileUpdater: Saved Current Default Profile ${profile.name} with ID ${profile.eid}");
+      } else {
+        alog("NSProfileUpdater: Failed to save Current Default Profile ${profile.name} with ID ${profile.eid}");
+      }
+    }
+
+    // This is a bit of a hack, but it saves an annoying query later.
+    // Like pulling the most recent default profile, then the store id, then all store profiles, then their names
+    Profile.currentProfileNames.value = names;
+    return true;
+  }
+}

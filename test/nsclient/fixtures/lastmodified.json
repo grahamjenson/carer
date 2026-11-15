@@ -1,0 +1,14 @@
+{
+    "result": {
+        "collections": {
+            "devicestatus": 1787706849388,
+            "entries": 1787706849505,
+            "food": 1787706849624,
+            "profile": 1787706849693,
+            "settings": 1787706850019,
+            "treatments": 1787706849975
+        },
+        "srvDate": 1787706850025
+    },
+    "status": 200
+}

@@ -1,0 +1,324 @@
+import 'package:carer/models/properties_data.dart';
+import 'package:carer/models/sql/constants.dart';
+import 'package:carer/models/sql/sgv.dart';
+import 'package:carer/models/valueAtTime.dart';
+import 'package:carer/services/settings/status_settings.dart';
+import 'package:carer/services/settings/ui_settings.dart';
+import 'package:carer/services/themes_service.dart';
+import 'package:carer/services/ui/icons.dart';
+import 'package:carer/utils/dates.dart';
+import 'package:carer/utils/math.dart';
+import 'package:flutter/widgets.dart';
+
+abstract class _InfoMethods with ThemeMixin {
+  const _InfoMethods();
+  IconData get icon;
+  String get title;
+  String get tooltip => title;
+  String get description;
+  bool get highlight => false;
+  Unit get unit => UISettings().unit;
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small);
+}
+
+enum Info {
+  iob(_IOB()),
+  cob(_COB()),
+  basal(_Basal()),
+  target(_Target()),
+  currentProfile(_CurrentProfile()),
+  todaysInRange(_TodayInRange());
+
+  final _InfoMethods _methods;
+
+  const Info(this._methods);
+
+  IconData get icon => _methods.icon;
+  String get title => _methods.title;
+  String get tooltip => _methods.tooltip;
+  String get description => _methods.description;
+  bool get highlight => _methods.highlight;
+  bool get enabled => !StatusSettings().infoDisabledContains(name);
+
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) =>
+      _methods.status(context, style, small);
+}
+
+class _IOB extends _InfoMethods {
+  const _IOB();
+
+  double? get value => PropertiesData().iob;
+
+  @override
+  String get tooltip {
+    var tt = "IOB";
+    if (PropertiesData().iobMinsOld >= 1) {
+      tt += " (${PropertiesData().iobMinsOld}m)";
+    }
+    double? iob = PropertiesData().iob;
+    double? bolusIOB = PropertiesData().treatmentiob;
+    double? basalIOB = PropertiesData().basaliob;
+    if (iob != null) {
+      tt += "\n${toMax2dp(iob)}u";
+    } else {
+      return "$tt ?";
+    }
+    if (bolusIOB != null) {
+      tt += "\nBolus ${toMax2dp(bolusIOB)}u";
+    }
+    if (basalIOB != null) {
+      tt += "\nBasal ${toMax2dp(basalIOB)}u";
+    }
+    return tt;
+  }
+
+  @override
+  String get title => "IOB";
+
+  @override
+  String get description => "Insulin on board";
+
+  @override
+  IconData get icon => CarerIcons.INFO_INSULIN_ON_BOARD;
+
+  @override
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
+    if (value == null) {
+      return (["?"], [style]);
+    }
+
+    return (["${toMax2dp(value!)}", "u"], [style, small]);
+  }
+}
+
+class _COB extends _InfoMethods {
+  const _COB();
+
+  double? get value => PropertiesData().cob;
+
+  @override
+  String get title => "COB";
+
+  @override
+  String get tooltip {
+    var tt = "COB";
+    if (PropertiesData().cobMinsOld >= 1) {
+      tt += " (${PropertiesData().cobMinsOld}m)";
+    }
+    return tt;
+  }
+
+  @override
+  String get description => "Carbs on board";
+
+  @override
+  IconData get icon => CarerIcons.INFO_CARBS_ON_BOARD;
+
+  @override
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
+    if (value == null) {
+      return (["?"], [style]);
+    }
+    return (["${value!.round()}", "g"], [style, small]);
+  }
+}
+
+class _Basal extends _InfoMethods {
+  const _Basal();
+
+  @override
+  String get title => "Basal Rate";
+
+  @override
+  String get description => "Current Basal Rate";
+
+  @override
+  IconData get icon => CarerIcons.INFO_BASAL_RATE;
+
+  @override
+  bool get highlight {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return false;
+    }
+    return valueAtTime.isTempBasal;
+  }
+
+  @override
+  String get tooltip {
+    var tt = "Basal";
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return tt;
+    }
+    tt += "\n${toMax2dp(valueAtTime.basal)} u/h";
+    if (valueAtTime.isTempBasal) {
+      tt += " ${Dates.dateAgoShort(valueAtTime.tempBasalRemaining)}";
+    }
+    return tt;
+  }
+
+  @override
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return (["?"], [style]);
+    }
+
+    List<String> texts = ["${toMax2dp(valueAtTime.basal)}", "u/h"];
+    List<TextStyle> styles = [style, small];
+    if (valueAtTime.isTempBasal) {
+      texts.add(" ${Dates.dateAgoShort(valueAtTime.tempBasalRemaining)}");
+      styles.add(small.copyWith(color: primaryColor(context)));
+    }
+
+    return (texts, styles);
+  }
+}
+
+class _Target extends _InfoMethods {
+  const _Target();
+
+  @override
+  String get title => "Target";
+
+  @override
+  String get tooltip {
+    var tt = "Target";
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return tt;
+    }
+
+    String lowStr = unit.str(valueAtTime.lowTarget);
+    String highStr = unit.str(valueAtTime.highTarget);
+    if (highStr == lowStr) {
+      tt += "\n$lowStr ${unit.name}";
+    } else {
+      tt += "\n$lowStr-$highStr ${unit.name}";
+    }
+    if (valueAtTime.isTempTarget) {
+      tt += " ${Dates.dateAgoShort(valueAtTime.tempTargetRemaining)}";
+    }
+
+    return tt;
+  }
+
+  @override
+  String get description => "Current Target Range";
+
+  @override
+  IconData get icon => CarerIcons.INFO_TARGET;
+
+  @override
+  bool get highlight {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return false;
+    }
+    return valueAtTime.isTempTarget;
+  }
+
+  @override
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return (["?-?"], [style]);
+    }
+    String lowStr = unit.str(valueAtTime.lowTarget);
+    String highStr = unit.str(valueAtTime.highTarget);
+
+    List<String> texts = ["$lowStr-$highStr", unit.name];
+    List<TextStyle> styles = [style, small];
+
+    if (highStr == lowStr) {
+      texts = [lowStr, unit.name];
+    }
+
+    if (valueAtTime.isTempTarget) {
+      texts.add(" ${Dates.dateAgoShort(valueAtTime.tempTargetRemaining)}");
+      styles.add(small.copyWith(color: primaryColor(context)));
+    }
+    return (texts, styles);
+  }
+}
+
+class _CurrentProfile extends _InfoMethods {
+  const _CurrentProfile();
+
+  @override
+  String get title => "Profile";
+
+  @override
+  String get description => "Current Profile";
+
+  @override
+  IconData get icon => CarerIcons.INFO_PROFILE;
+
+  @override
+  bool get highlight {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return false;
+    }
+    return valueAtTime.isTempProfile;
+  }
+
+  @override
+  String get tooltip {
+    var tt = "Profile";
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return tt;
+    }
+    tt += "\n${valueAtTime.profileName} ${valueAtTime.profilePercent}%";
+    if (valueAtTime.isTempProfile) {
+      tt += " ${Dates.dateAgoShort(valueAtTime.tempProfileRemaining)}";
+    }
+    return tt;
+  }
+
+  @override
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
+    var valueAtTime = ValueAtTime.last();
+    if (valueAtTime == null) {
+      return (["?"], [style]);
+    }
+
+    List<String> texts = ["${valueAtTime.profilePercent}", "%"];
+    List<TextStyle> styles = [style, small];
+
+    if (valueAtTime.isTempProfile) {
+      texts.add(" ${Dates.dateAgoShort(valueAtTime.tempProfileRemaining)}");
+      styles.add(small.copyWith(color: primaryColor(context)));
+    }
+    return (texts, styles);
+  }
+}
+
+class _TodayInRange extends _InfoMethods {
+  const _TodayInRange();
+
+  double get value => SGV.todaysPercentage.value ?? 0.0;
+
+  @override
+  String get title => "TIR";
+
+  @override
+  String get description => "Today's Time in Range";
+
+  @override
+  IconData get icon => CarerIcons.INFO_TODAY_IN_RANGE;
+
+  @override
+  (List<String> texts, List<TextStyle> styles) status(BuildContext context, TextStyle style, TextStyle small) {
+    return ([(value.toStringAsFixed(0)), "%"], [style, small]);
+  }
+
+  @override
+  String get tooltip {
+    var yir = SGV.yesterdaysPercentage.value ?? 0.0;
+
+    return "Today's TIR: ${value.toStringAsFixed(0)}%\nYesterday's TIR: ${yir.toStringAsFixed(0)}%";
+  }
+}

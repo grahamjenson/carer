@@ -1,0 +1,262 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'dart:convert';
+
+import 'package:carer/models/details/alarms/alarms.dart';
+import 'package:carer/services/alarms_service.dart';
+import 'package:carer/services/settings/alarm_settings.dart';
+import 'package:carer/services/settings/secure_settings.dart';
+import 'package:carer/services/settings/target_settings.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../../test_utils.dart';
+
+void main() async {
+  agroup("AlarmTest:", () {
+    // Want to be explicit about the values
+    int URGENTHIGH = 200;
+
+    int HIGH = 180;
+    int HIGHMINUTES = 20;
+
+    int LOW = 70;
+    int LOWPREDICIONTMINUTES = 10;
+    int URGENTLOW = 50;
+
+    int FASTRISE = 10;
+    int FASTRISEMINUTES = 10;
+
+    int FASTDROP = -10;
+    int FASTDROPMINUTES = 10;
+
+    int NODATAMINUTES = 20;
+
+    // EXAMPLE
+    int INRANGE = 80;
+
+    setUp(() {
+      SecureSettings().setNSValuesFromURL("https://test.com?token=1232432434");
+
+      // Turn on all alarms
+      AlarmSettings().urgentLowAlarm = true;
+      AlarmSettings().lowAlarm = true;
+      AlarmSettings().highAlarm = true;
+      AlarmSettings().urgentHighAlarm = true;
+      AlarmSettings().lowPredictionAlarm = true;
+      AlarmSettings().carerBatteryAlarm = true;
+      AlarmSettings().t1dBatteryAlarm = true;
+      AlarmSettings().smartSnoozeHigh = true;
+
+      AlarmSettings().fastRiseAlarmMinutes = FASTRISEMINUTES;
+      AlarmSettings().fastDropAlarmMinutes = FASTDROPMINUTES;
+      AlarmSettings().noDataAlarmMinutes = NODATAMINUTES;
+      AlarmSettings().lowPredictionMinutes = LOWPREDICIONTMINUTES;
+      AlarmSettings().highMinutes = HIGHMINUTES;
+
+      TargetSettings().highUrgent = URGENTHIGH.toDouble();
+      TargetSettings().highTarget = HIGH.toDouble();
+      TargetSettings().lowTarget = LOW.toDouble();
+      TargetSettings().lowUrgent = URGENTLOW.toDouble();
+      TargetSettings().fastRiseDelta = FASTRISE.toDouble();
+      TargetSettings().fastDropDelta = FASTDROP.toDouble();
+    });
+
+    var tests = [
+      // NEGATIVE CASES
+      AlarmTest(
+        "Blank Data",
+        sgvs: [INRANGE, null, null, null],
+        expectedAlarms: {}, // predictive low
+      ),
+      AlarmTest(
+        "Normal operation",
+        sgvs: [INRANGE, INRANGE, INRANGE, INRANGE],
+        expectedAlarms: {},
+      ),
+      AlarmTest(
+        "Not High Enough",
+        sgvs: [INRANGE, INRANGE, HIGH + 10, HIGH + 10],
+        expectedAlarms: {},
+      ),
+      //
+      //
+      // POSITIVE ALARM CASES
+      //
+      AlarmTest(
+        "Predictive Alarm triggering",
+        sgvs: [LOW + 40, LOW + 20, LOW + 1],
+        expectedAlarms: {AlarmType.low}, // predictive low
+      ),
+      AlarmTest(
+        "Blank Data Causing No Data Alarm",
+        sgvs: [INRANGE, null, null, null, null],
+        expectedAlarms: {AlarmType.noData}, // predictive low
+      ),
+      AlarmTest(
+        "Fast Drop",
+        sgvs: [HIGH, HIGH - 10, HIGH - 30, HIGH - 50],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Fast Drop When last reading shows massive drop",
+        sgvs: [HIGH, HIGH - 10, null, HIGH - 50],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Fast Drop When last Value is null should still trigger",
+        sgvs: [HIGH, HIGH - 10, HIGH - 30, HIGH - 50, null],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Lots of Blank Data",
+        sgvs: [HIGH, HIGH - 10, HIGH - 30, null, null],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Fast Rise",
+        sgvs: [LOW, LOW + 10, LOW + 30, LOW + 50],
+        expectedAlarms: {AlarmType.fastRise},
+      ),
+      AlarmTest(
+        "Fast Rise with missing data",
+        sgvs: [LOW, LOW + 15, null, LOW + 50],
+        expectedAlarms: {AlarmType.fastRise},
+      ),
+      AlarmTest(
+        "Urgent High",
+        sgvs: [INRANGE, INRANGE, URGENTHIGH + 10],
+        expectedAlarms: {AlarmType.urgentHigh},
+      ),
+      AlarmTest(
+        "Urgent Low",
+        sgvs: [URGENTLOW - 10],
+        expectedAlarms: {AlarmType.urgentLow, AlarmType.low},
+        calculatedExpectedActiveAlarms: {AlarmType.urgentLow},
+        calculatedExpectedPendingAlarms: {AlarmType.urgentLow},
+      ),
+
+      AlarmTest(
+        "Low",
+        sgvs: [LOW - 10],
+        expectedAlarms: {AlarmType.low},
+      ),
+      AlarmTest(
+        "HIGH",
+        sgvs: [HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10, HIGH + 10],
+        expectedAlarms: {AlarmType.high},
+      ),
+
+      // Fast Drop/Rise/High should not be true when we are waiting for the lag from last reading
+      AlarmTest(
+        "Lag: Fast Drop Control ON Reading",
+        sgvs: [HIGH, HIGH, HIGH - 10, HIGH - 20, HIGH - 30],
+        expectedAlarms: {AlarmType.fastDrop},
+      ),
+      AlarmTest(
+        "Lag: Fast Drop should not trigger if within lag from last window",
+        sgvs: [HIGH, HIGH, HIGH - 10, HIGH - 20, null],
+        expectedAlarms: {},
+      ),
+      AlarmTest(
+        "Lag: Fast Drop should trigger after 30 seconds waiting for lag",
+        sgvs: [HIGH, HIGH, HIGH - 10, HIGH - 20, null],
+        expectedAlarms: {AlarmType.fastDrop},
+        offset: const Duration(minutes: 1),
+      ),
+    ];
+
+    for (var t in tests) {
+      atest("${t.name} est ${tests.indexOf(t)}", () async {
+        // Pre-Test
+        expect(AlarmType.triggeredAlarms(), <AlarmType>{});
+        expect(AlarmType.activeAlarms(), AlarmType.values.toSet()..removeAll([AlarmType.test, AlarmType.unknown]));
+        expect(AlarmType.smartSnoozeAlarms(), <AlarmType>{});
+
+        var (pengindAlarms, activeAlarms) = AlarmsService().calculateAlarms();
+        expect(pengindAlarms.isEmpty, true);
+        expect(activeAlarms.isEmpty, true);
+
+        await createSGVsInOrder(t.sgvs, offset: t.offset);
+
+        Set<AlarmType> triggeredAlarms = {};
+        for (var alarm in AlarmType.values) {
+          var (triggered, active, smartSnooze) = alarm.alarmStatus();
+          if (triggered) {
+            triggeredAlarms.add(alarm);
+          }
+
+          // just checking for errors here
+          expect(alarm.description, isNotNull);
+          expect(alarm.title, isNotNull);
+          expect(alarm.shortSummary(), isNotNull);
+          expect(alarm.statement(), isNotNull);
+          expect(alarm.details(), isNotNull);
+          // This has tripped me up a few times accidentally adding objects to the map
+          expect(jsonEncode(alarm.details()), isNotNull);
+        }
+
+        (pengindAlarms, activeAlarms) = AlarmsService().calculateAlarms();
+        expect(pengindAlarms.toSet(), t.calculatedExpectedPendingAlarms);
+        expect(activeAlarms.toSet(), t.calculatedExpectedActiveAlarms);
+
+        expect(triggeredAlarms, t.expectedAlarms);
+      });
+    }
+  });
+}
+
+class TestAlarm extends AlarmMethods {
+  @override
+  int get minutesToTrigger => 10;
+
+  @override
+  String get title => "Test";
+
+  @override
+  IconData icon() => Icons.abc;
+
+  @override
+  String get description => "Test";
+
+  @override
+  String shortSummary() => "Test";
+
+  @override
+  String statement() => "Test";
+
+  @override
+  bool trigger() => false;
+
+  @override
+  bool active() => false;
+}
+
+class AlarmTest {
+  List<int?> sgvs;
+  List<Duration>? sgvAges;
+  Set<AlarmType> _expectedAlarms = {};
+  Set<AlarmType> _calculatedExpectedPendingAlarms = {};
+  Set<AlarmType> _calculatedExpectedActiveAlarms = {};
+  Duration offset;
+  String name;
+  AlarmTest(this.name,
+      {required this.sgvs,
+      required Set<AlarmType> expectedAlarms,
+      this.sgvAges,
+      Set<AlarmType>? calculatedExpectedPendingAlarms,
+      Set<AlarmType>? calculatedExpectedActiveAlarms,
+      this.offset = Duration.zero}) {
+    if (sgvAges != null) {
+      assert(sgvAges!.length == sgvs.length);
+    }
+    _expectedAlarms = expectedAlarms;
+    _calculatedExpectedActiveAlarms = calculatedExpectedActiveAlarms ?? expectedAlarms;
+    _calculatedExpectedPendingAlarms = calculatedExpectedPendingAlarms ?? expectedAlarms;
+  }
+
+  Set<AlarmType> get expectedAlarms => _expectedAlarms;
+
+  Set<AlarmType> get calculatedExpectedPendingAlarms => _calculatedExpectedPendingAlarms;
+  Set<AlarmType> get calculatedExpectedActiveAlarms => _calculatedExpectedActiveAlarms;
+}

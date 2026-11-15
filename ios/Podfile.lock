@@ -1,0 +1,42 @@
+PODS:
+  - cupertino_http (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
+  - Mute (0.6.1)
+  - sound_mode (0.0.1):
+    - Flutter
+    - Mute (~> 0.6.0)
+
+DEPENDENCIES:
+  - cupertino_http (from `.symlinks/plugins/cupertino_http/darwin`)
+  - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - sound_mode (from `.symlinks/plugins/sound_mode/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Mute
+
+EXTERNAL SOURCES:
+  cupertino_http:
+    :path: ".symlinks/plugins/cupertino_http/darwin"
+  Flutter:
+    :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  sound_mode:
+    :path: ".symlinks/plugins/sound_mode/ios"
+
+SPEC CHECKSUMS:
+  cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
+  Mute: 20135a96076f140cc82bfc8b810e2d6150d8ec7e
+  sound_mode: 53bd43e2fb1f640571ea74931ca5efdea5ddfc97
+
+PODFILE CHECKSUM: 1cf71f840518f7a519d95d6e02db698b81255b1b
+
+COCOAPODS: 1.16.2
