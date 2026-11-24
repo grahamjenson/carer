@@ -15,12 +15,12 @@ jobs:
           uses: subosito/flutter-action@v2
           with:
             channel: stable
-            flutter-version: 3.29.3
+            flutter-version: 3.50.1
             cache: true
             cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
             cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
             pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache of dart pub get dependencies
-            pub-cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
+            pub-cache-path: "${{ runner.tool_cache }}/flutter-pub/:channel:-:version:-:arch:" # apart from the SDK's, as pub refuses to run with the SDK inside its cache
         - run: flutter --version
         - run: flutter pub get
         - run: flutter test
