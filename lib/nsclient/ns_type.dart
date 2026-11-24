@@ -49,6 +49,25 @@ abstract class NSType {
     return defaultValue;
   }
 
+  // The identifiers of a history's deleted documents (isValid false), and the srvModified of its last change
+  static (List<String>, int?) deletedAndLastModified(List<dynamic> jsonList) {
+    List<String> deleted = [];
+    int? last;
+    for (var json in jsonList) {
+      if (json is! Map<String, dynamic>) {
+        continue;
+      }
+      if (json['isValid'] == false && json['identifier'] is String) {
+        deleted.add(json['identifier']);
+      }
+      var srvModified = getInt(json['srvModified']);
+      if (srvModified != null && (last == null || srvModified > last)) {
+        last = srvModified;
+      }
+    }
+    return (deleted, last);
+  }
+
   static int? getInt(dynamic value, {int? defaultValue}) {
     if (value is int) {
       return value;

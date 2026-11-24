@@ -40,6 +40,12 @@ Uri entryHistoryEndpoint(nsURL, int gteCreatedAt) => Uri.parse('$nsURL/api/v3/en
 
 Uri treatmentsWriteEndpoint(nsURL) => Uri.parse('$nsURL/api/v3/treatments');
 
+// What changed in a collection since a srvModified, the oldest change first, deleted documents too as isValid false, so
+// a change to an old document, or one uploaded late, is not missed as a search by its date would miss it
+const historyLimit = 1000;
+Uri collectionHistoryEndpoint(nsURL, String collection, int sinceSrvModified) =>
+    Uri.parse('$nsURL/api/v3/$collection/history/$sinceSrvModified?limit=$historyLimit');
+
 Uri treatmentsHistoryEndpoint(nsURL, int createdAt) => Uri.parse(
       '$nsURL/api/v3/treatments'
       '?sort\$desc=created_at'
@@ -344,7 +350,7 @@ class NSClient {
     return NSLastModified.fromJson(response!.body);
   }
 
-  Future<NSEntries> getEntries(String nsURL, String token, int gteCreateAt) async {
+  Future<NSEntries> getEntries(String nsURL, String token, int gteCreateAt, {int? historySince}) async {
     if (nsURL == "" || token == "") {
       alog("No NS URL or token");
       return NSEntries.empty();
@@ -354,7 +360,7 @@ class NSClient {
       return NSEntries.empty();
     }
 
-    var ep = entryHistoryEndpoint(nsURL, gteCreateAt);
+    var ep = historySince != null ? collectionHistoryEndpoint(nsURL, "entries", historySince) : entryHistoryEndpoint(nsURL, gteCreateAt);
 
     final (response, err) = await go(http.get(ep, headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -368,7 +374,7 @@ class NSClient {
     return NSEntries.fromJson(response!.body);
   }
 
-  Future<NSTreatments> getTreatments(String nsURL, String token, int gteCreateAt) async {
+  Future<NSTreatments> getTreatments(String nsURL, String token, int gteCreateAt, {int? historySince}) async {
     if (nsURL == "" || token == "") {
       return NSTreatments.empty();
     }
@@ -378,7 +384,7 @@ class NSClient {
       return NSTreatments.empty();
     }
 
-    var ep = treatmentsHistoryEndpoint(nsURL, gteCreateAt);
+    var ep = historySince != null ? collectionHistoryEndpoint(nsURL, "treatments", historySince) : treatmentsHistoryEndpoint(nsURL, gteCreateAt);
     final (response, err) = await go(http.get(ep, headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       "Accept": " application/json",

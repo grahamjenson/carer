@@ -35,22 +35,33 @@ class NSEntriesUpdater extends NSCollection {
     return true;
   }
 
+  // update reads what changed since a srvModified, page by page, from the entries' history, so readings uploaded late,
+  // after a phone was offline, are not missed, and ones deleted are removed
   @override
   Future<bool> update(int lastModified) async {
     var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
-    // Get the last amount of readings with a few extra for certainty
-    var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, lastModified));
-    if (err != null || entries == null) {
-      return false;
+    var since = lastModified;
+    for (var page = 0; page < maxHistoryPages; page++) {
+      var (entries, err) = await go(NSClient().getEntries(nsURL, nsToken, since, historySince: since));
+      // An empty raw is a request that failed, so the same changes are asked for again
+      if (err != null || entries == null || entries.raw.isEmpty) {
+        return false;
+      }
+
+      raw.add(entries.raw);
+
+      List<SGV> sgvs = const NSEntryToSGV().mapAToB(entries.entries);
+      var total = await SQLToSGV().saveAll(sgvs);
+      var deleted = await SQLToSGV().deleteByEids(entries.deletedIds);
+      alog("entries: entry Total ${entries.entries.length}, Updated $total, Deleted $deleted");
+
+      var last = entries.lastSrvModified;
+      if (entries.count < historyLimit || last == null || last <= since) {
+        return true;
+      }
+      since = last;
     }
-
-    raw.add(entries.raw);
-
-    List<SGV> sgvs = const NSEntryToSGV().mapAToB(entries.entries);
-    var total = await SQLToSGV().saveAll(sgvs);
-
-    alog("entries: entry Total ${entries.entries.length}, Updated $total");
     return true;
   }
 }

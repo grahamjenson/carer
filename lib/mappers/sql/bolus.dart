@@ -45,4 +45,14 @@ class SQLToBolus extends SQLMapper<Bolus> {
       "type": model.type.name.toString(),
     });
   }
+
+  // A row is the model when every column it is written to is the same, so upsertAll updates a bolus that changed
+  @override
+  bool equals(SQLRow row, Bolus model) {
+    var modelRow = bToA(model);
+    return modelRow["value"] == row["value"] &&
+        modelRow["timestamp"] == row["timestamp"] &&
+        modelRow["eid"] == row["eid"] &&
+        modelRow["type"] == row["type"];
+  }
 }

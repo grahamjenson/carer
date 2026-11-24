@@ -42,4 +42,11 @@ class SQLToCarbs extends SQLMapper<Carbs> {
       "eid": model.eid!,
     });
   }
+
+  // A row is the model when every column it is written to is the same, so upsertAll updates carbs that changed
+  @override
+  bool equals(SQLRow row, Carbs model) {
+    var modelRow = bToA(model);
+    return modelRow["value"] == row["value"] && modelRow["timestamp"] == row["timestamp"] && modelRow["eid"] == row["eid"];
+  }
 }

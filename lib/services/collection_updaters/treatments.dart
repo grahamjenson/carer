@@ -64,32 +64,55 @@ class NSTreatmentsUpdater extends NSCollection {
     return processTreatments(treatments);
   }
 
+  // update reads what changed since a srvModified, page by page, from the treatments' history, so a treatment changed or
+  // uploaded long after its date, as a temp target AAPS cuts or carbs entered offline, is not missed, and one deleted is
+  // removed
   @override
   Future<bool> update(int lastModified) async {
     var (nsURL, nsToken) = SecureSettings().nightscoutURLAndToken;
 
-    // We need to update at least the last 3 hours because:
-    // 1. We want a clean last 2 hours
-    // 2. assuming the longest temp target would be 1 hour long
-    // 3. -2 hours - 1 hour = 3 hours
+    var since = lastModified;
+    for (var page = 0; page < maxHistoryPages; page++) {
+      var (treatments, err) = await go(NSClient().getTreatments(nsURL, nsToken, since, historySince: since));
+      // An empty raw is a request that failed, so the same changes are asked for again
+      if (err != null || treatments == null || treatments.raw.isEmpty) {
+        return false;
+      }
 
-    var (treatments, err) = await go(NSClient().getTreatments(nsURL, nsToken, lastModified));
+      raw.add(treatments.raw);
+      alog("Retrieved ${treatments.treatments.length} changed treatments, ${treatments.deletedIds.length} deleted");
+      await processTreatments(treatments);
+      await deleteTreatments(treatments.deletedIds);
 
-    if (err != null || treatments == null) {
-      return false;
+      var last = treatments.lastSrvModified;
+      if (treatments.count < historyLimit || last == null || last <= since) {
+        return true;
+      }
+      since = last;
     }
+    return true;
+  }
 
-    raw.add(treatments.raw);
-    alog("Retrieved ${treatments.treatments.length} treatments");
-    return processTreatments(treatments);
+  // deleteTreatments removes the treatments Nightscout deleted, from whichever table each is in
+  Future<void> deleteTreatments(List<String> ids) async {
+    if (ids.isEmpty) {
+      return;
+    }
+    var deleted = await SQLToBolus().deleteByEids(ids) +
+        await SQLToCarbs().deleteByEids(ids) +
+        await SQLToTempBasal().deleteByEids(ids) +
+        await SQLToTempTarget().deleteByEids(ids) +
+        await SQLToProfile().deleteByEids(ids);
+    alog("Deleted $deleted treatments");
   }
 
   Future<bool> processTreatments(NSTreatments treatments) async {
+    // Upserted, so an edited bolus or carbs is updated, not left as it first was
     List<Bolus> boluses = const NSBolusToBolus().mapAToB(treatments.boluses);
-    int bolusUpdates = await SQLToBolus().saveAll(boluses);
+    int bolusUpdates = await SQLToBolus().upsertAll(boluses);
 
     List<Carbs> carbs = const NSCarbsToCarbs().mapAToB(treatments.carbs);
-    int carbUpdates = await SQLToCarbs().saveAll(carbs);
+    int carbUpdates = await SQLToCarbs().upsertAll(carbs);
 
     List<TempBasal> tempBasals = const NSTempBasalToTempBasal().mapAToB(treatments.tempBasals);
     int tempBasalUpdates = await SQLToTempBasal().upsertAll(tempBasals);
