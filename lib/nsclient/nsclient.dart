@@ -179,8 +179,10 @@ class NSClient {
       return true;
     }
 
-    // If JWT is before now then no need to refresh
-    if (jwtExpire!.isBefore(clock.ago(hours: 1))) {
+    // Once the JWT has expired, refresh it. jwtExpire is already 5 minutes before the JWT's exp, so it is refreshed
+    // before a request is refused: Nighttroop's JWTs last 60 minutes, so waiting until an hour after it expired
+    // failed the first request each hour.
+    if (!jwtExpire!.isAfter(clock.now())) {
       return true;
     }
 
