@@ -71,6 +71,7 @@ class _NightScoutServiceSettingsState extends State<NightScoutServiceSettings> {
               tiles: [
                 SettingsTile(
                   title: TextField(
+                    key: const ValueKey("ns_setup_url"),
                     decoration: InputDecoration(
                       hintText: "https://example.com?token=your_token",
                       hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),

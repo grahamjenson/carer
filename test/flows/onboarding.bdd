@@ -1,0 +1,16 @@
+// A new carer is asked to accept the agreements, then for their Nightscout, before they see anything else
+ASSERT_PATH /agreements
+ASSERT_VISIBLE text=Accept
+SCREENSHOT agreements
+CLICK text=Accept
+ASSERT_PATH /ns_setup
+
+// Their Nightscout's URL and token are saved once Nightscout accepts the token
+INPUT #ns_setup_url https://nightscout.example?token=carer-token
+CLICK text=Save
+ASSERT_TEXT_VISIBLE Saved NS URL and Token
+ASSERT_TEXT_VISIBLE https://nightscout.example
+ASSERT_TEXT_VISIBLE carer-token
+SCREENSHOT ns_setup
+CLICK text=Next
+ASSERT_PATH /display

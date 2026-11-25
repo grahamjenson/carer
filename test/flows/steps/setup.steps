@@ -1,0 +1,7 @@
+// A carer who has accepted the agreements and saved their Nightscout's URL with its token, on the display page
+CLICK text=Accept
+INPUT #ns_setup_url https://nightscout.example?token=carer-token
+CLICK text=Save
+ASSERT_TEXT_VISIBLE Saved NS URL and Token
+CLICK text=Next
+ASSERT_PATH /display

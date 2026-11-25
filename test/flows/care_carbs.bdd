@@ -1,0 +1,11 @@
+// A carer adds carbs from the care page, after confirming, and Nightscout is sent them
+INCLUDE steps/setup.steps
+CLICK #bar_bottom_Care_false
+ASSERT_PATH /care
+SCREENSHOT care
+CLICK text=Add 5g carbs
+ASSERT_TEXT_VISIBLE Are you sure you want to 5g Carb?
+CLICK text=Add Carbs
+ASSERT_REQUEST POST /api/v3/treatments "eventType":"Carb Correction","carbs":5
+ASSERT_TEXT_VISIBLE 5g carbs added
+ASSERT_PATH /display

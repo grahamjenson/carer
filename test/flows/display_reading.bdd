@@ -1,0 +1,10 @@
+// The display page shows the last reading from Nightscout
+NIGHTSCOUT_READINGS 120 125 132
+INCLUDE steps/setup.steps
+ASSERT_VISIBLE text=132
+SCREENSHOT display_reading
+
+// A new reading in Nightscout is shown in its place
+NIGHTSCOUT_READINGS 140
+ASSERT_VISIBLE text=140
+ASSERT_NOT_VISIBLE text=132

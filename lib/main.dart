@@ -46,6 +46,23 @@ void runCarer() async {
     await DesktopWindow.setMinWindowSize(const Size(300, 450));
   }
 
+  await setupCarer();
+
+  if (Platform.isIOS || Platform.isAndroid) {
+    await BackgroundService().configure();
+    await BackgroundService().start();
+  }
+
+  runApp(const MyApp());
+
+  if (Platform.isAndroid) {
+    await BackgroundService().registerHeadlessTask();
+  }
+}
+
+// setupCarer starts Carer's storage, settings and services, all but the window, background tasks and app, which the UI
+// flows (test/flows) start too
+Future<void> setupCarer() async {
   StringAssets().loadStrings();
 
   // Signals logging
@@ -106,17 +123,6 @@ void runCarer() async {
   await ValueAtTime.setupSQLSignals();
   await SGV.setupSQLSignals();
   await SQLToEvents().setupSQLSignals();
-
-  if (Platform.isIOS || Platform.isAndroid) {
-    await BackgroundService().configure();
-    await BackgroundService().start();
-  }
-
-  runApp(const MyApp());
-
-  if (Platform.isAndroid) {
-    await BackgroundService().registerHeadlessTask();
-  }
 }
 
 class MyApp extends StatefulWidget {

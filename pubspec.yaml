@@ -85,6 +85,8 @@ dev_dependencies:
   sqflite_common_ffi: ^2.3.3 # sqflite has to use system version of sqlite in test  
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_launcher_icons: "^0.14.4"
   
 

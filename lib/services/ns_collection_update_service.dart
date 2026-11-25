@@ -34,6 +34,11 @@ class NSCollectionUpdateService {
 
   NSCollectionUpdateService._();
 
+  Timer? _timer;
+
+  // stop stops the updates start started
+  void stop() => _timer?.cancel();
+
   start() {
     for (var element in collections) {
       element.bootstrap(); // Download and do initial setting (usually of things far in the past like profile switchs or Sensor Change)
@@ -54,7 +59,8 @@ class NSCollectionUpdateService {
     // }, debugLabel: "${runtimeType}LastResumedUpdaterEffect");
 
     bool running = false;
-    Timer.periodic(intervalToCheck, (Timer t) async {
+    _timer?.cancel();
+    _timer = Timer.periodic(intervalToCheck, (Timer t) async {
       if (running) {
         alog("Update already running, skipping this interval");
         return;
