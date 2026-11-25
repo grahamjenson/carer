@@ -54,9 +54,18 @@ class NSEntries {
   int get length => entries.length;
   NSEntry operator [](int index) => entries[index];
 
+  // From a history: the identifiers of the readings deleted, the srvModified of the last change, and how many documents
+  // the page had, to know whether there are more
+  List<String> deletedIds;
+  int? lastSrvModified;
+  int count;
+
   NSEntries({
     required this.entries,
     required this.raw,
+    this.deletedIds = const [],
+    this.lastSrvModified,
+    this.count = 0,
   });
 
   factory NSEntries.empty() {
@@ -68,10 +77,12 @@ class NSEntries {
       final Map<String, dynamic> jsonObject = json.decode(jsonStr);
       final List<dynamic> jsonList = jsonObject['result'] ?? [];
 
-      List<NSEntry> entries = jsonList.map((json) => NSEntry.fromJson(json)).where((e) => e.isValidAndComplete()).toList();
+      var (deletedIds, lastSrvModified) = NSType.deletedAndLastModified(jsonList);
+      List<NSEntry> entries =
+          jsonList.where((json) => json['isValid'] != false).map((json) => NSEntry.fromJson(json)).where((e) => e.isValidAndComplete()).toList();
       entries.sort((a, b) => b.date.compareTo(a.date));
 
-      return NSEntries(entries: entries, raw: jsonStr);
+      return NSEntries(entries: entries, raw: jsonStr, deletedIds: deletedIds, lastSrvModified: lastSrvModified, count: jsonList.length);
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
       return NSEntries(entries: [], raw: jsonStr);

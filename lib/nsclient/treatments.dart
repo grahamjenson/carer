@@ -346,7 +346,12 @@ class NSInsulinChange extends NSTreatment {
 class NSTreatments {
   List<NSTreatment> treatments;
   String raw;
-  NSTreatments({required this.treatments, required this.raw});
+  // From a history: the identifiers of the documents deleted, the srvModified of the last change, and how many
+  // documents the page had, to know whether there are more
+  List<String> deletedIds;
+  int? lastSrvModified;
+  int count;
+  NSTreatments({required this.treatments, required this.raw, this.deletedIds = const [], this.lastSrvModified, this.count = 0});
 
   int get length => treatments.length;
   NSTreatment operator [](int index) => treatments[index];
@@ -359,7 +364,9 @@ class NSTreatments {
     try {
       final Map<String, dynamic> jsonObject = json.decode(jsonStr);
       final List<dynamic> jsonList = jsonObject['result'] ?? [];
-      List<NSRawTreatment> rawTreatments = jsonList.map((json) => NSRawTreatment.fromJson(json)).where((e) => e.isValidAndComplete()).toList();
+      var (deletedIds, lastSrvModified) = NSType.deletedAndLastModified(jsonList);
+      List<NSRawTreatment> rawTreatments =
+          jsonList.where((json) => json['isValid'] != false).map((json) => NSRawTreatment.fromJson(json)).where((e) => e.isValidAndComplete()).toList();
 
       rawTreatments.sort((a, b) => b.date.compareTo(a.date));
 
@@ -367,7 +374,7 @@ class NSTreatments {
       for (var rt in rawTreatments) {
         treatments.addAll(rt.toTreatments());
       }
-      return NSTreatments(treatments: treatments, raw: jsonStr);
+      return NSTreatments(treatments: treatments, raw: jsonStr, deletedIds: deletedIds, lastSrvModified: lastSrvModified, count: jsonList.length);
     } catch (e, stackTrace) {
       Errors.captureError(e, stackTrace);
       return NSTreatments(treatments: [], raw: jsonStr);
