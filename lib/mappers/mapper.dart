@@ -175,6 +175,22 @@ abstract class SQLMapper<T extends DBModel> extends SQLReadMapper<T> {
     return saves;
   }
 
+  // deleteByEids deletes the rows of the documents with these identifiers, as Nightscout deleted them, and is how many
+  Future<int> deleteByEids(List<String> eids, {bool withSignal = true}) async {
+    if (eids.isEmpty) {
+      return 0;
+    }
+    var cdb = await CarerDB.instance;
+    var (deleted, err) = await go(cdb.db.delete(tableName, where: "eid IN (${List.filled(eids.length, '?').join(',')})", whereArgs: eids));
+    if (err != null || deleted == null) {
+      return 0;
+    }
+    if (deleted > 0 && withSignal) {
+      updateWriteSignal();
+    }
+    return deleted;
+  }
+
   Future<int> upsertAll(List<T> models) async {
     var cdb = await CarerDB.instance;
     var tb = tableName;
