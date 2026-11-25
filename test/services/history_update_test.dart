@@ -94,6 +94,38 @@ void main() async {
       expect((await SQLToCarbs().query(conditions: {"eid = ?": "carbs-late"})).single.value, 5);
     });
 
+    // As in the Loops session's test (C11): carbs deleted in AAPS more than 10 minutes before Carer starts again
+    atest("after a restart, an update reads from the cursor kept, so a deletion made while Carer was closed is removed", () async {
+      const url = "https://carertest.example.nz";
+      await NSTreatmentsUpdater().processTreatments(NSTreatments.fromJson(jsonEncode({
+        "result": [
+          {"identifier": "carbs-deleted-closed", "eventType": "Carb Correction", "carbs": 25, "date": clock.minutesAgo(40).millisecondsSinceEpoch},
+        ]
+      })));
+      await (NSTreatmentsUpdater()..lastModifiedMilliSeconds = 5000).saveCursor(url);
+
+      // Carer starts again with a new updater, which has the cursor kept for its Nightscout, and another has none
+      var restarted = NSTreatmentsUpdater();
+      await restarted.loadCursor(url);
+      expect(restarted.lastModifiedMilliSeconds, 5000);
+      var other = NSTreatmentsUpdater();
+      await other.loadCursor("https://other.example.nz");
+      expect(other.lastModifiedMilliSeconds, 0);
+
+      List<String> asked = [];
+      NSClient().http = MockClient((request) async {
+        asked.add(request.url.path);
+        var deleted = {"identifier": "carbs-deleted-closed", "eventType": "Carb Correction", "carbs": 25, "date": clock.minutesAgo(40).millisecondsSinceEpoch, "srvModified": 5001, "isValid": false};
+        return Response(jsonEncode({"status": 200, "result": [deleted]}), 200);
+      });
+      SecureSettings().nightscoutURL = url;
+      SecureSettings().nightscoutToken = "carertest-token";
+
+      expect(await restarted.update(restarted.lastModifiedMilliSeconds), true);
+      expect(asked, contains("/api/v3/treatments/history/5000"));
+      expect(await SQLToCarbs().query(conditions: {"eid = ?": "carbs-deleted-closed"}), isEmpty);
+    });
+
     // A long time offline: Nightscout has more full pages of changes than one update reads
     atest("an update that reads its most pages stops there, and the next update goes on from where it stopped", () async {
       List<int> asked = [];

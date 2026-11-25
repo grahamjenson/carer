@@ -85,6 +85,7 @@ class NSCollectionUpdateService {
           if (newLastModified == null) {
             continue;
           }
+          await collection.loadCursor(nsURL);
 
           var rawreset = false;
           if (collection.updateForce) {
@@ -101,8 +102,9 @@ class NSCollectionUpdateService {
               // Append to the exsiting bootstrap
               collection.raw = [];
             }
-            // What changed since the last change read, by srvModified, so a change to an old document is not missed. The
-            // first time, the bootstrap has read the last day by date, so it is what changed in the 10 minutes before.
+            // What changed since the last change read, by srvModified, so a change to an old document is not missed, even
+            // one made while Carer was closed. The first time, the bootstrap has read the last day by date, so it is what
+            // changed in the 10 minutes before.
             const wiggle = 10 * 60 * 1000; // 10 minutes in milliseconds
             var since = collection.lastModifiedMilliSeconds == 0 ? newLastModified - wiggle : collection.lastModifiedMilliSeconds;
             var ret = await collection.update(since);
@@ -111,6 +113,7 @@ class NSCollectionUpdateService {
               collection.lastModifiedMilliSeconds = newLastModified;
               collection.lastSuccessfulUpdate = DateTime.now();
             }
+            await collection.saveCursor(nsURL);
           }
         }
       } finally {
