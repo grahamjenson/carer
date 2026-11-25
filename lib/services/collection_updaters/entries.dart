@@ -62,6 +62,6 @@ class NSEntriesUpdater extends NSCollection {
       }
       since = last;
     }
-    return true;
+    return readOnNextUpdate(since);
   }
 }

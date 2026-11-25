@@ -90,7 +90,7 @@ class NSTreatmentsUpdater extends NSCollection {
       }
       since = last;
     }
-    return true;
+    return readOnNextUpdate(since);
   }
 
   // deleteTreatments removes the treatments Nightscout deleted, from whichever table each is in

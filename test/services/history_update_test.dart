@@ -5,6 +5,8 @@ import 'package:carer/mappers/sql/temptarget.dart';
 import 'package:carer/nsclient/entries.dart';
 import 'package:carer/nsclient/nsclient.dart';
 import 'package:carer/nsclient/treatments.dart';
+import 'package:carer/services/collection_updaters/collection.dart';
+import 'package:carer/services/collection_updaters/entries.dart';
 import 'package:carer/services/collection_updaters/treatments.dart';
 import 'package:carer/services/settings/secure_settings.dart';
 import 'package:clock/clock.dart';
@@ -90,6 +92,31 @@ void main() async {
       expect(await SQLToCarbs().query(conditions: {"eid = ?": "carbs-deleted"}), isEmpty);
       expect((await SQLToCarbs().query(conditions: {"eid = ?": "carbs-edited"})).single.value, 15);
       expect((await SQLToCarbs().query(conditions: {"eid = ?": "carbs-late"})).single.value, 5);
+    });
+
+    // A long time offline: Nightscout has more full pages of changes than one update reads
+    atest("an update that reads its most pages stops there, and the next update goes on from where it stopped", () async {
+      List<int> asked = [];
+      NSClient().http = MockClient((request) async {
+        var since = int.parse(request.url.pathSegments.last);
+        asked.add(since);
+        var page = [
+          for (var i = 1; i <= historyLimit; i++)
+            {"identifier": "sgv-${since + i}", "type": "sgv", "sgv": 120, "date": clock.minutesAgo(30).millisecondsSinceEpoch, "srvModified": since + i},
+        ];
+        return Response(jsonEncode({"status": 200, "result": page}), 200);
+      });
+      SecureSettings().nightscoutURL = "https://carertest.example.nz";
+      SecureSettings().nightscoutToken = "carertest-token";
+
+      var entries = NSEntriesUpdater();
+      expect(await entries.update(1000), false);
+      expect(asked, [for (var page = 0; page < maxHistoryPages; page++) 1000 + page * historyLimit]);
+      expect(entries.lastModifiedMilliSeconds, 1000 + maxHistoryPages * historyLimit);
+
+      asked.clear();
+      await entries.update(entries.lastModifiedMilliSeconds);
+      expect(asked.first, 1000 + maxHistoryPages * historyLimit);
     });
   });
 }
