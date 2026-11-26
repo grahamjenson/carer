@@ -74,6 +74,7 @@ const tempbasalTable = DBTable(tempbasalTableName, '''
       start INTEGER,
       duration INTEGER,
       value REAL,
+      percent INTEGER,
 
       -- VIRTUAL
       timestamp INTEGER GENERATED ALWAYS AS (start) VIRTUAL,

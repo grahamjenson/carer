@@ -11,6 +11,7 @@ class NSTempBasalToTempBasal extends DataMapper<NSTreatmentTempBasal, TempBasal>
       startDate: model.date,
       duration: model.durationInMilliseconds ~/ 1000,
       value: model.absolute,
+      percent: model.percent,
       eid: model.id,
     );
   }
