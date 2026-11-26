@@ -26,6 +26,8 @@ class NSRawTreatment {
   int? durationInMilliseconds;
   double? absolute;
   double? rate;
+  // percent is a temp basal's change from the profile's basal, as AAPS sends it: 40 is 140 %
+  int? percent;
 
   double? targetBottom;
   double? targetTop;
@@ -56,6 +58,7 @@ class NSRawTreatment {
     required this.durationInMilliseconds,
     required this.absolute,
     required this.rate,
+    this.percent,
     required this.targetBottom,
     required this.targetTop,
     required this.reason,
@@ -84,6 +87,7 @@ class NSRawTreatment {
       insulin: NSType.getDouble(json['insulin']),
       absolute: NSType.getDouble(json['absolute']),
       rate: NSType.getDouble(json['rate']),
+      percent: NSType.getInt(json['percent']),
       duration: NSType.getDouble(json['duration']),
       durationInMilliseconds: NSType.getInt(json['durationInMilliseconds']),
       targetBottom: NSType.getDouble(json['targetBottom']),
@@ -123,11 +127,13 @@ class NSRawTreatment {
     String raw = json.encode(rawJson);
     switch (eventType) {
       case "Temp Basal":
-        if (absolute != null || rate != null) {
+        if (absolute != null || rate != null || percent != null) {
           double r = absolute ?? rate ?? 0;
           treatments.add(NSTreatmentTempBasal(
             id: id,
             absolute: r,
+            // With no absolute rate (AAPS), it is a percent of the profile's basal, whose rate changes as the profile does
+            percent: absolute == null ? percent : null,
             date: date,
             durationInMilliseconds: guessDurationInMilliseconds(),
             raw: raw,
@@ -248,12 +254,14 @@ class NSTreatmentInsulin extends NSTreatment {
 class NSTreatmentTempBasal extends NSTreatment {
   String id;
   double absolute;
+  int? percent;
   DateTime date;
   int durationInMilliseconds;
   String raw;
   NSTreatmentTempBasal({
     required this.id,
     required this.absolute,
+    this.percent,
     required this.date,
     required this.durationInMilliseconds,
     required this.raw,

@@ -33,6 +33,7 @@ class SQLToTempBasal extends SQLMapper<TempBasal> {
       startDate: DateTime.fromMillisecondsSinceEpoch(row["start"] as int),
       duration: row["duration"] as int,
       value: row["value"] as double,
+      percent: row["percent"] as int?,
     );
   }
 
@@ -42,6 +43,7 @@ class SQLToTempBasal extends SQLMapper<TempBasal> {
       "start": model.startDate.millisecondsSinceEpoch,
       "duration": model.duration,
       "value": model.value,
+      "percent": model.percent,
       "eid": model.eid!,
     });
   }
@@ -52,6 +54,7 @@ class SQLToTempBasal extends SQLMapper<TempBasal> {
     return modelRow["start"] == row["start"] &&
         modelRow["duration"] == row["duration"] &&
         modelRow["value"] == row["value"] &&
+        modelRow["percent"] == row["percent"] &&
         modelRow["eid"] == row["eid"];
   }
 }

@@ -74,7 +74,8 @@ class ValueAtTime with DateMixin {
     int lowTarget = tempTarget?.lowTarget ?? profile?.lowTarget[hourOfDay] ?? 0;
     int highTarget = tempTarget?.highTarget ?? profile?.highTarget[hourOfDay] ?? 0;
 
-    double basal = tempBasal?.value ?? profile?.basal[hourOfDay] ?? 0;
+    double? profileBasal = profile?.basal[hourOfDay];
+    double basal = tempBasal?.rateWith(profileBasal) ?? profileBasal ?? 0;
     int isf = profile?.sens[hourOfDay] ?? 0;
     int cr = profile?.carbratio[hourOfDay] ?? 0;
     String profileName = profile?.name ?? "";
